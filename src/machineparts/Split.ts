@@ -44,7 +44,7 @@ namespace MarbleRunSimulatorCore {
             this.pivot.material = this.game.materials.getMetalMaterial(this.getColor(4));
             this.pivot.parent = this;
             let dz = this.wireGauge * 0.5;
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/splitter-arrow.babylon").then((datas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon").then((datas) => {
                 if (datas[0]) {
                     let data = Mummu.CloneVertexData(datas[0]);
                     Mummu.TranslateVertexDataInPlace(data, new BABYLON.Vector3(0, 0, axisZMin));

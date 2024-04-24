@@ -98,7 +98,7 @@ namespace MarbleRunSimulatorCore {
                 let bielle = new BABYLON.Mesh("bielle");
                 bielle.material = this.game.materials.getMetalMaterial(0);
                 this.bielles[i] = bielle;
-                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/stairway-bielle.babylon").then((vertexDatas) => {
+                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-bielle.babylon").then((vertexDatas) => {
                     let vertexData = vertexDatas[0];
                     if (vertexData) {
                         vertexData = Mummu.CloneVertexData(vertexData);
@@ -124,7 +124,7 @@ namespace MarbleRunSimulatorCore {
                 let displayMesh = new BABYLON.Mesh("display-box-" + i);
                 displayMesh.material = this.game.materials.getMetalMaterial(0);
 
-                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/stairway-step.babylon").then((vertexDatas) => {
+                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-step.babylon").then((vertexDatas) => {
                     let vertexData = vertexDatas[0];
                     if (vertexData) {
                         vertexData = Mummu.CloneVertexData(vertexData);
@@ -182,7 +182,7 @@ namespace MarbleRunSimulatorCore {
             this.vil.position.y = -tileHeight * (this.h - 2 + 1.5);
             this.vil.parent = this;
 
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/stairway-vil.babylon").then((vertexDatas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-vil.babylon").then((vertexDatas) => {
                 let vertexData = vertexDatas[0];
                 if (vertexData) {
                     vertexData = Mummu.CloneVertexData(vertexData);

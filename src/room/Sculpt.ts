@@ -6,7 +6,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(): Promise<void> {
-            let vertexDatas = await this.room.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/museum-stand-decoy.babylon");
+            let vertexDatas = await this.room.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/museum-stand-decoy.babylon");
             if (vertexDatas && vertexDatas[0]) {
                 vertexDatas[0].applyToMesh(this);
             }

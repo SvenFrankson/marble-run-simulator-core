@@ -41,7 +41,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(): Promise<void> {
-            let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/room.babylon");
+            let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/room.babylon");
 
             vertexDatas[0].applyToMesh(this.ground);
             vertexDatas[1].applyToMesh(this.wall);
