@@ -1,0 +1,28 @@
+{
+    "balls": [
+        { "x": 0.1042025159298941, "y": 0.2739957865612651, "z": -0.05999999865889544 },
+        { "x": 0.10473963686758589, "y": 0.09356960918932625, "z": -0.05999999865889549 },
+        { "x": 0.1965233668136216, "y": 0.18521513733491213, "z": -0.18000000715255743 },
+        { "x": 0.19696285767256438, "y": 0.0037247819573764662, "z": -0.18000000715255743 }
+    ],
+    "parts": [
+        { "name": "uturn-0.4", "i": 2, "j": 0, "k": 0, "c": 0 },
+        { "name": "ramp-2.1.1", "i": 0, "j": -1, "k": 0, "mirrorX": false, "mirrorZ": false, "c": 0 },
+        { "name": "uturn-0.2", "i": -1, "j": -1, "k": 0, "mirrorX": true, "c": 0 },
+        { "name": "wave-4.1.1", "i": 0, "j": -2, "k": 1, "mirrorX": true, "mirrorZ": false, "c": 0 },
+        { "name": "screw-1.3", "i": 1, "j": -3, "k": 3, "mirrorX": true, "mirrorZ": false, "c": 1 },
+        { "name": "uturn-0.3", "i": 0, "j": -3, "k": 1, "mirrorX": true, "c": 1 },
+        { "name": "ramp-2.3.1", "i": 1, "j": -5, "k": 4, "mirrorX": false, "mirrorZ": false, "c": 0 },
+        { "name": "wall-3.3", "i": 4, "j": -5, "k": 1, "mirrorZ": false, "c": 0 },
+        { "name": "loop-1.2.1", "i": 3, "j": -6, "k": 3, "mirrorZ": true, "c": 0 },
+        { "name": "screw-1.3", "i": 1, "j": -6, "k": 1, "mirrorZ": false, "c": 1 },
+        { "name": "uturn-0.3", "i": 2, "j": -6, "k": 1, "c": 1 },
+        { "name": "wall-3.3", "i": 0, "j": -8, "k": 2, "mirrorX": true, "mirrorZ": false, "c": 0 },
+        { "name": "screw-1.3", "i": 1, "j": -9, "k": 3, "mirrorX": true, "mirrorZ": false, "c": 1 },
+        { "name": "uturn-0.3", "i": 0, "j": -9, "k": 1, "mirrorX": true, "c": 1 },
+        { "name": "uturn-0.2", "i": 3, "j": -10, "k": 1, "c": 0 },
+        { "name": "ramp-2.5.1", "i": 1, "j": -10, "k": 2, "mirrorX": true, "mirrorZ": false, "c": 0 },
+        { "name": "spiral-1.2.2", "i": 2, "j": -12, "k": 1, "c": 0 },
+        { "name": "screw-1.3", "i": 1, "j": -12, "k": 1, "mirrorZ": false, "c": 1 }
+    ]
+}
