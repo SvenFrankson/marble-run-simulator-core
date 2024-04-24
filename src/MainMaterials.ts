@@ -84,6 +84,14 @@ namespace MarbleRunSimulatorCore {
             this.velvetMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/velvet.jpg");
             this.velvetMaterial.specularColor.copyFromFloats(0, 0, 0);
 
+            this.logoMaterial = new BABYLON.StandardMaterial("logo-material");
+            this.logoMaterial.diffuseColor.copyFromFloats(1, 1, 1);
+            this.logoMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/logo-white-no-bg.png");
+            this.logoMaterial.diffuseTexture.hasAlpha = true;
+            this.logoMaterial.useAlphaFromDiffuseTexture = true;
+            this.logoMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.logoMaterial.alpha = 0.3;
+
             this.baseAxisMaterial = new BABYLON.StandardMaterial("logo-material");
             this.baseAxisMaterial.diffuseColor.copyFromFloats(1, 1, 1);
             this.baseAxisMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/axis.png");
