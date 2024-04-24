@@ -25,7 +25,7 @@ namespace MarbleRunSimulatorCore {
                 lightedPlane.layerMask = 0x10000000;
             }
 
-            let texture = new BABYLON.Texture("./datas/textures/" + this.paintingName + ".jpg");
+            let texture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + this.paintingName + ".jpg");
 
             return new Promise<void>((resolve) => {
                 let checkTextureLoaded = () => {

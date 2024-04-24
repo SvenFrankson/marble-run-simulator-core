@@ -411,27 +411,20 @@ var MarbleRunSimulatorCore;
             steelMaterial.baseColor = new BABYLON.Color3(0.5, 0.75, 1.0);
             steelMaterial.metallic = 1.0;
             steelMaterial.roughness = 0.15;
-            steelMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./datas/environment/environmentSpecular.env", this.game.scene);
+            steelMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
             let copperMaterial = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             copperMaterial.baseColor = BABYLON.Color3.FromHexString("#B87333");
             copperMaterial.metallic = 1.0;
             copperMaterial.roughness = 0.15;
-            copperMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./datas/environment/environmentSpecular.env", this.game.scene);
+            copperMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
             this.metalMaterials = [steelMaterial, copperMaterial];
             this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);
-            this.velvetMaterial.diffuseTexture = new BABYLON.Texture("./datas/textures/velvet.jpg");
+            this.velvetMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/velvet.jpg");
             this.velvetMaterial.specularColor.copyFromFloats(0, 0, 0);
-            this.logoMaterial = new BABYLON.StandardMaterial("logo-material");
-            this.logoMaterial.diffuseColor.copyFromFloats(1, 1, 1);
-            this.logoMaterial.diffuseTexture = new BABYLON.Texture("./datas/icons/logo-white-no-bg.png");
-            this.logoMaterial.diffuseTexture.hasAlpha = true;
-            this.logoMaterial.useAlphaFromDiffuseTexture = true;
-            this.logoMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
-            this.logoMaterial.alpha = 0.3;
             this.baseAxisMaterial = new BABYLON.StandardMaterial("logo-material");
             this.baseAxisMaterial.diffuseColor.copyFromFloats(1, 1, 1);
-            this.baseAxisMaterial.diffuseTexture = new BABYLON.Texture("./datas/textures/axis.png");
+            this.baseAxisMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/axis.png");
             this.baseAxisMaterial.diffuseTexture.hasAlpha = true;
             this.baseAxisMaterial.useAlphaFromDiffuseTexture = true;
             this.baseAxisMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
@@ -443,7 +436,7 @@ var MarbleRunSimulatorCore;
             this.whiteMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             this.paintingLight = new BABYLON.StandardMaterial("autolit-material");
             this.paintingLight.diffuseColor.copyFromFloats(1, 1, 1);
-            this.paintingLight.emissiveTexture = new BABYLON.Texture("./datas/textures/painting-light.png");
+            this.paintingLight.emissiveTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/painting-light.png");
             this.paintingLight.specularColor.copyFromFloats(0.1, 0.1, 0.1);
         }
         getMetalMaterial(colorIndex) {
@@ -4452,7 +4445,7 @@ var MarbleRunSimulatorCore;
                 lightedPlane.material = this.room.game.materials.paintingLight;
                 lightedPlane.layerMask = 0x10000000;
             }
-            let texture = new BABYLON.Texture("./datas/textures/" + this.paintingName + ".jpg");
+            let texture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + this.paintingName + ".jpg");
             return new Promise((resolve) => {
                 let checkTextureLoaded = () => {
                     if (texture.isReady()) {
@@ -4503,7 +4496,7 @@ var MarbleRunSimulatorCore;
             this.ground.position.y = -2;
             this.ground.receiveShadows = true;
             let groundMaterial = new BABYLON.StandardMaterial("ground-material");
-            groundMaterial.diffuseTexture = new BABYLON.Texture("./datas/textures/concrete.png");
+            groundMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/concrete.png");
             groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#3f4c52");
             groundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             this.ground.material = groundMaterial;
