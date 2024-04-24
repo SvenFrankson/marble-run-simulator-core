@@ -9,7 +9,6 @@ namespace MarbleRunSimulatorCore {
         }
 
         public static GenerateTemplate(n: number, mirrorX?: boolean): MachinePartTemplate {
-            console.log("n = " + n);
             let template = new MachinePartTemplate();
 
             template.partName = "jumper-" + n.toFixed(0);

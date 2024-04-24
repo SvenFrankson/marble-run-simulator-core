@@ -77,7 +77,7 @@ namespace MarbleRunSimulatorCore {
             this.wires.push(shieldWireL);
 
             let shieldConnector = new BABYLON.Mesh("shieldConnector");
-            this.game.vertexDataLoader.get("./meshes/uConnector.babylon").then((datas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/uConnector.babylon").then((datas) => {
                 let data = Mummu.CloneVertexData(datas[0]);
                 Mummu.ScaleVertexDataInPlace(data, 0.024);
                 data.applyToMesh(shieldConnector);
@@ -99,7 +99,7 @@ namespace MarbleRunSimulatorCore {
                 this.wires.push(shieldWireUpL);
 
                 let shieldConnectorUp = new BABYLON.Mesh("shieldConnectorUp");
-                this.game.vertexDataLoader.get("./meshes/uConnector.babylon").then((datas) => {
+                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/uConnector.babylon").then((datas) => {
                     let data = Mummu.CloneVertexData(datas[0]);
                     Mummu.ScaleVertexDataInPlace(data, 0.033);
                     data.applyToMesh(shieldConnectorUp);
@@ -130,7 +130,7 @@ namespace MarbleRunSimulatorCore {
             this.box.parent = this;
 
             let tip = BABYLON.MeshBuilder.CreateCylinder("tip", { height: 0.004, diameter: 0.04 });
-            this.game.vertexDataLoader.get("./meshes/wheel.babylon").then((datas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/wheel.babylon").then((datas) => {
                 let data = Mummu.CloneVertexData(datas[1]);
                 Mummu.ScaleVertexDataInPlace(data, 1.05);
                 data.applyToMesh(tip);

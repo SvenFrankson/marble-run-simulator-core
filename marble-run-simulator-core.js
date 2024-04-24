@@ -785,7 +785,7 @@ var MarbleRunSimulatorCore;
                 this.baseFrame = new BABYLON.Mesh("base-frame");
                 this.baseFrame.position.copyFrom(this.baseWall.position);
                 this.baseFrame.material = this.game.materials.metalMaterials[0];
-                let vertexDatas = await this.game.vertexDataLoader.get("./meshes/base-frame.babylon");
+                let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/base-frame.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
                 let positions = [...data.positions];
                 for (let i = 0; i < positions.length / 3; i++) {
@@ -819,7 +819,7 @@ var MarbleRunSimulatorCore;
                 this.baseFrame.position.y = this.baseMeshMinY;
                 this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
                 this.baseFrame.material = this.game.materials.whiteMaterial;
-                let vertexDatas = await this.game.vertexDataLoader.get("./meshes/museum-stand.babylon");
+                let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/museum-stand.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
                 let positions = [...data.positions];
                 for (let i = 0; i < positions.length / 3; i++) {
@@ -2539,7 +2539,7 @@ var MarbleRunSimulatorCore;
             this.wheels[1].position.copyFromFloats(0.03 * x, 0.035 - MarbleRunSimulatorCore.tileHeight, 0);
             this.wheels[1].parent = this;
             this.wheels[1].material = this.game.materials.getMetalMaterial(0);
-            this.game.vertexDataLoader.get("./meshes/wheel.babylon").then((vertexDatas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/wheel.babylon").then((vertexDatas) => {
                 let vertexData = vertexDatas[0];
                 if (vertexData) {
                     vertexData.applyToMesh(this.wheels[0]);
@@ -2908,7 +2908,6 @@ var MarbleRunSimulatorCore;
             this.generateWires();
         }
         static GenerateTemplate(n, mirrorX) {
-            console.log("n = " + n);
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "jumper-" + n.toFixed(0);
             template.h = 2;
@@ -3221,7 +3220,7 @@ var MarbleRunSimulatorCore;
             shieldWireL.path = [p0.clone().addInPlaceFromFloats(0, 0, 0.012).addInPlace(this.dir.scale(0.04)).addInPlace(n.scale(0.01)), p0.clone().addInPlaceFromFloats(0, 0, 0.012).addInPlace(this.dir.scale(-0.02)).addInPlace(n.scale(0.01))];
             this.wires.push(shieldWireL);
             let shieldConnector = new BABYLON.Mesh("shieldConnector");
-            this.game.vertexDataLoader.get("./meshes/uConnector.babylon").then((datas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/uConnector.babylon").then((datas) => {
                 let data = Mummu.CloneVertexData(datas[0]);
                 Mummu.ScaleVertexDataInPlace(data, 0.024);
                 data.applyToMesh(shieldConnector);
@@ -3240,7 +3239,7 @@ var MarbleRunSimulatorCore;
                 shieldWireUpL.path = [p0.clone().addInPlaceFromFloats(0, 0, 0.0165).addInPlace(this.dir.scale(0.03)).addInPlace(n.scale(0.022)), p0.clone().addInPlaceFromFloats(0, 0, 0.0165).addInPlace(this.dir.scale(-0.03)).addInPlace(n.scale(0.022))];
                 this.wires.push(shieldWireUpL);
                 let shieldConnectorUp = new BABYLON.Mesh("shieldConnectorUp");
-                this.game.vertexDataLoader.get("./meshes/uConnector.babylon").then((datas) => {
+                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/uConnector.babylon").then((datas) => {
                     let data = Mummu.CloneVertexData(datas[0]);
                     Mummu.ScaleVertexDataInPlace(data, 0.033);
                     data.applyToMesh(shieldConnectorUp);
@@ -3267,7 +3266,7 @@ var MarbleRunSimulatorCore;
             this.box.rotationQuaternion = Mummu.QuaternionFromXYAxis(this.dir, BABYLON.Axis.Y);
             this.box.parent = this;
             let tip = BABYLON.MeshBuilder.CreateCylinder("tip", { height: 0.004, diameter: 0.04 });
-            this.game.vertexDataLoader.get("./meshes/wheel.babylon").then((datas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/wheel.babylon").then((datas) => {
                 let data = Mummu.CloneVertexData(datas[1]);
                 Mummu.ScaleVertexDataInPlace(data, 1.05);
                 data.applyToMesh(tip);
@@ -3575,7 +3574,7 @@ var MarbleRunSimulatorCore;
             this.pivot.material = this.game.materials.getMetalMaterial(this.getColor(4));
             this.pivot.parent = this;
             let dz = this.wireGauge * 0.5;
-            this.game.vertexDataLoader.get("./meshes/splitter-arrow.babylon").then((datas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/splitter-arrow.babylon").then((datas) => {
                 if (datas[0]) {
                     let data = Mummu.CloneVertexData(datas[0]);
                     Mummu.TranslateVertexDataInPlace(data, new BABYLON.Vector3(0, 0, axisZMin));
@@ -3798,7 +3797,7 @@ var MarbleRunSimulatorCore;
                 let bielle = new BABYLON.Mesh("bielle");
                 bielle.material = this.game.materials.getMetalMaterial(0);
                 this.bielles[i] = bielle;
-                this.game.vertexDataLoader.get("./meshes/stairway-bielle.babylon").then((vertexDatas) => {
+                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/stairway-bielle.babylon").then((vertexDatas) => {
                     let vertexData = vertexDatas[0];
                     if (vertexData) {
                         vertexData = Mummu.CloneVertexData(vertexData);
@@ -3820,7 +3819,7 @@ var MarbleRunSimulatorCore;
                 this.boxes[i] = box;
                 let displayMesh = new BABYLON.Mesh("display-box-" + i);
                 displayMesh.material = this.game.materials.getMetalMaterial(0);
-                this.game.vertexDataLoader.get("./meshes/stairway-step.babylon").then((vertexDatas) => {
+                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/stairway-step.babylon").then((vertexDatas) => {
                     let vertexData = vertexDatas[0];
                     if (vertexData) {
                         vertexData = Mummu.CloneVertexData(vertexData);
@@ -3876,7 +3875,7 @@ var MarbleRunSimulatorCore;
             this.vil.material = this.game.materials.getMetalMaterial(0);
             this.vil.position.y = -MarbleRunSimulatorCore.tileHeight * (this.h - 2 + 1.5);
             this.vil.parent = this;
-            this.game.vertexDataLoader.get("./meshes/stairway-vil.babylon").then((vertexDatas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/stairway-vil.babylon").then((vertexDatas) => {
                 let vertexData = vertexDatas[0];
                 if (vertexData) {
                     vertexData = Mummu.CloneVertexData(vertexData);
@@ -4435,7 +4434,7 @@ var MarbleRunSimulatorCore;
             this.layerMask = 0x10000000;
         }
         async instantiate() {
-            let vertexDatas = await this.room.game.vertexDataLoader.get("./meshes/paint-support.babylon");
+            let vertexDatas = await this.room.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/paint-support.babylon");
             if (vertexDatas && vertexDatas[0]) {
                 vertexDatas[0].applyToMesh(this);
             }
@@ -4526,7 +4525,7 @@ var MarbleRunSimulatorCore;
             this.light2.includeOnlyWithLayerMask = 0x10000000;
         }
         async instantiate() {
-            let vertexDatas = await this.game.vertexDataLoader.get("./meshes/room.babylon");
+            let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/room.babylon");
             vertexDatas[0].applyToMesh(this.ground);
             vertexDatas[1].applyToMesh(this.wall);
             vertexDatas[2].applyToMesh(this.frame);
@@ -4617,7 +4616,7 @@ var MarbleRunSimulatorCore;
             this.layerMask = 0x10000000;
         }
         async instantiate() {
-            let vertexDatas = await this.room.game.vertexDataLoader.get("./meshes/museum-stand-decoy.babylon");
+            let vertexDatas = await this.room.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/museum-stand-decoy.babylon");
             if (vertexDatas && vertexDatas[0]) {
                 vertexDatas[0].applyToMesh(this);
             }

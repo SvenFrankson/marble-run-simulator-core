@@ -218,7 +218,7 @@ namespace MarbleRunSimulatorCore {
                 this.baseFrame.position.copyFrom(this.baseWall.position);
                 this.baseFrame.material = this.game.materials.metalMaterials[0];
 
-                let vertexDatas = await this.game.vertexDataLoader.get("./meshes/base-frame.babylon");
+                let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/base-frame.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
                 let positions = [...data.positions];
                 for (let i = 0; i < positions.length / 3; i++) {
@@ -252,7 +252,7 @@ namespace MarbleRunSimulatorCore {
                 this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
                 this.baseFrame.material = this.game.materials.whiteMaterial;
 
-                let vertexDatas = await this.game.vertexDataLoader.get("./meshes/museum-stand.babylon");
+                let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/museum-stand.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
                 let positions = [...data.positions];
                 for (let i = 0; i < positions.length / 3; i++) {

@@ -6,7 +6,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(): Promise<void> {
-            let vertexDatas = await this.room.game.vertexDataLoader.get("./meshes/paint-support.babylon");
+            let vertexDatas = await this.room.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/paint-support.babylon");
             if (vertexDatas && vertexDatas[0]) {
                 vertexDatas[0].applyToMesh(this);
             }

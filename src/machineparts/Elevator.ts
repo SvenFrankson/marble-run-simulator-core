@@ -27,7 +27,7 @@ namespace MarbleRunSimulatorCore {
             this.wheels[1].parent = this;
             this.wheels[1].material = this.game.materials.getMetalMaterial(0);
 
-            this.game.vertexDataLoader.get("./meshes/wheel.babylon").then((vertexDatas) => {
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/meshes/wheel.babylon").then((vertexDatas) => {
                 let vertexData = vertexDatas[0];
                 if (vertexData) {
                     vertexData.applyToMesh(this.wheels[0]);
