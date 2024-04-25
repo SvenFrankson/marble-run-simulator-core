@@ -3764,6 +3764,9 @@ var MarbleRunSimulatorCore;
             this.a = 0;
             let partName = "stairway-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            for (let i = this.colors.length; i < 4; i++) {
+                this.colors[i] = 0;
+            }
             let x = 1;
             if (prop.mirrorX) {
                 x = -1;
@@ -3795,7 +3798,7 @@ var MarbleRunSimulatorCore;
                 box.position.y = (1 - fY) * this.y0 + fY * this.y1 - this.stepH;
                 let l = box.position.y - -MarbleRunSimulatorCore.tileHeight * (this.h - 2 + 1.5) + this.stepH - 0.002;
                 let bielle = new BABYLON.Mesh("bielle");
-                bielle.material = this.game.materials.getMetalMaterial(0);
+                bielle.material = this.game.materials.getMetalMaterial(this.getColor(2));
                 this.bielles[i] = bielle;
                 this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-bielle.babylon").then((vertexDatas) => {
                     let vertexData = vertexDatas[0];
@@ -3818,7 +3821,7 @@ var MarbleRunSimulatorCore;
                 });
                 this.boxes[i] = box;
                 let displayMesh = new BABYLON.Mesh("display-box-" + i);
-                displayMesh.material = this.game.materials.getMetalMaterial(0);
+                displayMesh.material = this.game.materials.getMetalMaterial(this.getColor(1));
                 this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-step.babylon").then((vertexDatas) => {
                     let vertexData = vertexDatas[0];
                     if (vertexData) {
@@ -3872,7 +3875,7 @@ var MarbleRunSimulatorCore;
                 });
             }
             this.vil = new BABYLON.Mesh("display-vil");
-            this.vil.material = this.game.materials.getMetalMaterial(0);
+            this.vil.material = this.game.materials.getMetalMaterial(this.getColor(3));
             this.vil.position.y = -MarbleRunSimulatorCore.tileHeight * (this.h - 2 + 1.5);
             this.vil.parent = this;
             this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-vil.babylon").then((vertexDatas) => {
@@ -3910,13 +3913,17 @@ var MarbleRunSimulatorCore;
                         Mummu.TranslateVertexDataInPlace(partData, new BABYLON.Vector3(x, 0, 0));
                         vilPartsDatas.push(partData);
                     }
-                    let wheel0Data = BABYLON.CreateCylinderVertexData({ height: 0.002, diameter: 0.03 });
-                    Mummu.RotateVertexDataInPlace(wheel0Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Z, Math.PI * 0.5));
-                    Mummu.TranslateVertexDataInPlace(wheel0Data, new BABYLON.Vector3(this.x0 - 0.001, 0, 0));
-                    let wheel1Data = BABYLON.CreateCylinderVertexData({ height: 0.002, diameter: 0.03 });
-                    Mummu.RotateVertexDataInPlace(wheel1Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Z, Math.PI * 0.5));
-                    Mummu.TranslateVertexDataInPlace(wheel1Data, new BABYLON.Vector3(this.x1 + 0.001, 0, 0));
-                    Mummu.MergeVertexDatas(...vilPartsDatas, wheel0Data, wheel1Data).applyToMesh(this.vil);
+                    this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon").then((datas) => {
+                        let wheel0Data = Mummu.CloneVertexData(datas[1]);
+                        //Mummu.ScaleVertexDataInPlace(wheel0Data, 0.03);
+                        Mummu.RotateVertexDataInPlace(wheel0Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI * 0.5));
+                        Mummu.TranslateVertexDataInPlace(wheel0Data, new BABYLON.Vector3(this.x0 - 0.001, 0, 0));
+                        let wheel1Data = Mummu.CloneVertexData(datas[1]);
+                        //Mummu.ScaleVertexDataInPlace(wheel1Data, 0.03);
+                        Mummu.RotateVertexDataInPlace(wheel1Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI * 0.5));
+                        Mummu.TranslateVertexDataInPlace(wheel1Data, new BABYLON.Vector3(this.x1 + 0.001, 0, 0));
+                        Mummu.MergeVertexDatas(...vilPartsDatas, wheel0Data, wheel1Data).applyToMesh(this.vil);
+                    });
                 }
             });
             this.generateWires();
