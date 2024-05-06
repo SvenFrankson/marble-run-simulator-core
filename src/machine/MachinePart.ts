@@ -185,7 +185,10 @@ namespace MarbleRunSimulatorCore {
             if (this._i != v) {
                 this._i = v;
                 if (this.game.mode === GameMode.Challenge) {
-                    this._i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax);
+                    let i = this._i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax);
+                    if (isFinite(i)) {
+                        this._i = i;
+                    }
                 }
                 this.position.x = this._i * tileWidth;
                 this.isPlaced = true;
@@ -205,7 +208,10 @@ namespace MarbleRunSimulatorCore {
             if (this._j != v) {
                 this._j = v;
                 if (this.game.mode === GameMode.Challenge) {
-                    this._j = Nabu.MinMax(this._j, this.game.gridJMin, this.game.gridJMax);
+                    let j = this._j = Nabu.MinMax(this._j, this.game.gridJMin, this.game.gridJMax);
+                    if (isFinite(j)) {
+                        this._j = j;
+                    }
                 }
                 this.position.y = -this._j * tileHeight;
                 this.isPlaced = true;
@@ -225,7 +231,10 @@ namespace MarbleRunSimulatorCore {
             if (this._k != v) {
                 this._k = v;
                 if (this.game.mode === GameMode.Challenge) {
-                    this._k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax);
+                    let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax);
+                    if (isFinite(k)) {
+                        this._k = k;
+                    }
                 }
                 this.position.z = -this._k * tileDepth;
                 this.isPlaced = true;
