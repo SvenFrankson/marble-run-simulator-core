@@ -52,12 +52,17 @@ namespace MarbleRunSimulatorCore {
     }
 
     export interface IMachineData {
+        name: string;
+        author: string;
         sleepers?: ISleeperMeshProps;
         balls: IBallData[];
         parts: IMachinePartData[];
     }
 
     export class Machine {
+        public name: string = "Unnamed Machine";
+        public author: string = "Unknown Author";
+
         public baseWall: BABYLON.Mesh;
         public baseFrame: BABYLON.Mesh;
         public baseLogo: BABYLON.Mesh;
@@ -74,6 +79,7 @@ namespace MarbleRunSimulatorCore {
         public playing: boolean = false;
 
         constructor(public game: IGame) {
+            this.name = MachineName.GetRandom();
             this.trackFactory = new MachinePartFactory(this);
             this.templateManager = new TemplateManager(this);
         }
@@ -416,6 +422,8 @@ namespace MarbleRunSimulatorCore {
 
         public serialize(): IMachineData {
             let data: IMachineData = {
+                name: this.name,
+                author: this.author,
                 balls: [],
                 parts: [],
             };
@@ -444,6 +452,13 @@ namespace MarbleRunSimulatorCore {
         }
 
         public deserialize(data: IMachineData): void {
+            if (data.name) {
+                this.name = data.name;
+            }
+            if (data.author) {
+                this.author = data.author;
+            }
+            
             this.balls = [];
             this.parts = [];
 

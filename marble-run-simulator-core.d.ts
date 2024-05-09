@@ -157,12 +157,16 @@ declare namespace MarbleRunSimulatorCore {
         c?: number | number[];
     }
     interface IMachineData {
+        name: string;
+        author: string;
         sleepers?: ISleeperMeshProps;
         balls: IBallData[];
         parts: IMachinePartData[];
     }
     class Machine {
         game: IGame;
+        name: string;
+        author: string;
         baseWall: BABYLON.Mesh;
         baseFrame: BABYLON.Mesh;
         baseLogo: BABYLON.Mesh;
@@ -204,6 +208,13 @@ declare namespace MarbleRunSimulatorCore {
         requestUpdateShadow: boolean;
         updateShadow(): void;
     }
+}
+declare class MachineName {
+    static PartOnes: string[];
+    static PartTwos: string[];
+    static PartThrees: string[];
+    static PartFours: string[];
+    static GetRandom(): string;
 }
 declare namespace MarbleRunSimulatorCore {
     var baseRadius: number;

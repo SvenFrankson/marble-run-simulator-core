@@ -650,6 +650,8 @@ var MarbleRunSimulatorCore;
     class Machine {
         constructor(game) {
             this.game = game;
+            this.name = "Unnamed Machine";
+            this.author = "Unknown Author";
             this.parts = [];
             this.balls = [];
             this.instantiated = false;
@@ -663,6 +665,7 @@ var MarbleRunSimulatorCore;
             this.baseMeshMinZ = -this.margin;
             this.baseMeshMaxZ = this.margin;
             this.requestUpdateShadow = false;
+            this.name = MachineName.GetRandom();
             this.trackFactory = new MarbleRunSimulatorCore.MachinePartFactory(this);
             this.templateManager = new MarbleRunSimulatorCore.TemplateManager(this);
         }
@@ -970,6 +973,8 @@ var MarbleRunSimulatorCore;
         }
         serialize() {
             let data = {
+                name: this.name,
+                author: this.author,
                 balls: [],
                 parts: [],
             };
@@ -994,6 +999,12 @@ var MarbleRunSimulatorCore;
             return data;
         }
         deserialize(data) {
+            if (data.name) {
+                this.name = data.name;
+            }
+            if (data.author) {
+                this.author = data.author;
+            }
             this.balls = [];
             this.parts = [];
             for (let i = 0; i < data.balls.length; i++) {
@@ -1059,6 +1070,48 @@ var MarbleRunSimulatorCore;
     }
     MarbleRunSimulatorCore.Machine = Machine;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+class MachineName {
+    static GetRandom() {
+        let r1 = Math.floor(Math.random() * MachineName.PartOnes.length);
+        let r2 = Math.floor(Math.random() * MachineName.PartTwos.length);
+        let r3 = Math.floor(Math.random() * MachineName.PartThrees.length);
+        let r4 = Math.floor(Math.random() * MachineName.PartFours.length);
+        return MachineName.PartOnes[r1] + MachineName.PartTwos[r2] + MachineName.PartThrees[r3] + MachineName.PartFours[r4];
+    }
+}
+MachineName.PartOnes = [
+    "The ",
+    "A ",
+    "Our ",
+    "My ",
+    ""
+];
+MachineName.PartTwos = [
+    "Great ",
+    "Magnificent ",
+    "Intricated ",
+    "Simple ",
+    "Nice ",
+    "Cool ",
+    "Complex "
+];
+MachineName.PartThrees = [
+    "Ball ",
+    "Loop ",
+    "Curve ",
+    "Rail ",
+    "Spiral ",
+    "Steel ",
+    "Track "
+];
+MachineName.PartFours = [
+    "Machine",
+    "Factory",
+    "Thing",
+    "Invention",
+    "Construction",
+    "Computer"
+];
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     MarbleRunSimulatorCore.baseRadius = 0.075;
