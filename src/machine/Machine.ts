@@ -52,8 +52,8 @@ namespace MarbleRunSimulatorCore {
     }
 
     export interface IMachineData {
-        name: string;
-        author: string;
+        name?: string;
+        author?: string;
         sleepers?: ISleeperMeshProps;
         balls: IBallData[];
         parts: IMachinePartData[];

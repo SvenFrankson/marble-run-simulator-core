@@ -157,8 +157,8 @@ declare namespace MarbleRunSimulatorCore {
         c?: number | number[];
     }
     interface IMachineData {
-        name: string;
-        author: string;
+        name?: string;
+        author?: string;
         sleepers?: ISleeperMeshProps;
         balls: IBallData[];
         parts: IMachinePartData[];
