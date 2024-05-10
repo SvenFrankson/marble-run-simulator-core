@@ -157,11 +157,15 @@ declare namespace MarbleRunSimulatorCore {
         c?: number | number[];
     }
     interface IMachineData {
+        n?: string;
         name?: string;
+        a?: string;
         author?: string;
+        v?: number;
         sleepers?: ISleeperMeshProps;
-        balls: IBallData[];
-        parts: IMachinePartData[];
+        balls?: IBallData[];
+        parts?: IMachinePartData[];
+        d?: string;
     }
     class Machine {
         game: IGame;
@@ -202,7 +206,11 @@ declare namespace MarbleRunSimulatorCore {
             part: MachinePart;
         };
         serialize(): IMachineData;
+        serializeV1(): IMachineData;
+        serializeV2(): IMachineData;
         deserialize(data: IMachineData): void;
+        deserializeV1(data: IMachineData): void;
+        deserializeV2(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;

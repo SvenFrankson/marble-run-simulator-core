@@ -4,6 +4,13 @@
 
 namespace MarbleRunSimulatorCore {
 
+    function NToHex(n: number, l: number = 2): string {
+        return n.toString(36).padStart(l, "0").substring(0, l);
+    }
+
+    var ballOffset = 23328; // it's 36 * 36 * 36 / 2
+    var partOffset = 648; // it's 36 * 36 / 2
+
     export interface IGame {
         scene: BABYLON.Scene;
         DEBUG_MODE: boolean;
@@ -52,11 +59,15 @@ namespace MarbleRunSimulatorCore {
     }
 
     export interface IMachineData {
-        name?: string;
-        author?: string;
-        sleepers?: ISleeperMeshProps;
-        balls: IBallData[];
-        parts: IMachinePartData[];
+        n?: string; // v2
+        name?: string; // v1 - deprecated
+        a?: string; // v2
+        author?: string; // v1 - deprecated
+        v?: number; // v2
+        sleepers?: ISleeperMeshProps; // v1 - deprecated
+        balls?: IBallData[]; // v1 - deprecated
+        parts?: IMachinePartData[]; // v1 - deprecated
+        d?: string; // v2
     }
 
     export class Machine {
@@ -421,6 +432,10 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
+            return this.serializeV2();
+        }
+
+        public serializeV1(): IMachineData {
             let data: IMachineData = {
                 name: this.name,
                 author: this.author,
@@ -451,7 +466,93 @@ namespace MarbleRunSimulatorCore {
             return data;
         }
 
+        public serializeV2(): IMachineData {
+            let data: IMachineData = {
+                n: this.name,
+                a: this.author,
+                v: 2
+            };
+
+            let dataString = "";
+
+            // Add ball count
+            dataString += NToHex(this.balls.length, 2);
+            for (let i = 0; i < this.balls.length; i++) {
+                let ball = this.balls[i];
+                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
+                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
+                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
+                dataString += NToHex(x, 3);
+                dataString += NToHex(y, 3);
+                dataString += NToHex(z, 3);
+            }
+
+            // Add parts count
+            dataString += NToHex(this.parts.length, 2);
+            for (let i = 0; i < this.parts.length; i++) {
+                let partDataString = "";
+                let part = this.parts[i];
+                let baseName = part.partName.split("-")[0];
+                let index = TrackNames.findIndex((name) => {
+                    return name.startsWith(baseName);
+                });
+                if (index === - 1) {
+                    console.error("Error, can't find part index.");
+                    debugger;
+                }
+                partDataString += NToHex(index, 2);
+                
+                let pI = part.i + partOffset;
+                let pJ = part.j + partOffset;
+                let pK = part.k + partOffset;
+                partDataString += NToHex(pI, 2);
+                partDataString += NToHex(pJ, 2);
+                partDataString += NToHex(pK, 2);
+
+                partDataString += NToHex(part.w, 1);
+                partDataString += NToHex(part.h, 1);
+                partDataString += NToHex(part.d, 1);
+                partDataString += NToHex(part.n, 1);
+                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                partDataString += NToHex(m, 1);
+
+                let colourCount = part.colors.length;
+                partDataString += NToHex(colourCount, 1);
+                for (let j = 0; j < part.colors.length; j++) {
+                    let c = part.colors[j];
+                    partDataString += NToHex(c, 1);
+                }
+                console.log("---------------------------");
+                console.log("serialize");
+                console.log(part);
+                console.log("into");
+                console.log(partDataString);
+                console.log("---------------------------");
+                dataString += partDataString;
+            }
+
+            data.d = dataString;
+
+            return data;
+        }
+
         public deserialize(data: IMachineData): void {
+            if (data) {
+                let version: number;
+                if (isFinite(data.v)) {
+                    version = data.v;
+                }
+
+                if (!isFinite(version) || version === 1) {
+                    return this.deserializeV1(data);
+                }
+                else if (version === 2) {
+                    return this.deserializeV2(data);
+                }
+            }
+        }
+
+        public deserializeV1(data: IMachineData): void {
             if (data.name) {
                 this.name = data.name;
             }
@@ -488,6 +589,106 @@ namespace MarbleRunSimulatorCore {
                         track.sleepersMeshProp = data.sleepers;
                     }
                     this.parts.push(track);
+                }
+            }
+        }
+
+        public deserializeV2(data: IMachineData): void {
+            let dataString = data.d;
+            if (dataString) {
+                if (data.n) {
+                    this.name = data.n;
+                }
+                if (data.a) {
+                    this.author = data.a;
+                }
+            
+                this.balls = [];
+                this.parts = [];
+
+                let pt = 0;
+                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                console.log("ballCount = " + ballCount);
+
+                for (let i = 0; i < ballCount; i++) {
+                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+
+                    console.log("ball xyz " + x + " " + y + " " + z);
+                    let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
+                    this.balls.push(ball);
+                }
+                
+                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                console.log("partCount = " + partCount);
+
+                for (let i = 0; i < partCount; i++) {
+                    /*
+                    partDataString += NToHex(index, 2);
+                    
+                    let pI = part.i + partOffset;
+                    let pJ = part.j + partOffset;
+                    let pK = part.k + partOffset;
+                    partDataString += NToHex(pI, 2);
+                    partDataString += NToHex(pJ, 2);
+                    partDataString += NToHex(pK, 2);
+
+                    partDataString += NToHex(part.w, 1);
+                    partDataString += NToHex(part.h, 1);
+                    partDataString += NToHex(part.d, 1);
+                    partDataString += NToHex(part.n, 1);
+                    let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                    partDataString += NToHex(m, 1);
+
+                    let colourCount = part.colors.length;
+                    partDataString += NToHex(colourCount, 1);
+                    for (let j = 0; j < part.colors.length; j++) {
+                        let c = part.colors[j];
+                        partDataString += NToHex(c, 1);
+                    }
+                    */
+                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                    let baseName = TrackNames[index].split("-")[0];
+                    console.log("basename " + baseName);
+
+                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+
+                    console.log("part ijk " + pI + " " + pJ + " " + pK);
+
+                    let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+
+                    console.log("part whdn " + w + " " + h + " " + d + " " + n);
+
+                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                    console.log(colorCount);
+                    let colors: number[] = [];
+                    for (let ii = 0; ii < colorCount; ii++) {
+                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                    }
+
+                    let prop: IMachinePartProp = {
+                        i: pI,
+                        j: pJ,
+                        k: pK,
+                        w: w,
+                        h: h,
+                        d: d,
+                        n: n,
+                        mirrorX: (mirror % 2) === 1,
+                        mirrorZ: mirror >= 2,
+                        c: colors
+                    }
+                    let track = this.trackFactory.createTrackWHDN(baseName, prop);
+                    if (track) {
+                        this.parts.push(track);
+                    }
                 }
             }
         }
