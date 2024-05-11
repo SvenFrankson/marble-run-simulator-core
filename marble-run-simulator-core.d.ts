@@ -361,6 +361,7 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine);
         createTrackWHDN(trackname: string, props?: IMachinePartProp): MachinePart;
         createTrack(partName: string, prop: IMachinePartProp): MachinePart;
+        createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart;
     }
 }
 declare namespace MarbleRunSimulatorCore {

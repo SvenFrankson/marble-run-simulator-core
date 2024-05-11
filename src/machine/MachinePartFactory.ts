@@ -170,5 +170,68 @@ namespace MarbleRunSimulatorCore {
                 return new DoubleNote(this.machine, prop);
             }
         }
+
+        public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
+            if (baseName === "ramp") {
+                return new Ramp(this.machine, prop);
+            }
+            if (baseName === "wave") {
+                return new Wave(this.machine, prop);
+            }
+            if (baseName === "snake") {
+                return new Snake(this.machine, prop);
+            }
+            if (baseName === "uturn") {
+                return new UTurn(this.machine, prop);
+            }
+            if (baseName === "wall") {
+                return new Wall(this.machine, prop);
+            }
+            if (baseName === "uturnsharp") {
+                return new UTurnSharp(this.machine, prop);
+            }
+            if (baseName === "start") {
+                return new Start(this.machine, prop);
+            }
+            if (baseName === "end") {
+                return new End(this.machine, prop);
+            }
+            if (baseName === "jumper") {
+                return new Jumper(this.machine, prop);
+            }
+            if (baseName === "gravity-well") {
+                return new GravityWell(this.machine, prop);
+            }
+            if (baseName === "loop") {
+                return new Loop(this.machine, prop);
+            }
+            if (baseName === "spiral") {
+                return new Spiral(this.machine, prop);
+            }
+            if (baseName === "join") {
+                return new Join(this.machine, prop);
+            }
+            if (baseName === "flatjoin") {
+                return new FlatJoin(this.machine, prop);
+            }
+            if (baseName === "split") {
+                return new Split(this.machine, prop);
+            }
+            if (baseName === "elevator") {
+                return new Elevator(this.machine, prop);
+            }
+            if (baseName === "stairway") {
+                return new Stairway(this.machine, prop);
+            }
+            if (baseName === "screw") {
+                return new Screw(this.machine, prop);
+            }
+            if (baseName === "quarter") {
+                return new QuarterNote(this.machine, prop);
+            }
+            if (baseName === "double") {
+                return new DoubleNote(this.machine, prop);
+            }
+        }
     }
 }

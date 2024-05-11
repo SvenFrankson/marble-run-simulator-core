@@ -1199,7 +1199,7 @@ var MarbleRunSimulatorCore;
                         mirrorZ: mirror >= 2,
                         c: colors
                     };
-                    let track = this.trackFactory.createTrackWHDN(baseName, prop);
+                    let track = this.trackFactory.createTrackBaseName(baseName, prop);
                     if (track) {
                         this.parts.push(track);
                     }
@@ -1895,6 +1895,68 @@ var MarbleRunSimulatorCore;
                 return new MarbleRunSimulatorCore.QuarterNote(this.machine, prop);
             }
             if (partName === "double") {
+                return new MarbleRunSimulatorCore.DoubleNote(this.machine, prop);
+            }
+        }
+        createTrackBaseName(baseName, prop) {
+            if (baseName === "ramp") {
+                return new MarbleRunSimulatorCore.Ramp(this.machine, prop);
+            }
+            if (baseName === "wave") {
+                return new MarbleRunSimulatorCore.Wave(this.machine, prop);
+            }
+            if (baseName === "snake") {
+                return new MarbleRunSimulatorCore.Snake(this.machine, prop);
+            }
+            if (baseName === "uturn") {
+                return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
+            }
+            if (baseName === "wall") {
+                return new MarbleRunSimulatorCore.Wall(this.machine, prop);
+            }
+            if (baseName === "uturnsharp") {
+                return new MarbleRunSimulatorCore.UTurnSharp(this.machine, prop);
+            }
+            if (baseName === "start") {
+                return new MarbleRunSimulatorCore.Start(this.machine, prop);
+            }
+            if (baseName === "end") {
+                return new MarbleRunSimulatorCore.End(this.machine, prop);
+            }
+            if (baseName === "jumper") {
+                return new MarbleRunSimulatorCore.Jumper(this.machine, prop);
+            }
+            if (baseName === "gravity-well") {
+                return new MarbleRunSimulatorCore.GravityWell(this.machine, prop);
+            }
+            if (baseName === "loop") {
+                return new MarbleRunSimulatorCore.Loop(this.machine, prop);
+            }
+            if (baseName === "spiral") {
+                return new MarbleRunSimulatorCore.Spiral(this.machine, prop);
+            }
+            if (baseName === "join") {
+                return new MarbleRunSimulatorCore.Join(this.machine, prop);
+            }
+            if (baseName === "flatjoin") {
+                return new MarbleRunSimulatorCore.FlatJoin(this.machine, prop);
+            }
+            if (baseName === "split") {
+                return new MarbleRunSimulatorCore.Split(this.machine, prop);
+            }
+            if (baseName === "elevator") {
+                return new MarbleRunSimulatorCore.Elevator(this.machine, prop);
+            }
+            if (baseName === "stairway") {
+                return new MarbleRunSimulatorCore.Stairway(this.machine, prop);
+            }
+            if (baseName === "screw") {
+                return new MarbleRunSimulatorCore.Screw(this.machine, prop);
+            }
+            if (baseName === "quarter") {
+                return new MarbleRunSimulatorCore.QuarterNote(this.machine, prop);
+            }
+            if (baseName === "double") {
                 return new MarbleRunSimulatorCore.DoubleNote(this.machine, prop);
             }
         }
