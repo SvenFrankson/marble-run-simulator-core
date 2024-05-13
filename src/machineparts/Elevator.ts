@@ -167,11 +167,12 @@ namespace MarbleRunSimulatorCore {
 
         public reset = () => {
             for (let i = 0; i < this.boxesCount; i++) {
-                this.boxX[i] = (i / this.boxesCount) * this.chainLength;
+                this.x = 0;
                 this.update(0);
             }
         };
 
+        public x: number = 0;
         public l: number = 0;
         public p: number = 0;
         public chainLength: number = 0;
@@ -184,8 +185,13 @@ namespace MarbleRunSimulatorCore {
                 x = -1;
             }
 
+            this.x += dx;
+            while (this.x > this.chainLength) {
+                this.x -= this.chainLength;
+            }
+
             for (let i = 0; i < this.boxesCount; i++) {
-                this.boxX[i] += dx;
+                this.boxX[i] = this.x + (i / this.boxesCount) * this.chainLength;
                 while (this.boxX[i] > this.chainLength) {
                     this.boxX[i] -= this.chainLength;
                 }

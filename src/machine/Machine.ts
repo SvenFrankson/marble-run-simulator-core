@@ -137,6 +137,56 @@ namespace MarbleRunSimulatorCore {
             this.instantiated = false;
         }
 
+        public getBallPos(): any {
+            let datas = {
+                balls: [],
+                elevators: [],
+                screws: [],
+                stairways: [],
+            };
+            for (let i = 0; i < this.balls.length; i++) {
+                let ball = this.balls[i];
+                let data = {
+                    p: ball.position,
+                    v: ball.velocity
+                }
+                datas.balls.push(data);
+            }
+            let elevators: Elevator[] = this.parts.filter(p => { return p instanceof Elevator }) as Elevator[];
+            for (let i = 0; i < elevators.length; i++) {
+                datas.elevators.push(elevators[i].x);
+            }
+            let screws: Screw[] = this.parts.filter(p => { return p instanceof Screw }) as Screw[];
+            for (let i = 0; i < screws.length; i++) {
+                datas.screws.push(screws[i].a);
+            }
+            let stairways: Stairway[] = this.parts.filter(p => { return p instanceof Stairway }) as Stairway[];
+            for (let i = 0; i < stairways.length; i++) {
+                datas.stairways.push(stairways[i].a);
+            }
+            return datas;
+        }
+
+        public applyBallPos(save: any): void {
+            for (let i = 0; i < this.balls.length && i < save.balls.length; i++) {
+                let ball = this.balls[i];
+                ball.position = save.balls[i].p;
+                ball.velocity = save.balls[i].v;
+            }
+            let elevators: Elevator[] = this.parts.filter(p => { return p instanceof Elevator }) as Elevator[];
+            for (let i = 0; i < elevators.length && i < save.elevators.length; i++) {
+                elevators[i].x = save.elevators[i];
+            }
+            let screws: Screw[] = this.parts.filter(p => { return p instanceof Screw }) as Screw[];
+            for (let i = 0; i < screws.length && i < save.screws.length; i++) {
+                screws[i].a = save.elevators[i];
+            }
+            let stairways: Stairway[] = this.parts.filter(p => { return p instanceof Stairway }) as Stairway[];
+            for (let i = 0; i < stairways.length && i < save.stairways.length; i++) {
+                stairways[i].a = save.elevators[i];
+            }
+        }
+
         public update(): void {
             if (!this.instantiated) {
                 return;
@@ -523,12 +573,12 @@ namespace MarbleRunSimulatorCore {
                     let c = part.colors[j];
                     partDataString += NToHex(c, 1);
                 }
-                console.log("---------------------------");
-                console.log("serialize");
-                console.log(part);
-                console.log("into");
-                console.log(partDataString);
-                console.log("---------------------------");
+                //console.log("---------------------------");
+                //console.log("serialize");
+                //console.log(part);
+                //console.log("into");
+                //console.log(partDataString);
+                //console.log("---------------------------");
                 dataString += partDataString;
             }
 
@@ -609,20 +659,20 @@ namespace MarbleRunSimulatorCore {
 
                 let pt = 0;
                 let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                console.log("ballCount = " + ballCount);
+                //console.log("ballCount = " + ballCount);
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
 
-                    console.log("ball xyz " + x + " " + y + " " + z);
+                    //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                 }
                 
                 let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                console.log("partCount = " + partCount);
+                //console.log("partCount = " + partCount);
 
                 for (let i = 0; i < partCount; i++) {
                     /*
@@ -651,13 +701,13 @@ namespace MarbleRunSimulatorCore {
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     let baseName = TrackNames[index].split("-")[0];
-                    console.log("basename " + baseName);
+                    //console.log("basename " + baseName);
 
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
 
-                    console.log("part ijk " + pI + " " + pJ + " " + pK);
+                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
 
                     let w = parseInt(dataString.substring(pt, pt += 1), 36);
                     let h = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -665,10 +715,10 @@ namespace MarbleRunSimulatorCore {
                     let n = parseInt(dataString.substring(pt, pt += 1), 36);
                     let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
 
-                    console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
 
                     let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                    console.log(colorCount);
+                    //console.log(colorCount);
                     let colors: number[] = [];
                     for (let ii = 0; ii < colorCount; ii++) {
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);

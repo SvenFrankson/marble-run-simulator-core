@@ -186,6 +186,8 @@ declare namespace MarbleRunSimulatorCore {
         setAllIsSelectable(isSelectable: boolean): void;
         instantiate(): Promise<void>;
         dispose(): void;
+        getBallPos(): any;
+        applyBallPos(save: any): void;
         update(): void;
         play(): void;
         onStopCallbacks: Nabu.UniqueList<() => void>;
@@ -484,6 +486,7 @@ declare namespace MarbleRunSimulatorCore {
         static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
+        x: number;
         l: number;
         p: number;
         chainLength: number;

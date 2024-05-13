@@ -711,6 +711,54 @@ var MarbleRunSimulatorCore;
             }
             this.instantiated = false;
         }
+        getBallPos() {
+            let datas = {
+                balls: [],
+                elevators: [],
+                screws: [],
+                stairways: [],
+            };
+            for (let i = 0; i < this.balls.length; i++) {
+                let ball = this.balls[i];
+                let data = {
+                    p: ball.position,
+                    v: ball.velocity
+                };
+                datas.balls.push(data);
+            }
+            let elevators = this.parts.filter(p => { return p instanceof MarbleRunSimulatorCore.Elevator; });
+            for (let i = 0; i < elevators.length; i++) {
+                datas.elevators.push(elevators[i].x);
+            }
+            let screws = this.parts.filter(p => { return p instanceof MarbleRunSimulatorCore.Screw; });
+            for (let i = 0; i < screws.length; i++) {
+                datas.screws.push(screws[i].a);
+            }
+            let stairways = this.parts.filter(p => { return p instanceof MarbleRunSimulatorCore.Stairway; });
+            for (let i = 0; i < stairways.length; i++) {
+                datas.stairways.push(stairways[i].a);
+            }
+            return datas;
+        }
+        applyBallPos(save) {
+            for (let i = 0; i < this.balls.length && i < save.balls.length; i++) {
+                let ball = this.balls[i];
+                ball.position = save.balls[i].p;
+                ball.velocity = save.balls[i].v;
+            }
+            let elevators = this.parts.filter(p => { return p instanceof MarbleRunSimulatorCore.Elevator; });
+            for (let i = 0; i < elevators.length && i < save.elevators.length; i++) {
+                elevators[i].x = save.elevators[i];
+            }
+            let screws = this.parts.filter(p => { return p instanceof MarbleRunSimulatorCore.Screw; });
+            for (let i = 0; i < screws.length && i < save.screws.length; i++) {
+                screws[i].a = save.elevators[i];
+            }
+            let stairways = this.parts.filter(p => { return p instanceof MarbleRunSimulatorCore.Stairway; });
+            for (let i = 0; i < stairways.length && i < save.stairways.length; i++) {
+                stairways[i].a = save.elevators[i];
+            }
+        }
         update() {
             if (!this.instantiated) {
                 return;
@@ -1057,12 +1105,12 @@ var MarbleRunSimulatorCore;
                     let c = part.colors[j];
                     partDataString += NToHex(c, 1);
                 }
-                console.log("---------------------------");
-                console.log("serialize");
-                console.log(part);
-                console.log("into");
-                console.log(partDataString);
-                console.log("---------------------------");
+                //console.log("---------------------------");
+                //console.log("serialize");
+                //console.log(part);
+                //console.log("into");
+                //console.log(partDataString);
+                //console.log("---------------------------");
                 dataString += partDataString;
             }
             data.d = dataString;
@@ -1133,17 +1181,17 @@ var MarbleRunSimulatorCore;
                 this.parts = [];
                 let pt = 0;
                 let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                console.log("ballCount = " + ballCount);
+                //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    console.log("ball xyz " + x + " " + y + " " + z);
+                    //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                 }
                 let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                console.log("partCount = " + partCount);
+                //console.log("partCount = " + partCount);
                 for (let i = 0; i < partCount; i++) {
                     /*
                     partDataString += NToHex(index, 2);
@@ -1171,19 +1219,19 @@ var MarbleRunSimulatorCore;
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
-                    console.log("basename " + baseName);
+                    //console.log("basename " + baseName);
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    console.log("part ijk " + pI + " " + pJ + " " + pK);
+                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
                     let w = parseInt(dataString.substring(pt, pt += 1), 36);
                     let h = parseInt(dataString.substring(pt, pt += 1), 36);
                     let d = parseInt(dataString.substring(pt, pt += 1), 36);
                     let n = parseInt(dataString.substring(pt, pt += 1), 36);
                     let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
-                    console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
                     let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                    console.log(colorCount);
+                    //console.log(colorCount);
                     let colors = [];
                     for (let ii = 0; ii < colorCount; ii++) {
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -2813,10 +2861,11 @@ var MarbleRunSimulatorCore;
             this.wheels = [];
             this.reset = () => {
                 for (let i = 0; i < this.boxesCount; i++) {
-                    this.boxX[i] = (i / this.boxesCount) * this.chainLength;
+                    this.x = 0;
                     this.update(0);
                 }
             };
+            this.x = 0;
             this.l = 0;
             this.p = 0;
             this.chainLength = 0;
@@ -2954,8 +3003,12 @@ var MarbleRunSimulatorCore;
             if (this.mirrorX) {
                 x = -1;
             }
+            this.x += dx;
+            while (this.x > this.chainLength) {
+                this.x -= this.chainLength;
+            }
             for (let i = 0; i < this.boxesCount; i++) {
-                this.boxX[i] += dx;
+                this.boxX[i] = this.x + (i / this.boxesCount) * this.chainLength;
                 while (this.boxX[i] > this.chainLength) {
                     this.boxX[i] -= this.chainLength;
                 }
