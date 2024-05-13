@@ -1,5 +1,5 @@
 namespace MarbleRunSimulatorCore {
-    export var TrackNames = ["ramp-1.1.1", "wave-2.1.1", "snake-2.1.1", "join", "flatjoin", "split", "uturn-0.2", "wall-3.3", "uturnsharp", "loop-1.1", "spiral-1.2.1", "elevator-4", "stairway-1.6", "screw-1.4", "start", "end", "jumper-1", "gravity-well"];
+    export var TrackNames = ["ramp-1.1.1", "wave-2.1.1", "snake-2.1.1", "join", "flatjoin", "split", "uturn-0.2", "wall-3.3", "uturnsharp", "loop-1.1", "spiral-1.2.1", "elevator-4", "stairway-1.6", "screw-1.4", "start", "end", "jumper-1", "gravitywell"];
 
     export interface IMachinePartProp {
         fullPartName?: string;
@@ -114,7 +114,7 @@ namespace MarbleRunSimulatorCore {
                 prop.n = n;
                 return new Jumper(this.machine, prop);
             }
-            if (partName === "gravity-well") {
+            if (partName === "gravitywell") {
                 return new GravityWell(this.machine, prop);
             }
             if (partName.startsWith("loop-")) {
@@ -199,7 +199,7 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "jumper") {
                 return new Jumper(this.machine, prop);
             }
-            if (baseName === "gravity-well") {
+            if (baseName === "gravitywell") {
                 return new GravityWell(this.machine, prop);
             }
             if (baseName === "loop") {

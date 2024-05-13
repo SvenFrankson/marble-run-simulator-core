@@ -680,6 +680,7 @@ var MarbleRunSimulatorCore;
             }
         }
         async instantiate() {
+            console.log("instantiate machine");
             this.parts = this.parts.sort((a, b) => {
                 return b.j + b.h - (a.j + a.h);
             });
@@ -1744,7 +1745,7 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
-    MarbleRunSimulatorCore.TrackNames = ["ramp-1.1.1", "wave-2.1.1", "snake-2.1.1", "join", "flatjoin", "split", "uturn-0.2", "wall-3.3", "uturnsharp", "loop-1.1", "spiral-1.2.1", "elevator-4", "stairway-1.6", "screw-1.4", "start", "end", "jumper-1", "gravity-well"];
+    MarbleRunSimulatorCore.TrackNames = ["ramp-1.1.1", "wave-2.1.1", "snake-2.1.1", "join", "flatjoin", "split", "uturn-0.2", "wall-3.3", "uturnsharp", "loop-1.1", "spiral-1.2.1", "elevator-4", "stairway-1.6", "screw-1.4", "start", "end", "jumper-1", "gravitywell"];
     class MachinePartFactory {
         constructor(machine) {
             this.machine = machine;
@@ -1842,7 +1843,7 @@ var MarbleRunSimulatorCore;
                 prop.n = n;
                 return new MarbleRunSimulatorCore.Jumper(this.machine, prop);
             }
-            if (partName === "gravity-well") {
+            if (partName === "gravitywell") {
                 return new MarbleRunSimulatorCore.GravityWell(this.machine, prop);
             }
             if (partName.startsWith("loop-")) {
@@ -1926,7 +1927,7 @@ var MarbleRunSimulatorCore;
             if (baseName === "jumper") {
                 return new MarbleRunSimulatorCore.Jumper(this.machine, prop);
             }
-            if (baseName === "gravity-well") {
+            if (baseName === "gravitywell") {
                 return new MarbleRunSimulatorCore.GravityWell(this.machine, prop);
             }
             if (baseName === "loop") {

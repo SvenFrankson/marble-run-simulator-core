@@ -102,6 +102,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(): Promise<void> {
+            console.log("instantiate machine");
             this.parts = this.parts.sort((a, b) => {
                 return b.j + b.h - (a.j + a.h);
             });
