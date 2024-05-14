@@ -16,7 +16,7 @@ namespace MarbleRunSimulatorCore {
             template.maxAngle = (0.8 * Math.PI) / 2;
             template.minTurnRadius = 0.12;
 
-            template.w = 1;
+            template.w = 2;
             template.h = h;
             template.minH = 3;
             template.d = d;
@@ -27,7 +27,7 @@ namespace MarbleRunSimulatorCore {
             template.zExtendable = true;
             template.xMirrorable = true;
 
-            let r = tileWidth * 0.5;
+            let r = tileWidth;
             let rY = template.h * tileHeight * 0.5;
             let depthStart = 0;
             let depthEnd = -tileDepth * (template.d - 1);
