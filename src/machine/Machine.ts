@@ -591,7 +591,7 @@ namespace MarbleRunSimulatorCore {
             let data: IMachineData = {
                 n: this.name,
                 a: this.author,
-                v: 2
+                v: 3
             };
 
             let dataString = "";

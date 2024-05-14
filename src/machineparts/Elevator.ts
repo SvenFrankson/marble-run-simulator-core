@@ -115,7 +115,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "elevator-" + h.toFixed(0);
-
+            template.w = 2;
             template.h = h;
             template.mirrorX = mirrorX;
 

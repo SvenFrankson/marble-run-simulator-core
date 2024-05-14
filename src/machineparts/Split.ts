@@ -34,13 +34,13 @@ namespace MarbleRunSimulatorCore {
             anchorDatas.push(tmpVertexData);
 
             let anchor = new BABYLON.Mesh("anchor");
-            anchor.position.copyFromFloats(0, -tileHeight, 0);
+            anchor.position.copyFromFloats(tileWidth * 0.5, -tileHeight, 0);
             anchor.parent = this;
             anchor.material = this.game.materials.getMetalMaterial(this.getColor(4));
             Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(anchor);
 
             this.pivot = new BABYLON.Mesh("pivot");
-            this.pivot.position.copyFromFloats(0, -tileHeight, 0);
+            this.pivot.position.copyFromFloats(tileWidth * 0.5, -tileHeight, 0);
             this.pivot.material = this.game.materials.getMetalMaterial(this.getColor(4));
             this.pivot.parent = this;
             let dz = this.wireGauge * 0.5;
@@ -152,6 +152,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "split";
 
+            template.w = 2;
             template.h = 2;
 
             template.xMirrorable = true;
@@ -161,34 +162,48 @@ namespace MarbleRunSimulatorCore {
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
-            let pEndLeft = new BABYLON.Vector3(0, -tileHeight, 0);
+            let pEndLeft = new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0);
             pEndLeft.x -= Split.pivotL / Math.SQRT2;
             pEndLeft.y += Split.pivotL / Math.SQRT2;
-            let pEndRight = pEndLeft.multiplyByFloats(-1, 1, 1);
+            let pEndRight = new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0);
+            pEndRight.x += Split.pivotL / Math.SQRT2;
+            pEndRight.y += Split.pivotL / Math.SQRT2;
             let dirEnd = Tools.V3Dir(135);
             let nEnd = Tools.V3Dir(45);
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
-            template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir), new TrackPoint(template.trackTemplates[0], pEndLeft.subtract(dirEnd.scale(0.001)), dirEnd)];
+            template.trackTemplates[0].trackpoints = [
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir), 
+                new TrackPoint(template.trackTemplates[0], pEndLeft.subtract(dirEnd.scale(0.001)), dirEnd)
+            ];
 
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 2;
-            template.trackTemplates[1].trackpoints = [new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0), dir), new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-Split.pivotL / Math.SQRT2, -tileHeight - Split.pivotL / Math.SQRT2 - 0.0015 * 1.5, 0), dirEnd.multiplyByFloats(1, -1, 1))];
+            template.trackTemplates[1].trackpoints = [
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0), dir), 
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-Split.pivotL / Math.SQRT2 + tileWidth * 0.5, -tileHeight - Split.pivotL / Math.SQRT2 - 0.0015 * 1.5, 0), dirEnd.multiplyByFloats(1, -1, 1))
+            ];
 
             template.trackTemplates[2] = new TrackTemplate(template);
             template.trackTemplates[2].colorIndex = 3;
-            template.trackTemplates[2].trackpoints = [new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(Split.pivotL / Math.SQRT2, -tileHeight - Split.pivotL / Math.SQRT2 - 0.0015 * 1.5, 0), dirEnd), new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight * template.h, 0), dir)];
+            template.trackTemplates[2].trackpoints = [
+                new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(Split.pivotL / Math.SQRT2 + tileWidth * 0.5, -tileHeight - Split.pivotL / Math.SQRT2 - 0.0015 * 1.5, 0), dirEnd), 
+                new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(tileWidth * 1.5, -tileHeight * template.h, 0), dir)
+            ];
 
             template.trackTemplates[3] = new TrackTemplate(template);
             template.trackTemplates[3].colorIndex = 1;
-            template.trackTemplates[3].trackpoints = [new TrackPoint(template.trackTemplates[3], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), dir.multiplyByFloats(-1, 1, 1)), new TrackPoint(template.trackTemplates[3], pEndLeft.subtract(dirEnd.scale(0.001)).multiplyByFloats(-1, 1, 1), dirEnd.multiplyByFloats(-1, 1, 1))];
+            template.trackTemplates[3].trackpoints = [
+                new TrackPoint(template.trackTemplates[3], new BABYLON.Vector3(tileWidth * 1.5, 0, 0), dir.multiplyByFloats(-1, 1, 1)), 
+                new TrackPoint(template.trackTemplates[3], pEndRight.subtract(dirEnd.scale(0.001).multiplyByFloats(-1, 1, 1)), dirEnd.multiplyByFloats(-1, 1, 1))
+            ];
 
             template.trackTemplates[4] = new TrackTemplate(template);
             template.trackTemplates[4].colorIndex = 4;
             template.trackTemplates[4].trackpoints = [
                 new TrackPoint(template.trackTemplates[4], pEndLeft.add(Tools.V3Dir(315, 0.02)).add(Tools.V3Dir(45, 0.014)), Tools.V3Dir(150), new BABYLON.Vector3(0, -1, 0)),
-                new TrackPoint(template.trackTemplates[4], new BABYLON.Vector3(0, -0.003, 0)),
+                new TrackPoint(template.trackTemplates[4], new BABYLON.Vector3(tileWidth * 0.5, -0.003, 0)),
                 new TrackPoint(template.trackTemplates[4], pEndRight.add(Tools.V3Dir(45, 0.02)).add(Tools.V3Dir(315, 0.014)), Tools.V3Dir(30), new BABYLON.Vector3(0, -1, 0)),
             ];
             template.trackTemplates[4].drawStartTip = true;
