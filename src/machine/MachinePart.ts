@@ -1,6 +1,6 @@
 namespace MarbleRunSimulatorCore {
     export var baseRadius = 0.075;
-    export var tileWidth = 0.15;
+    export var tileWidth = 0.075;
     export var tileHeight = 0.03;
     export var tileDepth = 0.06;
     export var colorSlotsCount = 6;
