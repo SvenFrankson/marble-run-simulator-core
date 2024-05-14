@@ -40,7 +40,7 @@ namespace MarbleRunSimulatorCore {
             let nSpirals = template.n;
             let xCenterStart = 0;
             let xCenterEnd = tileWidth * (template.w - 1);
-            let r = tileWidth * 0.5 * 0.8;
+            let r = tileWidth * 0.8;
             let heightStart = 0;
             let heightEnd = -tileHeight * template.h;
 

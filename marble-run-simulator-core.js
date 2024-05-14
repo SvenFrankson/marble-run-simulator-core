@@ -4003,7 +4003,7 @@ var MarbleRunSimulatorCore;
             let nSpirals = template.n;
             let xCenterStart = 0;
             let xCenterEnd = MarbleRunSimulatorCore.tileWidth * (template.w - 1);
-            let r = MarbleRunSimulatorCore.tileWidth * 0.5 * 0.8;
+            let r = MarbleRunSimulatorCore.tileWidth * 0.8;
             let heightStart = 0;
             let heightEnd = -MarbleRunSimulatorCore.tileHeight * template.h;
             for (let n = 0; n <= 6 * nSpirals; n++) {
