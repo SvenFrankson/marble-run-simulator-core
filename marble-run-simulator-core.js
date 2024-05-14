@@ -4744,8 +4744,8 @@ var MarbleRunSimulatorCore;
             let end = new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * (template.w - 0.5), -MarbleRunSimulatorCore.tileHeight * template.h, -MarbleRunSimulatorCore.tileDepth * (template.d - 1));
             let tanVector = dir.scale(BABYLON.Vector3.Distance(start, end));
             template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];
-            for (let i = 1; i < 2 * (w + 1); i++) {
-                let p1 = BABYLON.Vector3.Hermite(start, tanVector, end, tanVector, i / (2 * (w + 1)));
+            for (let i = 1; i < (w + 1); i++) {
+                let p1 = BABYLON.Vector3.Hermite(start, tanVector, end, tanVector, i / (w + 1));
                 if (i % 2 === 1) {
                     p1.y -= 0.008;
                 }
