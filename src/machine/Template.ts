@@ -358,7 +358,7 @@ namespace MarbleRunSimulatorCore {
                 } else if (partName.startsWith("jumper-")) {
                     let n = parseInt(partName.split("-")[1].split(".")[0]);
                     data = Jumper.GenerateTemplate(n, mirrorX);
-                } else if (partName === "gravity-well") {
+                } else if (partName === "gravitywell") {
                     data = GravityWell.GenerateTemplate(mirrorX);
                 }
                 datas[mirrorIndex] = data;
