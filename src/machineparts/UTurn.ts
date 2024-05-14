@@ -14,7 +14,7 @@ namespace MarbleRunSimulatorCore {
             template.partName = "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 50;
 
-            (template.w = Math.ceil(d / 3)), (template.h = h), (template.d = d), (template.mirrorX = mirrorX), (template.mirrorZ = mirrorZ);
+            (template.w = Math.ceil(d / 1.5)), (template.h = h), (template.d = d), (template.mirrorX = mirrorX), (template.mirrorZ = mirrorZ);
 
             template.yExtendable = true;
             template.zExtendable = true;

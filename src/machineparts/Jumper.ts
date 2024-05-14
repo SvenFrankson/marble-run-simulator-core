@@ -12,6 +12,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "jumper-" + n.toFixed(0);
+            template.w = 2;
             template.h = 2;
             template.n = n;
 
@@ -24,7 +25,7 @@ namespace MarbleRunSimulatorCore {
             let aDeg = template.n * 10;
             let aRad = (aDeg / 180) * Math.PI;
 
-            let xEnd = Math.cos(aRad) * d;
+            let xEnd = tileWidth * 0.5 + Math.cos(aRad) * d;
             let yEnd = -tileHeight * template.h + Math.sin(aRad) * d;
 
             template.trackTemplates[0] = new TrackTemplate(template);
