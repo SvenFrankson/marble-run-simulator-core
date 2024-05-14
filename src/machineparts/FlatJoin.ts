@@ -17,6 +17,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "flatjoin";
+            template.w = 2;
 
             template.mirrorX = mirrorX;
 
@@ -31,13 +32,13 @@ namespace MarbleRunSimulatorCore {
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
-            template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dir), new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight, 0), dir)];
+            template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dir), new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 1.5, -tileHeight, 0), dir)];
 
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
-            template.trackTemplates[1].trackpoints = [new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir), new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.25, -tileHeight * 0.25, 0), dirJoin)];
+            template.trackTemplates[1].trackpoints = [new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir), new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(0, -tileHeight * 0.25, 0), dirJoin)];
 
-            let center = new BABYLON.Vector3(-0.0135, 0.0165, 0);
+            let center = new BABYLON.Vector3(-0.0135 + tileWidth * 0.5, 0.0165, 0);
             let r = 0.02;
 
             template.trackTemplates[2] = new TrackTemplate(template);
