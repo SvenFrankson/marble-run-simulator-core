@@ -201,9 +201,11 @@ namespace MarbleRunSimulatorCore {
                         let d = distPrev / (distPrev + distNext);
 
                         tmpAngles[i] = (1 - f) * a + f * ((1 - d) * aPrev + d * aNext);
-                    } else if (isFinite(aPrev)) {
+                    }
+                    else if (isFinite(aPrev)) {
                         tmpAngles[i] = (1 - f) * a + f * aPrev;
-                    } else if (isFinite(aNext)) {
+                    }
+                    else if (isFinite(aNext)) {
                         tmpAngles[i] = (1 - f) * a + f * aNext;
                     }
                 }
@@ -299,66 +301,87 @@ namespace MarbleRunSimulatorCore {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
                     data = UTurn.GenerateTemplate(h, d, mirrorX, mirrorZ);
-                } else if (partName.startsWith("wall-")) {
+                }
+                else if (partName.startsWith("wall-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
                     data = Wall.GenerateTemplate(h, d, mirrorX);
-                } else if (partName === "uturnsharp") {
+                }
+                else if (partName === "uturnsharp") {
                     data = UTurnSharp.GenerateTemplate(mirrorX);
-                } else if (partName.startsWith("ramp-")) {
+                }
+                else if (partName.startsWith("ramp-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     let d = parseInt(partName.split("-")[1].split(".")[2]);
                     data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
-                } else if (partName.startsWith("wave-")) {
+                }
+                else if (partName.startsWith("wave-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     let d = parseInt(partName.split("-")[1].split(".")[2]);
                     data = Wave.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
-                } else if (partName.startsWith("snake-")) {
+                }
+                else if (partName.startsWith("snake-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
-                    data = Snake.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
-                } else if (partName.startsWith("elevator-")) {
+                    data = Snake.GenerateTemplate(w, mirrorZ);
+                }
+                else if (partName.startsWith("elevator-")) {
                     let h = parseInt(partName.split("-")[1]);
                     data = Elevator.GenerateTemplate(h, mirrorX);
-                } else if (partName.startsWith("stairway-")) {
+                }
+                else if (partName.startsWith("shooter-")) {
+                    let h = parseInt(partName.split("-")[1]);
+                    data = Shooter.GenerateTemplate(h, mirrorX);
+                }
+                else if (partName.startsWith("stairway-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     data = Stairway.GenerateTemplate(w, h, mirrorX);
-                } else if (partName.startsWith("screw-")) {
+                }
+                else if (partName.startsWith("screw-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     data = Screw.GenerateTemplate(w, h, mirrorX);
-                } else if (partName === "split") {
+                }
+                else if (partName === "split") {
                     data = Split.GenerateTemplate(mirrorX);
-                } else if (partName === "flatjoin") {
+                }
+                else if (partName === "flatjoin") {
                     data = FlatJoin.GenerateTemplate(mirrorX);
-                } else if (partName === "join") {
+                }
+                else if (partName === "join") {
                     data = Join.GenerateTemplate(mirrorX);
-                } else if (partName.startsWith("loop-")) {
+                }
+                else if (partName.startsWith("loop-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
                     let n = parseInt(partName.split("-")[1].split(".")[2]);
                     data = Loop.GenerateTemplate(w, d, n, mirrorX, mirrorZ);
-                } else if (partName.startsWith("spiral-")) {
+                }
+                else if (partName.startsWith("spiral-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     let n = parseInt(partName.split("-")[1].split(".")[2]);
                     data = Spiral.GenerateTemplate(w, h, n, mirrorX, mirrorZ);
-                } else if (partName === "quarter") {
+                }
+                else if (partName === "quarter") {
                     data = QuarterNote.GenerateTemplate(mirrorX);
-                } else if (partName === "double") {
+                }
+                else if (partName === "double") {
                     data = DoubleNote.GenerateTemplate(mirrorX);
-                } else if (partName === "start") {
+                }
+                else if (partName === "start") {
                     data = Start.GenerateTemplate(mirrorX);
-                } else if (partName === "end") {
+                }
+                else if (partName === "end") {
                     data = End.GenerateTemplate(mirrorX);
-                } else if (partName.startsWith("jumper-")) {
+                }
+                else if (partName.startsWith("jumper-")) {
                     let n = parseInt(partName.split("-")[1].split(".")[0]);
                     data = Jumper.GenerateTemplate(n, mirrorX);
-                } else if (partName === "gravitywell") {
+                }
+                else if (partName === "gravitywell") {
                     data = GravityWell.GenerateTemplate(mirrorX);
                 }
                 datas[mirrorIndex] = data;

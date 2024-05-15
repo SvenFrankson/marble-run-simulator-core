@@ -1,5 +1,25 @@
 namespace MarbleRunSimulatorCore {
-    export var TrackNames = ["ramp-1.1.1", "wave-2.1.1", "snake-2.1.1", "join", "flatjoin", "split", "uturn-0.2", "wall-3.3", "uturnsharp", "loop-1.1", "spiral-1.2.1", "elevator-4", "stairway-1.6", "screw-1.4", "start", "end", "jumper-1", "gravitywell"];
+    export var TrackNames = [
+        "ramp-1.1.1",
+        "wave-2.1.1",
+        "snake-2.1.1",
+        "join",
+        "flatjoin",
+        "split",
+        "uturn-0.2",
+        "wall-3.3",
+        "uturnsharp",
+        "loop-1.1",
+        "spiral-1.2.1",
+        "elevator-4",
+        "stairway-1.6",
+        "screw-1.4",
+        "start",
+        "end",
+        "jumper-1",
+        "gravitywell",
+        "shooter-4"
+    ];
 
     export interface IMachinePartProp {
         fullPartName?: string;
@@ -75,11 +95,7 @@ namespace MarbleRunSimulatorCore {
             }
             if (partName.startsWith("snake-")) {
                 let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                let d = parseInt(partName.split("-")[1].split(".")[2]);
                 prop.w = w;
-                prop.h = h;
-                prop.d = d;
                 return new Snake(this.machine, prop);
             }
             if (partName.startsWith("uturn-")) {
@@ -148,6 +164,11 @@ namespace MarbleRunSimulatorCore {
                 let h = parseInt(partName.split("-")[1]);
                 prop.h = h;
                 return new Elevator(this.machine, prop);
+            }
+            if (partName.startsWith("shooter-")) {
+                let h = parseInt(partName.split("-")[1]);
+                prop.h = h;
+                return new Shooter(this.machine, prop);
             }
             if (partName.startsWith("stairway-")) {
                 let w = parseInt(partName.split("-")[1].split(".")[0]);
@@ -219,6 +240,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "elevator") {
                 return new Elevator(this.machine, prop);
+            }
+            if (baseName === "shooter") {
+                return new Shooter(this.machine, prop);
             }
             if (baseName === "stairway") {
                 return new Stairway(this.machine, prop);

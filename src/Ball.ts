@@ -175,6 +175,8 @@ namespace MarbleRunSimulatorCore {
             this._lastWireIndexes[this._pouet] = index;
         }
 
+        public debugNextYFlip: () => void;
+
         public averageWithOptim = 0;
         public averageNoOptim = 0;
         public optimCount = 0;
@@ -182,6 +184,7 @@ namespace MarbleRunSimulatorCore {
         private _timer: number = 0;
         public strReaction: number = 0;
         public update(dt: number): void {
+            let sign = Math.sign(this.velocity.y);
             if (this.position.y < this.machine.baseMeshMinY - 0.2) {
                 if (this.game.mode === GameMode.Challenge) {
                     if (this.machine.playing) {
@@ -399,6 +402,12 @@ namespace MarbleRunSimulatorCore {
             } else if (this.surface === Surface.Bowl) {
                 this.marbleBowlLoopSound.setVolume(10 * this.strReaction * f * this.game.timeFactor * this.game.mainVolume);
                 this.marbleLoopSound.setVolume(0, 0.5);
+            }
+            let sign2 = Math.sign(this.velocity.y);
+
+            if (sign != sign2 && this.debugNextYFlip) {
+                this.debugNextYFlip();
+                this.debugNextYFlip = undefined;
             }
         }
     }

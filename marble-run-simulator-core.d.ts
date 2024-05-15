@@ -48,6 +48,7 @@ declare namespace MarbleRunSimulatorCore {
         private _pouet;
         getLastIndex(wire: Wire): number;
         setLastHit(wire: Wire, index: number): void;
+        debugNextYFlip: () => void;
         averageWithOptim: number;
         averageNoOptim: number;
         optimCount: number;
@@ -576,9 +577,20 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class Snake extends MachinePartWithOriginDestination {
+    class Shooter extends MachinePart {
+        static velocityKicks: number[];
+        velocityKick: number;
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(w?: number, h?: number, d?: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class Snake extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static GenerateTemplate(w?: number, mirrorZ?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Snake;
     }
 }

@@ -617,6 +617,7 @@ namespace MarbleRunSimulatorCore {
                 let index = TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
+                console.log(part.partName + " " + baseName + " " + index);
                 if (index === - 1) {
                     console.error("Error, can't find part index.");
                     debugger;
@@ -874,7 +875,7 @@ namespace MarbleRunSimulatorCore {
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     let baseName = TrackNames[index].split("-")[0];
-                    //console.log("basename " + baseName);
+                    console.log("basename " + baseName);
 
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -912,6 +913,11 @@ namespace MarbleRunSimulatorCore {
                     let track = this.trackFactory.createTrackBaseName(baseName, prop);
                     if (track) {
                         this.parts.push(track);
+                    }
+                    else {
+                        console.warn("failed to createTrackBaseName");
+                        console.log(baseName);
+                        console.log(prop);
                     }
                 }
             }
