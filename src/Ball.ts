@@ -333,6 +333,24 @@ namespace MarbleRunSimulatorCore {
                                 reactionsCount++;
                             }
                         }
+                        if (part instanceof Shooter) {
+                            let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.shieldCollider);
+                            if (col.hit) {
+                                //this.setLastHit(wire, col.index);
+                                let colDig = col.normal.scale(-1);
+                                // Move away from collision
+                                forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                // Cancel depth component of speed
+                                let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                if (depthSpeed > 0) {
+                                    canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                }
+                                // Add ground reaction
+                                let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
+                                reactions.addInPlace(reaction);
+                                reactionsCount++;
+                            }
+                        }
                         /*
                     if (part instanceof QuarterNote || part instanceof DoubleNote) {
                         part.tings.forEach(ting => {
@@ -370,8 +388,8 @@ namespace MarbleRunSimulatorCore {
                                 }
                             }
 
-                            this.velocity.copyFrom(otherSpeed.scale(0.999));
-                            ball.velocity.copyFrom(mySpeed.scale(0.999));
+                            this.velocity.copyFrom(otherSpeed.scale(0.99));
+                            ball.velocity.copyFrom(mySpeed.scale(0.99));
                             canceledSpeed.copyFromFloats(0, 0, 0);
                             //this.velocity.copyFrom(otherSpeed).scaleInPlace(.5);
                             //ball.velocity.copyFrom(mySpeed).scaleInPlace(.6);

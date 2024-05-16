@@ -4,6 +4,8 @@ namespace MarbleRunSimulatorCore {
         public static velocityKicks: number[] = [
             1,
             1,
+            1,
+            1,
             1.03,
             1.27,
             1.46,
@@ -26,20 +28,34 @@ namespace MarbleRunSimulatorCore {
         ];
         public velocityKick: number = 1;
 
+        public kicker: BABYLON.Mesh;
+        public kickerCollider: BABYLON.Mesh;
         public kickerRadius: number = 0.0025;
         public kickerLength: number = 0.04;
         public kickerYIdle: number = 0;
-        public kicker: BABYLON.Mesh;
-        public kickerCollider: BABYLON.Mesh;
         public hasCollidingKicker: boolean = true;
+
+        public shield: BABYLON.Mesh;
+        public shieldCollider: BABYLON.Mesh;
+        public shieldYClosed: number = 0;
+        public shieldLength: number = 0.02;
+        
+        public base: BABYLON.Mesh;
+
+        public animateKickerArm = Mummu.AnimationFactory.EmptyNumberCallback;
+        public animateKickerKick = Mummu.AnimationFactory.EmptyNumberCallback;
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            prop.h = Nabu.MinMax(prop.h, 2, 20);
+            prop.h = Nabu.MinMax(prop.h, 4, 22);
 
             let partName = "shooter-" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+
+            for (let i = this.colors.length; i < 4; i++) {
+                this.colors[i] = 0;
+            }
 
             let x = 1;
             if (prop.mirrorX) {
@@ -50,17 +66,97 @@ namespace MarbleRunSimulatorCore {
 
             this.velocityKick = Shooter.velocityKicks[this.h];
 
-            this.kicker = BABYLON.MeshBuilder.CreateBox("kicker", { width: 2 * this.kickerRadius, height: 2 * this.kickerLength, depth: 2 * this.kickerRadius });
-            this.kickerCollider = this.kicker;
+            this.base = new BABYLON.Mesh("base");
+
+            this.kicker = new BABYLON.Mesh("kicker");
+            this.kickerCollider = new BABYLON.Mesh("kicker-collider");
+            this.kickerCollider.parent = this.kicker;
+            this.kickerCollider.isVisible = false;
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/kicker.babylon").then(datas => {
+                let data = datas[0];
+                if (data) {
+                    data.applyToMesh(this.kicker);
+                    this.kicker.material = this.game.materials.leatherMaterial;
+                }
+                let body = new BABYLON.Mesh("kicker-body");
+                body.parent = this.kicker;
+                if (datas[1]) {
+                    datas[1].applyToMesh(body);
+                    body.material = this.game.materials.getMetalMaterial(this.getColor(1));
+                }
+                let weight = new BABYLON.Mesh("kicker-weight");
+                weight.parent = this.kicker;
+                if (datas[2]) {
+                    datas[2].applyToMesh(weight);
+                    weight.material = this.game.materials.getMetalMaterial(this.getColor(3));
+                }
+
+                if (datas[4]) {
+                    datas[4].applyToMesh(this.base);
+                    this.base.material = this.game.materials.getMetalMaterial(this.getColor(2));
+                }
+
+                let colData = datas[3];
+                if (colData) {
+                    colData.applyToMesh(this.kickerCollider);
+                    this.kickerCollider.isVisible = false;
+                }
+            });
 
             let cupR = 0.006;
             let dH = 0.001;
-            this.kickerYIdle = -tileHeight * this.h - dH - cupR * 0.8 - 0.004;
+            this.kickerYIdle = -tileHeight * (this.h - 2) - dH - cupR * 0.8 - 0.004;
             this.kicker.parent = this;
             this.kicker.position.copyFromFloats(tileWidth * 0.4 - 0, this.kickerYIdle, 0);
 
+            this.shield = new BABYLON.Mesh("shield");
+            this.shieldCollider = new BABYLON.Mesh("shield-collider");
+            this.shieldCollider.parent = this.shield;
+            this.shieldCollider.isVisible = false;
+            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/shield.babylon").then(datas => {
+                let data = datas[0];
+                if (data) {
+                    data.applyToMesh(this.shield);
+                    this.shield.material = this.game.materials.getMetalMaterial(this.getColor(3));
+                }
+                let colData = datas[1];
+                if (colData) {
+                    colData.applyToMesh(this.shieldCollider);
+                    this.shieldCollider.isVisible = false;
+                }
+            });
+
+            this.shieldYClosed = - tileHeight * (this.h - 2);
+            this.shield.position.copyFromFloats(tileWidth * 0.4 - 0, this.shieldYClosed, 0);
+            this.shield.parent = this;
+            
+            this.base.position.copyFromFloats(tileWidth * 0.4 - 0, this.shieldYClosed - 0.02, 0);
+            this.base.parent = this;
+
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+
+            this.animateKickerArm = Mummu.AnimationFactory.CreateNumber(
+                this,
+                this.kicker.position,
+                "y",
+                () => {
+                    this._freezeKicker();
+                },
+                false,
+                Nabu.Easing.easeOutCubic
+            );
+
+            this.animateKickerKick = Mummu.AnimationFactory.CreateNumber(
+                this,
+                this.kicker.position,
+                "y",
+                () => {
+                    this._freezeKicker();
+                },
+                false,
+                Nabu.Easing.easeOutElastic
+            );
 
             console.log("alpha");
         }
@@ -96,11 +192,11 @@ namespace MarbleRunSimulatorCore {
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * h, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * (h - 2), 0), dir),
 
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 1.6 * cupR, -tileHeight * h - dH, 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 0, -tileHeight * h - dH - cupR * 0.8, 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, -tileHeight * h - dH, 0), n),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 1.6 * cupR, -tileHeight * (h - 2) - dH, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 0, -tileHeight * (h - 2) - dH - cupR * 0.8, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, -tileHeight * (h - 2) - dH, 0), n),
 
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, - tileHeight, 0), n),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR - 0.015, 0.035 - tileHeight, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
@@ -131,84 +227,134 @@ namespace MarbleRunSimulatorCore {
             
         };
 
-        public currentShootState: number = 0;
-        public update(dt: number): void {
-            let balls = this.machine.balls;
-            let center = new BABYLON.Vector3(0.0301, - tileHeight * this.h - 0.0004, 0);
+        public get shieldOpened(): boolean {
+            return this.shield.position.y >= this.shieldYClosed + this.shieldLength;
+        }
+
+        public get shieldClosed(): boolean {
+            return this.shield.position.y <= this.shieldYClosed;
+        }
+
+        public getBallReady(): Ball {
+            for (let i = 0; i < this.machine.balls.length; i++) {
+                let ball = this.machine.balls[i];
+                if (Math.abs(ball.position.x - this.kickerCollider.absolutePosition.x) < ball.radius + this.kickerRadius + 0.001) {
+                    if (Math.abs(ball.position.z - this.kickerCollider.absolutePosition.z) < 0.001) {
+                        return ball;
+                    }
+                }
+            }
+            return undefined;
+        }
+
+        public getBallArmed(): Ball {
+            let center = new BABYLON.Vector3(0.0301, - tileHeight * (this.h - 2) - 0.0004, 0);
             center.addInPlace(this.position);
-            if (this.currentShootState === 0) {
-                this.hasCollidingKicker = true;
-                for (let i = 0; i < balls.length; i++) {
-                    let ball = balls[i];
-                    if (Math.abs(ball.position.x - this.kickerCollider.absolutePosition.x) < ball.radius + this.kickerRadius + 0.001) {
-                        if (Math.abs(ball.position.z - this.kickerCollider.absolutePosition.z) < 0.001) {
-                            this.currentShootState = 1;
-                        }
-                        this.currentShootState = 1;
+            for (let i = 0; i < this.machine.balls.length; i++) {
+                let ball = this.machine.balls[i];
+                if (ball.velocity.length() < 0.02 && Math.abs(ball.velocity.x) < 0.001) {
+                    if (BABYLON.Vector3.DistanceSquared(center, ball.position) < 0.0005 * 0.0005) {
+                        return ball;
                     }
-                }
-            }
-            else if (this.currentShootState === 1) {
-                this.hasCollidingKicker = true;
-                if (this.kicker.position.y > this.kickerYIdle - this.kickerLength) {
-                    this.kicker.position.y -= 0.02 * dt;
-                    this.kicker.freezeWorldMatrix();
-                }
-                else {
-                    this.kicker.position.y = this.kickerYIdle - this.kickerLength;
-                    this.kicker.freezeWorldMatrix();
-                    this.currentShootState = 2;
-                }
-            }
-            else if (this.currentShootState === 2) {
-                this.hasCollidingKicker = false;
-                for (let i = 0; i < balls.length; i++) {
-                    if (balls[i].velocity.length() < 0.02 && Math.abs(balls[i].velocity.x) < 0.001) {
-                        console.log(balls[i].position.subtract(this.position).subtractFromFloats(0, -tileHeight * this.h, 0));
-                        if (BABYLON.Vector3.DistanceSquared(center, balls[i].position) < 0.0005 * 0.0005) {
-                            balls[i].velocity.copyFromFloats(0, this.velocityKick, 0);
-                            this.currentShootState = 3;
-                            let ball = balls[i];
-                            ball.debugNextYFlip = () => {
-                                let y = this.position.y - ball.position.y;
-                                if (y < 0.004) {
-                                    console.log(this.h + " too fast");
-                                    Shooter.velocityKicks[this.h] -= 0.005;
-                                }
-                                else if (y > 0.006) {
-                                    console.log(this.h + " too slow");
-                                    Shooter.velocityKicks[this.h] += 0.005;
-                                }
-                                else {
-                                    console.log(this.h + " ok");
-                                    console.log(Shooter.velocityKicks);
-                                }
-                                this.velocityKick = Shooter.velocityKicks[this.h];
-                            }
-                        }
-                    }
-                }
-            }
-            else if (this.currentShootState === 3) {
-                this.hasCollidingKicker = false;
-                if (this.kicker.position.y < this.kickerYIdle) {
-                    this.kicker.position.y += this.velocityKick * dt;
-                    this.kicker.freezeWorldMatrix();
-                }
-                else {
-                    this.kicker.position.y = this.kickerYIdle
-                    this.kicker.freezeWorldMatrix();
-                    this.currentShootState = 4;
-                    this.hasCollidingKicker = true;
-                    setTimeout(() => {
-                        this.currentShootState = 0;
-                    }, 1000);
                 }
             }
         }
 
-        public async kick(ball: Ball): Promise<void> {
+        public shieldClose: boolean = false;
+        public currentShootState: number = 0;
 
+        public update(dt: number): void {
+            if (this.shieldClose) {
+                if (this.shield.position.y > this.shieldYClosed) {
+                    this.shield.position.y -= 0.1 * dt;
+                    this.shield.freezeWorldMatrix();
+                    this.shieldCollider.freezeWorldMatrix();
+                }
+            }
+            else {
+                if (this.shield.position.y < this.shieldYClosed + this.shieldLength) {
+                    this.shield.position.y += 0.1 * dt;
+                    this.shield.freezeWorldMatrix();
+                    this.shieldCollider.freezeWorldMatrix();
+                }
+            }
+
+            let balls = this.machine.balls;
+            let center = new BABYLON.Vector3(0.0301, - tileHeight * (this.h - 2) - 0.0004, 0);
+            center.addInPlace(this.position);
+            if (this.currentShootState === 0) {
+                this.shieldClose = false;
+                this.hasCollidingKicker = true;
+
+                if (this.getBallReady()) {
+                    this.currentShootState = 0.5;
+                    setTimeout(() => {
+                        this.currentShootState = 1;
+                    }, 500);
+                }
+            }
+            else if (this.currentShootState === 1) {
+                this.shieldClose = false;
+                this.hasCollidingKicker = true;
+
+                this.currentShootState = 1.5;
+                this.animateKickerArm(this.kickerYIdle - this.kickerLength, 1.5).then(() => {
+                    setTimeout(() => {
+                        this.currentShootState = 2;
+                    }, 500);
+                });
+            }
+            else if (this.currentShootState === 2) {
+                this.shieldClose = true;
+                this.hasCollidingKicker = true;
+
+                if (this.shieldClosed) {
+                    this.currentShootState = 2.5;
+                    setTimeout(() => {
+                        this.currentShootState = 3;
+                    }, 400);
+                }
+            }
+            else if (this.currentShootState === 3) {
+                this.shieldClose = true;
+                this.hasCollidingKicker = false;
+
+                let ballArmed = this.getBallArmed();
+                if (ballArmed) {
+                    ballArmed.velocity.copyFromFloats(0, this.velocityKick, 0);
+                    this.currentShootState = 4;
+                }
+                else {
+                    let ballReady = this.getBallReady();
+                    if (!ballReady) {
+                        this.currentShootState = 4;
+                    }
+                }
+            }
+            else if (this.currentShootState === 4) {
+                this.shieldClose = true;
+                this.hasCollidingKicker = false;
+
+                this.currentShootState = 4.5;
+                this.animateKickerKick(this.kickerYIdle, 0.8).then(() => {
+                    this.currentShootState = 5;
+                });
+            }
+            else if (this.currentShootState === 5) {
+                this.shieldClose = false;
+                this.hasCollidingKicker = true;
+                
+                if (this.shieldOpened) {
+                    this.currentShootState = 0;
+                }
+            }
+        }
+
+        private _freezeKicker(): void {
+            this.kicker.freezeWorldMatrix();
+            this.kicker.getChildMeshes().forEach(child => {
+                child.freezeWorldMatrix();
+            })
         }
     }
 }
