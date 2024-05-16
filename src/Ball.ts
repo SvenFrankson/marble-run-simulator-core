@@ -315,6 +315,24 @@ namespace MarbleRunSimulatorCore {
                                 }
                             });
                         }
+                        if (part instanceof Shooter && part.hasCollidingKicker) {
+                            let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.kickerCollider);
+                            if (col.hit) {
+                                //this.setLastHit(wire, col.index);
+                                let colDig = col.normal.scale(-1);
+                                // Move away from collision
+                                forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                // Cancel depth component of speed
+                                let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                if (depthSpeed > 0) {
+                                    canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                }
+                                // Add ground reaction
+                                let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
+                                reactions.addInPlace(reaction);
+                                reactionsCount++;
+                            }
+                        }
                         /*
                     if (part instanceof QuarterNote || part instanceof DoubleNote) {
                         part.tings.forEach(ting => {

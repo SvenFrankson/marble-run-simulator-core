@@ -580,11 +580,19 @@ declare namespace MarbleRunSimulatorCore {
     class Shooter extends MachinePart {
         static velocityKicks: number[];
         velocityKick: number;
+        kickerRadius: number;
+        kickerLength: number;
+        kickerYIdle: number;
+        kicker: BABYLON.Mesh;
+        kickerCollider: BABYLON.Mesh;
+        hasCollidingKicker: boolean;
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
+        currentShootState: number;
         update(dt: number): void;
+        kick(ball: Ball): Promise<void>;
     }
 }
 declare namespace MarbleRunSimulatorCore {
