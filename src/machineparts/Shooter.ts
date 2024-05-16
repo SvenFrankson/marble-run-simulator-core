@@ -39,6 +39,7 @@ namespace MarbleRunSimulatorCore {
         public shieldCollider: BABYLON.Mesh;
         public shieldYClosed: number = 0;
         public shieldLength: number = 0.02;
+        public clicSound: BABYLON.Sound;
         
         public base: BABYLON.Mesh;
 
@@ -63,6 +64,8 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.generateWires();
+
+            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
 
             this.velocityKick = Shooter.velocityKicks[this.h];
 
@@ -264,16 +267,28 @@ namespace MarbleRunSimulatorCore {
         public currentShootState: number = 0;
 
         public update(dt: number): void {
-            if (this.shieldClose) {
-                if (this.shield.position.y > this.shieldYClosed) {
-                    this.shield.position.y -= 0.1 * dt;
+            if (this.shieldClose && !this.shieldClosed) {
+                if (this.shield.position.y > this.shieldYClosed + 0.1 * dt) {
+                    this.shield.position.y -= 0.15 * dt;
+                    this.shield.freezeWorldMatrix();
+                    this.shieldCollider.freezeWorldMatrix();
+                }
+                else {
+                    this.clicSound.play();
+                    this.shield.position.y = this.shieldYClosed;
                     this.shield.freezeWorldMatrix();
                     this.shieldCollider.freezeWorldMatrix();
                 }
             }
-            else {
-                if (this.shield.position.y < this.shieldYClosed + this.shieldLength) {
-                    this.shield.position.y += 0.1 * dt;
+            else if (!this.shieldClose && !this.shieldOpened) {
+                if (this.shield.position.y < this.shieldYClosed + this.shieldLength - 0.1 * dt) {
+                    this.shield.position.y += 0.15 * dt;
+                    this.shield.freezeWorldMatrix();
+                    this.shieldCollider.freezeWorldMatrix();
+                }
+                else {
+                    this.clicSound.play();
+                    this.shield.position.y = this.shieldYClosed + this.shieldLength;
                     this.shield.freezeWorldMatrix();
                     this.shieldCollider.freezeWorldMatrix();
                 }
@@ -299,6 +314,7 @@ namespace MarbleRunSimulatorCore {
 
                 this.currentShootState = 1.5;
                 this.animateKickerArm(this.kickerYIdle - this.kickerLength, 1.5).then(() => {
+                    this.clicSound.play();
                     setTimeout(() => {
                         this.currentShootState = 2;
                     }, 500);
@@ -336,6 +352,11 @@ namespace MarbleRunSimulatorCore {
                 this.hasCollidingKicker = false;
 
                 this.currentShootState = 4.5;
+                let ballReady = this.getBallReady();
+                if (ballReady) {
+                    ballReady.marbleChocSound.setVolume(2);
+                    ballReady.marbleChocSound.play();
+                }
                 this.animateKickerKick(this.kickerYIdle, 0.8).then(() => {
                     this.currentShootState = 5;
                 });

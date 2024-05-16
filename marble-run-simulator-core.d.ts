@@ -590,6 +590,7 @@ declare namespace MarbleRunSimulatorCore {
         shieldCollider: BABYLON.Mesh;
         shieldYClosed: number;
         shieldLength: number;
+        clicSound: BABYLON.Sound;
         base: BABYLON.Mesh;
         animateKickerArm: (target: number, duration: number) => Promise<void>;
         animateKickerKick: (target: number, duration: number) => Promise<void>;

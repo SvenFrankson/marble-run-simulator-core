@@ -3986,6 +3986,7 @@ var MarbleRunSimulatorCore;
                 x = -1;
             }
             this.generateWires();
+            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.velocityKick = Shooter.velocityKicks[this.h];
             this.base = new BABYLON.Mesh("base");
             this.kicker = new BABYLON.Mesh("kicker");
@@ -4133,16 +4134,28 @@ var MarbleRunSimulatorCore;
             }
         }
         update(dt) {
-            if (this.shieldClose) {
-                if (this.shield.position.y > this.shieldYClosed) {
-                    this.shield.position.y -= 0.1 * dt;
+            if (this.shieldClose && !this.shieldClosed) {
+                if (this.shield.position.y > this.shieldYClosed + 0.1 * dt) {
+                    this.shield.position.y -= 0.15 * dt;
+                    this.shield.freezeWorldMatrix();
+                    this.shieldCollider.freezeWorldMatrix();
+                }
+                else {
+                    this.clicSound.play();
+                    this.shield.position.y = this.shieldYClosed;
                     this.shield.freezeWorldMatrix();
                     this.shieldCollider.freezeWorldMatrix();
                 }
             }
-            else {
-                if (this.shield.position.y < this.shieldYClosed + this.shieldLength) {
-                    this.shield.position.y += 0.1 * dt;
+            else if (!this.shieldClose && !this.shieldOpened) {
+                if (this.shield.position.y < this.shieldYClosed + this.shieldLength - 0.1 * dt) {
+                    this.shield.position.y += 0.15 * dt;
+                    this.shield.freezeWorldMatrix();
+                    this.shieldCollider.freezeWorldMatrix();
+                }
+                else {
+                    this.clicSound.play();
+                    this.shield.position.y = this.shieldYClosed + this.shieldLength;
                     this.shield.freezeWorldMatrix();
                     this.shieldCollider.freezeWorldMatrix();
                 }
@@ -4165,6 +4178,7 @@ var MarbleRunSimulatorCore;
                 this.hasCollidingKicker = true;
                 this.currentShootState = 1.5;
                 this.animateKickerArm(this.kickerYIdle - this.kickerLength, 1.5).then(() => {
+                    this.clicSound.play();
                     setTimeout(() => {
                         this.currentShootState = 2;
                     }, 500);
@@ -4199,6 +4213,11 @@ var MarbleRunSimulatorCore;
                 this.shieldClose = true;
                 this.hasCollidingKicker = false;
                 this.currentShootState = 4.5;
+                let ballReady = this.getBallReady();
+                if (ballReady) {
+                    ballReady.marbleChocSound.setVolume(2);
+                    ballReady.marbleChocSound.play();
+                }
                 this.animateKickerKick(this.kickerYIdle, 0.8).then(() => {
                     this.currentShootState = 5;
                 });
