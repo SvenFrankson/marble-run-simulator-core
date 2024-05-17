@@ -572,12 +572,6 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class UTurnSharp extends MachinePart {
-        constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
-    }
-}
-declare namespace MarbleRunSimulatorCore {
     class Shooter extends MachinePart {
         static velocityKicks: number[];
         velocityKick: number;
@@ -671,6 +665,12 @@ declare namespace MarbleRunSimulatorCore {
     class UTurn extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(h: number, d: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class UTurnSharp extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

@@ -182,13 +182,13 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[1].colorIndex = 2;
             template.trackTemplates[1].trackpoints = [
                 new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0), dir), 
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-Split.pivotL / Math.SQRT2, -tileHeight * 0.5 - Split.pivotL / Math.SQRT2 - 0.0015 * 1.5, 0), dirEnd.multiplyByFloats(1, -1, 1))
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-Split.pivotL / Math.SQRT2, -tileHeight * 0.5 - Split.pivotL / Math.SQRT2 - 0.001, 0), dirEnd.multiplyByFloats(1, -1, 1))
             ];
 
             template.trackTemplates[2] = new TrackTemplate(template);
             template.trackTemplates[2].colorIndex = 3;
             template.trackTemplates[2].trackpoints = [
-                new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(Split.pivotL / Math.SQRT2, -tileHeight * 0.5 - Split.pivotL / Math.SQRT2 - 0.0015 * 1.5, 0), dirEnd), 
+                new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(Split.pivotL / Math.SQRT2, -tileHeight * 0.5 - Split.pivotL / Math.SQRT2 - 0.001, 0), dirEnd), 
                 new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight * template.h, 0), dir)
             ];
 
@@ -246,15 +246,19 @@ namespace MarbleRunSimulatorCore {
                         if (local.y < ball.radius * 0.9) {
                             if (local.x > ball.radius * 0.5 && local.x < Split.pivotL) {
                                 this._moving = true;
-                                this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
-                                    this._moving = false;
-                                });
+                                setTimeout(() => {
+                                    this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this._moving = false;
+                                    });
+                                }, 150 / this.game.currentTimeFactor)
                                 return;
                             } else if (local.x > -Split.pivotL && local.x < -ball.radius * 0.5) {
                                 this._moving = true;
-                                this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
-                                    this._moving = false;
-                                });
+                                setTimeout(() => {
+                                    this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this._moving = false;
+                                    });
+                                }, 150 / this.game.currentTimeFactor)
                                 return;
                             }
                         }
