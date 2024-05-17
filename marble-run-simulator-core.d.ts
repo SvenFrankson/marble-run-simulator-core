@@ -31,6 +31,7 @@ declare namespace MarbleRunSimulatorCore {
         setPositionZero(p: BABYLON.Vector3): void;
         get k(): number;
         set k(v: number);
+        bumpSurfaceIsRail?: boolean;
         marbleChocSound: BABYLON.Sound;
         railBumpSound: BABYLON.Sound;
         marbleLoopSound: BABYLON.Sound;
@@ -604,6 +605,7 @@ declare namespace MarbleRunSimulatorCore {
         getBallArmed(): Ball;
         shieldClose: boolean;
         currentShootState: number;
+        shieldSpeed: number;
         update(dt: number): void;
         private _freezeKicker;
     }
