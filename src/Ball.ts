@@ -60,6 +60,7 @@ namespace MarbleRunSimulatorCore {
             this.positionZeroGhost.position.copyFrom(this.positionZero);
         }
 
+        public bumpSurfaceIsRail?: boolean = true;
         public marbleChocSound: BABYLON.Sound;
         public railBumpSound: BABYLON.Sound;
         public marbleLoopSound: BABYLON.Sound;
@@ -211,6 +212,7 @@ namespace MarbleRunSimulatorCore {
                 let forcedDisplacement = BABYLON.Vector3.Zero();
                 let canceledSpeed = BABYLON.Vector3.Zero();
 
+                this.bumpSurfaceIsRail = true;
                 this.machine.parts.forEach((part) => {
                     if (Mummu.SphereAABBCheck(this.position, this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
                         part.allWires.forEach((wire) => {
@@ -290,6 +292,7 @@ namespace MarbleRunSimulatorCore {
                                 }
 
                                 this.surface = Surface.Bowl;
+                                this.bumpSurfaceIsRail = false;
                             }
                         }
                         if (part instanceof Stairway) {
@@ -312,6 +315,8 @@ namespace MarbleRunSimulatorCore {
 
                                     this.position.z = box.absolutePosition.z;
                                     this.velocity.z = 0;
+
+                                    this.bumpSurfaceIsRail = false;
                                 }
                             });
                         }
@@ -331,6 +336,7 @@ namespace MarbleRunSimulatorCore {
                                 let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
                                 reactions.addInPlace(reaction);
                                 reactionsCount++;
+                                this.bumpSurfaceIsRail = false;
                             }
                         }
                         if (part instanceof Shooter) {
@@ -349,6 +355,7 @@ namespace MarbleRunSimulatorCore {
                                 let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
                                 reactions.addInPlace(reaction);
                                 reactionsCount++;
+                                this.bumpSurfaceIsRail = false;
                             }
                         }
                         /*
@@ -408,11 +415,19 @@ namespace MarbleRunSimulatorCore {
                 }
                 let canceledSpeedLength = canceledSpeed.length();
                 if (canceledSpeedLength > 0.22) {
-                    let f = Nabu.MinMax((canceledSpeedLength - 0.22) / 0.5, 0, 1);
-                    let v = (1 - f) * 0.01 + f * 0.03;
-                    if (!this.railBumpSound.isPlaying) {
-                        this.railBumpSound.setVolume(v);
-                        this.railBumpSound.play();
+                    let f = Nabu.MinMax((canceledSpeedLength - 0.22) / 0.25, 0, 1);
+                    let v = (1 - f) * 0.01 + f * 0.06;
+                    if (this.bumpSurfaceIsRail) {
+                        if (!this.railBumpSound.isPlaying) {
+                            this.railBumpSound.setVolume(v);
+                            this.railBumpSound.play();
+                        }
+                    }
+                    else {
+                        if (!this.marbleChocSound.isPlaying) {
+                            this.marbleChocSound.setVolume(v * 4);
+                            this.marbleChocSound.play();
+                        }
                     }
                 }
                 this.strReaction = this.strReaction * 0.98;
