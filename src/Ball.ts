@@ -358,6 +358,16 @@ namespace MarbleRunSimulatorCore {
                                 this.bumpSurfaceIsRail = false;
                             }
                         }
+                        if (part instanceof Controler) {
+                            let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.pivotControler);
+                            if (col.hit) {
+                                // Move away from collision
+                                forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                if (this.velocity.length() > 0.5) {
+                                    this.velocity.scaleInPlace(0.9);
+                                }
+                            }
+                        }
                         /*
                     if (part instanceof QuarterNote || part instanceof DoubleNote) {
                         part.tings.forEach(ting => {

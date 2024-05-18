@@ -347,6 +347,9 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "split") {
                     data = Split.GenerateTemplate(mirrorX);
                 }
+                else if (partName === "controler") {
+                    data = Controler.GenerateTemplate(mirrorX);
+                }
                 else if (partName === "flatjoin") {
                     data = FlatJoin.GenerateTemplate(mirrorX);
                 }

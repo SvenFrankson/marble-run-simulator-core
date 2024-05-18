@@ -479,6 +479,20 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Controler extends MachinePart {
+        private _animatePivot;
+        pivotPass: BABYLON.Mesh;
+        pivotControler: BABYLON.Mesh;
+        static pivotL: number;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        private _moving;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class Elevator extends MachinePart {
         boxesCount: number;
         rWheel: number;

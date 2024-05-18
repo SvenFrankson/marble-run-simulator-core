@@ -18,7 +18,8 @@ namespace MarbleRunSimulatorCore {
         "end",
         "jumper-1",
         "gravitywell",
-        "shooter-4"
+        "shooter-4",
+        "controler",
     ];
 
     export interface IMachinePartProp {
@@ -160,6 +161,9 @@ namespace MarbleRunSimulatorCore {
             if (partName === "split") {
                 return new Split(this.machine, prop);
             }
+            if (partName === "controler") {
+                return new Controler(this.machine, prop);
+            }
             if (partName.startsWith("elevator-")) {
                 let h = parseInt(partName.split("-")[1]);
                 prop.h = h;
@@ -237,6 +241,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "split") {
                 return new Split(this.machine, prop);
+            }
+            if (baseName === "controler") {
+                return new Controler(this.machine, prop);
             }
             if (baseName === "elevator") {
                 return new Elevator(this.machine, prop);
