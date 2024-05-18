@@ -4,13 +4,20 @@ namespace MarbleRunSimulatorCore {
 
         public pivotPass: BABYLON.Mesh;
         public pivotControler: BABYLON.Mesh;
-        public static pivotL: number = 0.013;
+        public pivotControlerCollider: BABYLON.Mesh;
+        
+        public clicSound: BABYLON.Sound;
+
+        public static pivotL: number = 0.014;
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
             let partName = "controler";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+
+            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound.setVolume(0.25);
 
             for (let i = this.colors.length; i < 6; i++) {
                 this.colors[i] = 0;
@@ -45,6 +52,10 @@ namespace MarbleRunSimulatorCore {
             this.pivotControler.material = this.game.materials.getMetalMaterial(this.getColor(5));
             this.pivotControler.parent = this;
 
+            this.pivotControlerCollider = new BABYLON.Mesh("collider-trigger");
+            this.pivotControlerCollider.isVisible = false;
+            this.pivotControlerCollider.parent = this.pivotControler;
+
             let cog8 = new BABYLON.Mesh("cog8");
             cog8.material = this.game.materials.getMetalMaterial(this.getColor(5));
             cog8.parent = this.pivotControler;
@@ -76,6 +87,9 @@ namespace MarbleRunSimulatorCore {
 
                 let triggerData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 0);
                 triggerData.applyToMesh(this.pivotControler);
+                
+                let triggerColliderData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 1);
+                triggerColliderData.applyToMesh(this.pivotControlerCollider);
             }
 
             loadMeshes();
@@ -130,6 +144,7 @@ namespace MarbleRunSimulatorCore {
             template.w = 1;
             template.h = 1;
             template.d = 2;
+            template.mirrorX = mirrorX;
 
             template.xMirrorable = true;
 
@@ -240,6 +255,9 @@ namespace MarbleRunSimulatorCore {
             this.pivotControler.getChildMeshes().forEach((child) => {
                 child.freezeWorldMatrix();
             });
+            this.wires.forEach((wire) => {
+                wire.recomputeAbsolutePath();
+            });
         };
 
         private _moving: boolean = false;
@@ -250,21 +268,23 @@ namespace MarbleRunSimulatorCore {
                     if (BABYLON.Vector3.Distance(ball.position, this.pivotControler.absolutePosition) < 0.05) {
                         let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivotControler.getWorldMatrix().clone().invert());
                         if (local.y < 0 && local.y > - 0.03) {
-                            if (local.x > 0 && local.x < ball.radius * 1.1) {
+                            if (local.x > 0 && local.x < ball.radius + 0.004) {
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
                                 ball.marbleChocSound.play();
                                 this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                    this.clicSound.play();
                                     setTimeout(() => {
                                         this._moving = false;
                                     }, 500 / this.game.currentTimeFactor);
                                 });
                                 return;
-                            } else if (local.x < 0 && local.x > - ball.radius * 1.1) {
+                            } else if (local.x < 0 && local.x > - ball.radius - 0.004) {
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
                                 ball.marbleChocSound.play();
                                 this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                    this.clicSound.play();
                                     setTimeout(() => {
                                         this._moving = false;
                                     }, 500 / this.game.currentTimeFactor);
