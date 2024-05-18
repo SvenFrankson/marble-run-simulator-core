@@ -3,6 +3,9 @@ namespace MarbleRunSimulatorCore {
         private _animatePivot = Mummu.AnimationFactory.EmptyNumberCallback;
 
         public pivot: BABYLON.Mesh;
+
+        public clicSound: BABYLON.Sound;
+        
         public static pivotL: number = 0.013;
 
         constructor(machine: Machine, prop: IMachinePartProp) {
@@ -10,6 +13,9 @@ namespace MarbleRunSimulatorCore {
 
             let partName = "split";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+
+            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound.setVolume(0.25);
 
             for (let i = this.colors.length; i < 6; i++) {
                 this.colors[i] = 0;
@@ -154,6 +160,7 @@ namespace MarbleRunSimulatorCore {
 
             template.w = 1;
             template.h = 1;
+            template.mirrorX = mirrorX;
 
             template.xMirrorable = true;
 
@@ -248,6 +255,7 @@ namespace MarbleRunSimulatorCore {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this.clicSound.play()
                                         this._moving = false;
                                     });
                                 }, 150 / this.game.currentTimeFactor)
@@ -256,6 +264,7 @@ namespace MarbleRunSimulatorCore {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this.clicSound.play();
                                         this._moving = false;
                                     });
                                 }, 150 / this.game.currentTimeFactor)
