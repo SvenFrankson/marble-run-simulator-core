@@ -73,7 +73,7 @@ namespace MarbleRunSimulatorCore {
             this.base = new BABYLON.Mesh("base");
 
             this.kicker = new BABYLON.Mesh("kicker");
-            this.kickerCollider = new BABYLON.Mesh("kicker-collider");
+            this.kickerCollider = new BABYLON.Mesh("collider-kicker");
             this.kickerCollider.parent = this.kicker;
             this.kickerCollider.isVisible = false;
             this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/kicker.babylon").then(datas => {
@@ -114,7 +114,7 @@ namespace MarbleRunSimulatorCore {
             this.kicker.position.copyFromFloats(tileWidth * 0.4 - 0, this.kickerYIdle, 0);
 
             this.shield = new BABYLON.Mesh("shield");
-            this.shieldCollider = new BABYLON.Mesh("shield-collider");
+            this.shieldCollider = new BABYLON.Mesh("collider-shield");
             this.shieldCollider.parent = this.shield;
             this.shieldCollider.isVisible = false;
             this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/shield.babylon").then(datas => {
