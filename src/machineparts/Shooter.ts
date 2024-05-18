@@ -111,7 +111,10 @@ namespace MarbleRunSimulatorCore {
             let dH = 0.001;
             this.kickerYIdle = -tileHeight * (this.h - 2) - dH - cupR * 0.8 - 0.004;
             this.kicker.parent = this;
-            this.kicker.position.copyFromFloats(tileWidth * 0.4 - 0, this.kickerYIdle, 0);
+            this.kicker.position.copyFromFloats(x * tileWidth * 0.4 - 0, this.kickerYIdle, 0);
+            if (this.mirrorX) {
+                this.kicker.rotation.y = Math.PI;
+            }
 
             this.shield = new BABYLON.Mesh("shield");
             this.shieldCollider = new BABYLON.Mesh("collider-shield");
@@ -131,10 +134,16 @@ namespace MarbleRunSimulatorCore {
             });
 
             this.shieldYClosed = - tileHeight * (this.h - 2);
-            this.shield.position.copyFromFloats(tileWidth * 0.4 - 0, this.shieldYClosed, 0);
+            this.shield.position.copyFromFloats(x * tileWidth * 0.4 - 0, this.shieldYClosed, 0);
+            if (this.mirrorX) {
+                this.shield.rotation.y = Math.PI;
+            }
             this.shield.parent = this;
             
-            this.base.position.copyFromFloats(tileWidth * 0.4 - 0, this.shieldYClosed - 0.02, 0);
+            this.base.position.copyFromFloats(x * tileWidth * 0.4 - 0, this.shieldYClosed - 0.02, 0);
+            if (this.mirrorX) {
+                this.base.rotation.y = Math.PI;
+            }
             this.base.parent = this;
 
             this.machine.onStopCallbacks.push(this.reset);
@@ -252,7 +261,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public getBallArmed(): Ball {
-            let center = new BABYLON.Vector3(0.0301, - tileHeight * (this.h - 2) - 0.0004, 0);
+            let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? - 1 : 1), - tileHeight * (this.h - 2) - 0.0004, 0);
             center.addInPlace(this.position);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
