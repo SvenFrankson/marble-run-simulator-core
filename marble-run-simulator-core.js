@@ -324,7 +324,7 @@ var MarbleRunSimulatorCore;
                             }
                         }
                         if (part instanceof MarbleRunSimulatorCore.Controler) {
-                            let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.pivotControler);
+                            let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.pivotControlerCollider);
                             if (col.hit) {
                                 // Move away from collision
                                 forcedDisplacement.addInPlace(col.normal.scale(col.depth));
@@ -2029,13 +2029,13 @@ var MarbleRunSimulatorCore;
         "loop-1.1",
         "spiral-1.2.1",
         "elevator-4",
-        "stairway-1.6",
-        "screw-1.4",
+        "stairway-2.4",
+        "screw-2.2",
         "start",
         "end",
         "jumper-1",
         "gravitywell",
-        "shooter-4",
+        "shooter-8",
         "controler",
     ];
     class MachinePartFactory {
@@ -3131,10 +3131,15 @@ var MarbleRunSimulatorCore;
                 this.pivotControler.getChildMeshes().forEach((child) => {
                     child.freezeWorldMatrix();
                 });
+                this.wires.forEach((wire) => {
+                    wire.recomputeAbsolutePath();
+                });
             };
             this._moving = false;
             let partName = "controler";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound.setVolume(0.25);
             for (let i = this.colors.length; i < 6; i++) {
                 this.colors[i] = 0;
             }
@@ -3160,6 +3165,9 @@ var MarbleRunSimulatorCore;
             this.pivotControler.position.copyFromFloats(0, MarbleRunSimulatorCore.tileHeight * 0.5, 0);
             this.pivotControler.material = this.game.materials.getMetalMaterial(this.getColor(5));
             this.pivotControler.parent = this;
+            this.pivotControlerCollider = new BABYLON.Mesh("collider-trigger");
+            this.pivotControlerCollider.isVisible = false;
+            this.pivotControlerCollider.parent = this.pivotControler;
             let cog8 = new BABYLON.Mesh("cog8");
             cog8.material = this.game.materials.getMetalMaterial(this.getColor(5));
             cog8.parent = this.pivotControler;
@@ -3185,6 +3193,8 @@ var MarbleRunSimulatorCore;
                 arrowData.applyToMesh(this.pivotPass);
                 let triggerData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 0);
                 triggerData.applyToMesh(this.pivotControler);
+                let triggerColliderData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 1);
+                triggerColliderData.applyToMesh(this.pivotControlerCollider);
             };
             loadMeshes();
             let wireVertical0 = new MarbleRunSimulatorCore.Wire(this);
@@ -3223,6 +3233,7 @@ var MarbleRunSimulatorCore;
             template.w = 1;
             template.h = 1;
             template.d = 2;
+            template.mirrorX = mirrorX;
             template.xMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -3309,22 +3320,24 @@ var MarbleRunSimulatorCore;
                     if (BABYLON.Vector3.Distance(ball.position, this.pivotControler.absolutePosition) < 0.05) {
                         let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivotControler.getWorldMatrix().clone().invert());
                         if (local.y < 0 && local.y > -0.03) {
-                            if (local.x > 0 && local.x < ball.radius * 1.1) {
+                            if (local.x > 0 && local.x < ball.radius + 0.004) {
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
                                 ball.marbleChocSound.play();
                                 this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                    this.clicSound.play();
                                     setTimeout(() => {
                                         this._moving = false;
                                     }, 500 / this.game.currentTimeFactor);
                                 });
                                 return;
                             }
-                            else if (local.x < 0 && local.x > -ball.radius * 1.1) {
+                            else if (local.x < 0 && local.x > -ball.radius - 0.004) {
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
                                 ball.marbleChocSound.play();
                                 this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                    this.clicSound.play();
                                     setTimeout(() => {
                                         this._moving = false;
                                     }, 500 / this.game.currentTimeFactor);
@@ -3337,7 +3350,7 @@ var MarbleRunSimulatorCore;
             }
         }
     }
-    Controler.pivotL = 0.013;
+    Controler.pivotL = 0.014;
     MarbleRunSimulatorCore.Controler = Controler;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
@@ -4275,7 +4288,7 @@ var MarbleRunSimulatorCore;
             this.velocityKick = Shooter.velocityKicks[this.h];
             this.base = new BABYLON.Mesh("base");
             this.kicker = new BABYLON.Mesh("kicker");
-            this.kickerCollider = new BABYLON.Mesh("kicker-collider");
+            this.kickerCollider = new BABYLON.Mesh("collider-kicker");
             this.kickerCollider.parent = this.kicker;
             this.kickerCollider.isVisible = false;
             this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/kicker.babylon").then(datas => {
@@ -4312,7 +4325,7 @@ var MarbleRunSimulatorCore;
             this.kicker.parent = this;
             this.kicker.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.4 - 0, this.kickerYIdle, 0);
             this.shield = new BABYLON.Mesh("shield");
-            this.shieldCollider = new BABYLON.Mesh("shield-collider");
+            this.shieldCollider = new BABYLON.Mesh("collider-shield");
             this.shieldCollider.parent = this.shield;
             this.shieldCollider.isVisible = false;
             this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/shield.babylon").then(datas => {
@@ -4762,6 +4775,8 @@ var MarbleRunSimulatorCore;
             this._moving = false;
             let partName = "split";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound.setVolume(0.25);
             for (let i = this.colors.length; i < 6; i++) {
                 this.colors[i] = 0;
             }
@@ -4879,6 +4894,7 @@ var MarbleRunSimulatorCore;
             template.partName = "split";
             template.w = 1;
             template.h = 1;
+            template.mirrorX = mirrorX;
             template.xMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -4946,6 +4962,7 @@ var MarbleRunSimulatorCore;
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this.clicSound.play();
                                         this._moving = false;
                                     });
                                 }, 150 / this.game.currentTimeFactor);
@@ -4955,6 +4972,7 @@ var MarbleRunSimulatorCore;
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this.clicSound.play();
                                         this._moving = false;
                                     });
                                 }, 150 / this.game.currentTimeFactor);

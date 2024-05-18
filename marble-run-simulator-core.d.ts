@@ -483,6 +483,8 @@ declare namespace MarbleRunSimulatorCore {
         private _animatePivot;
         pivotPass: BABYLON.Mesh;
         pivotControler: BABYLON.Mesh;
+        pivotControlerCollider: BABYLON.Mesh;
+        clicSound: BABYLON.Sound;
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
@@ -635,6 +637,7 @@ declare namespace MarbleRunSimulatorCore {
     class Split extends MachinePart {
         private _animatePivot;
         pivot: BABYLON.Mesh;
+        clicSound: BABYLON.Sound;
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;

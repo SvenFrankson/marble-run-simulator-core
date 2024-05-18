@@ -12,13 +12,13 @@ namespace MarbleRunSimulatorCore {
         "loop-1.1",
         "spiral-1.2.1",
         "elevator-4",
-        "stairway-1.6",
-        "screw-1.4",
+        "stairway-2.4",
+        "screw-2.2",
         "start",
         "end",
         "jumper-1",
         "gravitywell",
-        "shooter-4",
+        "shooter-8",
         "controler",
     ];
 
