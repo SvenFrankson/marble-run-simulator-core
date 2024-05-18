@@ -359,7 +359,7 @@ namespace MarbleRunSimulatorCore {
                             }
                         }
                         if (part instanceof Controler) {
-                            let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.pivotControler);
+                            let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.pivotControlerCollider);
                             if (col.hit) {
                                 // Move away from collision
                                 forcedDisplacement.addInPlace(col.normal.scale(col.depth));
