@@ -146,10 +146,8 @@ namespace MarbleRunSimulatorCore {
             if (partName.startsWith("spiral-")) {
                 let w = parseInt(partName.split("-")[1].split(".")[0]);
                 let h = parseInt(partName.split("-")[1].split(".")[1]);
-                let n = parseInt(partName.split("-")[1].split(".")[2]);
                 prop.w = w;
                 prop.h = h;
-                prop.n = n;
                 return new Spiral(this.machine, prop);
             }
             if (partName === "join") {

@@ -238,7 +238,7 @@ var MarbleRunSimulatorCore;
                             */
                             let f = Nabu.MinMax(this.velocity.lengthSquared(), 0, 1);
                             let range = Math.round(f * 32 + (1 - f) * 2);
-                            col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, true, index, range);
+                            col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, !(part instanceof MarbleRunSimulatorCore.Spiral), index, range);
                             //}
                             if (col.hit) {
                                 //this.setLastHit(wire, col.index);
@@ -2240,10 +2240,8 @@ var MarbleRunSimulatorCore;
             if (partName.startsWith("spiral-")) {
                 let w = parseInt(partName.split("-")[1].split(".")[0]);
                 let h = parseInt(partName.split("-")[1].split(".")[1]);
-                let n = parseInt(partName.split("-")[1].split(".")[2]);
                 prop.w = w;
                 prop.h = h;
-                prop.n = n;
                 return new MarbleRunSimulatorCore.Spiral(this.machine, prop);
             }
             if (partName === "join") {
@@ -2890,8 +2888,7 @@ var MarbleRunSimulatorCore;
                 else if (partName.startsWith("spiral-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let n = parseInt(partName.split("-")[1].split(".")[2]);
-                    data = MarbleRunSimulatorCore.Spiral.GenerateTemplate(w, h, n, mirrorX, mirrorZ);
+                    data = MarbleRunSimulatorCore.Spiral.GenerateTemplate(w, h, mirrorX, mirrorZ);
                 }
                 else if (partName === "quarter") {
                     data = MarbleRunSimulatorCore.QuarterNote.GenerateTemplate(mirrorX);
@@ -4803,23 +4800,23 @@ var MarbleRunSimulatorCore;
     class Spiral extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "spiral-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
+            prop.w = Nabu.MinMax(prop.w, 1, 2);
+            let partName = "spiral-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
-        static GenerateTemplate(w, h, n, mirrorX, mirrorZ) {
+        static GenerateTemplate(w, h, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "spiral-" + w.toFixed(0) + "." + h.toFixed(0) + "." + n.toFixed(0);
-            template.angleSmoothSteps = 50;
+            template.partName = "spiral-" + w.toFixed(0) + "." + h.toFixed(0);
+            template.angleSmoothSteps = 200;
             template.w = w;
+            template.d = w === 1 ? 2 : 3;
             template.h = h;
-            template.d = 3;
-            template.n = n;
+            template.n = h;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
             template.xExtendable = true;
             template.yExtendable = true;
-            template.nExtendable = true;
             template.xMirrorable = true;
             template.zMirrorable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
@@ -4830,21 +4827,27 @@ var MarbleRunSimulatorCore;
             };
             template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))];
             let nSpirals = template.n;
-            let xCenterStart = 0;
-            let xCenterEnd = MarbleRunSimulatorCore.tileWidth * (template.w - 1);
-            let r = MarbleRunSimulatorCore.tileWidth * 0.8;
+            let widthInM = template.w * MarbleRunSimulatorCore.tileWidth;
+            let r = widthInM * 0.5 - 0.01;
             let heightStart = 0;
             let heightEnd = -MarbleRunSimulatorCore.tileHeight * template.h;
-            for (let n = 0; n <= 6 * nSpirals; n++) {
-                let f = n / (6 * nSpirals);
-                let a = (2 * Math.PI * n) / 6;
-                let cosa = Math.cos(a);
-                let sina = Math.sin(a);
-                let dir;
-                if (n === 0 || n === 6 * nSpirals) {
-                    dir = BABYLON.Vector3.Right();
+            for (let nS = 0; nS < nSpirals; nS++) {
+                let x = -MarbleRunSimulatorCore.tileWidth * 0.5 + template.w * MarbleRunSimulatorCore.tileWidth * 0.5;
+                let nV0 = 0;
+                if (nS >= 1) {
+                    nV0 = 1;
                 }
-                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(f * (xCenterEnd - xCenterStart) + xCenterStart + sina * r, f * (heightEnd - heightStart) + heightStart, (cosa - 1) * r), dir));
+                for (let nV = nV0; nV <= 8; nV++) {
+                    let f = ((nS * 8) + nV) / (nSpirals * 8);
+                    let a = (2 * Math.PI * nV) / 8;
+                    let cosa = Math.cos(a);
+                    let sina = Math.sin(a);
+                    let dir;
+                    if (nV === 0 || nV === 8) {
+                        dir = BABYLON.Vector3.Right();
+                    }
+                    template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x + sina * r, f * (heightEnd - heightStart) + heightStart, -r + cosa * r), dir));
+                }
             }
             template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * (template.w - 0.5), heightEnd, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)));
             if (mirrorX) {

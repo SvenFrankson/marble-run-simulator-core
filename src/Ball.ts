@@ -270,7 +270,7 @@ namespace MarbleRunSimulatorCore {
                             */
                             let f = Nabu.MinMax(this.velocity.lengthSquared(), 0, 1);
                             let range = Math.round(f * 32 + (1 - f) * 2);
-                            col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, true, index, range);
+                            col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, !(part instanceof Spiral), index, range);
                             //}
                             if (col.hit) {
                                 //this.setLastHit(wire, col.index);
