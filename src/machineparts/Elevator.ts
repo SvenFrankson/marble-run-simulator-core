@@ -19,7 +19,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.wheels = [new BABYLON.Mesh("wheel-0"), new BABYLON.Mesh("wheel-1")];
-            this.wheels[0].position.copyFromFloats(0.03 * x + tileWidth * 0.5, -tileHeight * (this.h + 0.45), 0);
+            this.wheels[0].position.copyFromFloats(0.03 * x + tileWidth * 0.5, -tileHeight * (this.h + 0.35), 0);
             this.wheels[0].parent = this;
             this.wheels[0].material = this.game.materials.getMetalMaterial(0);
 

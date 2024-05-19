@@ -591,7 +591,9 @@ var MarbleRunSimulatorCore;
                 makeBallMaterial("circle-green", "ball-circle-green.png"),
                 makeBallMaterial("star-blue", "ball-star-blue.png"),
                 makeBallMaterial("tiaratum", "ball-tiaratum.png"),
-                makeBallMaterial("html5", "ball-html5.png")
+                makeBallMaterial("html5", "ball-html5.png"),
+                makeBallMaterial("tiaratum", "ball-bjs.png"),
+                makeBallMaterial("html5", "ball-poki.png")
             ];
         }
         getMetalMaterial(colorIndex) {
@@ -3472,7 +3474,7 @@ var MarbleRunSimulatorCore;
                 x = -1;
             }
             this.wheels = [new BABYLON.Mesh("wheel-0"), new BABYLON.Mesh("wheel-1")];
-            this.wheels[0].position.copyFromFloats(0.03 * x + MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * (this.h + 0.45), 0);
+            this.wheels[0].position.copyFromFloats(0.03 * x + MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * (this.h + 0.35), 0);
             this.wheels[0].parent = this;
             this.wheels[0].material = this.game.materials.getMetalMaterial(0);
             this.wheels[1].position.copyFromFloats(0.03 * x + MarbleRunSimulatorCore.tileWidth * 0.5, 0.035 - MarbleRunSimulatorCore.tileHeight, 0);

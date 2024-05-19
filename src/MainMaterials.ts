@@ -164,7 +164,9 @@ namespace MarbleRunSimulatorCore {
                 makeBallMaterial("circle-green", "ball-circle-green.png"),
                 makeBallMaterial("star-blue", "ball-star-blue.png"),
                 makeBallMaterial("tiaratum", "ball-tiaratum.png"),
-                makeBallMaterial("html5", "ball-html5.png")
+                makeBallMaterial("html5", "ball-html5.png"),
+                makeBallMaterial("tiaratum", "ball-bjs.png"),
+                makeBallMaterial("html5", "ball-poki.png")
             ]
         }
     }
