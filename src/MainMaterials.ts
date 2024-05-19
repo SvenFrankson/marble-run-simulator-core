@@ -19,6 +19,7 @@ namespace MarbleRunSimulatorCore {
         public blueMaterial: BABYLON.StandardMaterial;
         public whiteAutolitMaterial: BABYLON.StandardMaterial;
         public whiteFullLitMaterial: BABYLON.StandardMaterial;
+        public earth: BABYLON.PBRMetallicRoughnessMaterial;
 
         constructor(public game: IGame) {
             this.handleMaterial = new BABYLON.StandardMaterial("handle-material");
@@ -141,6 +142,13 @@ namespace MarbleRunSimulatorCore {
             this.paintingLight.diffuseColor.copyFromFloats(1, 1, 1);
             this.paintingLight.emissiveTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/painting-light.png");
             this.paintingLight.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+
+            this.earth = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            this.earth.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+            this.earth.metallic = 0.7;
+            this.earth.roughness = 0.3;
+            this.earth.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            this.earth.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/earth.png");
         }
     }
 }

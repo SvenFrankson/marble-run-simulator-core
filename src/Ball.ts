@@ -32,6 +32,8 @@ namespace MarbleRunSimulatorCore {
             return Math.PI * this.radius * this.radius;
         }
         public velocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public rotationSpeed: number = 0;
+        public rotationAxis: BABYLON.Vector3 = BABYLON.Vector3.Right();
         public surface: Surface = Surface.Rail;
 
         public _showPositionZeroGhost: boolean = false;
@@ -99,6 +101,7 @@ namespace MarbleRunSimulatorCore {
             data.applyToMesh(this);
 
             this.material = this.game.materials.getMetalMaterial(0);
+            this.material = this.game.materials.earth;
 
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.dispose();
@@ -455,6 +458,14 @@ namespace MarbleRunSimulatorCore {
                 this.velocity.addInPlace(acceleration.scale(dt));
 
                 this.position.addInPlace(this.velocity.scale(dt));
+
+                if (reactions.length() > 0) {
+                    let currentRight = BABYLON.Vector3.Cross(reactions, this.velocity).normalize();
+                    this.rotationAxis.scaleInPlace(0.9).addInPlace(currentRight.scale(0.1)).normalize();
+                    let rotationSpeed = this.velocity.length() / (2 * Math.PI * this.radius);
+                    this.rotationSpeed = 0.9 * this.rotationSpeed + 0.1 * rotationSpeed;
+                }
+                this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
             }
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {

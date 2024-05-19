@@ -22,6 +22,8 @@ declare namespace MarbleRunSimulatorCore {
         get mass(): number;
         get sectionArea(): number;
         velocity: BABYLON.Vector3;
+        rotationSpeed: number;
+        rotationAxis: BABYLON.Vector3;
         surface: Surface;
         _showPositionZeroGhost: boolean;
         get showPositionZeroGhost(): boolean;
@@ -79,6 +81,7 @@ declare namespace MarbleRunSimulatorCore {
         blueMaterial: BABYLON.StandardMaterial;
         whiteAutolitMaterial: BABYLON.StandardMaterial;
         whiteFullLitMaterial: BABYLON.StandardMaterial;
+        earth: BABYLON.PBRMetallicRoughnessMaterial;
         constructor(game: IGame);
     }
 }

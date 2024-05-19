@@ -20,6 +20,8 @@ var MarbleRunSimulatorCore;
             this.constructorIndex = 0;
             this.size = 0.016;
             this.velocity = BABYLON.Vector3.Zero();
+            this.rotationSpeed = 0;
+            this.rotationAxis = BABYLON.Vector3.Right();
             this.surface = Surface.Rail;
             this._showPositionZeroGhost = false;
             this.bumpSurfaceIsRail = true;
@@ -94,6 +96,7 @@ var MarbleRunSimulatorCore;
             let data = BABYLON.CreateSphereVertexData({ diameter: this.size });
             data.applyToMesh(this);
             this.material = this.game.materials.getMetalMaterial(0);
+            this.material = this.game.materials.earth;
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.dispose();
             }
@@ -412,6 +415,13 @@ var MarbleRunSimulatorCore;
                     .scaleInPlace(1 / m);
                 this.velocity.addInPlace(acceleration.scale(dt));
                 this.position.addInPlace(this.velocity.scale(dt));
+                if (reactions.length() > 0) {
+                    let currentRight = BABYLON.Vector3.Cross(reactions, this.velocity).normalize();
+                    this.rotationAxis.scaleInPlace(0.9).addInPlace(currentRight.scale(0.1)).normalize();
+                    let rotationSpeed = this.velocity.length() / (2 * Math.PI * this.radius);
+                    this.rotationSpeed = 0.9 * this.rotationSpeed + 0.1 * rotationSpeed;
+                }
+                this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
             }
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
@@ -536,6 +546,12 @@ var MarbleRunSimulatorCore;
             this.paintingLight.diffuseColor.copyFromFloats(1, 1, 1);
             this.paintingLight.emissiveTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/painting-light.png");
             this.paintingLight.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.earth = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            this.earth.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+            this.earth.metallic = 0.7;
+            this.earth.roughness = 0.3;
+            this.earth.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            this.earth.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/earth.png");
         }
         getMetalMaterial(colorIndex) {
             return this.metalMaterials[colorIndex % this.metalMaterials.length];
