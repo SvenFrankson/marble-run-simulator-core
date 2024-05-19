@@ -3640,7 +3640,9 @@ var MarbleRunSimulatorCore;
             }
             let deltaAngle = (dx / this.p) * 2 * Math.PI * x;
             this.wheels[0].rotation.z -= deltaAngle;
+            this.wheels[0].freezeWorldMatrix();
             this.wheels[1].rotation.z -= deltaAngle;
+            this.wheels[1].freezeWorldMatrix();
         }
     }
     MarbleRunSimulatorCore.Elevator = Elevator;
