@@ -19,7 +19,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.wheels = [new BABYLON.Mesh("wheel-0"), new BABYLON.Mesh("wheel-1")];
-            this.wheels[0].position.copyFromFloats(0.03 * x + tileWidth * 0.5, -tileHeight * (this.h + 0.35), 0);
+            this.wheels[0].position.copyFromFloats(0.03 * x + tileWidth * 0.5, -tileHeight * (this.h + 0.45), 0);
             this.wheels[0].parent = this;
             this.wheels[0].material = this.game.materials.getMetalMaterial(0);
 
@@ -137,14 +137,20 @@ namespace MarbleRunSimulatorCore {
             let nRight = new BABYLON.Vector3(-1, 1, 0);
             nRight.normalize();
 
+            let cupR = 0.006;
+            let dH = 0.002;
+            let vertX: number = tileWidth * 0.5 + 0.01 - cupR;
+
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * h, 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.2 + tileWidth * 0.5, -tileHeight * (h + 0.15), 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0 + tileWidth * 0.5, -tileHeight * (h + 0.35), 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0 + 0.01 + tileWidth * 0.5, -tileHeight * (h + 0.35) + 0.01, 0), n),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0 + 0.01 + tileWidth * 0.5, 0 - tileHeight, 0), n),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-0.005 + tileWidth * 0.5, 0.035 - tileHeight, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
+
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX - 1.6 * cupR, -tileHeight * h - dH, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX - 0, -tileHeight * h - dH - cupR * 0.6, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR, -tileHeight * h - dH, 0), n),
+
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR, - tileHeight, 0), n),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR - 0.015, 0.035 - tileHeight, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
             ];
             template.trackTemplates[0].drawEndTip = true;
 
