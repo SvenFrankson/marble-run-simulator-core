@@ -483,7 +483,32 @@ var MarbleRunSimulatorCore;
             copperMaterial.metallic = 1.0;
             copperMaterial.roughness = 0.15;
             copperMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
-            this.metalMaterials = [steelMaterial, copperMaterial];
+            let plasticIndigo = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticIndigo.baseColor = BABYLON.Color3.FromHexString("#004777");
+            plasticIndigo.metallic = 0;
+            plasticIndigo.roughness = 0.9;
+            plasticIndigo.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            let plasticRed = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticRed.baseColor = BABYLON.Color3.FromHexString("#A30000");
+            plasticRed.metallic = 0;
+            plasticRed.roughness = 0.9;
+            plasticRed.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            let plasticOrange = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticOrange.baseColor = BABYLON.Color3.FromHexString("#FF7700");
+            plasticOrange.metallic = 0;
+            plasticOrange.roughness = 0.9;
+            plasticOrange.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            let plasticYellow = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticYellow.baseColor = BABYLON.Color3.FromHexString("#EFD28D");
+            plasticYellow.metallic = 0;
+            plasticYellow.roughness = 0.9;
+            plasticYellow.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            let plasticGreen = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticGreen.baseColor = BABYLON.Color3.FromHexString("#00AFB5");
+            plasticGreen.metallic = 0;
+            plasticGreen.roughness = 0.9;
+            plasticGreen.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            this.metalMaterials = [steelMaterial, copperMaterial, plasticIndigo, plasticRed, plasticOrange, plasticYellow, plasticGreen];
             this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);
             this.velvetMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/velvet.jpg");
@@ -746,7 +771,7 @@ var MarbleRunSimulatorCore;
             }
         }
         async instantiate() {
-            console.log("instantiate machine");
+            this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             this.parts = this.parts.sort((a, b) => {
                 return b.j + b.h - (a.j + a.h);
             });
@@ -2280,6 +2305,7 @@ var MarbleRunSimulatorCore;
             let partialsDatas = [];
             for (let j = 0; j < part.tracks.length; j++) {
                 let track = part.tracks[j];
+                let colorIndex = track.part.getColor(track.template.colorIndex);
                 let interpolatedPoints = track.templateInterpolatedPoints;
                 let summedLength = [0];
                 for (let i = 1; i < interpolatedPoints.length; i++) {
@@ -2291,7 +2317,10 @@ var MarbleRunSimulatorCore;
                 let count = Math.round(summedLength[summedLength.length - 1] / props.spacing / 3) * 3;
                 count = Math.max(1, count);
                 let correctedSpacing = summedLength[summedLength.length - 1] / count;
-                let radius = part.wireSize * 0.5 * 0.75;
+                let radiusShape = part.wireSize * 0.5 * 0.75;
+                if (colorIndex >= 2) {
+                    radiusShape *= 2;
+                }
                 let nShape = 3;
                 if (q === 1) {
                     nShape = 4;
@@ -2304,14 +2333,7 @@ var MarbleRunSimulatorCore;
                     let a = (i / nShape) * 2 * Math.PI;
                     let cosa = Math.cos(a);
                     let sina = Math.sin(a);
-                    shape[i] = new BABYLON.Vector3(cosa * radius, sina * radius, 0);
-                }
-                let shapeSmall = [];
-                for (let i = 0; i < nShape; i++) {
-                    let a = (i / nShape) * 2 * Math.PI;
-                    let cosa = Math.cos(a);
-                    let sina = Math.sin(a);
-                    shapeSmall[i] = new BABYLON.Vector3(cosa * radius * 0.75, sina * radius * 0.75, 0);
+                    shape[i] = new BABYLON.Vector3(cosa * radiusShape, sina * radiusShape, 0);
                 }
                 let radiusPath = part.wireGauge * 0.5;
                 let nPath = 4;
@@ -2328,6 +2350,14 @@ var MarbleRunSimulatorCore;
                     let sina = Math.sin(a);
                     basePath[i] = new BABYLON.Vector3(cosa * radiusPath, -sina * radiusPath, 0);
                 }
+                let sleeperPieceVertexDataTypeIndex = colorIndex >= 2 ? 3 : 0;
+                if (q === 1) {
+                    sleeperPieceVertexDataTypeIndex += 1;
+                }
+                else if (q === 0) {
+                    sleeperPieceVertexDataTypeIndex += 2;
+                }
+                let sleeperPieceVertexData = part.machine.sleeperVertexData ? part.machine.sleeperVertexData[sleeperPieceVertexDataTypeIndex] : undefined;
                 let quat = BABYLON.Quaternion.Identity();
                 let n = 0.5;
                 for (let i = 1; i < interpolatedPoints.length - 1; i++) {
@@ -2348,35 +2378,30 @@ var MarbleRunSimulatorCore;
                             addSleeper = true;
                         }
                     }
-                    if (addSleeper) {
-                        let path = basePath.map((v) => {
-                            return v.clone();
-                        });
+                    let anchor = BABYLON.Vector3.Zero();
+                    if (addSleeper && sleeperPieceVertexData) {
+                        anchor = new BABYLON.Vector3(0, -radiusPath, 0);
                         let dir = interpolatedPoints[i + 1].subtract(interpolatedPoints[i - 1]).normalize();
                         let t = interpolatedPoints[i];
                         let up = track.trackInterpolatedNormals[i];
                         Mummu.QuaternionFromYZAxisToRef(up, dir, quat);
-                        let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), quat, t);
-                        for (let j = 0; j < path.length; j++) {
-                            BABYLON.Vector3.TransformCoordinatesToRef(path[j], m, path[j]);
-                        }
-                        let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                        let colorIndex = track.part.getColor(track.template.colorIndex);
+                        anchor.rotateByQuaternionToRef(quat, anchor);
+                        anchor.addInPlace(t);
+                        let tmp = Mummu.CloneVertexData(sleeperPieceVertexData);
+                        Mummu.RotateVertexDataInPlace(tmp, quat);
+                        Mummu.TranslateVertexDataInPlace(tmp, t);
                         if (!partialsDatas[colorIndex]) {
                             partialsDatas[colorIndex] = [];
                         }
-                        partialsDatas[colorIndex].push(BABYLON.VertexData.ExtractFromMesh(tmp));
-                        tmp.dispose();
+                        partialsDatas[colorIndex].push(tmp);
                         if (props.drawWallAnchors) {
                             let addAnchor = false;
                             if (part.k === 0 && (n - 1.5) % 3 === 0) {
-                                let anchor = path[nPath / 2 - 1];
                                 if (anchor.z > -0.01) {
                                     addAnchor = true;
                                 }
                             }
                             if (addAnchor) {
-                                let anchor = path[nPath / 2 - 1];
                                 let anchorCenter = anchor.clone();
                                 anchorCenter.z = 0.015;
                                 let radiusFixation = Math.abs(anchor.z - anchorCenter.z);
@@ -2415,7 +2440,6 @@ var MarbleRunSimulatorCore;
                         }
                         if (props.drawGroundAnchors) {
                             if (((n - 1.5) % 6 === 0 || count === 1) && up.y > 0.1) {
-                                let anchor = path[nPath / 2];
                                 let anchorYWorld = anchor.y + part.position.y;
                                 let anchorBase = anchor.clone();
                                 let minY = part.machine.baseMeshMinY;
@@ -4585,7 +4609,7 @@ var MarbleRunSimulatorCore;
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "snake-" + w.toFixed(0);
             template.angleSmoothSteps = 40;
-            template.maxAngle = Math.PI / 5;
+            template.maxAngle = Math.PI / 8;
             template.w = w;
             template.h = 0;
             template.d = 3;
@@ -4608,7 +4632,6 @@ var MarbleRunSimulatorCore;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             let start = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, z0);
             let end = new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * (template.w - 0.5), 0, z0);
-            let tanVector = dir.scale(BABYLON.Vector3.Distance(start, end));
             template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];
             for (let i = 1; i < count; i++) {
                 let x = -MarbleRunSimulatorCore.tileWidth * 0.5 + i * r;

@@ -85,6 +85,8 @@ namespace MarbleRunSimulatorCore {
         public trackFactory: MachinePartFactory;
         public templateManager: TemplateManager;
 
+        public sleeperVertexData: BABYLON.VertexData[];
+
         public instantiated: boolean = false;
 
         public playing: boolean = false;
@@ -102,7 +104,8 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(): Promise<void> {
-            console.log("instantiate machine");
+            this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
+            
             this.parts = this.parts.sort((a, b) => {
                 return b.j + b.h - (a.j + a.h);
             });

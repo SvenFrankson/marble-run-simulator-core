@@ -77,7 +77,37 @@ namespace MarbleRunSimulatorCore {
             copperMaterial.roughness = 0.15;
             copperMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
 
-            this.metalMaterials = [steelMaterial, copperMaterial];
+            let plasticIndigo = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticIndigo.baseColor = BABYLON.Color3.FromHexString("#004777");
+            plasticIndigo.metallic = 0;
+            plasticIndigo.roughness = 0.9;
+            plasticIndigo.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+
+            let plasticRed = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticRed.baseColor = BABYLON.Color3.FromHexString("#A30000");
+            plasticRed.metallic = 0;
+            plasticRed.roughness = 0.9;
+            plasticRed.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            
+            let plasticOrange = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticOrange.baseColor = BABYLON.Color3.FromHexString("#FF7700");
+            plasticOrange.metallic = 0;
+            plasticOrange.roughness = 0.9;
+            plasticOrange.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+
+            let plasticYellow = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticYellow.baseColor = BABYLON.Color3.FromHexString("#EFD28D");
+            plasticYellow.metallic = 0;
+            plasticYellow.roughness = 0.9;
+            plasticYellow.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+
+            let plasticGreen = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            plasticGreen.baseColor = BABYLON.Color3.FromHexString("#00AFB5");
+            plasticGreen.metallic = 0;
+            plasticGreen.roughness = 0.9;
+            plasticGreen.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+
+            this.metalMaterials = [steelMaterial, copperMaterial, plasticIndigo, plasticRed, plasticOrange, plasticYellow, plasticGreen];
 
             this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);

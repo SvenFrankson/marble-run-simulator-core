@@ -20,6 +20,7 @@ namespace MarbleRunSimulatorCore {
 
             for (let j = 0; j < part.tracks.length; j++) {
                 let track = part.tracks[j];
+                let colorIndex = track.part.getColor(track.template.colorIndex);
                 let interpolatedPoints = track.templateInterpolatedPoints;
                 let summedLength: number[] = [0];
                 for (let i = 1; i < interpolatedPoints.length; i++) {
@@ -33,7 +34,10 @@ namespace MarbleRunSimulatorCore {
                 count = Math.max(1, count);
                 let correctedSpacing = summedLength[summedLength.length - 1] / count;
 
-                let radius = part.wireSize * 0.5 * 0.75;
+                let radiusShape = part.wireSize * 0.5 * 0.75;
+                if (colorIndex >= 2) {
+                    radiusShape *= 2;
+                }
                 let nShape = 3;
                 if (q === 1) {
                     nShape = 4;
@@ -45,15 +49,7 @@ namespace MarbleRunSimulatorCore {
                     let a = (i / nShape) * 2 * Math.PI;
                     let cosa = Math.cos(a);
                     let sina = Math.sin(a);
-                    shape[i] = new BABYLON.Vector3(cosa * radius, sina * radius, 0);
-                }
-
-                let shapeSmall: BABYLON.Vector3[] = [];
-                for (let i = 0; i < nShape; i++) {
-                    let a = (i / nShape) * 2 * Math.PI;
-                    let cosa = Math.cos(a);
-                    let sina = Math.sin(a);
-                    shapeSmall[i] = new BABYLON.Vector3(cosa * radius * 0.75, sina * radius * 0.75, 0);
+                    shape[i] = new BABYLON.Vector3(cosa * radiusShape, sina * radiusShape, 0);
                 }
 
                 let radiusPath = part.wireGauge * 0.5;
@@ -70,6 +66,14 @@ namespace MarbleRunSimulatorCore {
                     let sina = Math.sin(a);
                     basePath[i] = new BABYLON.Vector3(cosa * radiusPath, -sina * radiusPath, 0);
                 }
+
+                let sleeperPieceVertexDataTypeIndex = colorIndex >= 2 ? 3 : 0;
+                if (q === 1) {
+                    sleeperPieceVertexDataTypeIndex += 1;
+                } else if (q === 0) {
+                    sleeperPieceVertexDataTypeIndex += 2;
+                }
+                let sleeperPieceVertexData = part.machine.sleeperVertexData ? part.machine.sleeperVertexData[sleeperPieceVertexDataTypeIndex] : undefined;
 
                 let quat = BABYLON.Quaternion.Identity();
                 let n = 0.5;
@@ -91,40 +95,37 @@ namespace MarbleRunSimulatorCore {
                             addSleeper = true;
                         }
                     }
-                    if (addSleeper) {
-                        let path = basePath.map((v) => {
-                            return v.clone();
-                        });
+
+                    let anchor: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+                    if (addSleeper && sleeperPieceVertexData) {
+                        anchor = new BABYLON.Vector3(0, - radiusPath, 0);
 
                         let dir = interpolatedPoints[i + 1].subtract(interpolatedPoints[i - 1]).normalize();
                         let t = interpolatedPoints[i];
                         let up = track.trackInterpolatedNormals[i];
                         Mummu.QuaternionFromYZAxisToRef(up, dir, quat);
-                        let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), quat, t);
 
-                        for (let j = 0; j < path.length; j++) {
-                            BABYLON.Vector3.TransformCoordinatesToRef(path[j], m, path[j]);
-                        }
+                        anchor.rotateByQuaternionToRef(quat, anchor);
+                        anchor.addInPlace(t);
 
-                        let tmp = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                        let colorIndex = track.part.getColor(track.template.colorIndex);
+                        let tmp = Mummu.CloneVertexData(sleeperPieceVertexData);
+                        Mummu.RotateVertexDataInPlace(tmp, quat);
+                        Mummu.TranslateVertexDataInPlace(tmp, t);
+
                         if (!partialsDatas[colorIndex]) {
                             partialsDatas[colorIndex] = [];
                         }
-                        partialsDatas[colorIndex].push(BABYLON.VertexData.ExtractFromMesh(tmp));
-                        tmp.dispose();
+                        partialsDatas[colorIndex].push(tmp);
 
                         if (props.drawWallAnchors) {
                             let addAnchor = false;
                             if (part.k === 0 && (n - 1.5) % 3 === 0) {
-                                let anchor = path[nPath / 2 - 1];
                                 if (anchor.z > -0.01) {
                                     addAnchor = true;
                                 }
                             }
 
                             if (addAnchor) {
-                                let anchor = path[nPath / 2 - 1];
                                 let anchorCenter = anchor.clone();
                                 anchorCenter.z = 0.015;
                                 let radiusFixation = Math.abs(anchor.z - anchorCenter.z);
@@ -165,7 +166,6 @@ namespace MarbleRunSimulatorCore {
 
                         if (props.drawGroundAnchors) {
                             if (((n - 1.5) % 6 === 0 || count === 1) && up.y > 0.1) {
-                                let anchor = path[nPath / 2];
                                 let anchorYWorld = anchor.y + part.position.y;
                                 let anchorBase = anchor.clone();
                                 let minY = part.machine.baseMeshMinY;

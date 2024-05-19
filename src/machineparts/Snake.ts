@@ -15,7 +15,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "snake-" + w.toFixed(0);
             template.angleSmoothSteps = 40;
-            template.maxAngle = Math.PI / 5;
+            template.maxAngle = Math.PI / 8;
 
             template.w = w;
             template.h = 0;
@@ -44,7 +44,6 @@ namespace MarbleRunSimulatorCore {
 
             let start = new BABYLON.Vector3(-tileWidth * 0.5, 0, z0);
             let end = new BABYLON.Vector3(tileWidth * (template.w - 0.5), 0, z0);
-            let tanVector = dir.scale(BABYLON.Vector3.Distance(start, end));
 
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];
             for (let i = 1; i < count; i++) {

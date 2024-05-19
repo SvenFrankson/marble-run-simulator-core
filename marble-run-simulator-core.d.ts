@@ -182,6 +182,7 @@ declare namespace MarbleRunSimulatorCore {
         debugAxis: BABYLON.LinesMesh;
         trackFactory: MachinePartFactory;
         templateManager: TemplateManager;
+        sleeperVertexData: BABYLON.VertexData[];
         instantiated: boolean;
         playing: boolean;
         constructor(game: IGame);
