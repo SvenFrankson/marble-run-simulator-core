@@ -4,6 +4,10 @@ namespace MarbleRunSimulatorCore {
         public getMetalMaterial(colorIndex: number): BABYLON.PBRMetallicRoughnessMaterial {
             return this.metalMaterials[colorIndex % this.metalMaterials.length];
         }
+        public ballMaterials: BABYLON.Material[] = [];
+        public getBallMaterial(colorIndex: number): BABYLON.Material {
+            return this.ballMaterials[colorIndex % this.ballMaterials.length];
+        }
         public velvetMaterial: BABYLON.StandardMaterial;
         public logoMaterial: BABYLON.StandardMaterial;
         public baseAxisMaterial: BABYLON.StandardMaterial;
@@ -19,7 +23,6 @@ namespace MarbleRunSimulatorCore {
         public blueMaterial: BABYLON.StandardMaterial;
         public whiteAutolitMaterial: BABYLON.StandardMaterial;
         public whiteFullLitMaterial: BABYLON.StandardMaterial;
-        public earth: BABYLON.PBRMetallicRoughnessMaterial;
 
         constructor(public game: IGame) {
             this.handleMaterial = new BABYLON.StandardMaterial("handle-material");
@@ -143,12 +146,26 @@ namespace MarbleRunSimulatorCore {
             this.paintingLight.emissiveTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/painting-light.png");
             this.paintingLight.specularColor.copyFromFloats(0.1, 0.1, 0.1);
 
-            this.earth = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
-            this.earth.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
-            this.earth.metallic = 0.7;
-            this.earth.roughness = 0.3;
-            this.earth.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
-            this.earth.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/earth.png");
+            let makeBallMaterial = (name: string, textureName: string) => {
+                let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
+                ballMaterial.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+                ballMaterial.metallic = 0.7;
+                ballMaterial.roughness = 0.3;
+                ballMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+                ballMaterial.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + textureName, undefined, undefined, false);
+
+                return ballMaterial;
+            }
+
+            this.ballMaterials = [
+                this.metalMaterials[0],
+                this.metalMaterials[1],
+                makeBallMaterial("square-red", "ball-square-red.png"),
+                makeBallMaterial("circle-green", "ball-circle-green.png"),
+                makeBallMaterial("star-blue", "ball-star-blue.png"),
+                makeBallMaterial("tiaratum", "ball-tiaratum.png"),
+                makeBallMaterial("html5", "ball-html5.png")
+            ]
         }
     }
 }

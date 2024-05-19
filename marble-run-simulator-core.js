@@ -24,6 +24,7 @@ var MarbleRunSimulatorCore;
             this.rotationAxis = BABYLON.Vector3.Right();
             this.surface = Surface.Rail;
             this._showPositionZeroGhost = false;
+            this._materialIndex = 0;
             this.bumpSurfaceIsRail = true;
             this.memCount = 2;
             this._lastWires = [];
@@ -35,6 +36,8 @@ var MarbleRunSimulatorCore;
             this.totalCount = 0;
             this._timer = 0;
             this.strReaction = 0;
+            this.lastPosition = BABYLON.Vector3.Zero();
+            this.visibleVelocity = BABYLON.Vector3.Zero();
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -67,6 +70,13 @@ var MarbleRunSimulatorCore;
                 this.positionZeroGhost.isVisible = v;
             }
         }
+        get materialIndex() {
+            return this._materialIndex;
+        }
+        set materialIndex(v) {
+            this._materialIndex = v;
+            this.material = this.game.materials.getBallMaterial(this.materialIndex);
+        }
         setPositionZero(p) {
             this.positionZero.copyFrom(p);
             this.positionZeroGhost.position.copyFrom(p);
@@ -94,9 +104,12 @@ var MarbleRunSimulatorCore;
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
             let data = BABYLON.CreateSphereVertexData({ diameter: this.size });
+            let uvs = data.uvs;
+            for (let i = 0; i < uvs.length / 2; i++) {
+                uvs[2 * i] *= -2;
+            }
             data.applyToMesh(this);
-            this.material = this.game.materials.getMetalMaterial(0);
-            this.material = this.game.materials.earth;
+            this.material = this.game.materials.getBallMaterial(this.materialIndex);
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.dispose();
             }
@@ -138,6 +151,9 @@ var MarbleRunSimulatorCore;
         }
         reset() {
             this.position.copyFrom(this.positionZero);
+            if (this.rotationQuaternion) {
+                this.rotationQuaternion.copyFromFloats(0, 0, 0, 1);
+            }
             this.velocity.copyFromFloats(0, 0, 0);
             this._timer = 0;
             this.marbleLoopSound.setVolume(0, 0.1);
@@ -415,11 +431,19 @@ var MarbleRunSimulatorCore;
                     .scaleInPlace(1 / m);
                 this.velocity.addInPlace(acceleration.scale(dt));
                 this.position.addInPlace(this.velocity.scale(dt));
+                if (this.lastPosition) {
+                    this.visibleVelocity.copyFrom(this.position).subtractInPlace(this.lastPosition).scaleInPlace(1 / dt);
+                    if (this.visibleVelocity.lengthSquared() > 1) {
+                        this.visibleVelocity.normalize();
+                    }
+                }
+                this.lastPosition.copyFrom(this.position);
                 if (reactions.length() > 0) {
-                    let currentRight = BABYLON.Vector3.Cross(reactions, this.velocity).normalize();
-                    this.rotationAxis.scaleInPlace(0.9).addInPlace(currentRight.scale(0.1)).normalize();
-                    let rotationSpeed = this.velocity.length() / (2 * Math.PI * this.radius);
-                    this.rotationSpeed = 0.9 * this.rotationSpeed + 0.1 * rotationSpeed;
+                    BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis).normalize();
+                    this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
+                    if (reactionsCount > 2) {
+                        this.rotationSpeed /= 3;
+                    }
                 }
                 this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
             }
@@ -448,6 +472,7 @@ var MarbleRunSimulatorCore;
         constructor(game) {
             this.game = game;
             this.metalMaterials = [];
+            this.ballMaterials = [];
             this.handleMaterial = new BABYLON.StandardMaterial("handle-material");
             this.handleMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.handleMaterial.specularColor.copyFromFloats(0, 0, 0);
@@ -546,15 +571,30 @@ var MarbleRunSimulatorCore;
             this.paintingLight.diffuseColor.copyFromFloats(1, 1, 1);
             this.paintingLight.emissiveTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/painting-light.png");
             this.paintingLight.specularColor.copyFromFloats(0.1, 0.1, 0.1);
-            this.earth = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
-            this.earth.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
-            this.earth.metallic = 0.7;
-            this.earth.roughness = 0.3;
-            this.earth.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
-            this.earth.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/earth.png");
+            let makeBallMaterial = (name, textureName) => {
+                let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
+                ballMaterial.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+                ballMaterial.metallic = 0.7;
+                ballMaterial.roughness = 0.3;
+                ballMaterial.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+                ballMaterial.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + textureName, undefined, undefined, false);
+                return ballMaterial;
+            };
+            this.ballMaterials = [
+                this.metalMaterials[0],
+                this.metalMaterials[1],
+                makeBallMaterial("square-red", "ball-square-red.png"),
+                makeBallMaterial("circle-green", "ball-circle-green.png"),
+                makeBallMaterial("star-blue", "ball-star-blue.png"),
+                makeBallMaterial("tiaratum", "ball-tiaratum.png"),
+                makeBallMaterial("html5", "ball-html5.png")
+            ];
         }
         getMetalMaterial(colorIndex) {
             return this.metalMaterials[colorIndex % this.metalMaterials.length];
+        }
+        getBallMaterial(colorIndex) {
+            return this.ballMaterials[colorIndex % this.ballMaterials.length];
         }
     }
     MarbleRunSimulatorCore.MainMaterials = MainMaterials;
@@ -1133,7 +1173,7 @@ var MarbleRunSimulatorCore;
             }
         }
         serialize() {
-            return this.serializeV3();
+            return this.serializeV34(4);
         }
         serializeV1() {
             let data = {
@@ -1223,11 +1263,11 @@ var MarbleRunSimulatorCore;
             data.d = dataString;
             return data;
         }
-        serializeV3() {
+        serializeV34(version) {
             let data = {
                 n: this.name,
                 a: this.author,
-                v: 3
+                v: version
             };
             let dataString = "";
             // Add ball count
@@ -1240,6 +1280,9 @@ var MarbleRunSimulatorCore;
                 dataString += NToHex(x, 3);
                 dataString += NToHex(y, 3);
                 dataString += NToHex(z, 3);
+                if (version === 4) {
+                    dataString += NToHex(ball.materialIndex, 2);
+                }
             }
             // Add parts count
             dataString += NToHex(this.parts.length, 2);
@@ -1297,8 +1340,8 @@ var MarbleRunSimulatorCore;
                 else if (version === 2) {
                     return this.deserializeV2(data);
                 }
-                else if (version === 3) {
-                    return this.deserializeV3(data);
+                else if (version === 3 || version === 4) {
+                    return this.deserializeV34(data);
                 }
             }
         }
@@ -1427,7 +1470,7 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
-        deserializeV3(data) {
+        deserializeV34(data) {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -1448,6 +1491,10 @@ var MarbleRunSimulatorCore;
                     //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
+                    if (data.v === 4) {
+                        let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                        ball.materialIndex = materialIndex;
+                    }
                 }
                 let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
                 //console.log("partCount = " + partCount);

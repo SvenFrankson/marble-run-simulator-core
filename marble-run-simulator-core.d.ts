@@ -30,6 +30,9 @@ declare namespace MarbleRunSimulatorCore {
         setShowPositionZeroGhost(v: boolean): void;
         positionZeroGhost: BABYLON.Mesh;
         selectedMesh: BABYLON.Mesh;
+        private _materialIndex;
+        get materialIndex(): number;
+        set materialIndex(v: number);
         setPositionZero(p: BABYLON.Vector3): void;
         get k(): number;
         set k(v: number);
@@ -58,6 +61,8 @@ declare namespace MarbleRunSimulatorCore {
         totalCount: number;
         private _timer;
         strReaction: number;
+        lastPosition: BABYLON.Vector3;
+        visibleVelocity: BABYLON.Vector3;
         update(dt: number): void;
     }
 }
@@ -66,6 +71,8 @@ declare namespace MarbleRunSimulatorCore {
         game: IGame;
         metalMaterials: BABYLON.PBRMetallicRoughnessMaterial[];
         getMetalMaterial(colorIndex: number): BABYLON.PBRMetallicRoughnessMaterial;
+        ballMaterials: BABYLON.Material[];
+        getBallMaterial(colorIndex: number): BABYLON.Material;
         velvetMaterial: BABYLON.StandardMaterial;
         logoMaterial: BABYLON.StandardMaterial;
         baseAxisMaterial: BABYLON.StandardMaterial;
@@ -81,7 +88,6 @@ declare namespace MarbleRunSimulatorCore {
         blueMaterial: BABYLON.StandardMaterial;
         whiteAutolitMaterial: BABYLON.StandardMaterial;
         whiteFullLitMaterial: BABYLON.StandardMaterial;
-        earth: BABYLON.PBRMetallicRoughnessMaterial;
         constructor(game: IGame);
     }
 }
@@ -216,11 +222,11 @@ declare namespace MarbleRunSimulatorCore {
         serialize(): IMachineData;
         serializeV1(): IMachineData;
         serializeV2(): IMachineData;
-        serializeV3(): IMachineData;
+        serializeV34(version: number): IMachineData;
         deserialize(data: IMachineData): void;
         deserializeV1(data: IMachineData): void;
         deserializeV2(data: IMachineData): void;
-        deserializeV3(data: IMachineData): void;
+        deserializeV34(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;

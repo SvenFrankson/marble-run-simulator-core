@@ -49,6 +49,15 @@ namespace MarbleRunSimulatorCore {
         public positionZeroGhost: BABYLON.Mesh;
         public selectedMesh: BABYLON.Mesh;
 
+        private _materialIndex: number = 0;
+        public get materialIndex(): number {
+            return this._materialIndex;
+        }
+        public set materialIndex(v: number) {
+            this._materialIndex = v;
+            this.material = this.game.materials.getBallMaterial(this.materialIndex);
+        }
+
         public setPositionZero(p: BABYLON.Vector3): void {
             this.positionZero.copyFrom(p);
             this.positionZeroGhost.position.copyFrom(p);
@@ -98,10 +107,13 @@ namespace MarbleRunSimulatorCore {
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
             let data = BABYLON.CreateSphereVertexData({ diameter: this.size });
+            let uvs = data.uvs;
+            for (let i = 0; i < uvs.length / 2; i++) {
+                uvs[2 * i] *= - 2;
+            }
             data.applyToMesh(this);
 
-            this.material = this.game.materials.getMetalMaterial(0);
-            this.material = this.game.materials.earth;
+            this.material = this.game.materials.getBallMaterial(this.materialIndex);
 
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.dispose();
@@ -149,6 +161,9 @@ namespace MarbleRunSimulatorCore {
 
         public reset(): void {
             this.position.copyFrom(this.positionZero);
+            if (this.rotationQuaternion) {
+                this.rotationQuaternion.copyFromFloats(0, 0, 0, 1);
+            }
             this.velocity.copyFromFloats(0, 0, 0);
             this._timer = 0;
             this.marbleLoopSound.setVolume(0, 0.1);
@@ -187,6 +202,10 @@ namespace MarbleRunSimulatorCore {
         public totalCount = 0;
         private _timer: number = 0;
         public strReaction: number = 0;
+        
+        public lastPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public visibleVelocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+
         public update(dt: number): void {
             let sign = Math.sign(this.velocity.y);
             if (this.position.y < this.machine.baseMeshMinY - 0.2) {
@@ -459,11 +478,20 @@ namespace MarbleRunSimulatorCore {
 
                 this.position.addInPlace(this.velocity.scale(dt));
 
+                if (this.lastPosition) {
+                    this.visibleVelocity.copyFrom(this.position).subtractInPlace(this.lastPosition).scaleInPlace(1 / dt);
+                    if (this.visibleVelocity.lengthSquared() > 1) {
+                        this.visibleVelocity.normalize();
+                    }
+                }
+                this.lastPosition.copyFrom(this.position);
+
                 if (reactions.length() > 0) {
-                    let currentRight = BABYLON.Vector3.Cross(reactions, this.velocity).normalize();
-                    this.rotationAxis.scaleInPlace(0.9).addInPlace(currentRight.scale(0.1)).normalize();
-                    let rotationSpeed = this.velocity.length() / (2 * Math.PI * this.radius);
-                    this.rotationSpeed = 0.9 * this.rotationSpeed + 0.1 * rotationSpeed;
+                    BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis).normalize();
+                    this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
+                    if (reactionsCount > 2) {
+                        this.rotationSpeed /= 3;
+                    }
                 }
                 this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
             }

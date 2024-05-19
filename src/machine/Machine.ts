@@ -486,7 +486,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
-            return this.serializeV3();
+            return this.serializeV34(4);
         }
 
         public serializeV1(): IMachineData {
@@ -590,11 +590,11 @@ namespace MarbleRunSimulatorCore {
             return data;
         }
 
-        public serializeV3(): IMachineData {
+        public serializeV34(version: number): IMachineData {
             let data: IMachineData = {
                 n: this.name,
                 a: this.author,
-                v: 3
+                v: version
             };
 
             let dataString = "";
@@ -609,6 +609,9 @@ namespace MarbleRunSimulatorCore {
                 dataString += NToHex(x, 3);
                 dataString += NToHex(y, 3);
                 dataString += NToHex(z, 3);
+                if (version === 4) {
+                    dataString += NToHex(ball.materialIndex, 2);
+                }
             }
 
             // Add parts count
@@ -674,8 +677,8 @@ namespace MarbleRunSimulatorCore {
                 else if (version === 2) {
                     return this.deserializeV2(data);
                 }
-                else if (version === 3) {
-                    return this.deserializeV3(data);
+                else if (version === 3 || version === 4) {
+                    return this.deserializeV34(data);
                 }
             }
         }
@@ -821,7 +824,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public deserializeV3(data: IMachineData): void {
+        public deserializeV34(data: IMachineData): void {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -846,6 +849,11 @@ namespace MarbleRunSimulatorCore {
                     //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
+
+                    if (data.v === 4) {
+                        let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                        ball.materialIndex = materialIndex;
+                    }
                 }
                 
                 let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
