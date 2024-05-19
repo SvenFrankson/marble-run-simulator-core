@@ -13,10 +13,11 @@ var MarbleRunSimulatorCore;
         Surface[Surface["Bowl"] = 1] = "Bowl";
     })(Surface = MarbleRunSimulatorCore.Surface || (MarbleRunSimulatorCore.Surface = {}));
     class Ball extends BABYLON.Mesh {
-        constructor(positionZero, machine) {
+        constructor(positionZero, machine, _materialIndex = 0) {
             super("ball");
             this.positionZero = positionZero;
             this.machine = machine;
+            this._materialIndex = _materialIndex;
             this.constructorIndex = 0;
             this.size = 0.016;
             this.velocity = BABYLON.Vector3.Zero();
@@ -24,7 +25,6 @@ var MarbleRunSimulatorCore;
             this.rotationAxis = BABYLON.Vector3.Right();
             this.surface = Surface.Rail;
             this._showPositionZeroGhost = false;
-            this._materialIndex = 0;
             this.bumpSurfaceIsRail = true;
             this.memCount = 2;
             this._lastWires = [];
@@ -255,6 +255,10 @@ var MarbleRunSimulatorCore;
                                 reactions.addInPlace(reaction);
                                 reactionsCount++;
                                 this.surface = Surface.Rail;
+                                if (part instanceof MarbleRunSimulatorCore.Elevator) {
+                                    this.position.z = part.absolutePosition.z;
+                                    this.velocity.z = 0;
+                                }
                             }
                         });
                         if (part instanceof MarbleRunSimulatorCore.GravityWell) {

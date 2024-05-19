@@ -49,7 +49,6 @@ namespace MarbleRunSimulatorCore {
         public positionZeroGhost: BABYLON.Mesh;
         public selectedMesh: BABYLON.Mesh;
 
-        private _materialIndex: number = 0;
         public get materialIndex(): number {
             return this._materialIndex;
         }
@@ -77,7 +76,7 @@ namespace MarbleRunSimulatorCore {
         public marbleLoopSound: BABYLON.Sound;
         public marbleBowlLoopSound: BABYLON.Sound;
 
-        constructor(public positionZero: BABYLON.Vector3, public machine: Machine) {
+        constructor(public positionZero: BABYLON.Vector3, public machine: Machine, private _materialIndex: number = 0) {
             super("ball");
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -289,6 +288,11 @@ namespace MarbleRunSimulatorCore {
                                 reactionsCount++;
 
                                 this.surface = Surface.Rail;
+
+                                if (part instanceof Elevator) {
+                                    this.position.z = part.absolutePosition.z;
+                                    this.velocity.z = 0;
+                                }
                             }
                         });
                         if (part instanceof GravityWell) {

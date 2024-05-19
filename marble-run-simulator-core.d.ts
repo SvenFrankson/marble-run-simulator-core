@@ -13,6 +13,7 @@ declare namespace MarbleRunSimulatorCore {
     class Ball extends BABYLON.Mesh {
         positionZero: BABYLON.Vector3;
         machine: Machine;
+        private _materialIndex;
         static ConstructorIndex: number;
         constructorIndex: number;
         get game(): IGame;
@@ -30,7 +31,6 @@ declare namespace MarbleRunSimulatorCore {
         setShowPositionZeroGhost(v: boolean): void;
         positionZeroGhost: BABYLON.Mesh;
         selectedMesh: BABYLON.Mesh;
-        private _materialIndex;
         get materialIndex(): number;
         set materialIndex(v: number);
         setPositionZero(p: BABYLON.Vector3): void;
@@ -41,7 +41,7 @@ declare namespace MarbleRunSimulatorCore {
         railBumpSound: BABYLON.Sound;
         marbleLoopSound: BABYLON.Sound;
         marbleBowlLoopSound: BABYLON.Sound;
-        constructor(positionZero: BABYLON.Vector3, machine: Machine);
+        constructor(positionZero: BABYLON.Vector3, machine: Machine, _materialIndex?: number);
         select(): void;
         unselect(): void;
         setIsVisible(isVisible: boolean): void;
