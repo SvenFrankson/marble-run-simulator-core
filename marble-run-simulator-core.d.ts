@@ -626,6 +626,7 @@ declare namespace MarbleRunSimulatorCore {
         shieldClose: boolean;
         currentShootState: number;
         shieldSpeed: number;
+        delayTimeout: number;
         update(dt: number): void;
         private _freezeKicker;
     }

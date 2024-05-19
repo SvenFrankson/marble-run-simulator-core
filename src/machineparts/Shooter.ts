@@ -233,6 +233,7 @@ namespace MarbleRunSimulatorCore {
 
         public dispose(): void {
             super.dispose();
+            clearTimeout(this.delayTimeout);
             this.machine.onStopCallbacks.remove(this.reset);
         }
 
@@ -276,6 +277,7 @@ namespace MarbleRunSimulatorCore {
         public shieldClose: boolean = false;
         public currentShootState: number = 0;
         public shieldSpeed: number = 0.15;
+        public delayTimeout: number = 0;
 
         public update(dt: number): void {
             if (this.shieldClose && !this.shieldClosed) {
@@ -314,7 +316,7 @@ namespace MarbleRunSimulatorCore {
 
                 if (this.getBallReady()) {
                     this.currentShootState = 0.5;
-                    setTimeout(() => {
+                    this.delayTimeout = setTimeout(() => {
                         this.currentShootState = 1;
                     }, 500 / this.game.currentTimeFactor);
                 }
@@ -326,7 +328,7 @@ namespace MarbleRunSimulatorCore {
                 this.currentShootState = 1.5;
                 this.animateKickerArm(this.kickerYIdle - this.kickerLength, 1.5  / this.game.currentTimeFactor).then(() => {
                     this.clicSound.play();
-                    setTimeout(() => {
+                    this.delayTimeout = setTimeout(() => {
                         this.currentShootState = 2;
                     }, 500 / this.game.currentTimeFactor);
                 });
@@ -337,7 +339,7 @@ namespace MarbleRunSimulatorCore {
 
                 if (this.shieldClosed) {
                     this.currentShootState = 2.5;
-                    setTimeout(() => {
+                    this.delayTimeout = setTimeout(() => {
                         this.currentShootState = 3;
                     }, 400 / this.game.currentTimeFactor);
                 }

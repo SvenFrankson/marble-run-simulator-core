@@ -708,7 +708,7 @@ var MarbleRunSimulatorCore;
             while (this.getChildren().length > 0) {
                 this.getChildren()[0].dispose();
             }
-            let n = 3;
+            let n = 4;
             if (q === 1) {
                 n = 6;
             }
@@ -724,18 +724,10 @@ var MarbleRunSimulatorCore;
             }
             if (!Wire.DEBUG_DISPLAY) {
                 let path = this.path;
-                if (q === 1) {
+                if (q < 2) {
                     path = [];
                     for (let i = 0; i < this.path.length; i++) {
                         if (i % 3 === 0 || i === this.path.length - 1) {
-                            path.push(this.path[i]);
-                        }
-                    }
-                }
-                if (q === 0) {
-                    path = [];
-                    for (let i = 0; i < this.path.length; i++) {
-                        if (i % 6 === 0 || i === this.path.length - 1) {
                             path.push(this.path[i]);
                         }
                     }
@@ -2080,6 +2072,10 @@ var MarbleRunSimulatorCore;
             this.machine.requestUpdateShadow = true;
         }
         doSleepersMeshUpdate() {
+            let q = this.game.getGraphicQ();
+            if (q === 0) {
+                return;
+            }
             let datas = MarbleRunSimulatorCore.SleeperMeshBuilder.GenerateSleepersVertexData(this, this.sleepersMeshProp);
             datas.forEach((vData, colorIndex) => {
                 if (!this.sleepersMeshes.get(colorIndex)) {
@@ -2094,7 +2090,6 @@ var MarbleRunSimulatorCore;
             });
             this.machine.requestUpdateShadow = true;
             if (this.game.DEBUG_MODE) {
-                //console.log(this.partName + " tricount " + this.getTriCount());
             }
         }
         getTriCount() {
@@ -4367,6 +4362,7 @@ var MarbleRunSimulatorCore;
             this.shieldClose = false;
             this.currentShootState = 0;
             this.shieldSpeed = 0.15;
+            this.delayTimeout = 0;
             prop.h = Nabu.MinMax(prop.h, 4, 22);
             let partName = "shooter-" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
@@ -4504,6 +4500,7 @@ var MarbleRunSimulatorCore;
         }
         dispose() {
             super.dispose();
+            clearTimeout(this.delayTimeout);
             this.machine.onStopCallbacks.remove(this.reset);
         }
         get shieldOpened() {
@@ -4570,7 +4567,7 @@ var MarbleRunSimulatorCore;
                 this.hasCollidingKicker = true;
                 if (this.getBallReady()) {
                     this.currentShootState = 0.5;
-                    setTimeout(() => {
+                    this.delayTimeout = setTimeout(() => {
                         this.currentShootState = 1;
                     }, 500 / this.game.currentTimeFactor);
                 }
@@ -4581,7 +4578,7 @@ var MarbleRunSimulatorCore;
                 this.currentShootState = 1.5;
                 this.animateKickerArm(this.kickerYIdle - this.kickerLength, 1.5 / this.game.currentTimeFactor).then(() => {
                     this.clicSound.play();
-                    setTimeout(() => {
+                    this.delayTimeout = setTimeout(() => {
                         this.currentShootState = 2;
                     }, 500 / this.game.currentTimeFactor);
                 });
@@ -4591,7 +4588,7 @@ var MarbleRunSimulatorCore;
                 this.hasCollidingKicker = true;
                 if (this.shieldClosed) {
                     this.currentShootState = 2.5;
-                    setTimeout(() => {
+                    this.delayTimeout = setTimeout(() => {
                         this.currentShootState = 3;
                     }, 400 / this.game.currentTimeFactor);
                 }

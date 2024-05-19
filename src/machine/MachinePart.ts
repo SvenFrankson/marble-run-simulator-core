@@ -489,6 +489,10 @@ namespace MarbleRunSimulatorCore {
         }
 
         public doSleepersMeshUpdate(): void {
+            let q = this.game.getGraphicQ();
+            if (q === 0) {
+                return;
+            }
             let datas = SleeperMeshBuilder.GenerateSleepersVertexData(this, this.sleepersMeshProp);
             datas.forEach((vData, colorIndex) => {
                 if (!this.sleepersMeshes.get(colorIndex)) {
@@ -503,7 +507,6 @@ namespace MarbleRunSimulatorCore {
             });
             this.machine.requestUpdateShadow = true;
             if (this.game.DEBUG_MODE) {
-                //console.log(this.partName + " tricount " + this.getTriCount());
             }
         }
 

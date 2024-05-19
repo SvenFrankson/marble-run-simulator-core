@@ -65,7 +65,7 @@ namespace MarbleRunSimulatorCore {
                 this.getChildren()[0].dispose();
             }
 
-            let n = 3;
+            let n = 4;
             if (q === 1) {
                 n = 6;
             } else if (q === 2) {
@@ -81,18 +81,10 @@ namespace MarbleRunSimulatorCore {
 
             if (!Wire.DEBUG_DISPLAY) {
                 let path = this.path;
-                if (q === 1) {
+                if (q < 2) {
                     path = [];
                     for (let i = 0; i < this.path.length; i++) {
                         if (i % 3 === 0 || i === this.path.length - 1) {
-                            path.push(this.path[i]);
-                        }
-                    }
-                }
-                if (q === 0) {
-                    path = [];
-                    for (let i = 0; i < this.path.length; i++) {
-                        if (i % 6 === 0 || i === this.path.length - 1) {
                             path.push(this.path[i]);
                         }
                     }
