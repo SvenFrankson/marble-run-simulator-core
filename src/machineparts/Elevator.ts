@@ -137,7 +137,7 @@ namespace MarbleRunSimulatorCore {
             let nRight = new BABYLON.Vector3(-1, 1, 0);
             nRight.normalize();
 
-            let cupR = 0.006;
+            let cupR = 0.008;
             let dH = 0.002;
             let vertX: number = tileWidth * 0.5 + 0.01 - cupR;
 
