@@ -103,7 +103,14 @@ var MarbleRunSimulatorCore;
         async instantiate() {
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
-            let data = BABYLON.CreateSphereVertexData({ diameter: this.size });
+            let segmentsCount = 6;
+            if (this.game.getGraphicQ() === 1) {
+                segmentsCount = 10;
+            }
+            else if (this.game.getGraphicQ() === 2) {
+                segmentsCount = 14;
+            }
+            let data = BABYLON.CreateSphereVertexData({ diameter: this.size, segments: segmentsCount });
             let uvs = data.uvs;
             for (let i = 0; i < uvs.length / 2; i++) {
                 uvs[2 * i] *= -2;
@@ -114,7 +121,7 @@ var MarbleRunSimulatorCore;
                 this.positionZeroGhost.dispose();
             }
             this.positionZeroGhost = new BallGhost(this);
-            BABYLON.CreateSphereVertexData({ diameter: this.size * 0.95 }).applyToMesh(this.positionZeroGhost);
+            BABYLON.CreateSphereVertexData({ diameter: this.size * 0.95, segments: segmentsCount }).applyToMesh(this.positionZeroGhost);
             this.positionZeroGhost.material = this.game.materials.ghostMaterial;
             this.positionZeroGhost.position.copyFrom(this.positionZero);
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
