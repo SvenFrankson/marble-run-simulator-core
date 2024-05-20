@@ -486,7 +486,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
-            return this.serializeV34(4);
+            return this.serializeV345(5);
         }
 
         public serializeV1(): IMachineData {
@@ -590,7 +590,7 @@ namespace MarbleRunSimulatorCore {
             return data;
         }
 
-        public serializeV34(version: number): IMachineData {
+        public serializeV345(version: number): IMachineData {
             let data: IMachineData = {
                 n: this.name,
                 a: this.author,
@@ -677,8 +677,8 @@ namespace MarbleRunSimulatorCore {
                 else if (version === 2) {
                     return this.deserializeV2(data);
                 }
-                else if (version === 3 || version === 4) {
-                    return this.deserializeV34(data);
+                else if (version === 3 || version === 4 || version === 5) {
+                    return this.deserializeV345(data);
                 }
             }
         }
@@ -824,7 +824,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public deserializeV34(data: IMachineData): void {
+        public deserializeV345(data: IMachineData): void {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -886,7 +886,6 @@ namespace MarbleRunSimulatorCore {
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     let baseName = TrackNames[index].split("-")[0];
-                    console.log("basename " + baseName);
 
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -907,6 +906,21 @@ namespace MarbleRunSimulatorCore {
                     let colors: number[] = [];
                     for (let ii = 0; ii < colorCount; ii++) {
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                    }
+
+                    if (data.v < 5) {
+                        if (baseName === "uturn") {
+                            if (d === 2) {
+                                if ((mirror % 2) === 1) {
+                                    pI++;
+                                }
+                            }
+                            if (d === 6 || d === 7) {
+                                if ((mirror % 2) === 1) {
+                                    pI--;
+                                }
+                            }
+                        }
                     }
 
                     let prop: IMachinePartProp = {

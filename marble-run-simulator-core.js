@@ -1180,7 +1180,7 @@ var MarbleRunSimulatorCore;
             }
         }
         serialize() {
-            return this.serializeV34(4);
+            return this.serializeV345(5);
         }
         serializeV1() {
             let data = {
@@ -1270,7 +1270,7 @@ var MarbleRunSimulatorCore;
             data.d = dataString;
             return data;
         }
-        serializeV34(version) {
+        serializeV345(version) {
             let data = {
                 n: this.name,
                 a: this.author,
@@ -1347,8 +1347,8 @@ var MarbleRunSimulatorCore;
                 else if (version === 2) {
                     return this.deserializeV2(data);
                 }
-                else if (version === 3 || version === 4) {
-                    return this.deserializeV34(data);
+                else if (version === 3 || version === 4 || version === 5) {
+                    return this.deserializeV345(data);
                 }
             }
         }
@@ -1477,7 +1477,7 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
-        deserializeV34(data) {
+        deserializeV345(data) {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -1532,7 +1532,6 @@ var MarbleRunSimulatorCore;
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
-                    console.log("basename " + baseName);
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -1548,6 +1547,20 @@ var MarbleRunSimulatorCore;
                     let colors = [];
                     for (let ii = 0; ii < colorCount; ii++) {
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                    }
+                    if (data.v < 5) {
+                        if (baseName === "uturn") {
+                            if (d === 2) {
+                                if ((mirror % 2) === 1) {
+                                    pI++;
+                                }
+                            }
+                            if (d === 6 || d === 7) {
+                                if ((mirror % 2) === 1) {
+                                    pI--;
+                                }
+                            }
+                        }
                     }
                     let prop = {
                         i: pI,
@@ -5455,7 +5468,14 @@ var MarbleRunSimulatorCore;
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 50;
-            (template.w = Math.ceil(d / 1.5)), (template.h = h), (template.d = d), (template.mirrorX = mirrorX), (template.mirrorZ = mirrorZ);
+            template.w = d - 1;
+            if (d >= 8) {
+                template.w = d - 2;
+            }
+            template.h = h;
+            template.d = d;
+            template.mirrorX = mirrorX;
+            template.mirrorZ = mirrorZ;
             template.yExtendable = true;
             template.zExtendable = true;
             template.minD = 2;

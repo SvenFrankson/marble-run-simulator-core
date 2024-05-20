@@ -222,11 +222,11 @@ declare namespace MarbleRunSimulatorCore {
         serialize(): IMachineData;
         serializeV1(): IMachineData;
         serializeV2(): IMachineData;
-        serializeV34(version: number): IMachineData;
+        serializeV345(version: number): IMachineData;
         deserialize(data: IMachineData): void;
         deserializeV1(data: IMachineData): void;
         deserializeV2(data: IMachineData): void;
-        deserializeV34(data: IMachineData): void;
+        deserializeV345(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;
