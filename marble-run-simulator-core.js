@@ -1240,7 +1240,7 @@ var MarbleRunSimulatorCore;
             }
         }
         serialize() {
-            return this.serializeV345(5);
+            return this.serializeV3456(6);
         }
         serializeV1() {
             let data = {
@@ -1330,7 +1330,7 @@ var MarbleRunSimulatorCore;
             data.d = dataString;
             return data;
         }
-        serializeV345(version) {
+        serializeV3456(version) {
             let data = {
                 n: this.name,
                 a: this.author,
@@ -1347,7 +1347,7 @@ var MarbleRunSimulatorCore;
                 dataString += NToHex(x, 3);
                 dataString += NToHex(y, 3);
                 dataString += NToHex(z, 3);
-                if (version === 4) {
+                if (version === 4 || version >= 6) {
                     dataString += NToHex(ball.materialIndex, 2);
                 }
             }
@@ -1407,8 +1407,8 @@ var MarbleRunSimulatorCore;
                 else if (version === 2) {
                     return this.deserializeV2(data);
                 }
-                else if (version === 3 || version === 4 || version === 5) {
-                    return this.deserializeV345(data);
+                else if (version === 3 || version === 4 || version === 5 || version === 6) {
+                    return this.deserializeV3456(data);
                 }
             }
         }
@@ -1537,7 +1537,7 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
-        deserializeV345(data) {
+        deserializeV3456(data) {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -1558,7 +1558,7 @@ var MarbleRunSimulatorCore;
                     //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
-                    if (data.v === 4) {
+                    if (data.v === 4 || data.v >= 6) {
                         let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                         ball.materialIndex = materialIndex;
                     }

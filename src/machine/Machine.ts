@@ -486,7 +486,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
-            return this.serializeV345(5);
+            return this.serializeV3456(6);
         }
 
         public serializeV1(): IMachineData {
@@ -590,7 +590,7 @@ namespace MarbleRunSimulatorCore {
             return data;
         }
 
-        public serializeV345(version: number): IMachineData {
+        public serializeV3456(version: number): IMachineData {
             let data: IMachineData = {
                 n: this.name,
                 a: this.author,
@@ -609,7 +609,7 @@ namespace MarbleRunSimulatorCore {
                 dataString += NToHex(x, 3);
                 dataString += NToHex(y, 3);
                 dataString += NToHex(z, 3);
-                if (version === 4) {
+                if (version === 4 || version >= 6) {
                     dataString += NToHex(ball.materialIndex, 2);
                 }
             }
@@ -677,8 +677,8 @@ namespace MarbleRunSimulatorCore {
                 else if (version === 2) {
                     return this.deserializeV2(data);
                 }
-                else if (version === 3 || version === 4 || version === 5) {
-                    return this.deserializeV345(data);
+                else if (version === 3 || version === 4 || version === 5 || version === 6) {
+                    return this.deserializeV3456(data);
                 }
             }
         }
@@ -824,7 +824,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public deserializeV345(data: IMachineData): void {
+        public deserializeV3456(data: IMachineData): void {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -850,7 +850,7 @@ namespace MarbleRunSimulatorCore {
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
 
-                    if (data.v === 4) {
+                    if (data.v === 4 || data.v >= 6) {
                         let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                         ball.materialIndex = materialIndex;
                     }
