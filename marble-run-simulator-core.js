@@ -11,6 +11,7 @@ var MarbleRunSimulatorCore;
     (function (Surface) {
         Surface[Surface["Rail"] = 0] = "Rail";
         Surface[Surface["Bowl"] = 1] = "Bowl";
+        Surface[Surface["Velvet"] = 2] = "Velvet";
     })(Surface = MarbleRunSimulatorCore.Surface || (MarbleRunSimulatorCore.Surface = {}));
     class Ball extends BABYLON.Mesh {
         constructor(positionZero, machine, _materialIndex = 0) {
@@ -382,6 +383,41 @@ var MarbleRunSimulatorCore;
                     */
                     }
                 });
+                // Collide with playground limits
+                if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
+                    this.velocity.x = Math.abs(this.velocity.x) * 0.95;
+                    this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
+                }
+                if (this.position.x + this.radius > this.machine.baseMeshMaxX + this.machine.margin - 0.015) {
+                    this.velocity.x = -Math.abs(this.velocity.x) * 0.95;
+                    this.position.x = this.machine.baseMeshMaxX + this.machine.margin - 0.015 - this.radius;
+                }
+                if (this.position.z - this.radius < this.machine.baseMeshMinZ - this.machine.margin + 0.015) {
+                    this.velocity.z = Math.abs(this.velocity.z) * 0.95;
+                    this.position.z = this.machine.baseMeshMinZ - this.machine.margin + 0.015 + this.radius;
+                }
+                if (this.position.z + this.radius > this.machine.baseMeshMaxZ + this.machine.margin - 0.015) {
+                    this.velocity.z = -Math.abs(this.velocity.z) * 0.95;
+                    this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
+                }
+                let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
+                if (col.hit) {
+                    //this.setLastHit(wire, col.index);
+                    let colDig = col.normal.scale(-1);
+                    // Move away from collision
+                    forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                    // Cancel depth component of speed
+                    let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                    if (depthSpeed > 0) {
+                        canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                    }
+                    // Add ground reaction
+                    let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
+                    reactions.addInPlace(reaction);
+                    reactionsCount++;
+                    this.bumpSurfaceIsRail = false;
+                    this.surface = Surface.Velvet;
+                }
                 this.machine.balls.forEach((ball) => {
                     if (ball != this) {
                         let dist = BABYLON.Vector3.Distance(this.position, ball.position);
@@ -436,6 +472,12 @@ var MarbleRunSimulatorCore;
                 //this.velocity.addInPlace(forcedDisplacement.scale(0.1 * 1 / dt));
                 this.position.addInPlace(forcedDisplacement);
                 let friction = this.velocity.scale(-1).scaleInPlace(0.001);
+                if (this.surface === Surface.Velvet) {
+                    friction = this.velocity.scale(-1).scaleInPlace(0.01);
+                }
+                if (this.surface === Surface.Velvet) {
+                    weight.copyFromFloats(-0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
+                }
                 let acceleration = weight
                     .add(reactions)
                     .add(friction)
@@ -1042,19 +1084,19 @@ var MarbleRunSimulatorCore;
                 let h = this.baseMeshMaxY - this.baseMeshMinY;
                 let u = w * 4;
                 let v = h * 4;
-                if (this.baseWall) {
-                    this.baseWall.dispose();
+                if (this.pedestalTop) {
+                    this.pedestalTop.dispose();
                 }
-                this.baseWall = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 2 * this.margin, height: w + 2 * this.margin, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
-                this.baseWall.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
-                this.baseWall.position.y = (this.baseMeshMaxY + this.baseMeshMinY) * 0.5;
-                this.baseWall.position.z += 0.016;
-                this.baseWall.rotation.z = Math.PI / 2;
+                this.pedestalTop = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 2 * this.margin, height: w + 2 * this.margin, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
+                this.pedestalTop.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+                this.pedestalTop.position.y = (this.baseMeshMaxY + this.baseMeshMinY) * 0.5;
+                this.pedestalTop.position.z += 0.016;
+                this.pedestalTop.rotation.z = Math.PI / 2;
                 if (this.baseFrame) {
                     this.baseFrame.dispose();
                 }
                 this.baseFrame = new BABYLON.Mesh("base-frame");
-                this.baseFrame.position.copyFrom(this.baseWall.position);
+                this.baseFrame.position.copyFrom(this.pedestalTop.position);
                 this.baseFrame.material = this.game.materials.getMetalMaterial(0);
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/base-frame.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
@@ -1111,15 +1153,15 @@ var MarbleRunSimulatorCore;
                 }
                 data.positions = positions;
                 data.applyToMesh(this.baseFrame);
-                if (this.baseWall) {
-                    this.baseWall.dispose();
+                if (this.pedestalTop) {
+                    this.pedestalTop.dispose();
                 }
-                this.baseWall = new BABYLON.Mesh("base-top");
-                this.baseWall.receiveShadows = true;
-                this.baseWall.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
-                this.baseWall.position.y = this.baseMeshMinY;
-                this.baseWall.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
-                this.baseWall.material = this.game.materials.velvetMaterial;
+                this.pedestalTop = new BABYLON.Mesh("pedestal-top");
+                this.pedestalTop.receiveShadows = true;
+                this.pedestalTop.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+                this.pedestalTop.position.y = this.baseMeshMinY;
+                this.pedestalTop.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
+                this.pedestalTop.material = this.game.materials.velvetMaterial;
                 data = Mummu.CloneVertexData(vertexDatas[1]);
                 let uvs = [];
                 positions = [...data.positions];
@@ -1143,7 +1185,7 @@ var MarbleRunSimulatorCore;
                 }
                 data.positions = positions;
                 data.uvs = uvs;
-                data.applyToMesh(this.baseWall);
+                data.applyToMesh(this.pedestalTop);
                 if (this.baseLogo) {
                     this.baseLogo.dispose();
                 }
@@ -1213,8 +1255,8 @@ var MarbleRunSimulatorCore;
             if (this.baseFrame) {
                 this.baseFrame.isVisible = v;
             }
-            if (this.baseWall) {
-                this.baseWall.isVisible = v;
+            if (this.pedestalTop) {
+                this.pedestalTop.isVisible = v;
             }
             if (this.baseLogo) {
                 this.baseLogo.isVisible = v;

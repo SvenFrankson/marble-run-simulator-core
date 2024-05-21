@@ -74,7 +74,7 @@ namespace MarbleRunSimulatorCore {
         public name: string = "Unnamed Machine";
         public author: string = "Unknown Author";
 
-        public baseWall: BABYLON.Mesh;
+        public pedestalTop: BABYLON.Mesh;
         public baseFrame: BABYLON.Mesh;
         public baseLogo: BABYLON.Mesh;
         public baseAxis: BABYLON.Mesh;
@@ -237,6 +237,7 @@ namespace MarbleRunSimulatorCore {
         public baseMeshMaxY: number = this.margin;
         public baseMeshMinZ: number = -this.margin;
         public baseMeshMaxZ: number = this.margin;
+        private debugWallLeft: BABYLON.Mesh;
         public async generateBaseMesh(): Promise<void> {
             let previousBaseMinY = this.baseMeshMinY;
 
@@ -273,20 +274,20 @@ namespace MarbleRunSimulatorCore {
                 let u = w * 4;
                 let v = h * 4;
 
-                if (this.baseWall) {
-                    this.baseWall.dispose();
+                if (this.pedestalTop) {
+                    this.pedestalTop.dispose();
                 }
-                this.baseWall = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 2 * this.margin, height: w + 2 * this.margin, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
-                this.baseWall.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
-                this.baseWall.position.y = (this.baseMeshMaxY + this.baseMeshMinY) * 0.5;
-                this.baseWall.position.z += 0.016;
-                this.baseWall.rotation.z = Math.PI / 2;
+                this.pedestalTop = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 2 * this.margin, height: w + 2 * this.margin, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
+                this.pedestalTop.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+                this.pedestalTop.position.y = (this.baseMeshMaxY + this.baseMeshMinY) * 0.5;
+                this.pedestalTop.position.z += 0.016;
+                this.pedestalTop.rotation.z = Math.PI / 2;
 
                 if (this.baseFrame) {
                     this.baseFrame.dispose();
                 }
                 this.baseFrame = new BABYLON.Mesh("base-frame");
-                this.baseFrame.position.copyFrom(this.baseWall.position);
+                this.baseFrame.position.copyFrom(this.pedestalTop.position);
                 this.baseFrame.material = this.game.materials.getMetalMaterial(0);
 
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/base-frame.babylon");
@@ -344,15 +345,15 @@ namespace MarbleRunSimulatorCore {
                 data.positions = positions;
                 data.applyToMesh(this.baseFrame);
 
-                if (this.baseWall) {
-                    this.baseWall.dispose();
+                if (this.pedestalTop) {
+                    this.pedestalTop.dispose();
                 }
-                this.baseWall = new BABYLON.Mesh("base-top");
-                this.baseWall.receiveShadows = true;
-                this.baseWall.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
-                this.baseWall.position.y = this.baseMeshMinY;
-                this.baseWall.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
-                this.baseWall.material = this.game.materials.velvetMaterial;
+                this.pedestalTop = new BABYLON.Mesh("pedestal-top");
+                this.pedestalTop.receiveShadows = true;
+                this.pedestalTop.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+                this.pedestalTop.position.y = this.baseMeshMinY;
+                this.pedestalTop.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
+                this.pedestalTop.material = this.game.materials.velvetMaterial;
 
                 data = Mummu.CloneVertexData(vertexDatas[1]);
                 let uvs = [];
@@ -376,7 +377,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 data.positions = positions;
                 data.uvs = uvs;
-                data.applyToMesh(this.baseWall);
+                data.applyToMesh(this.pedestalTop);
 
                 if (this.baseLogo) {
                     this.baseLogo.dispose();
@@ -457,8 +458,8 @@ namespace MarbleRunSimulatorCore {
             if (this.baseFrame) {
                 this.baseFrame.isVisible = v;
             }
-            if (this.baseWall) {
-                this.baseWall.isVisible = v;
+            if (this.pedestalTop) {
+                this.pedestalTop.isVisible = v;
             }
             if (this.baseLogo) {
                 this.baseLogo.isVisible = v;

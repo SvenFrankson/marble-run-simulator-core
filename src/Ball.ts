@@ -8,6 +8,7 @@ namespace MarbleRunSimulatorCore {
     export enum Surface {
         Rail,
         Bowl,
+        Velvet
     }
 
     export class Ball extends BABYLON.Mesh {
@@ -421,6 +422,42 @@ namespace MarbleRunSimulatorCore {
                     }
                 });
 
+                // Collide with playground limits
+                if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
+                    this.velocity.x = Math.abs(this.velocity.x) * 0.95;
+                    this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
+                }
+                if (this.position.x + this.radius > this.machine.baseMeshMaxX + this.machine.margin - 0.015) {
+                    this.velocity.x = - Math.abs(this.velocity.x) * 0.95;
+                    this.position.x = this.machine.baseMeshMaxX + this.machine.margin - 0.015 - this.radius;
+                }
+                if (this.position.z - this.radius < this.machine.baseMeshMinZ - this.machine.margin + 0.015) {
+                    this.velocity.z = Math.abs(this.velocity.z) * 0.95;
+                    this.position.z = this.machine.baseMeshMinZ - this.machine.margin + 0.015 + this.radius;
+                }
+                if (this.position.z + this.radius > this.machine.baseMeshMaxZ + this.machine.margin - 0.015) {
+                    this.velocity.z = - Math.abs(this.velocity.z) * 0.95;
+                    this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
+                }
+                let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
+                if (col.hit) {
+                    //this.setLastHit(wire, col.index);
+                    let colDig = col.normal.scale(-1);
+                    // Move away from collision
+                    forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                    // Cancel depth component of speed
+                    let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                    if (depthSpeed > 0) {
+                        canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                    }
+                    // Add ground reaction
+                    let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
+                    reactions.addInPlace(reaction);
+                    reactionsCount++;
+                    this.bumpSurfaceIsRail = false;
+                    this.surface = Surface.Velvet;
+                }
+
                 this.machine.balls.forEach((ball) => {
                     if (ball != this) {
                         let dist = BABYLON.Vector3.Distance(this.position, ball.position);
@@ -480,7 +517,13 @@ namespace MarbleRunSimulatorCore {
                 this.position.addInPlace(forcedDisplacement);
 
                 let friction = this.velocity.scale(-1).scaleInPlace(0.001);
+                if (this.surface === Surface.Velvet) {
+                    friction = this.velocity.scale(-1).scaleInPlace(0.01);
+                }
 
+                if (this.surface === Surface.Velvet) {
+                    weight.copyFromFloats(- 0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
+                }
                 let acceleration = weight
                     .add(reactions)
                     .add(friction)

@@ -8,7 +8,8 @@ declare namespace MarbleRunSimulatorCore {
     }
     enum Surface {
         Rail = 0,
-        Bowl = 1
+        Bowl = 1,
+        Velvet = 2
     }
     class Ball extends BABYLON.Mesh {
         positionZero: BABYLON.Vector3;
@@ -186,7 +187,7 @@ declare namespace MarbleRunSimulatorCore {
         game: IGame;
         name: string;
         author: string;
-        baseWall: BABYLON.Mesh;
+        pedestalTop: BABYLON.Mesh;
         baseFrame: BABYLON.Mesh;
         baseLogo: BABYLON.Mesh;
         baseAxis: BABYLON.Mesh;
@@ -215,6 +216,7 @@ declare namespace MarbleRunSimulatorCore {
         baseMeshMaxY: number;
         baseMeshMinZ: number;
         baseMeshMaxZ: number;
+        private debugWallLeft;
         generateBaseMesh(): Promise<void>;
         regenerateBaseAxis(): void;
         setBaseIsVisible(v: boolean): void;
