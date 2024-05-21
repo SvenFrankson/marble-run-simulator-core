@@ -41,8 +41,8 @@ namespace MarbleRunSimulatorCore {
             let nSpirals = template.n;
             let widthInM = template.w * tileWidth;
             let r = widthInM * 0.5 - 0.01;
-            let heightStart = 0;
-            let heightEnd = -tileHeight * template.h;
+            let heightStart = 0 - 0.003;
+            let heightEnd = - tileHeight * template.h + 0.003;
 
             for (let nS = 0; nS < nSpirals; nS++) {
 
@@ -58,8 +58,8 @@ namespace MarbleRunSimulatorCore {
                     let sina = Math.sin(a);
 
                     let dir: BABYLON.Vector3;
-                    if (nV === 0 || nV === 8) {
-                        dir = BABYLON.Vector3.Right();
+                    if (nV === 0 || ((nV === 8) && (nS === nSpirals - 1))) {
+                        //dir = BABYLON.Vector3.Right();
                     }
                     
                     template.trackTemplates[0].trackpoints.push(
@@ -68,7 +68,7 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), heightEnd, 0), Tools.V3Dir(90)));
+            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), - tileHeight * template.h, 0), Tools.V3Dir(90)));
 
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
