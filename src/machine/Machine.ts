@@ -287,7 +287,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 this.baseFrame = new BABYLON.Mesh("base-frame");
                 this.baseFrame.position.copyFrom(this.baseWall.position);
-                this.baseFrame.material = this.game.materials.metalMaterials[0];
+                this.baseFrame.material = this.game.materials.getMetalMaterial(0);
 
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/base-frame.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);

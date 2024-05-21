@@ -489,10 +489,6 @@ namespace MarbleRunSimulatorCore {
         }
 
         public doSleepersMeshUpdate(): void {
-            let q = this.game.getGraphicQ();
-            if (q === 0) {
-                return;
-            }
             let datas = SleeperMeshBuilder.GenerateSleepersVertexData(this, this.sleepersMeshProp);
             datas.forEach((vData, colorIndex) => {
                 if (!this.sleepersMeshes.get(colorIndex)) {

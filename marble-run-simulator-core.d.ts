@@ -69,10 +69,14 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class MainMaterials {
         game: IGame;
-        metalMaterials: BABYLON.PBRMetallicRoughnessMaterial[];
-        getMetalMaterial(colorIndex: number): BABYLON.PBRMetallicRoughnessMaterial;
-        ballMaterials: BABYLON.Material[];
-        getBallMaterial(colorIndex: number): BABYLON.Material;
+        private _metalMaterialsPBR;
+        private _metalMaterialsSTD;
+        getMetalMaterial(colorIndex: number, graphicQ?: number): BABYLON.Material;
+        get metalMaterialsCount(): number;
+        private _ballMaterialsPBR;
+        private _ballMaterialsSTD;
+        getBallMaterial(colorIndex: number, graphicQ?: number): BABYLON.Material;
+        get ballMaterialsCount(): number;
         velvetMaterial: BABYLON.StandardMaterial;
         logoMaterial: BABYLON.StandardMaterial;
         baseAxisMaterial: BABYLON.StandardMaterial;

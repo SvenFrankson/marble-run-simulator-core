@@ -164,7 +164,7 @@ namespace MarbleRunSimulatorCore {
                             }
                         }
 
-                        if (props.drawGroundAnchors) {
+                        if (props.drawGroundAnchors && q > 0) {
                             if (((n - 1.5) % 6 === 0 || count === 1) && up.y > 0.1) {
                                 let anchorYWorld = anchor.y + part.position.y;
                                 let anchorBase = anchor.clone();
