@@ -35,7 +35,7 @@ var MarbleRunSimulatorCore;
             this._showPositionZeroGhost = false;
             this.bumpSurfaceIsRail = true;
             this.flyBackProgress = 0;
-            this.flyBackGroundSpeed = 2;
+            this.flyBackDuration = 1;
             this.memCount = 2;
             this._lastWires = [];
             this._lastWireIndexes = [];
@@ -557,7 +557,7 @@ var MarbleRunSimulatorCore;
             this.lastPosition.copyFrom(this.position);
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
-                    this.flyBackProgress += dt * this.flyBackGroundSpeed;
+                    this.flyBackProgress += dt / this.flyBackDuration;
                     let dirOrigin = this.flybackPeak.subtract(this.flybackOrigin);
                     let dirDestination = this.flybackDestination.subtract(this.flybackPeak);
                     let f = this.flyBackProgress;
@@ -4917,8 +4917,9 @@ var MarbleRunSimulatorCore;
                         ballArmed.flybackOrigin = ballArmed.position.clone();
                         ballArmed.flybackDestination = ballArmed.positionZero.clone();
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
-                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + 1.5;
+                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + 1.2;
                         ballArmed.flyBackProgress = 0;
+                        ballArmed.flyBackDuration = BABYLON.Vector3.Distance(ballArmed.flybackOrigin, ballArmed.flybackDestination) * 2;
                         ballArmed.collisionState = MarbleRunSimulatorCore.CollisionState.Flyback;
                         this.currentShootState = 4;
                     }

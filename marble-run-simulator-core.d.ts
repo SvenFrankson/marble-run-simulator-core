@@ -53,7 +53,7 @@ declare namespace MarbleRunSimulatorCore {
         flybackDestination: BABYLON.Vector3;
         flybackPeak: BABYLON.Vector3;
         flyBackProgress: number;
-        flyBackGroundSpeed: number;
+        flyBackDuration: number;
         constructor(positionZero: BABYLON.Vector3, machine: Machine, _materialIndex?: number);
         select(): void;
         unselect(): void;

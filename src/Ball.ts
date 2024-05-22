@@ -89,7 +89,7 @@ namespace MarbleRunSimulatorCore {
         public flybackDestination: BABYLON.Vector3;
         public flybackPeak: BABYLON.Vector3;
         public flyBackProgress: number = 0;
-        public flyBackGroundSpeed: number = 2;
+        public flyBackDuration: number = 1;
 
         constructor(public positionZero: BABYLON.Vector3, public machine: Machine, private _materialIndex: number = 0) {
             super("ball");
@@ -616,7 +616,7 @@ namespace MarbleRunSimulatorCore {
 
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
-                    this.flyBackProgress += dt * this.flyBackGroundSpeed;
+                    this.flyBackProgress += dt / this.flyBackDuration;
                     let dirOrigin = this.flybackPeak.subtract(this.flybackOrigin);
                     let dirDestination = this.flybackDestination.subtract(this.flybackPeak);
                     let f = this.flyBackProgress;
