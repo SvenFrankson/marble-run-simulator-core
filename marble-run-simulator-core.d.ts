@@ -64,6 +64,7 @@ declare namespace MarbleRunSimulatorCore {
         strReaction: number;
         lastPosition: BABYLON.Vector3;
         visibleVelocity: BABYLON.Vector3;
+        comingBack: boolean;
         update(dt: number): void;
     }
 }
@@ -199,6 +200,11 @@ declare namespace MarbleRunSimulatorCore {
         sleeperVertexData: BABYLON.VertexData[];
         instantiated: boolean;
         playing: boolean;
+        exitShooter: Shooter;
+        exitTrack: Start;
+        exitHoleIn: BABYLON.Mesh;
+        exitHoleInPath: BABYLON.Vector3[];
+        exitHoleOut: BABYLON.Mesh;
         constructor(game: IGame);
         setAllIsSelectable(isSelectable: boolean): void;
         instantiate(): Promise<void>;
@@ -335,6 +341,7 @@ declare namespace MarbleRunSimulatorCore {
         setTemplate(template: MachinePartTemplate): void;
         sleepersMeshProp: ISleeperMeshProps;
         constructor(machine: Machine, prop: IMachinePartProp, isPlaced?: boolean);
+        offsetPosition: BABYLON.Vector3;
         private _i;
         get i(): number;
         setI(v: number): void;

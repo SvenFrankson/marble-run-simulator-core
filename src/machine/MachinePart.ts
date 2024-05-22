@@ -177,6 +177,8 @@ namespace MarbleRunSimulatorCore {
             this.tracks = [new Track(this)];
         }
 
+        public offsetPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+
         private _i: number = 0;
         public get i(): number {
             return this._i;
@@ -190,7 +192,7 @@ namespace MarbleRunSimulatorCore {
                         this._i = i;
                     }
                 }
-                this.position.x = this._i * tileWidth;
+                this.position.x = this._i * tileWidth + this.offsetPosition.x;
                 this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
@@ -213,7 +215,7 @@ namespace MarbleRunSimulatorCore {
                         this._j = j;
                     }
                 }
-                this.position.y = -this._j * tileHeight;
+                this.position.y = -this._j * tileHeight + this.offsetPosition.y;
                 this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
@@ -236,7 +238,7 @@ namespace MarbleRunSimulatorCore {
                         this._k = k;
                     }
                 }
-                this.position.z = -this._k * tileDepth;
+                this.position.z = -this._k * tileDepth + this.offsetPosition.z;
                 this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {

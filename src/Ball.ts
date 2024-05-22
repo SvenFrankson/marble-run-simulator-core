@@ -173,6 +173,7 @@ namespace MarbleRunSimulatorCore {
             }
             this.velocity.copyFromFloats(0, 0, 0);
             this._timer = 0;
+            this.comingBack = false;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
         }
@@ -212,16 +213,14 @@ namespace MarbleRunSimulatorCore {
         
         public lastPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public visibleVelocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public comingBack: boolean = false;
 
         public update(dt: number): void {
             let sign = Math.sign(this.velocity.y);
             if (this.position.y < this.machine.baseMeshMinY - 0.2) {
-                if (this.game.mode === GameMode.Challenge) {
-                    if (this.machine.playing) {
-                        this.machine.stop();
-                    }
-                }
-                return;
+                this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
+                this.velocity.copyFromFloats(0, 0, - 0.2);
+                this.comingBack = true;
             }
 
             this._timer += dt * this.game.currentTimeFactor;
@@ -242,7 +241,8 @@ namespace MarbleRunSimulatorCore {
                 let canceledSpeed = BABYLON.Vector3.Zero();
 
                 this.bumpSurfaceIsRail = true;
-                this.machine.parts.forEach((part) => {
+                let allParts = [...this.machine.parts, this.machine.exitShooter, this.machine.exitTrack];
+                allParts.forEach((part) => {
                     if (Mummu.SphereAABBCheck(this.position, this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
                         part.allWires.forEach((wire) => {
                             let index = this.getLastIndex(wire);
@@ -423,39 +423,76 @@ namespace MarbleRunSimulatorCore {
                 });
 
                 // Collide with playground limits
-                if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
-                    this.velocity.x = Math.abs(this.velocity.x) * 0.95;
-                    this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
+                if (!this.comingBack) {
+                    if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
+                        this.velocity.x = Math.abs(this.velocity.x) * 0.5;
+                        this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
+                    }
+                    if (this.position.x + this.radius > this.machine.baseMeshMaxX + this.machine.margin - 0.015) {
+                        this.velocity.x = - Math.abs(this.velocity.x) * 0.5;
+                        this.position.x = this.machine.baseMeshMaxX + this.machine.margin - 0.015 - this.radius;
+                    }
+                    if (this.position.z - this.radius < this.machine.baseMeshMinZ - this.machine.margin + 0.015) {
+                        this.velocity.z = Math.abs(this.velocity.z) * 0.5;
+                        this.position.z = this.machine.baseMeshMinZ - this.machine.margin + 0.015 + this.radius;
+                    }
+                    if (this.position.z + this.radius > this.machine.baseMeshMaxZ + this.machine.margin - 0.015) {
+                        this.velocity.z = - Math.abs(this.velocity.z) * 0.5;
+                        this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
+                    }
                 }
-                if (this.position.x + this.radius > this.machine.baseMeshMaxX + this.machine.margin - 0.015) {
-                    this.velocity.x = - Math.abs(this.velocity.x) * 0.95;
-                    this.position.x = this.machine.baseMeshMaxX + this.machine.margin - 0.015 - this.radius;
-                }
-                if (this.position.z - this.radius < this.machine.baseMeshMinZ - this.machine.margin + 0.015) {
-                    this.velocity.z = Math.abs(this.velocity.z) * 0.95;
-                    this.position.z = this.machine.baseMeshMinZ - this.machine.margin + 0.015 + this.radius;
-                }
-                if (this.position.z + this.radius > this.machine.baseMeshMaxZ + this.machine.margin - 0.015) {
-                    this.velocity.z = - Math.abs(this.velocity.z) * 0.95;
-                    this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
-                }
-                let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
-                if (col.hit) {
+                let colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHoleInPath);
+                if (colExitInHole.hit) {
                     //this.setLastHit(wire, col.index);
-                    let colDig = col.normal.scale(-1);
+                    let colDig = colExitInHole.normal.scale(-1);
                     // Move away from collision
-                    forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                    forcedDisplacement.addInPlace(colExitInHole.normal.scale(colExitInHole.depth));
                     // Cancel depth component of speed
                     let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
                     if (depthSpeed > 0) {
                         canceledSpeed.addInPlace(colDig.scale(depthSpeed));
                     }
                     // Add ground reaction
-                    let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
+                    let reaction = colExitInHole.normal.scale(colExitInHole.depth * 1000); // 1000 is a magic number.
                     reactions.addInPlace(reaction);
                     reactionsCount++;
+
+                    if (this.position.y < this.machine.exitHoleIn.absolutePosition.y - 0.05) {
+                        this.velocity.x *= 0.99;
+                        this.velocity.z *= 0.99;
+                    }
+
+                    this.surface = Surface.Bowl;
                     this.bumpSurfaceIsRail = false;
-                    this.surface = Surface.Velvet;
+                }
+                else {
+                    // Check for hole in pedestalTop
+                    let dx = this.position.x - this.machine.exitHoleIn.absolutePosition.x;
+                    let dy = this.position.z - this.machine.exitHoleIn.absolutePosition.z;
+                    let sqrDistToExitHoleAxis = dx * dx + dy * dy;
+                    if (sqrDistToExitHoleAxis > 0.01835 * 0.01835) {
+                        let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
+                        if (col.hit) {
+                            //this.setLastHit(wire, col.index);
+                            let colDig = col.normal.scale(-1);
+                            // Move away from collision
+                            forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                            // Cancel depth component of speed
+                            let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                            if (depthSpeed > 0) {
+                                canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                            }
+                            // Add ground reaction
+                            let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
+                            reactions.addInPlace(reaction);
+                            reactionsCount++;
+        
+                            this.surface = Surface.Velvet;
+                            this.bumpSurfaceIsRail = false;
+                            
+                            weight.copyFromFloats(- 0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
+                        }
+                    }
                 }
 
                 this.machine.balls.forEach((ball) => {
@@ -518,12 +555,9 @@ namespace MarbleRunSimulatorCore {
 
                 let friction = this.velocity.scale(-1).scaleInPlace(0.001);
                 if (this.surface === Surface.Velvet) {
-                    friction = this.velocity.scale(-1).scaleInPlace(0.01);
+                    friction = this.velocity.scale(-1).scaleInPlace(0.02);
                 }
 
-                if (this.surface === Surface.Velvet) {
-                    weight.copyFromFloats(- 0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
-                }
                 let acceleration = weight
                     .add(reactions)
                     .add(friction)

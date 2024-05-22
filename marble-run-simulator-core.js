@@ -39,6 +39,7 @@ var MarbleRunSimulatorCore;
             this.strReaction = 0;
             this.lastPosition = BABYLON.Vector3.Zero();
             this.visibleVelocity = BABYLON.Vector3.Zero();
+            this.comingBack = false;
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -164,6 +165,7 @@ var MarbleRunSimulatorCore;
             }
             this.velocity.copyFromFloats(0, 0, 0);
             this._timer = 0;
+            this.comingBack = false;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
         }
@@ -189,12 +191,9 @@ var MarbleRunSimulatorCore;
         update(dt) {
             let sign = Math.sign(this.velocity.y);
             if (this.position.y < this.machine.baseMeshMinY - 0.2) {
-                if (this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                    if (this.machine.playing) {
-                        this.machine.stop();
-                    }
-                }
-                return;
+                this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
+                this.velocity.copyFromFloats(0, 0, -0.2);
+                this.comingBack = true;
             }
             this._timer += dt * this.game.currentTimeFactor;
             this._timer = Math.min(this._timer, 1);
@@ -210,7 +209,8 @@ var MarbleRunSimulatorCore;
                 let forcedDisplacement = BABYLON.Vector3.Zero();
                 let canceledSpeed = BABYLON.Vector3.Zero();
                 this.bumpSurfaceIsRail = true;
-                this.machine.parts.forEach((part) => {
+                let allParts = [...this.machine.parts, this.machine.exitShooter, this.machine.exitTrack];
+                allParts.forEach((part) => {
                     if (Mummu.SphereAABBCheck(this.position, this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
                         part.allWires.forEach((wire) => {
                             let index = this.getLastIndex(wire);
@@ -384,39 +384,72 @@ var MarbleRunSimulatorCore;
                     }
                 });
                 // Collide with playground limits
-                if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
-                    this.velocity.x = Math.abs(this.velocity.x) * 0.95;
-                    this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
+                if (!this.comingBack) {
+                    if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
+                        this.velocity.x = Math.abs(this.velocity.x) * 0.5;
+                        this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
+                    }
+                    if (this.position.x + this.radius > this.machine.baseMeshMaxX + this.machine.margin - 0.015) {
+                        this.velocity.x = -Math.abs(this.velocity.x) * 0.5;
+                        this.position.x = this.machine.baseMeshMaxX + this.machine.margin - 0.015 - this.radius;
+                    }
+                    if (this.position.z - this.radius < this.machine.baseMeshMinZ - this.machine.margin + 0.015) {
+                        this.velocity.z = Math.abs(this.velocity.z) * 0.5;
+                        this.position.z = this.machine.baseMeshMinZ - this.machine.margin + 0.015 + this.radius;
+                    }
+                    if (this.position.z + this.radius > this.machine.baseMeshMaxZ + this.machine.margin - 0.015) {
+                        this.velocity.z = -Math.abs(this.velocity.z) * 0.5;
+                        this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
+                    }
                 }
-                if (this.position.x + this.radius > this.machine.baseMeshMaxX + this.machine.margin - 0.015) {
-                    this.velocity.x = -Math.abs(this.velocity.x) * 0.95;
-                    this.position.x = this.machine.baseMeshMaxX + this.machine.margin - 0.015 - this.radius;
-                }
-                if (this.position.z - this.radius < this.machine.baseMeshMinZ - this.machine.margin + 0.015) {
-                    this.velocity.z = Math.abs(this.velocity.z) * 0.95;
-                    this.position.z = this.machine.baseMeshMinZ - this.machine.margin + 0.015 + this.radius;
-                }
-                if (this.position.z + this.radius > this.machine.baseMeshMaxZ + this.machine.margin - 0.015) {
-                    this.velocity.z = -Math.abs(this.velocity.z) * 0.95;
-                    this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
-                }
-                let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
-                if (col.hit) {
+                let colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHoleInPath);
+                if (colExitInHole.hit) {
                     //this.setLastHit(wire, col.index);
-                    let colDig = col.normal.scale(-1);
+                    let colDig = colExitInHole.normal.scale(-1);
                     // Move away from collision
-                    forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                    forcedDisplacement.addInPlace(colExitInHole.normal.scale(colExitInHole.depth));
                     // Cancel depth component of speed
                     let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
                     if (depthSpeed > 0) {
                         canceledSpeed.addInPlace(colDig.scale(depthSpeed));
                     }
                     // Add ground reaction
-                    let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
+                    let reaction = colExitInHole.normal.scale(colExitInHole.depth * 1000); // 1000 is a magic number.
                     reactions.addInPlace(reaction);
                     reactionsCount++;
+                    if (this.position.y < this.machine.exitHoleIn.absolutePosition.y - 0.05) {
+                        this.velocity.x *= 0.99;
+                        this.velocity.z *= 0.99;
+                    }
+                    this.surface = Surface.Bowl;
                     this.bumpSurfaceIsRail = false;
-                    this.surface = Surface.Velvet;
+                }
+                else {
+                    // Check for hole in pedestalTop
+                    let dx = this.position.x - this.machine.exitHoleIn.absolutePosition.x;
+                    let dy = this.position.z - this.machine.exitHoleIn.absolutePosition.z;
+                    let sqrDistToExitHoleAxis = dx * dx + dy * dy;
+                    if (sqrDistToExitHoleAxis > 0.01835 * 0.01835) {
+                        let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
+                        if (col.hit) {
+                            //this.setLastHit(wire, col.index);
+                            let colDig = col.normal.scale(-1);
+                            // Move away from collision
+                            forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                            // Cancel depth component of speed
+                            let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                            if (depthSpeed > 0) {
+                                canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                            }
+                            // Add ground reaction
+                            let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
+                            reactions.addInPlace(reaction);
+                            reactionsCount++;
+                            this.surface = Surface.Velvet;
+                            this.bumpSurfaceIsRail = false;
+                            weight.copyFromFloats(-0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
+                        }
+                    }
                 }
                 this.machine.balls.forEach((ball) => {
                     if (ball != this) {
@@ -473,10 +506,7 @@ var MarbleRunSimulatorCore;
                 this.position.addInPlace(forcedDisplacement);
                 let friction = this.velocity.scale(-1).scaleInPlace(0.001);
                 if (this.surface === Surface.Velvet) {
-                    friction = this.velocity.scale(-1).scaleInPlace(0.01);
-                }
-                if (this.surface === Surface.Velvet) {
-                    weight.copyFromFloats(-0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
+                    friction = this.velocity.scale(-1).scaleInPlace(0.02);
                 }
                 let acceleration = weight
                     .add(reactions)
@@ -929,6 +959,21 @@ var MarbleRunSimulatorCore;
             this.name = MachineName.GetRandom();
             this.trackFactory = new MarbleRunSimulatorCore.MachinePartFactory(this);
             this.templateManager = new MarbleRunSimulatorCore.TemplateManager(this);
+            this.exitShooter = new MarbleRunSimulatorCore.Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true });
+            this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
+            this.exitShooter.sleepersMeshProp = { drawWallAnchors: true };
+            this.exitTrack = new MarbleRunSimulatorCore.Start(this, { i: 0, j: 0, k: 0, mirrorX: true });
+            this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
+            this.exitTrack.sleepersMeshProp = { drawWallAnchors: true };
+            this.exitHoleInPath = [new BABYLON.Vector3(0.011, -0.0015, 0), new BABYLON.Vector3(0.01835, 0, 0)];
+            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
+            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
+            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
+            this.exitHoleInPath = [new BABYLON.Vector3(0.01, -0.2, 0), ...this.exitHoleInPath];
+            this.exitHoleIn = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: this.exitHoleInPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            this.exitHoleOut = BABYLON.MeshBuilder.CreateLathe("exit-hole-out", { shape: this.exitHoleInPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            this.exitHoleOut.rotation.x = -Math.PI * 0.5;
+            this.exitHoleOut.material = this.game.materials.getMetalMaterial(1);
         }
         setAllIsSelectable(isSelectable) {
             for (let i = 0; i < this.parts.length; i++) {
@@ -937,6 +982,14 @@ var MarbleRunSimulatorCore;
         }
         async instantiate() {
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
+            if (this.exitShooter) {
+                this.exitShooter.instantiate();
+                this.exitShooter.isPlaced = true;
+            }
+            if (this.exitTrack) {
+                this.exitTrack.instantiate();
+                this.exitTrack.isPlaced = true;
+            }
             this.parts = this.parts.sort((a, b) => {
                 return b.j + b.h - (a.j + a.h);
             });
@@ -953,6 +1006,7 @@ var MarbleRunSimulatorCore;
                     for (let i = 0; i < this.parts.length; i++) {
                         this.parts[i].recomputeAbsolutePath();
                     }
+                    this.exitShooter.recomputeAbsolutePath();
                     this.instantiated = true;
                     resolve();
                 });
@@ -1032,6 +1086,9 @@ var MarbleRunSimulatorCore;
                         this.parts[i].update(dt);
                     }
                 }
+                if (this.exitShooter) {
+                    this.exitShooter.update(dt);
+                }
             }
             else {
                 for (let i = 0; i < this.balls.length; i++) {
@@ -1060,6 +1117,9 @@ var MarbleRunSimulatorCore;
             this.baseMeshMaxY = this.margin;
             this.baseMeshMinZ = -this.margin;
             this.baseMeshMaxZ = this.margin;
+            let maxI = 0;
+            let maxJ = 0;
+            let maxK = 0;
             for (let i = 0; i < this.parts.length; i++) {
                 let track = this.parts[i];
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - MarbleRunSimulatorCore.tileWidth * 0.5);
@@ -1068,6 +1128,9 @@ var MarbleRunSimulatorCore;
                 this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
                 this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.position.z - MarbleRunSimulatorCore.tileDepth * (track.d - 0.5));
                 this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z);
+                maxI = Math.max(maxI, track.i + track.w);
+                maxJ = Math.max(maxJ, track.j + track.h);
+                maxK = Math.max(maxK, track.k + track.d);
             }
             if (false && this.game.DEBUG_MODE) {
                 if (this.debugAxis) {
@@ -1222,6 +1285,26 @@ var MarbleRunSimulatorCore;
             }
             if (this.game.room) {
                 this.game.room.setGroundHeight(this.baseMeshMinY - 0.8);
+            }
+            if (this.exitShooter) {
+                this.exitShooter.setI(maxI - 2);
+                this.exitShooter.setJ(maxJ + 3);
+                this.exitShooter.setK(maxK + 1);
+            }
+            if (this.exitTrack) {
+                this.exitTrack.setI(maxI - 1);
+                this.exitTrack.setJ(maxJ + 4);
+                this.exitTrack.setK(maxK + 1);
+            }
+            if (this.exitHoleIn) {
+                this.exitHoleIn.position.x = this.baseMeshMinX - 0.01;
+                this.exitHoleIn.position.y = this.baseMeshMinY;
+                this.exitHoleIn.position.z = this.baseMeshMinZ - 0.01;
+            }
+            if (this.exitHoleOut) {
+                this.exitHoleOut.position.x = this.baseMeshMaxX - 0.015;
+                this.exitHoleOut.position.y = this.baseMeshMinY - 0.055;
+                this.exitHoleOut.position.z = this.baseMeshMinZ - 0.05;
             }
             this.game.spotLight.position.y = this.baseMeshMinY + 2.2;
             let dir = new BABYLON.Vector3((this.baseMeshMinX + this.baseMeshMaxX) * 0.5, -3, (this.baseMeshMinZ + this.baseMeshMaxZ) * 0.5).normalize();
@@ -1817,6 +1900,7 @@ var MarbleRunSimulatorCore;
             this.enclose23 = BABYLON.Vector3.One().scaleInPlace(2 / 3);
             this.encloseEnd = BABYLON.Vector3.One();
             this.neighbours = new Nabu.UniqueList();
+            this.offsetPosition = BABYLON.Vector3.Zero();
             this._i = 0;
             this._j = 0;
             this._k = 0;
@@ -1928,7 +2012,7 @@ var MarbleRunSimulatorCore;
                         this._i = i;
                     }
                 }
-                this.position.x = this._i * MarbleRunSimulatorCore.tileWidth;
+                this.position.x = this._i * MarbleRunSimulatorCore.tileWidth + this.offsetPosition.x;
                 this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
@@ -1949,7 +2033,7 @@ var MarbleRunSimulatorCore;
                         this._j = j;
                     }
                 }
-                this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight;
+                this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y;
                 this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
@@ -1970,7 +2054,7 @@ var MarbleRunSimulatorCore;
                         this._k = k;
                     }
                 }
-                this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth;
+                this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth + this.offsetPosition.z;
                 this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
@@ -4483,7 +4567,7 @@ var MarbleRunSimulatorCore;
             this.currentShootState = 0;
             this.shieldSpeed = 0.15;
             this.delayTimeout = 0;
-            prop.h = Nabu.MinMax(prop.h, 4, 22);
+            prop.h = Nabu.MinMax(prop.h, 3, 22);
             let partName = "shooter-" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             for (let i = this.colors.length; i < 4; i++) {
@@ -4597,21 +4681,35 @@ var MarbleRunSimulatorCore;
             nRight.normalize();
             let cupR = 0.006;
             let dH = 0.001;
-            template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * (h - 2), 0), dir),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 1.6 * cupR, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH, 0), dir),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 0, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH - cupR * 0.8, 0), dir),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH, 0), n),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, -MarbleRunSimulatorCore.tileHeight, 0), n),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.015, 0.035 - MarbleRunSimulatorCore.tileHeight, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
-            ];
-            template.trackTemplates[0].drawEndTip = true;
-            template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[1].trackpoints = [
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight, 0), dirLeft),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.02, -MarbleRunSimulatorCore.tileHeight * 0.6, 0), dirRight)
-            ];
+            if (h > 3) {
+                template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[0].trackpoints = [
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * (h - 2), 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 1.6 * cupR, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 0, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH - cupR * 0.8, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH, 0), n),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, -MarbleRunSimulatorCore.tileHeight, 0), n),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.015, 0.035 - MarbleRunSimulatorCore.tileHeight, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
+                ];
+                template.trackTemplates[0].drawEndTip = true;
+                template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[1].trackpoints = [
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight, 0), dirLeft),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.02, -MarbleRunSimulatorCore.tileHeight * 0.6, 0), dirRight)
+                ];
+            }
+            else {
+                template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[0].trackpoints = [
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * (h - 2), 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 1.6 * cupR, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 0, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH - cupR * 0.8, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH, 0), n),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, MarbleRunSimulatorCore.tileHeight * 0.5, 0), n),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR + 0.01, 0.025 + MarbleRunSimulatorCore.tileHeight * 0.5, 0), MarbleRunSimulatorCore.Tools.V3Dir(45), MarbleRunSimulatorCore.Tools.V3Dir(-45)),
+                ];
+                template.trackTemplates[0].drawEndTip = true;
+            }
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
             }
@@ -5542,7 +5640,10 @@ var MarbleRunSimulatorCore;
             template.mirrorX = mirrorX;
             template.xMirrorable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.3, 0.008, 0), MarbleRunSimulatorCore.Tools.V3Dir(120)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))];
+            template.trackTemplates[0].trackpoints = [
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0.008, 0), MarbleRunSimulatorCore.Tools.V3Dir(110)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))
+            ];
             template.trackTemplates[0].drawStartTip = true;
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();

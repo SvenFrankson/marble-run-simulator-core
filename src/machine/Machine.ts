@@ -91,10 +91,34 @@ namespace MarbleRunSimulatorCore {
 
         public playing: boolean = false;
 
+        public exitShooter: Shooter;
+        public exitTrack: Start;
+        public exitHoleIn: BABYLON.Mesh;
+        public exitHoleInPath: BABYLON.Vector3[];
+        public exitHoleOut: BABYLON.Mesh;
+
         constructor(public game: IGame) {
             this.name = MachineName.GetRandom();
             this.trackFactory = new MachinePartFactory(this);
             this.templateManager = new TemplateManager(this);
+            this.exitShooter = new Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true });
+            this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
+            this.exitShooter.sleepersMeshProp = { drawWallAnchors: true };
+            this.exitTrack = new Start(this, { i: 0, j: 0, k: 0, mirrorX: true });
+            this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
+            this.exitTrack.sleepersMeshProp = { drawWallAnchors: true };
+            
+            this.exitHoleInPath = [new BABYLON.Vector3(0.011, -0.0015, 0), new BABYLON.Vector3(0.01835, 0, 0)];
+            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, Tools.V3Dir(0), Tools.V3Dir(90));
+            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, Tools.V3Dir(0), Tools.V3Dir(90));
+            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, Tools.V3Dir(0), Tools.V3Dir(90));
+            
+            this.exitHoleInPath = [new BABYLON.Vector3(0.01, -0.2, 0), ...this.exitHoleInPath];
+            this.exitHoleIn = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: this.exitHoleInPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+
+            this.exitHoleOut = BABYLON.MeshBuilder.CreateLathe("exit-hole-out", { shape: this.exitHoleInPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            this.exitHoleOut.rotation.x = - Math.PI * 0.5;
+            this.exitHoleOut.material = this.game.materials.getMetalMaterial(1);
         }
 
         public setAllIsSelectable(isSelectable: boolean): void {
@@ -106,6 +130,15 @@ namespace MarbleRunSimulatorCore {
         public async instantiate(): Promise<void> {
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             
+            if (this.exitShooter) {
+                this.exitShooter.instantiate();
+                this.exitShooter.isPlaced = true;
+            }
+            if (this.exitTrack) {
+                this.exitTrack.instantiate();
+                this.exitTrack.isPlaced = true;
+            }
+
             this.parts = this.parts.sort((a, b) => {
                 return b.j + b.h - (a.j + a.h);
             });
@@ -124,6 +157,7 @@ namespace MarbleRunSimulatorCore {
                     for (let i = 0; i < this.parts.length; i++) {
                         this.parts[i].recomputeAbsolutePath();
                     }
+                    this.exitShooter.recomputeAbsolutePath();
                     this.instantiated = true;
                     resolve();
                 });
@@ -207,6 +241,9 @@ namespace MarbleRunSimulatorCore {
                         this.parts[i].update(dt);
                     }
                 }
+                if (this.exitShooter) {
+                    this.exitShooter.update(dt);
+                }
             } else {
                 for (let i = 0; i < this.balls.length; i++) {
                     this.balls[i].marbleLoopSound.setVolume(0, 0.1);
@@ -247,6 +284,9 @@ namespace MarbleRunSimulatorCore {
             this.baseMeshMaxY = this.margin;
             this.baseMeshMinZ = -this.margin;
             this.baseMeshMaxZ = this.margin;
+            let maxI = 0;
+            let maxJ = 0;
+            let maxK = 0;
             for (let i = 0; i < this.parts.length; i++) {
                 let track = this.parts[i];
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - tileWidth * 0.5);
@@ -255,6 +295,10 @@ namespace MarbleRunSimulatorCore {
                 this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
                 this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.position.z - tileDepth * (track.d - 0.5));
                 this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z);
+
+                maxI = Math.max(maxI, track.i + track.w);
+                maxJ = Math.max(maxJ, track.j + track.h);
+                maxK = Math.max(maxK, track.k + track.d);
             }
 
             if (false && this.game.DEBUG_MODE) {
@@ -422,6 +466,27 @@ namespace MarbleRunSimulatorCore {
 
             if (this.game.room) {
                 this.game.room.setGroundHeight(this.baseMeshMinY - 0.8);
+            }
+
+            if (this.exitShooter) {
+                this.exitShooter.setI(maxI - 2);
+                this.exitShooter.setJ(maxJ + 3);
+                this.exitShooter.setK(maxK + 1);
+            }
+            if (this.exitTrack) {
+                this.exitTrack.setI(maxI - 1);
+                this.exitTrack.setJ(maxJ + 4);
+                this.exitTrack.setK(maxK + 1);
+            }
+            if (this.exitHoleIn) {
+                this.exitHoleIn.position.x = this.baseMeshMinX - 0.01;
+                this.exitHoleIn.position.y = this.baseMeshMinY;
+                this.exitHoleIn.position.z = this.baseMeshMinZ - 0.01;
+            }
+            if (this.exitHoleOut) {
+                this.exitHoleOut.position.x = this.baseMeshMaxX - 0.015;
+                this.exitHoleOut.position.y = this.baseMeshMinY - 0.055;
+                this.exitHoleOut.position.z = this.baseMeshMinZ - 0.05;
             }
 
             this.game.spotLight.position.y = this.baseMeshMinY + 2.2;
