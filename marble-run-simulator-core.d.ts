@@ -58,7 +58,7 @@ declare namespace MarbleRunSimulatorCore {
         select(): void;
         unselect(): void;
         setIsVisible(isVisible: boolean): void;
-        instantiate(): Promise<void>;
+        instantiate(hotReload?: boolean): Promise<void>;
         dispose(doNotRecurse?: boolean, disposeMaterialAndTextures?: boolean): void;
         reset(): void;
         private memCount;
@@ -219,7 +219,7 @@ declare namespace MarbleRunSimulatorCore {
         exitHoleOut: BABYLON.Mesh;
         constructor(game: IGame);
         setAllIsSelectable(isSelectable: boolean): void;
-        instantiate(): Promise<void>;
+        instantiate(hotReload?: boolean): Promise<void>;
         dispose(): void;
         getBallPos(): any;
         applyBallPos(save: any): void;
@@ -412,6 +412,8 @@ declare namespace MarbleRunSimulatorCore {
         drawWallAnchors?: boolean;
         drawGroundAnchors?: boolean;
         groundAnchorsRelativeMaxY?: number;
+        forceDrawWallAnchors?: boolean;
+        forcedWallAnchorsZ?: number;
     }
     class SleeperMeshBuilder {
         static GenerateSleepersVertexData(part: MachinePart, props: ISleeperMeshProps): Map<number, BABYLON.VertexData>;

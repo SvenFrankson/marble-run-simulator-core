@@ -4,6 +4,8 @@ namespace MarbleRunSimulatorCore {
         drawWallAnchors?: boolean;
         drawGroundAnchors?: boolean;
         groundAnchorsRelativeMaxY?: number;
+        forceDrawWallAnchors?: boolean;
+        forcedWallAnchorsZ?: number;
     }
 
     export class SleeperMeshBuilder {
@@ -118,9 +120,9 @@ namespace MarbleRunSimulatorCore {
                         }
                         partialsDatas[colorIndex].push(tmp);
 
-                        if (props.drawWallAnchors) {
+                        if (props.drawWallAnchors || props.forceDrawWallAnchors) {
                             let addAnchor = false;
-                            if (part.k === 0 && (n - 1.5) % 3 === 0) {
+                            if ((part.k === 0 || props.forceDrawWallAnchors) && (n - 1.5) % 3 === 0 && up.y > 0.1) {
                                 if (anchor.z > -0.01) {
                                     addAnchor = true;
                                 }
@@ -129,6 +131,9 @@ namespace MarbleRunSimulatorCore {
                             if (addAnchor) {
                                 let anchorCenter = anchor.clone();
                                 anchorCenter.z = 0.015;
+                                if (isFinite(props.forcedWallAnchorsZ)) {
+                                    anchorCenter.z = props.forcedWallAnchorsZ;
+                                }
                                 let radiusFixation = Math.abs(anchor.z - anchorCenter.z);
                                 let anchorWall = anchorCenter.clone();
                                 anchorWall.y -= radiusFixation * 0.5;
@@ -155,7 +160,7 @@ namespace MarbleRunSimulatorCore {
                                 partialsDatas[colorIndex].push(BABYLON.VertexData.ExtractFromMesh(tmp));
                                 tmp.dispose();
 
-                                let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
+                                let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01, tessellation: 16 });
                                 let quat = BABYLON.Quaternion.Identity();
                                 Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), quat);
                                 Mummu.RotateVertexDataInPlace(tmpVertexData, quat);
@@ -192,7 +197,7 @@ namespace MarbleRunSimulatorCore {
                                         partialsDatas[colorIndex].push(BABYLON.VertexData.ExtractFromMesh(tmp));
                                         tmp.dispose();
 
-                                        let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.002, diameter: 0.008, tessellation: 8 });
+                                        let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.002, diameter: 0.012, tessellation: 8 });
                                         Mummu.TranslateVertexDataInPlace(tmpVertexData, anchorBase);
                                         partialsDatas[colorIndex].push(tmpVertexData);
                                         tmp.dispose();

@@ -103,10 +103,10 @@ namespace MarbleRunSimulatorCore {
             this.templateManager = new TemplateManager(this);
             this.exitShooter = new Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 4, 3] });
             this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
-            this.exitShooter.sleepersMeshProp = { drawWallAnchors: true };
+            this.exitShooter.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
             this.exitTrack = new Start(this, { i: 0, j: 0, k: 0, mirrorX: true, c: [0] });
             this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
-            this.exitTrack.sleepersMeshProp = { drawWallAnchors: true };
+            this.exitTrack.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
             
             this.exitHolePath = [new BABYLON.Vector3(0.011, -0.002, 0), new BABYLON.Vector3(0.01835, 0, 0)];
             Mummu.CatmullRomPathInPlace(this.exitHolePath, Tools.V3Dir(0), Tools.V3Dir(90));
@@ -156,7 +156,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public async instantiate(): Promise<void> {
+        public async instantiate(hotReload?: boolean): Promise<void> {
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             
             if (this.exitShooter) {
@@ -178,7 +178,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             for (let i = 0; i < this.balls.length; i++) {
-                await this.balls[i].instantiate();
+                await this.balls[i].instantiate(hotReload);
             }
 
             return new Promise<void>((resolve) => {
@@ -214,8 +214,8 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.balls.length; i++) {
                 let ball = this.balls[i];
                 let data = {
-                    p: ball.position,
-                    v: ball.velocity
+                    p: ball.position.clone(),
+                    v: ball.velocity.clone()
                 }
                 datas.balls.push(data);
             }
@@ -237,8 +237,8 @@ namespace MarbleRunSimulatorCore {
         public applyBallPos(save: any): void {
             for (let i = 0; i < this.balls.length && i < save.balls.length; i++) {
                 let ball = this.balls[i];
-                ball.position = save.balls[i].p;
-                ball.velocity = save.balls[i].v;
+                ball.position = save.balls[i].p.clone();
+                ball.velocity = save.balls[i].v.clone();
             }
             let elevators: Elevator[] = this.parts.filter(p => { return p instanceof Elevator }) as Elevator[];
             for (let i = 0; i < elevators.length && i < save.elevators.length; i++) {

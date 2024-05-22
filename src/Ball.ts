@@ -119,7 +119,7 @@ namespace MarbleRunSimulatorCore {
             });
         }
 
-        public async instantiate(): Promise<void> {
+        public async instantiate(hotReload?: boolean): Promise<void> {
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
             let segmentsCount = 6;
@@ -163,7 +163,9 @@ namespace MarbleRunSimulatorCore {
             this.selectedMesh.parent = this.positionZeroGhost;
             this.selectedMesh.isVisible = false;
 
-            this.reset();
+            if (!hotReload) {
+                this.reset();
+            }
         }
 
         public dispose(doNotRecurse?: boolean, disposeMaterialAndTextures?: boolean): void {

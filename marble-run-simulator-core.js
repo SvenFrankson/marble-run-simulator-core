@@ -113,7 +113,7 @@ var MarbleRunSimulatorCore;
                 m.isVisible = isVisible;
             });
         }
-        async instantiate() {
+        async instantiate(hotReload) {
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
             let segmentsCount = 6;
@@ -153,7 +153,9 @@ var MarbleRunSimulatorCore;
             });
             this.selectedMesh.parent = this.positionZeroGhost;
             this.selectedMesh.isVisible = false;
-            this.reset();
+            if (!hotReload) {
+                this.reset();
+            }
         }
         dispose(doNotRecurse, disposeMaterialAndTextures) {
             super.dispose(doNotRecurse, disposeMaterialAndTextures);
@@ -1024,10 +1026,10 @@ var MarbleRunSimulatorCore;
             this.templateManager = new MarbleRunSimulatorCore.TemplateManager(this);
             this.exitShooter = new MarbleRunSimulatorCore.Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 4, 3] });
             this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
-            this.exitShooter.sleepersMeshProp = { drawWallAnchors: true };
+            this.exitShooter.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
             this.exitTrack = new MarbleRunSimulatorCore.Start(this, { i: 0, j: 0, k: 0, mirrorX: true, c: [0] });
             this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
-            this.exitTrack.sleepersMeshProp = { drawWallAnchors: true };
+            this.exitTrack.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
             this.exitHolePath = [new BABYLON.Vector3(0.011, -0.002, 0), new BABYLON.Vector3(0.01835, 0, 0)];
             Mummu.CatmullRomPathInPlace(this.exitHolePath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
             Mummu.CatmullRomPathInPlace(this.exitHolePath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
@@ -1068,7 +1070,7 @@ var MarbleRunSimulatorCore;
                 this.parts[i].isSelectable = isSelectable;
             }
         }
-        async instantiate() {
+        async instantiate(hotReload) {
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             if (this.exitShooter) {
                 this.exitShooter.instantiate();
@@ -1087,7 +1089,7 @@ var MarbleRunSimulatorCore;
                 await Nabu.Wait(2);
             }
             for (let i = 0; i < this.balls.length; i++) {
-                await this.balls[i].instantiate();
+                await this.balls[i].instantiate(hotReload);
             }
             return new Promise((resolve) => {
                 requestAnimationFrame(() => {
@@ -1120,8 +1122,8 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < this.balls.length; i++) {
                 let ball = this.balls[i];
                 let data = {
-                    p: ball.position,
-                    v: ball.velocity
+                    p: ball.position.clone(),
+                    v: ball.velocity.clone()
                 };
                 datas.balls.push(data);
             }
@@ -1142,8 +1144,8 @@ var MarbleRunSimulatorCore;
         applyBallPos(save) {
             for (let i = 0; i < this.balls.length && i < save.balls.length; i++) {
                 let ball = this.balls[i];
-                ball.position = save.balls[i].p;
-                ball.velocity = save.balls[i].v;
+                ball.position = save.balls[i].p.clone();
+                ball.velocity = save.balls[i].v.clone();
             }
             let elevators = this.parts.filter(p => { return p instanceof MarbleRunSimulatorCore.Elevator; });
             for (let i = 0; i < elevators.length && i < save.elevators.length; i++) {
@@ -2757,9 +2759,9 @@ var MarbleRunSimulatorCore;
                             partialsDatas[colorIndex] = [];
                         }
                         partialsDatas[colorIndex].push(tmp);
-                        if (props.drawWallAnchors) {
+                        if (props.drawWallAnchors || props.forceDrawWallAnchors) {
                             let addAnchor = false;
-                            if (part.k === 0 && (n - 1.5) % 3 === 0) {
+                            if ((part.k === 0 || props.forceDrawWallAnchors) && (n - 1.5) % 3 === 0 && up.y > 0.1) {
                                 if (anchor.z > -0.01) {
                                     addAnchor = true;
                                 }
@@ -2767,6 +2769,9 @@ var MarbleRunSimulatorCore;
                             if (addAnchor) {
                                 let anchorCenter = anchor.clone();
                                 anchorCenter.z = 0.015;
+                                if (isFinite(props.forcedWallAnchorsZ)) {
+                                    anchorCenter.z = props.forcedWallAnchorsZ;
+                                }
                                 let radiusFixation = Math.abs(anchor.z - anchorCenter.z);
                                 let anchorWall = anchorCenter.clone();
                                 anchorWall.y -= radiusFixation * 0.5;
@@ -2792,7 +2797,7 @@ var MarbleRunSimulatorCore;
                                 }
                                 partialsDatas[colorIndex].push(BABYLON.VertexData.ExtractFromMesh(tmp));
                                 tmp.dispose();
-                                let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
+                                let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01, tessellation: 16 });
                                 let quat = BABYLON.Quaternion.Identity();
                                 Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), quat);
                                 Mummu.RotateVertexDataInPlace(tmpVertexData, quat);
@@ -2825,7 +2830,7 @@ var MarbleRunSimulatorCore;
                                         }
                                         partialsDatas[colorIndex].push(BABYLON.VertexData.ExtractFromMesh(tmp));
                                         tmp.dispose();
-                                        let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.002, diameter: 0.008, tessellation: 8 });
+                                        let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.002, diameter: 0.012, tessellation: 8 });
                                         Mummu.TranslateVertexDataInPlace(tmpVertexData, anchorBase);
                                         partialsDatas[colorIndex].push(tmpVertexData);
                                         tmp.dispose();
