@@ -374,6 +374,7 @@ declare namespace MarbleRunSimulatorCore {
         getBarycenter(): BABYLON.Vector3;
         recomputeAbsolutePath(): void;
         instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void>;
+        refreshEncloseMeshAndAABB(): void;
         dispose(): void;
         generateWires(): void;
         update(dt: number): void;

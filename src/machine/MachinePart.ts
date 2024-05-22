@@ -364,6 +364,18 @@ namespace MarbleRunSimulatorCore {
             }
             this.selectorMesh.visibility = 0;
 
+            this.refreshEncloseMeshAndAABB();
+
+            this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
+
+            this.freezeWorldMatrix();
+            this.getChildMeshes().forEach((m) => {
+                m.freezeWorldMatrix();
+            });
+            this.machine.requestUpdateShadow = true;
+        }
+
+        public refreshEncloseMeshAndAABB(): void {
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
             }
@@ -404,18 +416,10 @@ namespace MarbleRunSimulatorCore {
             this.encloseMesh.parent = this;
             this.encloseMesh.visibility = 0;
 
-            this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
-
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseEnd.y, this.encloseEnd.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
             this.AABBMin.addInPlace(this.position);
             this.AABBMax.addInPlace(this.position);
-
-            this.freezeWorldMatrix();
-            this.getChildMeshes().forEach((m) => {
-                m.freezeWorldMatrix();
-            });
-            this.machine.requestUpdateShadow = true;
         }
 
         public dispose(): void {

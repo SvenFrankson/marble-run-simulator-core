@@ -187,6 +187,7 @@ namespace MarbleRunSimulatorCore {
                         this.parts[i].recomputeAbsolutePath();
                     }
                     this.exitShooter.recomputeAbsolutePath();
+                    this.exitTrack.recomputeAbsolutePath();
                     this.instantiated = true;
                     resolve();
                 });
@@ -501,11 +502,15 @@ namespace MarbleRunSimulatorCore {
                 this.exitShooter.setI(maxI - 2);
                 this.exitShooter.setJ(maxJ + 3);
                 this.exitShooter.setK(maxK + 1);
+                this.exitShooter.recomputeAbsolutePath();
+                this.exitShooter.refreshEncloseMeshAndAABB();
             }
             if (this.exitTrack) {
                 this.exitTrack.setI(maxI - 1);
                 this.exitTrack.setJ(maxJ + 4);
                 this.exitTrack.setK(maxK + 1);
+                this.exitTrack.recomputeAbsolutePath();
+                this.exitTrack.refreshEncloseMeshAndAABB();
             }
             if (this.exitHoleIn) {
                 this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;

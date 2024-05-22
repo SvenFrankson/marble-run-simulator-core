@@ -1075,6 +1075,7 @@ var MarbleRunSimulatorCore;
                         this.parts[i].recomputeAbsolutePath();
                     }
                     this.exitShooter.recomputeAbsolutePath();
+                    this.exitTrack.recomputeAbsolutePath();
                     this.instantiated = true;
                     resolve();
                 });
@@ -1358,11 +1359,15 @@ var MarbleRunSimulatorCore;
                 this.exitShooter.setI(maxI - 2);
                 this.exitShooter.setJ(maxJ + 3);
                 this.exitShooter.setK(maxK + 1);
+                this.exitShooter.recomputeAbsolutePath();
+                this.exitShooter.refreshEncloseMeshAndAABB();
             }
             if (this.exitTrack) {
                 this.exitTrack.setI(maxI - 1);
                 this.exitTrack.setJ(maxJ + 4);
                 this.exitTrack.setK(maxK + 1);
+                this.exitTrack.recomputeAbsolutePath();
+                this.exitTrack.refreshEncloseMeshAndAABB();
             }
             if (this.exitHoleIn) {
                 this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;
@@ -2236,6 +2241,15 @@ var MarbleRunSimulatorCore;
                 Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMesh);
             }
             this.selectorMesh.visibility = 0;
+            this.refreshEncloseMeshAndAABB();
+            this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
+            this.freezeWorldMatrix();
+            this.getChildMeshes().forEach((m) => {
+                m.freezeWorldMatrix();
+            });
+            this.machine.requestUpdateShadow = true;
+        }
+        refreshEncloseMeshAndAABB() {
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
             }
@@ -2271,16 +2285,10 @@ var MarbleRunSimulatorCore;
             }, this.getScene());
             this.encloseMesh.parent = this;
             this.encloseMesh.visibility = 0;
-            this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseEnd.y, this.encloseEnd.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
             this.AABBMin.addInPlace(this.position);
             this.AABBMax.addInPlace(this.position);
-            this.freezeWorldMatrix();
-            this.getChildMeshes().forEach((m) => {
-                m.freezeWorldMatrix();
-            });
-            this.machine.requestUpdateShadow = true;
         }
         dispose() {
             super.dispose();
