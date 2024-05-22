@@ -11,6 +11,13 @@ namespace MarbleRunSimulatorCore {
         Velvet
     }
 
+    export enum CollisionState {
+        Normal,
+        Inside,
+        Exit,
+        Flyback
+    }
+
     export class Ball extends BABYLON.Mesh {
         public static ConstructorIndex: number = 0;
         public constructorIndex: number = 0;
@@ -179,7 +186,7 @@ namespace MarbleRunSimulatorCore {
             }
             this.velocity.copyFromFloats(0, 0, 0);
             this._timer = 0;
-            this.collisionState = 0;
+            this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
         }
@@ -219,14 +226,17 @@ namespace MarbleRunSimulatorCore {
         
         public lastPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public visibleVelocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-        public collisionState: number = 0;
+        public collisionState: number = CollisionState.Normal;
 
         public update(dt: number): void {
             let sign = Math.sign(this.velocity.y);
-            if (this.position.y < this.machine.baseMeshMinY - 0.2) {
-                this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
-                this.velocity.copyFromFloats(0, 0, - 0.2);
-                this.collisionState = 1;
+            if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.2) {
+                this.collisionState = CollisionState.Inside;
+                setTimeout(() => {
+                    this.collisionState = CollisionState.Exit;
+                    this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
+                    this.velocity.copyFromFloats(0, 0, - 0.2);
+                }, 3000);
             }
 
             this._timer += dt * this.game.currentTimeFactor;
@@ -248,10 +258,10 @@ namespace MarbleRunSimulatorCore {
 
                 this.bumpSurfaceIsRail = true;
                 let collisionableParts: MachinePart[];
-                if (this.collisionState === 0) {
+                if (this.collisionState === CollisionState.Normal) {
                     collisionableParts = this.machine.parts;
                 }
-                if (this.collisionState === 1) {
+                if (this.collisionState === CollisionState.Exit) {
                     collisionableParts = [this.machine.exitShooter, this.machine.exitTrack];
                 }
                 if (collisionableParts) {
@@ -437,7 +447,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 
                 // Collide with playground limits
-                if (this.collisionState === 0) {
+                if (this.collisionState === CollisionState.Normal) {
                     if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
                         this.velocity.x = Math.abs(this.velocity.x) * 0.5;
                         this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
@@ -454,7 +464,7 @@ namespace MarbleRunSimulatorCore {
                         this.velocity.z = - Math.abs(this.velocity.z) * 0.5;
                         this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
                     }
-                    let colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHoleInPath);
+                    let colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHolePath);
                     if (colExitInHole.hit) {
                         //this.setLastHit(wire, col.index);
                         let colDig = colExitInHole.normal.scale(-1);
@@ -509,9 +519,9 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
 
-                if (this.collisionState < 2) {
+                if (this.collisionState === CollisionState.Normal || this.collisionState === CollisionState.Exit) {
                     this.machine.balls.forEach((ball) => {
-                        if (ball != this) {
+                        if (ball != this && ball.collisionState === this.collisionState) {
                             let dist = BABYLON.Vector3.Distance(this.position, ball.position);
                             if (dist < this.size) {
                                 let depth = this.size - dist;
@@ -600,7 +610,7 @@ namespace MarbleRunSimulatorCore {
             }
             this.lastPosition.copyFrom(this.position);
 
-            if (this.collisionState === 2) {
+            if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
                     this.flyBackProgress += dt * this.flyBackGroundSpeed;
                     let dirOrigin = this.flybackPeak.subtract(this.flybackOrigin);
@@ -613,7 +623,7 @@ namespace MarbleRunSimulatorCore {
                     else {
                         this.position.copyFrom(this.flybackDestination);
                         this.velocity.copyFrom(this.visibleVelocity);
-                        this.collisionState = 0;
+                        this.collisionState = CollisionState.Normal;
                     }
                 }
             }

@@ -372,7 +372,7 @@ namespace MarbleRunSimulatorCore {
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
                         ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + 1;
                         ballArmed.flyBackProgress = 0;
-                        ballArmed.collisionState = 2;
+                        ballArmed.collisionState = CollisionState.Flyback;
                         this.currentShootState = 4;
                     }
                     else {

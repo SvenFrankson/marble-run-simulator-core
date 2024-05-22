@@ -13,6 +13,13 @@ var MarbleRunSimulatorCore;
         Surface[Surface["Bowl"] = 1] = "Bowl";
         Surface[Surface["Velvet"] = 2] = "Velvet";
     })(Surface = MarbleRunSimulatorCore.Surface || (MarbleRunSimulatorCore.Surface = {}));
+    let CollisionState;
+    (function (CollisionState) {
+        CollisionState[CollisionState["Normal"] = 0] = "Normal";
+        CollisionState[CollisionState["Inside"] = 1] = "Inside";
+        CollisionState[CollisionState["Exit"] = 2] = "Exit";
+        CollisionState[CollisionState["Flyback"] = 3] = "Flyback";
+    })(CollisionState = MarbleRunSimulatorCore.CollisionState || (MarbleRunSimulatorCore.CollisionState = {}));
     class Ball extends BABYLON.Mesh {
         constructor(positionZero, machine, _materialIndex = 0) {
             super("ball");
@@ -41,7 +48,7 @@ var MarbleRunSimulatorCore;
             this.strReaction = 0;
             this.lastPosition = BABYLON.Vector3.Zero();
             this.visibleVelocity = BABYLON.Vector3.Zero();
-            this.collisionState = 0;
+            this.collisionState = CollisionState.Normal;
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -167,7 +174,7 @@ var MarbleRunSimulatorCore;
             }
             this.velocity.copyFromFloats(0, 0, 0);
             this._timer = 0;
-            this.collisionState = 0;
+            this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
         }
@@ -192,10 +199,13 @@ var MarbleRunSimulatorCore;
         }
         update(dt) {
             let sign = Math.sign(this.velocity.y);
-            if (this.position.y < this.machine.baseMeshMinY - 0.2) {
-                this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
-                this.velocity.copyFromFloats(0, 0, -0.2);
-                this.collisionState = 1;
+            if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.2) {
+                this.collisionState = CollisionState.Inside;
+                setTimeout(() => {
+                    this.collisionState = CollisionState.Exit;
+                    this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
+                    this.velocity.copyFromFloats(0, 0, -0.2);
+                }, 3000);
             }
             this._timer += dt * this.game.currentTimeFactor;
             this._timer = Math.min(this._timer, 1);
@@ -212,10 +222,10 @@ var MarbleRunSimulatorCore;
                 let canceledSpeed = BABYLON.Vector3.Zero();
                 this.bumpSurfaceIsRail = true;
                 let collisionableParts;
-                if (this.collisionState === 0) {
+                if (this.collisionState === CollisionState.Normal) {
                     collisionableParts = this.machine.parts;
                 }
-                if (this.collisionState === 1) {
+                if (this.collisionState === CollisionState.Exit) {
                     collisionableParts = [this.machine.exitShooter, this.machine.exitTrack];
                 }
                 if (collisionableParts) {
@@ -394,7 +404,7 @@ var MarbleRunSimulatorCore;
                     });
                 }
                 // Collide with playground limits
-                if (this.collisionState === 0) {
+                if (this.collisionState === CollisionState.Normal) {
                     if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
                         this.velocity.x = Math.abs(this.velocity.x) * 0.5;
                         this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
@@ -411,7 +421,7 @@ var MarbleRunSimulatorCore;
                         this.velocity.z = -Math.abs(this.velocity.z) * 0.5;
                         this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
                     }
-                    let colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHoleInPath);
+                    let colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHolePath);
                     if (colExitInHole.hit) {
                         //this.setLastHit(wire, col.index);
                         let colDig = colExitInHole.normal.scale(-1);
@@ -461,9 +471,9 @@ var MarbleRunSimulatorCore;
                         }
                     }
                 }
-                if (this.collisionState < 2) {
+                if (this.collisionState === CollisionState.Normal || this.collisionState === CollisionState.Exit) {
                     this.machine.balls.forEach((ball) => {
-                        if (ball != this) {
+                        if (ball != this && ball.collisionState === this.collisionState) {
                             let dist = BABYLON.Vector3.Distance(this.position, ball.position);
                             if (dist < this.size) {
                                 let depth = this.size - dist;
@@ -542,7 +552,7 @@ var MarbleRunSimulatorCore;
                 }
             }
             this.lastPosition.copyFrom(this.position);
-            if (this.collisionState === 2) {
+            if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
                     this.flyBackProgress += dt * this.flyBackGroundSpeed;
                     let dirOrigin = this.flybackPeak.subtract(this.flybackOrigin);
@@ -555,7 +565,7 @@ var MarbleRunSimulatorCore;
                     else {
                         this.position.copyFrom(this.flybackDestination);
                         this.velocity.copyFrom(this.visibleVelocity);
-                        this.collisionState = 0;
+                        this.collisionState = CollisionState.Normal;
                     }
                 }
             }
@@ -643,6 +653,10 @@ var MarbleRunSimulatorCore;
             copperMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
             copperMaterialSTD.emissiveColor = copperMaterialSTD.diffuseColor.scale(0.5);
             copperMaterialSTD.roughness = 0.15;
+            this.plasticBlack = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
+            this.plasticBlack.diffuseColor = BABYLON.Color3.FromHexString("#282a33");
+            this.plasticBlack.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.plasticBlack.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
             let plasticIndigo = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticIndigo.baseColor = BABYLON.Color3.FromHexString("#004777");
             plasticIndigo.metallic = 0;
@@ -994,15 +1008,40 @@ var MarbleRunSimulatorCore;
             this.exitTrack = new MarbleRunSimulatorCore.Start(this, { i: 0, j: 0, k: 0, mirrorX: true });
             this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitTrack.sleepersMeshProp = { drawWallAnchors: true };
-            this.exitHoleInPath = [new BABYLON.Vector3(0.011, -0.0015, 0), new BABYLON.Vector3(0.01835, 0, 0)];
-            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
-            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
-            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
-            this.exitHoleInPath = [new BABYLON.Vector3(0.01, -0.2, 0), ...this.exitHoleInPath];
-            this.exitHoleIn = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: this.exitHoleInPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
-            this.exitHoleOut = BABYLON.MeshBuilder.CreateLathe("exit-hole-out", { shape: this.exitHoleInPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            this.exitHolePath = [new BABYLON.Vector3(0.011, -0.002, 0), new BABYLON.Vector3(0.01835, 0, 0)];
+            Mummu.CatmullRomPathInPlace(this.exitHolePath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
+            Mummu.CatmullRomPathInPlace(this.exitHolePath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
+            Mummu.CatmullRomPathInPlace(this.exitHolePath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
+            this.exitHolePath = [new BABYLON.Vector3(0.011, -0.1, 0), ...this.exitHolePath];
+            let tmpMesh = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: this.exitHolePath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            let data = BABYLON.VertexData.ExtractFromMesh(tmpMesh);
+            tmpMesh.dispose();
+            let colors = [];
+            for (let i = 0; i < data.positions.length / 3; i++) {
+                if (data.positions[3 * i + 1] < -0.05) {
+                    colors.push(0, 0, 0, 1);
+                }
+                else {
+                    colors.push(1, 1, 1, 1);
+                }
+            }
+            data.colors = colors;
+            let bottomData = Mummu.CreateQuadVertexData({
+                p1: new BABYLON.Vector3(-0.02, -0.1, -0.02),
+                p2: new BABYLON.Vector3(-0.02, -0.1, 0.02),
+                p3: new BABYLON.Vector3(0.02, -0.1, 0.02),
+                p4: new BABYLON.Vector3(0.02, -0.1, -0.02),
+                colors: new BABYLON.Color4(0, 0, 0, 1),
+                sideOrientation: 1
+            });
+            data = Mummu.MergeVertexDatas(data, bottomData);
+            this.exitHoleIn = new BABYLON.Mesh("exit-hole-in");
+            this.exitHoleIn.material = this.game.materials.plasticBlack;
+            data.applyToMesh(this.exitHoleIn);
+            this.exitHoleOut = new BABYLON.Mesh("exit-hole-out");
+            this.exitHoleOut.material = this.game.materials.plasticBlack;
+            data.applyToMesh(this.exitHoleOut);
             this.exitHoleOut.rotation.x = -Math.PI * 0.5;
-            this.exitHoleOut.material = this.game.materials.getMetalMaterial(1);
         }
         setAllIsSelectable(isSelectable) {
             for (let i = 0; i < this.parts.length; i++) {
@@ -1326,9 +1365,9 @@ var MarbleRunSimulatorCore;
                 this.exitTrack.setK(maxK + 1);
             }
             if (this.exitHoleIn) {
-                this.exitHoleIn.position.x = this.baseMeshMinX - 0.01;
+                this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;
                 this.exitHoleIn.position.y = this.baseMeshMinY;
-                this.exitHoleIn.position.z = this.baseMeshMinZ - 0.01;
+                this.exitHoleIn.position.z = this.baseMeshMinZ - 0.015;
             }
             if (this.exitHoleOut) {
                 this.exitHoleOut.position.x = this.baseMeshMaxX - 0.015;
@@ -4851,7 +4890,7 @@ var MarbleRunSimulatorCore;
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
                         ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + 1;
                         ballArmed.flyBackProgress = 0;
-                        ballArmed.collisionState = 2;
+                        ballArmed.collisionState = MarbleRunSimulatorCore.CollisionState.Flyback;
                         this.currentShootState = 4;
                     }
                     else {

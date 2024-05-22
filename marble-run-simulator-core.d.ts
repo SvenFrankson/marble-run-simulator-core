@@ -11,6 +11,12 @@ declare namespace MarbleRunSimulatorCore {
         Bowl = 1,
         Velvet = 2
     }
+    enum CollisionState {
+        Normal = 0,
+        Inside = 1,
+        Exit = 2,
+        Flyback = 3
+    }
     class Ball extends BABYLON.Mesh {
         positionZero: BABYLON.Vector3;
         machine: Machine;
@@ -99,6 +105,7 @@ declare namespace MarbleRunSimulatorCore {
         blueMaterial: BABYLON.StandardMaterial;
         whiteAutolitMaterial: BABYLON.StandardMaterial;
         whiteFullLitMaterial: BABYLON.StandardMaterial;
+        plasticBlack: BABYLON.StandardMaterial;
         constructor(game: IGame);
     }
 }
@@ -208,7 +215,7 @@ declare namespace MarbleRunSimulatorCore {
         exitShooter: Shooter;
         exitTrack: Start;
         exitHoleIn: BABYLON.Mesh;
-        exitHoleInPath: BABYLON.Vector3[];
+        exitHolePath: BABYLON.Vector3[];
         exitHoleOut: BABYLON.Mesh;
         constructor(game: IGame);
         setAllIsSelectable(isSelectable: boolean): void;

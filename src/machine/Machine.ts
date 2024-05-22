@@ -94,7 +94,7 @@ namespace MarbleRunSimulatorCore {
         public exitShooter: Shooter;
         public exitTrack: Start;
         public exitHoleIn: BABYLON.Mesh;
-        public exitHoleInPath: BABYLON.Vector3[];
+        public exitHolePath: BABYLON.Vector3[];
         public exitHoleOut: BABYLON.Mesh;
 
         constructor(public game: IGame) {
@@ -108,17 +108,46 @@ namespace MarbleRunSimulatorCore {
             this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitTrack.sleepersMeshProp = { drawWallAnchors: true };
             
-            this.exitHoleInPath = [new BABYLON.Vector3(0.011, -0.0015, 0), new BABYLON.Vector3(0.01835, 0, 0)];
-            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, Tools.V3Dir(0), Tools.V3Dir(90));
-            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, Tools.V3Dir(0), Tools.V3Dir(90));
-            Mummu.CatmullRomPathInPlace(this.exitHoleInPath, Tools.V3Dir(0), Tools.V3Dir(90));
+            this.exitHolePath = [new BABYLON.Vector3(0.011, -0.002, 0), new BABYLON.Vector3(0.01835, 0, 0)];
+            Mummu.CatmullRomPathInPlace(this.exitHolePath, Tools.V3Dir(0), Tools.V3Dir(90));
+            Mummu.CatmullRomPathInPlace(this.exitHolePath, Tools.V3Dir(0), Tools.V3Dir(90));
+            Mummu.CatmullRomPathInPlace(this.exitHolePath, Tools.V3Dir(0), Tools.V3Dir(90));
             
-            this.exitHoleInPath = [new BABYLON.Vector3(0.01, -0.2, 0), ...this.exitHoleInPath];
-            this.exitHoleIn = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: this.exitHoleInPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            this.exitHolePath = [new BABYLON.Vector3(0.011, -0.1, 0), ...this.exitHolePath];
 
-            this.exitHoleOut = BABYLON.MeshBuilder.CreateLathe("exit-hole-out", { shape: this.exitHoleInPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            let tmpMesh = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: this.exitHolePath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            let data = BABYLON.VertexData.ExtractFromMesh(tmpMesh);
+            tmpMesh.dispose();
+            let colors = []
+            for (let i = 0; i < data.positions.length / 3; i++) {
+                if (data.positions[3 * i + 1] < - 0.05) {
+                    colors.push(0, 0, 0, 1);
+                }
+                else {
+                    colors.push(1, 1, 1, 1);
+                }
+            }
+            data.colors = colors;
+            let bottomData = Mummu.CreateQuadVertexData(
+                {
+                    p1: new BABYLON.Vector3(-0.02, -0.1, -0.02),
+                    p2: new BABYLON.Vector3(-0.02, -0.1, 0.02),
+                    p3: new BABYLON.Vector3(0.02, -0.1, 0.02),
+                    p4: new BABYLON.Vector3(0.02, -0.1, -0.02),
+                    colors: new BABYLON.Color4(0, 0, 0, 1),
+                    sideOrientation: 1
+                }
+            )
+            data = Mummu.MergeVertexDatas(data, bottomData);
+
+            this.exitHoleIn = new BABYLON.Mesh("exit-hole-in");
+            this.exitHoleIn.material = this.game.materials.plasticBlack;
+            data.applyToMesh(this.exitHoleIn);
+
+            this.exitHoleOut = new BABYLON.Mesh("exit-hole-out");
+            this.exitHoleOut.material = this.game.materials.plasticBlack;
+            data.applyToMesh(this.exitHoleOut);
             this.exitHoleOut.rotation.x = - Math.PI * 0.5;
-            this.exitHoleOut.material = this.game.materials.getMetalMaterial(1);
         }
 
         public setAllIsSelectable(isSelectable: boolean): void {
@@ -479,9 +508,9 @@ namespace MarbleRunSimulatorCore {
                 this.exitTrack.setK(maxK + 1);
             }
             if (this.exitHoleIn) {
-                this.exitHoleIn.position.x = this.baseMeshMinX - 0.01;
+                this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;
                 this.exitHoleIn.position.y = this.baseMeshMinY;
-                this.exitHoleIn.position.z = this.baseMeshMinZ - 0.01;
+                this.exitHoleIn.position.z = this.baseMeshMinZ - 0.015;
             }
             if (this.exitHoleOut) {
                 this.exitHoleOut.position.x = this.baseMeshMaxX - 0.015;
