@@ -101,10 +101,10 @@ namespace MarbleRunSimulatorCore {
             this.name = MachineName.GetRandom();
             this.trackFactory = new MachinePartFactory(this);
             this.templateManager = new TemplateManager(this);
-            this.exitShooter = new Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true });
+            this.exitShooter = new Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 4, 3] });
             this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitShooter.sleepersMeshProp = { drawWallAnchors: true };
-            this.exitTrack = new Start(this, { i: 0, j: 0, k: 0, mirrorX: true });
+            this.exitTrack = new Start(this, { i: 0, j: 0, k: 0, mirrorX: true, c: [0] });
             this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitTrack.sleepersMeshProp = { drawWallAnchors: true };
             

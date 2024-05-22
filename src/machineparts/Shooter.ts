@@ -80,7 +80,7 @@ namespace MarbleRunSimulatorCore {
                 let data = datas[0];
                 if (data) {
                     data.applyToMesh(this.kicker);
-                    this.kicker.material = this.game.materials.leatherMaterial;
+                    this.kicker.material = this.game.materials.plasticBlack;
                 }
                 let body = new BABYLON.Mesh("kicker-body");
                 body.parent = this.kicker;
@@ -370,7 +370,7 @@ namespace MarbleRunSimulatorCore {
                         ballArmed.flybackOrigin = ballArmed.position.clone();
                         ballArmed.flybackDestination = ballArmed.positionZero.clone();
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
-                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + 1;
+                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + 1.5;
                         ballArmed.flyBackProgress = 0;
                         ballArmed.collisionState = CollisionState.Flyback;
                         this.currentShootState = 4;

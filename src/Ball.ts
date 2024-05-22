@@ -83,6 +83,7 @@ namespace MarbleRunSimulatorCore {
         public railBumpSound: BABYLON.Sound;
         public marbleLoopSound: BABYLON.Sound;
         public marbleBowlLoopSound: BABYLON.Sound;
+        public marbleBowlInsideSound: BABYLON.Sound;
 
         public flybackOrigin: BABYLON.Vector3;
         public flybackDestination: BABYLON.Vector3;
@@ -99,6 +100,8 @@ namespace MarbleRunSimulatorCore {
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
             this.marbleBowlLoopSound.setVolume(0);
+            this.marbleBowlInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.marbleBowlInsideSound.setVolume(0.2);
         }
 
         public select(): void {
@@ -232,11 +235,12 @@ namespace MarbleRunSimulatorCore {
             let sign = Math.sign(this.velocity.y);
             if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.2) {
                 this.collisionState = CollisionState.Inside;
+                this.marbleBowlInsideSound.play();
                 setTimeout(() => {
                     this.collisionState = CollisionState.Exit;
                     this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
                     this.velocity.copyFromFloats(0, 0, - 0.2);
-                }, 3000);
+                }, 2700);
             }
 
             this._timer += dt * this.game.currentTimeFactor;
@@ -511,7 +515,7 @@ namespace MarbleRunSimulatorCore {
                                 reactionsCount++;
             
                                 this.surface = Surface.Velvet;
-                                this.bumpSurfaceIsRail = false;
+                                this.bumpSurfaceIsRail = true;
                                 
                                 weight.copyFromFloats(- 0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
                             }

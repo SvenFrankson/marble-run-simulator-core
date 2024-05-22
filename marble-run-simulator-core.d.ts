@@ -48,6 +48,7 @@ declare namespace MarbleRunSimulatorCore {
         railBumpSound: BABYLON.Sound;
         marbleLoopSound: BABYLON.Sound;
         marbleBowlLoopSound: BABYLON.Sound;
+        marbleBowlInsideSound: BABYLON.Sound;
         flybackOrigin: BABYLON.Vector3;
         flybackDestination: BABYLON.Vector3;
         flybackPeak: BABYLON.Vector3;
@@ -93,7 +94,6 @@ declare namespace MarbleRunSimulatorCore {
         velvetMaterial: BABYLON.StandardMaterial;
         logoMaterial: BABYLON.StandardMaterial;
         baseAxisMaterial: BABYLON.StandardMaterial;
-        leatherMaterial: BABYLON.StandardMaterial;
         whiteMaterial: BABYLON.StandardMaterial;
         paintingLight: BABYLON.StandardMaterial;
         handleMaterial: BABYLON.StandardMaterial;

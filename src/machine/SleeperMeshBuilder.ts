@@ -21,6 +21,7 @@ namespace MarbleRunSimulatorCore {
             for (let j = 0; j < part.tracks.length; j++) {
                 let track = part.tracks[j];
                 let colorIndex = track.part.getColor(track.template.colorIndex);
+                let plasticIndex: number = 4;
                 let interpolatedPoints = track.templateInterpolatedPoints;
                 let summedLength: number[] = [0];
                 for (let i = 1; i < interpolatedPoints.length; i++) {
@@ -35,7 +36,7 @@ namespace MarbleRunSimulatorCore {
                 let correctedSpacing = summedLength[summedLength.length - 1] / count;
 
                 let radiusShape = part.wireSize * 0.5 * 0.75;
-                if (colorIndex >= 2) {
+                if (colorIndex >= plasticIndex) {
                     radiusShape *= 2;
                 }
                 let nShape = 3;
@@ -67,7 +68,7 @@ namespace MarbleRunSimulatorCore {
                     basePath[i] = new BABYLON.Vector3(cosa * radiusPath, -sina * radiusPath, 0);
                 }
 
-                let sleeperPieceVertexDataTypeIndex = colorIndex >= 2 ? 3 : 0;
+                let sleeperPieceVertexDataTypeIndex = colorIndex >= plasticIndex ? 3 : 0;
                 if (q === 1) {
                     sleeperPieceVertexDataTypeIndex += 1;
                 } else if (q === 0) {

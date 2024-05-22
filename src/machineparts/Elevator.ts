@@ -102,7 +102,7 @@ namespace MarbleRunSimulatorCore {
                 pathCable.push(new BABYLON.Vector3(x0 - cosa * this.rWheel, y0 + sina * this.rWheel));
             }
             this.cable = BABYLON.ExtrudeShape("wire", { shape: cableShape, path: pathCable, closeShape: true, closePath: true });
-            this.cable.material = this.game.materials.leatherMaterial;
+            this.cable.material = this.game.materials.plasticBlack;
             this.cable.parent = this;
 
             this.generateWires();
