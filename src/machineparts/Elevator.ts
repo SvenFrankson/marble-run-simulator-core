@@ -21,19 +21,9 @@ namespace MarbleRunSimulatorCore {
             this.wheels = [new BABYLON.Mesh("wheel-0"), new BABYLON.Mesh("wheel-1")];
             this.wheels[0].position.copyFromFloats(0.03 * x + tileWidth * 0.5, -tileHeight * (this.h + 0.35), 0);
             this.wheels[0].parent = this;
-            this.wheels[0].material = this.game.materials.getMetalMaterial(0);
 
             this.wheels[1].position.copyFromFloats(0.03 * x + tileWidth * 0.5, 0.035 - tileHeight, 0);
             this.wheels[1].parent = this;
-            this.wheels[1].material = this.game.materials.getMetalMaterial(0);
-
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon").then((vertexDatas) => {
-                let vertexData = vertexDatas[0];
-                if (vertexData) {
-                    vertexData.applyToMesh(this.wheels[0]);
-                    vertexData.applyToMesh(this.wheels[1]);
-                }
-            });
 
             this.wires = [];
             this.l = Math.abs(this.wheels[1].position.y - this.wheels[0].position.y);
@@ -102,13 +92,22 @@ namespace MarbleRunSimulatorCore {
                 pathCable.push(new BABYLON.Vector3(x0 - cosa * this.rWheel, y0 + sina * this.rWheel));
             }
             this.cable = BABYLON.ExtrudeShape("wire", { shape: cableShape, path: pathCable, closeShape: true, closePath: true });
-            this.cable.material = this.game.materials.plasticBlack;
             this.cable.parent = this;
 
             this.generateWires();
 
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+
+        protected async instantiateMachineSpecific(): Promise<void> {
+            this.cable.material = this.game.materials.plasticBlack;
+
+            let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 0);
+            wheelData.applyToMesh(this.wheels[0]);
+            wheelData.applyToMesh(this.wheels[1]);
+            this.wheels[0].material = this.game.materials.getMetalMaterial(0);
+            this.wheels[1].material = this.game.materials.getMetalMaterial(0);
         }
 
         public static GenerateTemplate(h: number, mirrorX: boolean) {

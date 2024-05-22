@@ -374,6 +374,7 @@ declare namespace MarbleRunSimulatorCore {
         getBarycenter(): BABYLON.Vector3;
         recomputeAbsolutePath(): void;
         instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void>;
+        protected instantiateMachineSpecific(): Promise<void>;
         refreshEncloseMeshAndAABB(): void;
         dispose(): void;
         generateWires(): void;
@@ -541,6 +542,7 @@ declare namespace MarbleRunSimulatorCore {
         wheels: BABYLON.Mesh[];
         cable: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;

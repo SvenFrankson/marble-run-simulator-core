@@ -2264,6 +2264,7 @@ var MarbleRunSimulatorCore;
             }
             this.selectorMesh.visibility = 0;
             this.refreshEncloseMeshAndAABB();
+            await this.instantiateMachineSpecific();
             this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
             this.freezeWorldMatrix();
             this.getChildMeshes().forEach((m) => {
@@ -2271,6 +2272,7 @@ var MarbleRunSimulatorCore;
             });
             this.machine.requestUpdateShadow = true;
         }
+        async instantiateMachineSpecific() { }
         refreshEncloseMeshAndAABB() {
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
@@ -2382,11 +2384,11 @@ var MarbleRunSimulatorCore;
             datas.forEach((vData, colorIndex) => {
                 if (!this.sleepersMeshes.get(colorIndex)) {
                     let sleeperMesh = new BABYLON.Mesh("sleeper-mesh-" + colorIndex);
-                    sleeperMesh.material = this.game.materials.getMetalMaterial(colorIndex);
                     sleeperMesh.parent = this;
                     this.sleepersMeshes.set(colorIndex, sleeperMesh);
                 }
                 let sleeperMesh = this.sleepersMeshes.get(colorIndex);
+                sleeperMesh.material = this.game.materials.getMetalMaterial(colorIndex);
                 vData.applyToMesh(sleeperMesh);
                 sleeperMesh.freezeWorldMatrix();
             });
@@ -3774,17 +3776,8 @@ var MarbleRunSimulatorCore;
             this.wheels = [new BABYLON.Mesh("wheel-0"), new BABYLON.Mesh("wheel-1")];
             this.wheels[0].position.copyFromFloats(0.03 * x + MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * (this.h + 0.35), 0);
             this.wheels[0].parent = this;
-            this.wheels[0].material = this.game.materials.getMetalMaterial(0);
             this.wheels[1].position.copyFromFloats(0.03 * x + MarbleRunSimulatorCore.tileWidth * 0.5, 0.035 - MarbleRunSimulatorCore.tileHeight, 0);
             this.wheels[1].parent = this;
-            this.wheels[1].material = this.game.materials.getMetalMaterial(0);
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon").then((vertexDatas) => {
-                let vertexData = vertexDatas[0];
-                if (vertexData) {
-                    vertexData.applyToMesh(this.wheels[0]);
-                    vertexData.applyToMesh(this.wheels[1]);
-                }
-            });
             this.wires = [];
             this.l = Math.abs(this.wheels[1].position.y - this.wheels[0].position.y);
             this.p = 2 * Math.PI * this.rWheel;
@@ -3845,11 +3838,18 @@ var MarbleRunSimulatorCore;
                 pathCable.push(new BABYLON.Vector3(x0 - cosa * this.rWheel, y0 + sina * this.rWheel));
             }
             this.cable = BABYLON.ExtrudeShape("wire", { shape: cableShape, path: pathCable, closeShape: true, closePath: true });
-            this.cable.material = this.game.materials.plasticBlack;
             this.cable.parent = this;
             this.generateWires();
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+        async instantiateMachineSpecific() {
+            this.cable.material = this.game.materials.plasticBlack;
+            let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 0);
+            wheelData.applyToMesh(this.wheels[0]);
+            wheelData.applyToMesh(this.wheels[1]);
+            this.wheels[0].material = this.game.materials.getMetalMaterial(0);
+            this.wheels[1].material = this.game.materials.getMetalMaterial(0);
         }
         static GenerateTemplate(h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();

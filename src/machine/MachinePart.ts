@@ -366,6 +366,8 @@ namespace MarbleRunSimulatorCore {
 
             this.refreshEncloseMeshAndAABB();
 
+            await this.instantiateMachineSpecific();
+
             this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
 
             this.freezeWorldMatrix();
@@ -374,6 +376,8 @@ namespace MarbleRunSimulatorCore {
             });
             this.machine.requestUpdateShadow = true;
         }
+
+        protected async instantiateMachineSpecific(): Promise<void> {}
 
         public refreshEncloseMeshAndAABB(): void {
             if (this.encloseMesh) {
@@ -499,16 +503,17 @@ namespace MarbleRunSimulatorCore {
             datas.forEach((vData, colorIndex) => {
                 if (!this.sleepersMeshes.get(colorIndex)) {
                     let sleeperMesh = new BABYLON.Mesh("sleeper-mesh-" + colorIndex);
-                    sleeperMesh.material = this.game.materials.getMetalMaterial(colorIndex);
                     sleeperMesh.parent = this;
                     this.sleepersMeshes.set(colorIndex, sleeperMesh);
                 }
                 let sleeperMesh = this.sleepersMeshes.get(colorIndex);
+                sleeperMesh.material = this.game.materials.getMetalMaterial(colorIndex);
                 vData.applyToMesh(sleeperMesh);
                 sleeperMesh.freezeWorldMatrix();
             });
             this.machine.requestUpdateShadow = true;
             if (this.game.DEBUG_MODE) {
+
             }
         }
 
