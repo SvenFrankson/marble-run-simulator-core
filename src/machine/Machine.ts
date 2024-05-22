@@ -308,15 +308,15 @@ namespace MarbleRunSimulatorCore {
         public async generateBaseMesh(): Promise<void> {
             let previousBaseMinY = this.baseMeshMinY;
 
-            this.baseMeshMinX = -this.margin;
-            this.baseMeshMaxX = this.margin;
-            this.baseMeshMinY = -this.margin;
-            this.baseMeshMaxY = this.margin;
-            this.baseMeshMinZ = -this.margin;
-            this.baseMeshMaxZ = this.margin;
-            let maxI = 0;
-            let maxJ = 0;
-            let maxK = 0;
+            this.baseMeshMinX = - tileWidth * 0.5;
+            this.baseMeshMaxX = tileWidth * 0.5;
+            this.baseMeshMinY = 0;
+            this.baseMeshMaxY = tileHeight;
+            this.baseMeshMinZ = - tileDepth * 0.5;
+            this.baseMeshMaxZ = tileDepth * 0.5;
+            let maxI = 1;
+            let maxJ = - 1;
+            let maxK = 1;
             for (let i = 0; i < this.parts.length; i++) {
                 let track = this.parts[i];
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - tileWidth * 0.5);
@@ -324,7 +324,7 @@ namespace MarbleRunSimulatorCore {
                 this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
                 this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
                 this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.position.z - tileDepth * (track.d - 0.5));
-                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z);
+                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z + tileDepth * 0.5);
 
                 maxI = Math.max(maxI, track.i + track.w);
                 maxJ = Math.max(maxJ, track.j + track.h);

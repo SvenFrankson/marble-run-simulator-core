@@ -1200,15 +1200,15 @@ var MarbleRunSimulatorCore;
         }
         async generateBaseMesh() {
             let previousBaseMinY = this.baseMeshMinY;
-            this.baseMeshMinX = -this.margin;
-            this.baseMeshMaxX = this.margin;
-            this.baseMeshMinY = -this.margin;
-            this.baseMeshMaxY = this.margin;
-            this.baseMeshMinZ = -this.margin;
-            this.baseMeshMaxZ = this.margin;
-            let maxI = 0;
-            let maxJ = 0;
-            let maxK = 0;
+            this.baseMeshMinX = -MarbleRunSimulatorCore.tileWidth * 0.5;
+            this.baseMeshMaxX = MarbleRunSimulatorCore.tileWidth * 0.5;
+            this.baseMeshMinY = 0;
+            this.baseMeshMaxY = MarbleRunSimulatorCore.tileHeight;
+            this.baseMeshMinZ = -MarbleRunSimulatorCore.tileDepth * 0.5;
+            this.baseMeshMaxZ = MarbleRunSimulatorCore.tileDepth * 0.5;
+            let maxI = 1;
+            let maxJ = -1;
+            let maxK = 1;
             for (let i = 0; i < this.parts.length; i++) {
                 let track = this.parts[i];
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - MarbleRunSimulatorCore.tileWidth * 0.5);
@@ -1216,7 +1216,7 @@ var MarbleRunSimulatorCore;
                 this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - MarbleRunSimulatorCore.tileHeight * (track.h + 1));
                 this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
                 this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.position.z - MarbleRunSimulatorCore.tileDepth * (track.d - 0.5));
-                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z);
+                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z + MarbleRunSimulatorCore.tileDepth * 0.5);
                 maxI = Math.max(maxI, track.i + track.w);
                 maxJ = Math.max(maxJ, track.j + track.h);
                 maxK = Math.max(maxK, track.k + track.d);
