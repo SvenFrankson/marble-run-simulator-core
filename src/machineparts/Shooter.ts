@@ -5,7 +5,7 @@ namespace MarbleRunSimulatorCore {
             1,
             1,
             1,
-            1,
+            3,
             1.03,
             1.27,
             1.46,
@@ -366,8 +366,19 @@ namespace MarbleRunSimulatorCore {
 
                 let ballArmed = this.getBallArmed();
                 if (ballArmed) {
-                    ballArmed.velocity.copyFromFloats(0, this.velocityKick, 0);
-                    this.currentShootState = 4;
+                    if (this.h === 3) {
+                        ballArmed.flybackOrigin = ballArmed.position.clone();
+                        ballArmed.flybackDestination = ballArmed.positionZero.clone();
+                        ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
+                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + 1;
+                        ballArmed.flyBackProgress = 0;
+                        ballArmed.collisionState = 2;
+                        this.currentShootState = 4;
+                    }
+                    else {
+                        ballArmed.velocity.copyFromFloats(0, this.velocityKick, 0);
+                        this.currentShootState = 4;
+                    }
                 }
                 else {
                     let ballReady = this.getBallReady();

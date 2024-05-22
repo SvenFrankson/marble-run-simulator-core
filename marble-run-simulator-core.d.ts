@@ -42,6 +42,11 @@ declare namespace MarbleRunSimulatorCore {
         railBumpSound: BABYLON.Sound;
         marbleLoopSound: BABYLON.Sound;
         marbleBowlLoopSound: BABYLON.Sound;
+        flybackOrigin: BABYLON.Vector3;
+        flybackDestination: BABYLON.Vector3;
+        flybackPeak: BABYLON.Vector3;
+        flyBackProgress: number;
+        flyBackGroundSpeed: number;
         constructor(positionZero: BABYLON.Vector3, machine: Machine, _materialIndex?: number);
         select(): void;
         unselect(): void;
@@ -64,7 +69,7 @@ declare namespace MarbleRunSimulatorCore {
         strReaction: number;
         lastPosition: BABYLON.Vector3;
         visibleVelocity: BABYLON.Vector3;
-        comingBack: boolean;
+        collisionState: number;
         update(dt: number): void;
     }
 }
