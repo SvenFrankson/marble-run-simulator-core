@@ -606,7 +606,7 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class Screw extends MachinePart {
-        box: BABYLON.Mesh;
+        rotor: BABYLON.Mesh;
         screwWire: Wire;
         x0: number;
         x1: number;
@@ -616,7 +616,11 @@ declare namespace MarbleRunSimulatorCore {
         stepH: number;
         dH: number;
         dir: BABYLON.Vector3;
+        shieldConnector: BABYLON.Mesh;
+        shieldConnectorUp: BABYLON.Mesh;
+        wheel: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(w: number, h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;

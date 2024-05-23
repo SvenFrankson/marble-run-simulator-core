@@ -4535,16 +4535,10 @@ var MarbleRunSimulatorCore;
             shieldWireL.colorIndex = 3;
             shieldWireL.path = [p0.clone().addInPlaceFromFloats(0, 0, 0.012).addInPlace(this.dir.scale(0.04)).addInPlace(n.scale(0.01)), p0.clone().addInPlaceFromFloats(0, 0, 0.012).addInPlace(this.dir.scale(-0.02)).addInPlace(n.scale(0.01))];
             this.wires.push(shieldWireL);
-            let shieldConnector = new BABYLON.Mesh("shieldConnector");
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/uConnector.babylon").then((datas) => {
-                let data = Mummu.CloneVertexData(datas[0]);
-                Mummu.ScaleVertexDataInPlace(data, 0.024);
-                data.applyToMesh(shieldConnector);
-            });
-            shieldConnector.position.copyFrom(p0).addInPlace(n.scale(0.01));
-            shieldConnector.rotationQuaternion = Mummu.QuaternionFromYZAxis(n, this.dir);
-            shieldConnector.parent = this;
-            shieldConnector.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            this.shieldConnector = new BABYLON.Mesh("shieldConnector");
+            this.shieldConnector.position.copyFrom(p0).addInPlace(n.scale(0.01));
+            this.shieldConnector.rotationQuaternion = Mummu.QuaternionFromYZAxis(n, this.dir);
+            this.shieldConnector.parent = this;
             if (this.h / this.w > 4) {
                 let shieldWireUpR = new MarbleRunSimulatorCore.Wire(this);
                 shieldWireUpR.colorIndex = 3;
@@ -4554,22 +4548,16 @@ var MarbleRunSimulatorCore;
                 shieldWireUpL.colorIndex = 3;
                 shieldWireUpL.path = [p0.clone().addInPlaceFromFloats(0, 0, 0.0165).addInPlace(this.dir.scale(0.03)).addInPlace(n.scale(0.022)), p0.clone().addInPlaceFromFloats(0, 0, 0.0165).addInPlace(this.dir.scale(-0.03)).addInPlace(n.scale(0.022))];
                 this.wires.push(shieldWireUpL);
-                let shieldConnectorUp = new BABYLON.Mesh("shieldConnectorUp");
-                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/uConnector.babylon").then((datas) => {
-                    let data = Mummu.CloneVertexData(datas[0]);
-                    Mummu.ScaleVertexDataInPlace(data, 0.033);
-                    data.applyToMesh(shieldConnectorUp);
-                });
-                shieldConnectorUp.position.copyFrom(p0).addInPlace(this.dir.scale(-0.01)).addInPlace(n.scale(0.022));
-                shieldConnectorUp.rotationQuaternion = Mummu.QuaternionFromYZAxis(n, this.dir);
-                shieldConnectorUp.parent = this;
-                shieldConnectorUp.material = this.game.materials.getMetalMaterial(this.getColor(4));
+                this.shieldConnectorUp = new BABYLON.Mesh("shieldConnectorUp");
+                this.shieldConnectorUp.position.copyFrom(p0).addInPlace(this.dir.scale(-0.01)).addInPlace(n.scale(0.022));
+                this.shieldConnectorUp.rotationQuaternion = Mummu.QuaternionFromYZAxis(n, this.dir);
+                this.shieldConnectorUp.parent = this;
             }
-            this.box = new BABYLON.Mesh("box");
+            this.rotor = new BABYLON.Mesh("box");
             this.screwWire = new MarbleRunSimulatorCore.Wire(this);
             this.screwWire.colorIndex = 1;
             this.screwWire.wireSize = 0.003;
-            this.screwWire.parent = this.box;
+            this.screwWire.parent = this.rotor;
             this.screwWire.path = [];
             for (let t = 0; t <= l; t += 0.001) {
                 let a = (t / period) * Math.PI * 2;
@@ -4577,24 +4565,37 @@ var MarbleRunSimulatorCore;
                 this.screwWire.path.push(point);
             }
             this.wires.push(this.screwWire);
-            this.box.position.copyFrom(p0);
-            this.box.position.addInPlace(n.scale(0.021));
-            this.box.rotationQuaternion = Mummu.QuaternionFromXYAxis(this.dir, BABYLON.Axis.Y);
-            this.box.parent = this;
-            let tip = BABYLON.MeshBuilder.CreateCylinder("tip", { height: 0.004, diameter: 0.04 });
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon").then((datas) => {
-                let data = Mummu.CloneVertexData(datas[1]);
-                Mummu.ScaleVertexDataInPlace(data, 1.05);
-                data.applyToMesh(tip);
-            });
-            tip.position.x = l;
-            tip.rotation.y = Math.PI * 0.5;
-            tip.parent = this.box;
-            tip.material = this.game.materials.getMetalMaterial(this.getColor(2));
+            this.rotor.position.copyFrom(p0);
+            this.rotor.position.addInPlace(n.scale(0.021));
+            this.rotor.rotationQuaternion = Mummu.QuaternionFromXYAxis(this.dir, BABYLON.Axis.Y);
+            this.rotor.parent = this;
+            this.wheel = new BABYLON.Mesh("wheel");
+            this.wheel.position.x = l;
+            this.wheel.rotation.y = Math.PI * 0.5;
+            this.wheel.parent = this.rotor;
             this.generateWires();
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+        async instantiateMachineSpecific() {
+            let shieldData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/uConnector.babylon", 0);
+            shieldData = Mummu.CloneVertexData(shieldData);
+            Mummu.ScaleVertexDataInPlace(shieldData, 0.024);
+            shieldData.applyToMesh(this.shieldConnector);
+            this.shieldConnector.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            if (this.shieldConnectorUp) {
+                let shieldDataUp = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/uConnector.babylon", 0);
+                shieldDataUp = Mummu.CloneVertexData(shieldDataUp);
+                Mummu.ScaleVertexDataInPlace(shieldDataUp, 0.033);
+                shieldDataUp.applyToMesh(this.shieldConnectorUp);
+                this.shieldConnectorUp.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            }
+            let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 1);
+            wheelData = Mummu.CloneVertexData(wheelData);
+            Mummu.ScaleVertexDataInPlace(wheelData, 1.05);
+            wheelData.applyToMesh(this.wheel);
+            this.wheel.material = this.game.materials.getMetalMaterial(this.getColor(2));
         }
         static GenerateTemplate(w, h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -4642,9 +4643,9 @@ var MarbleRunSimulatorCore;
             while (this.a > 2 * Math.PI) {
                 this.a -= 2 * Math.PI;
             }
-            this.box.rotate(BABYLON.Axis.X, -dA);
-            this.box.freezeWorldMatrix();
-            this.box.getChildMeshes().forEach((child) => {
+            this.rotor.rotate(BABYLON.Axis.X, -dA);
+            this.rotor.freezeWorldMatrix();
+            this.rotor.getChildMeshes().forEach((child) => {
                 child.freezeWorldMatrix();
             });
             this.screwWire.recomputeAbsolutePath();
