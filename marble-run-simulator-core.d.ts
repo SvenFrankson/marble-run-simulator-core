@@ -54,6 +54,7 @@ declare namespace MarbleRunSimulatorCore {
         flybackPeak: BABYLON.Vector3;
         flyBackProgress: number;
         flyBackDuration: number;
+        animatePosition: (target: BABYLON.Vector3, duration: number) => Promise<void>;
         constructor(positionZero: BABYLON.Vector3, machine: Machine, _materialIndex?: number);
         select(): void;
         unselect(): void;

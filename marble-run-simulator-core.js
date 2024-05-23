@@ -36,6 +36,7 @@ var MarbleRunSimulatorCore;
             this.bumpSurfaceIsRail = true;
             this.flyBackProgress = 0;
             this.flyBackDuration = 1;
+            this.animatePosition = Mummu.AnimationFactory.EmptyVector3Callback;
             this.memCount = 2;
             this._lastWires = [];
             this._lastWireIndexes = [];
@@ -58,6 +59,7 @@ var MarbleRunSimulatorCore;
             this.marbleBowlLoopSound.setVolume(0);
             this.marbleBowlInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.marbleBowlInsideSound.setVolume(0.2);
+            this.animatePosition = Mummu.AnimationFactory.CreateVector3(this, this, "position");
         }
         get game() {
             return this.machine.game;
@@ -203,15 +205,18 @@ var MarbleRunSimulatorCore;
         }
         update(dt) {
             let sign = Math.sign(this.velocity.y);
-            if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.2) {
+            if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.15) {
                 this.collisionState = CollisionState.Inside;
                 this.marbleBowlInsideSound.setPlaybackRate(this.game.currentTimeFactor);
                 this.marbleBowlInsideSound.play();
-                setTimeout(() => {
-                    this.collisionState = CollisionState.Exit;
-                    this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
-                    this.velocity.copyFromFloats(0, 0, -0.2);
-                }, 2700 / this.game.currentTimeFactor);
+                let tmpDestination = this.machine.exitHoleOut.absolutePosition.clone();
+                tmpDestination.z += 0.05;
+                this.animatePosition(tmpDestination, 2.7 / this.game.currentTimeFactor - 0.1).then(() => {
+                    this.animatePosition(this.machine.exitHoleOut.absolutePosition, 0.1).then(() => {
+                        this.collisionState = CollisionState.Exit;
+                        this.velocity.copyFromFloats(0, 0, -0.2);
+                    });
+                });
             }
             this._timer += dt * this.game.currentTimeFactor;
             this._timer = Math.min(this._timer, 1);
@@ -5648,7 +5653,8 @@ var MarbleRunSimulatorCore;
         }
         async instantiateMachineSpecific() {
             for (let i = 0; i < this.boxesCount; i++) {
-                let l = this.boxesColliders[i].position.y - -MarbleRunSimulatorCore.tileHeight * (this.h - 2 + 1.5) + this.stepH - 0.002;
+                let fY = (i + 0.5) / this.boxesCount;
+                let l = ((1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.5) - -MarbleRunSimulatorCore.tileHeight * (this.h - 2 + 1.5) + this.stepH - 0.002;
                 let vertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-bielle.babylon", 0);
                 vertexData = Mummu.CloneVertexData(vertexData);
                 let positions = vertexData.positions;

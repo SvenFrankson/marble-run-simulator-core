@@ -90,6 +90,7 @@ namespace MarbleRunSimulatorCore {
         public flybackPeak: BABYLON.Vector3;
         public flyBackProgress: number = 0;
         public flyBackDuration: number = 1;
+        public animatePosition = Mummu.AnimationFactory.EmptyVector3Callback;
 
         constructor(public positionZero: BABYLON.Vector3, public machine: Machine, private _materialIndex: number = 0) {
             super("ball");
@@ -102,6 +103,8 @@ namespace MarbleRunSimulatorCore {
             this.marbleBowlLoopSound.setVolume(0);
             this.marbleBowlInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.marbleBowlInsideSound.setVolume(0.2);
+
+            this.animatePosition = Mummu.AnimationFactory.CreateVector3(this, this, "position");
         }
 
         public select(): void {
@@ -235,15 +238,18 @@ namespace MarbleRunSimulatorCore {
 
         public update(dt: number): void {
             let sign = Math.sign(this.velocity.y);
-            if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.2) {
+            if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.15) {
                 this.collisionState = CollisionState.Inside;
                 this.marbleBowlInsideSound.setPlaybackRate(this.game.currentTimeFactor);
                 this.marbleBowlInsideSound.play();
-                setTimeout(() => {
-                    this.collisionState = CollisionState.Exit;
-                    this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
-                    this.velocity.copyFromFloats(0, 0, - 0.2);
-                }, 2700 / this.game.currentTimeFactor);
+                let tmpDestination = this.machine.exitHoleOut.absolutePosition.clone();
+                tmpDestination.z += 0.05;
+                this.animatePosition(tmpDestination, 2.7 / this.game.currentTimeFactor - 0.1).then(() => {
+                    this.animatePosition(this.machine.exitHoleOut.absolutePosition, 0.1).then(() => {
+                        this.collisionState = CollisionState.Exit;
+                        this.velocity.copyFromFloats(0, 0, - 0.2);
+                    })
+                });
             }
 
             this._timer += dt * this.game.currentTimeFactor;
