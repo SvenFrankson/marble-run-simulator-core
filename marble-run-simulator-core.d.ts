@@ -723,6 +723,7 @@ declare namespace MarbleRunSimulatorCore {
         static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
+        private _exitLeft;
         private _moving;
         update(dt: number): void;
     }

@@ -240,6 +240,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
+            this._exitLeft = true;
             this._moving = false;
             if (this.mirrorX) {
                 this.pivot.rotation.z = -Math.PI / 4;
@@ -251,7 +252,8 @@ namespace MarbleRunSimulatorCore {
                 child.freezeWorldMatrix();
             });
         };
-
+ 
+        private _exitLeft: boolean = true;
         private _moving: boolean = false;
         public update(dt: number): void {
             if (!this._moving) {
@@ -260,23 +262,25 @@ namespace MarbleRunSimulatorCore {
                     if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.05) {
                         let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivot.getWorldMatrix().clone().invert());
                         if (local.y < ball.radius * 0.9) {
-                            if (local.x > ball.radius * 0.5 && local.x < Split.pivotL) {
+                            if (this._exitLeft && local.x > ball.radius * 0.5 && local.x < Split.pivotL) {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
                                         this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play()
                                         this._moving = false;
+                                        this._exitLeft = false;
                                     });
                                 }, 150 / this.game.currentTimeFactor)
                                 return;
-                            } else if (local.x > -Split.pivotL && local.x < -ball.radius * 0.5) {
+                            } else if (!this._exitLeft && local.x > -Split.pivotL && local.x < -ball.radius * 0.5) {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
                                         this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
                                         this._moving = false;
+                                        this._exitLeft = true;
                                     });
                                 }, 150 / this.game.currentTimeFactor)
                                 return;

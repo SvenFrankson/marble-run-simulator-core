@@ -207,7 +207,7 @@ namespace MarbleRunSimulatorCore {
 
                 if (y > 0.005) {
                     positions[3 * p + 1] -= 0.01;
-                    positions[3 * p + 1] += this.stepH * 0.5;
+                    positions[3 * p + 1] += (this.stepH * 0.5 + this.dH * 0.5);
                 }
             }
             vertexData.positions = positions;
@@ -305,7 +305,7 @@ namespace MarbleRunSimulatorCore {
 
         public reset = () => {
             for (let i = 0; i < this.boxesCount; i++) {
-                this.a = 0;
+                this.a = Math.PI * 0.5;
                 this.update(0);
                 requestAnimationFrame(() => {
                     this.update(0);
@@ -349,9 +349,9 @@ namespace MarbleRunSimulatorCore {
                 this.bielles[i].position.copyFrom(this.vil.absolutePosition);
                 let fX = i / this.boxesCount;
                 this.bielles[i].position.x += (1 - fX) * this.x0 + fX * this.x1 + this.stepW * 0.5;
-                this.bielles[i].position.y += Math.cos(a) * this.stepH * 0.5;
-                this.bielles[i].position.z += Math.sin(a) * this.stepH * 0.5;
-                let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].position).addInPlaceFromFloats(0, +this.stepH - 0.002, 0);
+                this.bielles[i].position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.5);
+                this.bielles[i].position.z += Math.sin(a) * (this.stepH * 0.5 + this.dH * 0.5);
+                let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].position).addInPlaceFromFloats(0, this.stepH - 0.002, 0);
                 this.bielles[i].rotationQuaternion = Mummu.QuaternionFromYZAxis(dir, BABYLON.Axis.Z);
             }
         }

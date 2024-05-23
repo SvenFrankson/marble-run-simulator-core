@@ -5302,6 +5302,7 @@ var MarbleRunSimulatorCore;
             this.axisZMin = 0;
             this.axisZMax = 1;
             this.reset = () => {
+                this._exitLeft = true;
                 this._moving = false;
                 if (this.mirrorX) {
                     this.pivot.rotation.z = -Math.PI / 4;
@@ -5314,6 +5315,7 @@ var MarbleRunSimulatorCore;
                     child.freezeWorldMatrix();
                 });
             };
+            this._exitLeft = true;
             this._moving = false;
             let partName = "split";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
@@ -5502,24 +5504,26 @@ var MarbleRunSimulatorCore;
                     if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.05) {
                         let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivot.getWorldMatrix().clone().invert());
                         if (local.y < ball.radius * 0.9) {
-                            if (local.x > ball.radius * 0.5 && local.x < Split.pivotL) {
+                            if (this._exitLeft && local.x > ball.radius * 0.5 && local.x < Split.pivotL) {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
                                         this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
                                         this._moving = false;
+                                        this._exitLeft = false;
                                     });
                                 }, 150 / this.game.currentTimeFactor);
                                 return;
                             }
-                            else if (local.x > -Split.pivotL && local.x < -ball.radius * 0.5) {
+                            else if (!this._exitLeft && local.x > -Split.pivotL && local.x < -ball.radius * 0.5) {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
                                         this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
                                         this._moving = false;
+                                        this._exitLeft = true;
                                     });
                                 }, 150 / this.game.currentTimeFactor);
                                 return;
@@ -5551,7 +5555,7 @@ var MarbleRunSimulatorCore;
             this.dH = 0.002;
             this.reset = () => {
                 for (let i = 0; i < this.boxesCount; i++) {
-                    this.a = 0;
+                    this.a = Math.PI * 0.5;
                     this.update(0);
                     requestAnimationFrame(() => {
                         this.update(0);
@@ -5727,7 +5731,7 @@ var MarbleRunSimulatorCore;
                 }
                 if (y > 0.005) {
                     positions[3 * p + 1] -= 0.01;
-                    positions[3 * p + 1] += this.stepH * 0.5;
+                    positions[3 * p + 1] += (this.stepH * 0.5 + this.dH * 0.5);
                 }
             }
             vertexData.positions = positions;
@@ -5830,9 +5834,9 @@ var MarbleRunSimulatorCore;
                 this.bielles[i].position.copyFrom(this.vil.absolutePosition);
                 let fX = i / this.boxesCount;
                 this.bielles[i].position.x += (1 - fX) * this.x0 + fX * this.x1 + this.stepW * 0.5;
-                this.bielles[i].position.y += Math.cos(a) * this.stepH * 0.5;
-                this.bielles[i].position.z += Math.sin(a) * this.stepH * 0.5;
-                let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].position).addInPlaceFromFloats(0, +this.stepH - 0.002, 0);
+                this.bielles[i].position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.5);
+                this.bielles[i].position.z += Math.sin(a) * (this.stepH * 0.5 + this.dH * 0.5);
+                let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].position).addInPlaceFromFloats(0, this.stepH - 0.002, 0);
                 this.bielles[i].rotationQuaternion = Mummu.QuaternionFromYZAxis(dir, BABYLON.Axis.Z);
             }
         }
