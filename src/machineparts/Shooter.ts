@@ -388,6 +388,7 @@ namespace MarbleRunSimulatorCore {
                 let ballArmed = this.getBallArmed();
                 if (ballArmed) {
                     if (this.h === 3) {
+                        // This is not real physic. It just works.
                         ballArmed.flybackOrigin = ballArmed.position.clone();
                         ballArmed.flybackDestination = ballArmed.positionZero.clone();
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
@@ -395,7 +396,17 @@ namespace MarbleRunSimulatorCore {
                         d = Math.max(d, 0.4);
                         ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + d * 3;
                         ballArmed.flyBackProgress = 0;
-                        ballArmed.flyBackDuration = d * 1;
+
+                        let truePeakY = ballArmed.flybackOrigin.y;
+                        let dirOrigin = ballArmed.flybackPeak.subtract(ballArmed.flybackOrigin);
+                        let dirDestination = ballArmed.flybackDestination.subtract(ballArmed.flybackPeak);
+                        for (let test = 0; test < 100; test++) {
+                            let p = BABYLON.Vector3.Hermite(ballArmed.flybackOrigin, dirOrigin, ballArmed.flybackDestination, dirDestination, test / 100);
+                            truePeakY = Math.max(truePeakY, p.y);
+                        }
+                        let v0 = Math.sqrt(9.8 * 2 * (truePeakY - ballArmed.flybackOrigin.y));
+                        let tPeak = v0 / 9.8;
+                        ballArmed.flyBackDuration = tPeak * 1.7;
                         ballArmed.collisionState = CollisionState.Flyback;
                         this.currentShootState = 4;
                     }
