@@ -102,7 +102,7 @@ namespace MarbleRunSimulatorCore {
             steelMaterialPBR.environmentTexture = envTexture;
             
             let steelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
-            steelMaterialSTD.diffuseColor = new BABYLON.Color3(0.5, 0.75, 1.0);
+            steelMaterialSTD.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7);
             steelMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
             steelMaterialSTD.emissiveColor = steelMaterialSTD.diffuseColor.scale(0.5);
             steelMaterialSTD.roughness = 0.15;
@@ -126,22 +126,46 @@ namespace MarbleRunSimulatorCore {
             blackSteelMaterialPBR.environmentTexture = envTexture;
             
             let blackSteelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
-            blackSteelMaterialSTD.diffuseColor = new BABYLON.Color3(0.1, 0.15, 0.2);
+            blackSteelMaterialSTD.diffuseColor = new BABYLON.Color3(0.1, 0.11, 0.12);
             blackSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
             blackSteelMaterialSTD.emissiveColor = blackSteelMaterialSTD.diffuseColor.scale(0.5);
             blackSteelMaterialSTD.roughness = 0.25;
             
             let redSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("red-steel-pbr", this.game.scene);
-            redSteelMaterialPBR.baseColor = new BABYLON.Color3(0.1, 0, 0);
-            redSteelMaterialPBR.metallic = 0.85;
+            redSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#bf212f").scaleInPlace(0.5);
+            redSteelMaterialPBR.metallic = 0.8;
             redSteelMaterialPBR.roughness = 0.2;
             redSteelMaterialPBR.environmentTexture = envTexture;
             
             let redSteelMaterialSTD = new BABYLON.StandardMaterial("red-steel-std", this.game.scene);
-            redSteelMaterialSTD.diffuseColor = new BABYLON.Color3(0.1, 0.15, 0.2);
+            redSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#bf212f").scaleInPlace(1);
             redSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
             redSteelMaterialSTD.emissiveColor = redSteelMaterialSTD.diffuseColor.scale(0.5);
             redSteelMaterialSTD.roughness = 0.25;
+            
+            let greenSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("green-steel-pbr", this.game.scene);
+            greenSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#006f3c").scaleInPlace(0.5);
+            greenSteelMaterialPBR.metallic = 0.8;
+            greenSteelMaterialPBR.roughness = 0.2;
+            greenSteelMaterialPBR.environmentTexture = envTexture;
+            
+            let greenSteelMaterialSTD = new BABYLON.StandardMaterial("green-steel-std", this.game.scene);
+            greenSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#006f3c").scaleInPlace(1);
+            greenSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            greenSteelMaterialSTD.emissiveColor = greenSteelMaterialSTD.diffuseColor.scale(0.5);
+            greenSteelMaterialSTD.roughness = 0.25;
+            
+            let blueSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("blue-steel-pbr", this.game.scene);
+            blueSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#264b96").scaleInPlace(0.5);
+            blueSteelMaterialPBR.metallic = 0.8;
+            blueSteelMaterialPBR.roughness = 0.2;
+            blueSteelMaterialPBR.environmentTexture = envTexture;
+            
+            let blueSteelMaterialSTD = new BABYLON.StandardMaterial("blue-steel-std", this.game.scene);
+            blueSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#264b96").scaleInPlace(1);
+            blueSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            blueSteelMaterialSTD.emissiveColor = blueSteelMaterialSTD.diffuseColor.scale(0.5);
+            blueSteelMaterialSTD.roughness = 0.25;
 
             this.plasticBlack = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
             this.plasticBlack.diffuseColor = BABYLON.Color3.FromHexString("#282a33");
@@ -178,8 +202,8 @@ namespace MarbleRunSimulatorCore {
             plasticGreen.roughness = 0.9;
             plasticGreen.environmentTexture = envTexture;
 
-            this._metalMaterialsPBR = [steelMaterialPBR, copperMaterialPBR, blackSteelMaterialPBR, redSteelMaterialPBR, this.plasticBlack];
-            this._metalMaterialsSTD = [steelMaterialSTD, copperMaterialSTD, blackSteelMaterialSTD, redSteelMaterialSTD, this.plasticBlack];
+            this._metalMaterialsPBR = [steelMaterialPBR, copperMaterialPBR, blackSteelMaterialPBR, redSteelMaterialPBR, greenSteelMaterialPBR, blueSteelMaterialPBR, this.plasticBlack];
+            this._metalMaterialsSTD = [steelMaterialSTD, copperMaterialSTD, blackSteelMaterialSTD, redSteelMaterialSTD, greenSteelMaterialSTD, blueSteelMaterialSTD, this.plasticBlack];
 
             this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);

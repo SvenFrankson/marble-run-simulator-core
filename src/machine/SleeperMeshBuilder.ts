@@ -23,7 +23,7 @@ namespace MarbleRunSimulatorCore {
             for (let j = 0; j < part.tracks.length; j++) {
                 let track = part.tracks[j];
                 let colorIndex = track.part.getColor(track.template.colorIndex);
-                let plasticIndex: number = 4;
+                let plasticIndex: number = 6;
                 let interpolatedPoints = track.templateInterpolatedPoints;
                 let summedLength: number[] = [0];
                 for (let i = 1; i < interpolatedPoints.length; i++) {

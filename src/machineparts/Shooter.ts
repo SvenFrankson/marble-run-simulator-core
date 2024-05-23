@@ -256,7 +256,19 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
+            clearTimeout(this.delayTimeout);
+            this.shieldClose = false;
+            this.shield.position.y = this.shieldYClosed + this.shieldLength;
+            this.shield.freezeWorldMatrix();
+            this.shieldCollider.freezeWorldMatrix();
             
+            this.currentShootState = 0;
+            let x = 1;
+            if (this.mirrorX) {
+                x = -1;
+            }
+            this.kicker.position.copyFromFloats(x * tileWidth * 0.4 - 0, this.kickerYIdle, 0);
+            this._freezeKicker();
         };
 
         public get shieldOpened(): boolean {
