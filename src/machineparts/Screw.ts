@@ -142,6 +142,7 @@ namespace MarbleRunSimulatorCore {
 
             this.generateWires();
 
+            this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
         }

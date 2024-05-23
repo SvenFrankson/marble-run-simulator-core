@@ -691,7 +691,8 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Stairway extends MachinePart {
         boxesCount: number;
-        boxes: BABYLON.Mesh[];
+        boxesColliders: BABYLON.Mesh[];
+        boxesDisplayedMesh: BABYLON.Mesh[];
         vil: BABYLON.Mesh;
         bielles: BABYLON.Mesh[];
         x0: number;
@@ -703,6 +704,7 @@ declare namespace MarbleRunSimulatorCore {
         dH: number;
         static MakeStairwayColliderVertexData(width: number, height: number, depth: number, dH: number, radius?: number): BABYLON.VertexData;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(w: number, h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;

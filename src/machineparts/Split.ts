@@ -149,6 +149,8 @@ namespace MarbleRunSimulatorCore {
                 false,
                 Nabu.Easing.easeInSquare
             );
+            
+            this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
         }

@@ -359,7 +359,7 @@ namespace MarbleRunSimulatorCore {
                                 }
                             }
                             if (part instanceof Stairway) {
-                                part.boxes.forEach((box) => {
+                                part.boxesColliders.forEach((box) => {
                                     let col = Mummu.SphereMeshIntersection(this.position, this.radius, box);
                                     if (col.hit) {
                                         //this.setLastHit(wire, col.index);

@@ -1,7 +1,8 @@
 namespace MarbleRunSimulatorCore {
     export class Stairway extends MachinePart {
         public boxesCount: number = 4;
-        public boxes: BABYLON.Mesh[] = [];
+        public boxesColliders: BABYLON.Mesh[] = [];
+        public boxesDisplayedMesh: BABYLON.Mesh[] = [];
         public vil: BABYLON.Mesh;
         public bielles: BABYLON.Mesh[] = [];
         public x0: number = 0;
@@ -87,6 +88,8 @@ namespace MarbleRunSimulatorCore {
                 let data = Stairway.MakeStairwayColliderVertexData(this.stepW, this.stepH * 2, 0.02, this.dH, 0.001);
 
                 let box = new BABYLON.Mesh("collider-" + i);
+                this.boxesColliders[i] = box;
+                this.boxesDisplayedMesh[i] = new BABYLON.Mesh("display-box-" + i);
                 box.isVisible = false;
                 data.applyToMesh(box);
                 if (this.mirrorX) {
@@ -98,154 +101,146 @@ namespace MarbleRunSimulatorCore {
                 let fY = (i + 0.5) / this.boxesCount;
                 box.position.y = (1 - fY) * this.y0 + fY * this.y1 - this.stepH;
 
-                let l = box.position.y - -tileHeight * (this.h - 2 + 1.5) + this.stepH - 0.002;
-                let bielle = new BABYLON.Mesh("bielle");
-                bielle.material = this.game.materials.getMetalMaterial(this.getColor(2));
-                this.bielles[i] = bielle;
-                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-bielle.babylon").then((vertexDatas) => {
-                    let vertexData = vertexDatas[0];
-                    if (vertexData) {
-                        vertexData = Mummu.CloneVertexData(vertexData);
-                        let positions = vertexData.positions;
-                        for (let p = 0; p < positions.length / 3; p++) {
-                            let y = positions[3 * p + 1];
-
-                            if (y > 0.005) {
-                                positions[3 * p + 1] -= 0.01;
-                                positions[3 * p + 1] += l;
-                            }
-                        }
-                        vertexData.positions = positions;
-                        let normals = [];
-                        BABYLON.VertexData.ComputeNormals(vertexData.positions, vertexData.indices, normals);
-                        vertexData.normals = normals;
-                        vertexData.applyToMesh(bielle);
-                    }
-                });
-
-                this.boxes[i] = box;
-
-                let displayMesh = new BABYLON.Mesh("display-box-" + i);
-                displayMesh.material = this.game.materials.getMetalMaterial(this.getColor(1));
-
-                this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-step.babylon").then((vertexDatas) => {
-                    let vertexData = vertexDatas[0];
-                    if (vertexData) {
-                        vertexData = Mummu.CloneVertexData(vertexData);
-                        let positions = vertexData.positions;
-                        for (let p = 0; p < positions.length / 3; p++) {
-                            let x = positions[3 * p];
-                            let y = positions[3 * p + 1];
-                            let z = positions[3 * p + 2];
-
-                            if (x < 0) {
-                                positions[3 * p] += 0.005;
-                                positions[3 * p] -= this.stepW * 0.5;
-                            } else {
-                                positions[3 * p] -= 0.005;
-                                positions[3 * p] += this.stepW * 0.5;
-                            }
-
-                            if (y < 0) {
-                                positions[3 * p + 1] += 0.005;
-                                positions[3 * p + 1] -= this.stepH;
-                            } else {
-                                positions[3 * p + 1] -= 0.005;
-                                positions[3 * p + 1] += this.stepH;
-                            }
-
-                            if (z < 0) {
-                                positions[3 * p + 2] += 0.005;
-                                positions[3 * p + 2] -= 0.01;
-                            } else {
-                                positions[3 * p + 2] -= 0.005;
-                                positions[3 * p + 2] += 0.01;
-                            }
-
-                            if (x < 0 && y > 0) {
-                                positions[3 * p + 1] += this.dH;
-                            } else if (y < 0) {
-                                positions[3 * p + 1] -= this.dH;
-                            }
-
-                            if (x < 0) {
-                                positions[3 * p] += 0.0002;
-                            } else {
-                                positions[3 * p] -= 0.0002;
-                            }
-                        }
-                        vertexData.positions = positions;
-                        vertexData.applyToMesh(displayMesh);
-                        displayMesh.parent = box;
-                    }
-                });
+                this.bielles[i] = new BABYLON.Mesh("bielle");
             }
 
             this.vil = new BABYLON.Mesh("display-vil");
-            this.vil.material = this.game.materials.getMetalMaterial(this.getColor(3));
             this.vil.position.y = -tileHeight * (this.h - 2 + 1.5);
             this.vil.parent = this;
 
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/stairway-vil.babylon").then((vertexDatas) => {
-                let vertexData = vertexDatas[0];
-                if (vertexData) {
-                    vertexData = Mummu.CloneVertexData(vertexData);
-                    let positions = vertexData.positions;
-                    for (let p = 0; p < positions.length / 3; p++) {
-                        let x = positions[3 * p];
-                        let y = positions[3 * p + 1];
-                        let z = positions[3 * p + 2];
-
-                        if (x < -0.0045) {
-                            positions[3 * p] += 0.005;
-                            positions[3 * p] -= this.stepW * 0.5;
-                        } else if (x > 0.0045) {
-                            positions[3 * p] -= 0.005;
-                            positions[3 * p] += this.stepW * 0.5;
-                        }
-
-                        if (y > 0.005) {
-                            positions[3 * p + 1] -= 0.01;
-                            positions[3 * p + 1] += this.stepH * 0.5;
-                        }
-                    }
-                    vertexData.positions = positions;
-
-                    let vilPartsDatas: BABYLON.VertexData[] = [];
-                    let altQ = BABYLON.Quaternion.RotationAxis(BABYLON.Axis.X, Math.PI);
-                    for (let i = 0; i < this.boxesCount; i++) {
-                        let partData = Mummu.CloneVertexData(vertexData);
-
-                        let fX = i / this.boxesCount;
-                        let x = (1 - fX) * this.x0 + fX * this.x1 + this.stepW * 0.5;
-                        if (i % 2 === 1) {
-                            Mummu.RotateVertexDataInPlace(partData, altQ);
-                        }
-                        Mummu.TranslateVertexDataInPlace(partData, new BABYLON.Vector3(x, 0, 0));
-
-                        vilPartsDatas.push(partData);
-                    }
-
-                    this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon").then((datas) => {
-                        let wheel0Data = Mummu.CloneVertexData(datas[1]);
-                        //Mummu.ScaleVertexDataInPlace(wheel0Data, 0.03);
-                        Mummu.RotateVertexDataInPlace(wheel0Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI * 0.5));
-                        Mummu.TranslateVertexDataInPlace(wheel0Data, new BABYLON.Vector3(this.x0 - 0.001, 0, 0));
-    
-                        let wheel1Data = Mummu.CloneVertexData(datas[1]);
-                        //Mummu.ScaleVertexDataInPlace(wheel1Data, 0.03);
-                        Mummu.RotateVertexDataInPlace(wheel1Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI * 0.5));
-                        Mummu.TranslateVertexDataInPlace(wheel1Data, new BABYLON.Vector3(this.x1 + 0.001, 0, 0));
-    
-                        Mummu.MergeVertexDatas(...vilPartsDatas, wheel0Data, wheel1Data).applyToMesh(this.vil);
-                    });
-                }
-            });
-
             this.generateWires();
 
+            this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+
+        protected async instantiateMachineSpecific(): Promise<void> {
+            for (let i = 0; i < this.boxesCount; i++) {
+                let l = this.boxesColliders[i].position.y - -tileHeight * (this.h - 2 + 1.5) + this.stepH - 0.002;
+                let vertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-bielle.babylon", 0);
+                vertexData = Mummu.CloneVertexData(vertexData);
+                let positions = vertexData.positions;
+                for (let p = 0; p < positions.length / 3; p++) {
+                    let y = positions[3 * p + 1];
+
+                    if (y > 0.005) {
+                        positions[3 * p + 1] -= 0.01;
+                        positions[3 * p + 1] += l;
+                    }
+                }
+                vertexData.positions = positions;
+                let normals = [];
+                BABYLON.VertexData.ComputeNormals(vertexData.positions, vertexData.indices, normals);
+                vertexData.normals = normals;
+                vertexData.applyToMesh(this.bielles[i]);
+
+                this.bielles[i].material = this.game.materials.getMetalMaterial(this.getColor(2));
+
+                let stepVertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-step.babylon", 0);
+                stepVertexData = Mummu.CloneVertexData(stepVertexData);
+                positions = stepVertexData.positions;
+                for (let p = 0; p < positions.length / 3; p++) {
+                    let x = positions[3 * p];
+                    let y = positions[3 * p + 1];
+                    let z = positions[3 * p + 2];
+
+                    if (x < 0) {
+                        positions[3 * p] += 0.005;
+                        positions[3 * p] -= this.stepW * 0.5;
+                    } else {
+                        positions[3 * p] -= 0.005;
+                        positions[3 * p] += this.stepW * 0.5;
+                    }
+
+                    if (y < 0) {
+                        positions[3 * p + 1] += 0.005;
+                        positions[3 * p + 1] -= this.stepH;
+                    } else {
+                        positions[3 * p + 1] -= 0.005;
+                        positions[3 * p + 1] += this.stepH;
+                    }
+
+                    if (z < 0) {
+                        positions[3 * p + 2] += 0.005;
+                        positions[3 * p + 2] -= 0.01;
+                    } else {
+                        positions[3 * p + 2] -= 0.005;
+                        positions[3 * p + 2] += 0.01;
+                    }
+
+                    if (x < 0 && y > 0) {
+                        positions[3 * p + 1] += this.dH;
+                    } else if (y < 0) {
+                        positions[3 * p + 1] -= this.dH;
+                    }
+
+                    if (x < 0) {
+                        positions[3 * p] += 0.0002;
+                    } else {
+                        positions[3 * p] -= 0.0002;
+                    }
+                }
+                stepVertexData.positions = positions;
+                stepVertexData.applyToMesh(this.boxesDisplayedMesh[i]);
+                this.boxesDisplayedMesh[i].parent = this.boxesColliders[i];
+
+                this.boxesDisplayedMesh[i].material = this.game.materials.getMetalMaterial(this.getColor(1));
+            }
+
+            let vertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-vil.babylon", 0);
+            vertexData = Mummu.CloneVertexData(vertexData);
+
+            let positions = vertexData.positions;
+            for (let p = 0; p < positions.length / 3; p++) {
+                let x = positions[3 * p];
+                let y = positions[3 * p + 1];
+                let z = positions[3 * p + 2];
+
+                if (x < -0.0045) {
+                    positions[3 * p] += 0.005;
+                    positions[3 * p] -= this.stepW * 0.5;
+                } else if (x > 0.0045) {
+                    positions[3 * p] -= 0.005;
+                    positions[3 * p] += this.stepW * 0.5;
+                }
+
+                if (y > 0.005) {
+                    positions[3 * p + 1] -= 0.01;
+                    positions[3 * p + 1] += this.stepH * 0.5;
+                }
+            }
+            vertexData.positions = positions;
+
+            let vilPartsDatas: BABYLON.VertexData[] = [];
+            let altQ = BABYLON.Quaternion.RotationAxis(BABYLON.Axis.X, Math.PI);
+            for (let i = 0; i < this.boxesCount; i++) {
+                let partData = Mummu.CloneVertexData(vertexData);
+
+                let fX = i / this.boxesCount;
+                let x = (1 - fX) * this.x0 + fX * this.x1 + this.stepW * 0.5;
+                if (i % 2 === 1) {
+                    Mummu.RotateVertexDataInPlace(partData, altQ);
+                }
+                Mummu.TranslateVertexDataInPlace(partData, new BABYLON.Vector3(x, 0, 0));
+
+                vilPartsDatas.push(partData);
+            }
+
+            let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 1);
+            let wheel0Data = Mummu.CloneVertexData(wheelData);
+            //Mummu.ScaleVertexDataInPlace(wheel0Data, 0.03);
+            Mummu.RotateVertexDataInPlace(wheel0Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI * 0.5));
+            Mummu.TranslateVertexDataInPlace(wheel0Data, new BABYLON.Vector3(this.x0 - 0.001, 0, 0));
+
+            let wheel1Data = Mummu.CloneVertexData(wheelData);
+            //Mummu.ScaleVertexDataInPlace(wheel1Data, 0.03);
+            Mummu.RotateVertexDataInPlace(wheel1Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI * 0.5));
+            Mummu.TranslateVertexDataInPlace(wheel1Data, new BABYLON.Vector3(this.x1 + 0.001, 0, 0));
+
+            Mummu.MergeVertexDatas(...vilPartsDatas, wheel0Data, wheel1Data).applyToMesh(this.vil);
+
+            this.vil.material = this.game.materials.getMetalMaterial(this.getColor(3));
         }
 
         public static GenerateTemplate(w: number, h: number, mirrorX: boolean) {
@@ -336,18 +331,18 @@ namespace MarbleRunSimulatorCore {
             }
             this.vil.rotation.x = this.a;
             this.vil.freezeWorldMatrix();
-            for (let i = 0; i < this.boxes.length; i++) {
+            for (let i = 0; i < this.boxesColliders.length; i++) {
                 let a = this.a;
                 if (i % 2 === 1) {
                     a += Math.PI;
                 }
-                let box = this.boxes[i];
+                let box = this.boxesColliders[i];
 
                 let fY = (i + 0.5) / this.boxesCount;
                 box.position.y = (1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.5;
                 box.position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.5);
-                this.boxes[i].freezeWorldMatrix();
-                this.boxes[i].getChildMeshes().forEach((child) => {
+                this.boxesColliders[i].freezeWorldMatrix();
+                this.boxesColliders[i].getChildMeshes().forEach((child) => {
                     child.freezeWorldMatrix();
                 });
 
@@ -356,7 +351,7 @@ namespace MarbleRunSimulatorCore {
                 this.bielles[i].position.x += (1 - fX) * this.x0 + fX * this.x1 + this.stepW * 0.5;
                 this.bielles[i].position.y += Math.cos(a) * this.stepH * 0.5;
                 this.bielles[i].position.z += Math.sin(a) * this.stepH * 0.5;
-                let dir = this.boxes[i].absolutePosition.subtract(this.bielles[i].position).addInPlaceFromFloats(0, +this.stepH - 0.002, 0);
+                let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].position).addInPlaceFromFloats(0, +this.stepH - 0.002, 0);
                 this.bielles[i].rotationQuaternion = Mummu.QuaternionFromYZAxis(dir, BABYLON.Axis.Z);
             }
         }

@@ -146,6 +146,7 @@ namespace MarbleRunSimulatorCore {
             }
             this.base.parent = this;
 
+            this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
 
