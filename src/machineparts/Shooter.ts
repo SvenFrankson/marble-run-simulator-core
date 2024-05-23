@@ -76,36 +76,6 @@ namespace MarbleRunSimulatorCore {
             this.kickerCollider = new BABYLON.Mesh("collider-kicker");
             this.kickerCollider.parent = this.kicker;
             this.kickerCollider.isVisible = false;
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/kicker.babylon").then(datas => {
-                let data = datas[0];
-                if (data) {
-                    data.applyToMesh(this.kicker);
-                    this.kicker.material = this.game.materials.plasticBlack;
-                }
-                let body = new BABYLON.Mesh("kicker-body");
-                body.parent = this.kicker;
-                if (datas[1]) {
-                    datas[1].applyToMesh(body);
-                    body.material = this.game.materials.getMetalMaterial(this.getColor(1));
-                }
-                let weight = new BABYLON.Mesh("kicker-weight");
-                weight.parent = this.kicker;
-                if (datas[2]) {
-                    datas[2].applyToMesh(weight);
-                    weight.material = this.game.materials.getMetalMaterial(this.getColor(3));
-                }
-
-                if (datas[4]) {
-                    datas[4].applyToMesh(this.base);
-                    this.base.material = this.game.materials.getMetalMaterial(this.getColor(2));
-                }
-
-                let colData = datas[3];
-                if (colData) {
-                    colData.applyToMesh(this.kickerCollider);
-                    this.kickerCollider.isVisible = false;
-                }
-            });
 
             let cupR = 0.006;
             let dH = 0.001;
@@ -120,18 +90,6 @@ namespace MarbleRunSimulatorCore {
             this.shieldCollider = new BABYLON.Mesh("collider-shield");
             this.shieldCollider.parent = this.shield;
             this.shieldCollider.isVisible = false;
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/shield.babylon").then(datas => {
-                let data = datas[0];
-                if (data) {
-                    data.applyToMesh(this.shield);
-                    this.shield.material = this.game.materials.getMetalMaterial(this.getColor(3));
-                }
-                let colData = datas[1];
-                if (colData) {
-                    colData.applyToMesh(this.shieldCollider);
-                    this.shieldCollider.isVisible = false;
-                }
-            });
 
             this.shieldYClosed = - tileHeight * (this.h - 2);
             this.shield.position.copyFromFloats(x * tileWidth * 0.4 - 0, this.shieldYClosed, 0);
@@ -171,8 +129,51 @@ namespace MarbleRunSimulatorCore {
                 false,
                 Nabu.Easing.easeOutElastic
             );
+        }
 
-            console.log("alpha");
+        protected async instantiateMachineSpecific(): Promise<void> {
+            let kickerDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/kicker.babylon");
+
+            if (kickerDatas[0]) {
+                kickerDatas[0].applyToMesh(this.kicker);
+                this.kicker.material = this.game.materials.plasticBlack;
+            }
+
+            let body = new BABYLON.Mesh("kicker-body");
+            body.parent = this.kicker;
+            if (kickerDatas[1]) {
+                kickerDatas[1].applyToMesh(body);
+            }
+            body.material = this.game.materials.getMetalMaterial(this.getColor(1));
+
+            let weight = new BABYLON.Mesh("kicker-weight");
+            weight.parent = this.kicker;
+            if (kickerDatas[2]) {
+                kickerDatas[2].applyToMesh(weight);
+            }
+            weight.material = this.game.materials.getMetalMaterial(this.getColor(3));
+
+            if (kickerDatas[4]) {
+                kickerDatas[4].applyToMesh(this.base);
+            }
+            this.base.material = this.game.materials.getMetalMaterial(this.getColor(2));
+
+            if (kickerDatas[3]) {
+                kickerDatas[3].applyToMesh(this.kickerCollider);
+                this.kickerCollider.isVisible = false;
+            }
+            
+            let shieldDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/shield.babylon");
+
+            if (shieldDatas[0]) {
+                shieldDatas[0].applyToMesh(this.shield);
+            }
+            this.shield.material = this.game.materials.getMetalMaterial(this.getColor(3));
+            
+            if (shieldDatas[1]) {
+                shieldDatas[1].applyToMesh(this.shieldCollider);
+                this.shieldCollider.isVisible = false;
+            }
         }
 
         public static GenerateTemplate(h: number, mirrorX: boolean) {

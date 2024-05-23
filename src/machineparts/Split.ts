@@ -2,7 +2,11 @@ namespace MarbleRunSimulatorCore {
     export class Split extends MachinePart {
         private _animatePivot = Mummu.AnimationFactory.EmptyNumberCallback;
 
+        public anchor: BABYLON.Mesh;
         public pivot: BABYLON.Mesh;
+
+        public axisZMin: number = 0;
+        public axisZMax: number = 1;
 
         public clicSound: BABYLON.Sound;
         
@@ -23,40 +27,14 @@ namespace MarbleRunSimulatorCore {
 
             let rCurb = Split.pivotL * 0.3;
 
-            let anchorDatas: BABYLON.VertexData[] = [];
-            let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
-            let q = BABYLON.Quaternion.Identity();
-            Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
-            Mummu.RotateVertexDataInPlace(tmpVertexData, q);
-            Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, 0.015));
-            anchorDatas.push(tmpVertexData);
-
-            let axisZMin = -this.wireGauge * 0.6;
-            let axisZMax = 0.015 - 0.001 * 0.5;
-            tmpVertexData = BABYLON.CreateCylinderVertexData({ height: axisZMax - axisZMin, diameter: 0.001 });
-            Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
-            Mummu.RotateVertexDataInPlace(tmpVertexData, q);
-            Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (axisZMax + axisZMin) * 0.5));
-            anchorDatas.push(tmpVertexData);
-
-            let anchor = new BABYLON.Mesh("anchor");
-            anchor.position.copyFromFloats(0, -tileHeight * 0.5, 0);
-            anchor.parent = this;
-            anchor.material = this.game.materials.getMetalMaterial(this.getColor(4));
-            Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(anchor);
-
+            this.anchor = new BABYLON.Mesh("anchor");
+            this.anchor.position.copyFromFloats(0, -tileHeight * 0.5, 0);
+            this.anchor.parent = this;
+            
             this.pivot = new BABYLON.Mesh("pivot");
             this.pivot.position.copyFromFloats(0, -tileHeight * 0.5, 0);
-            this.pivot.material = this.game.materials.getMetalMaterial(this.getColor(4));
             this.pivot.parent = this;
             let dz = this.wireGauge * 0.5;
-            this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon").then((datas) => {
-                if (datas[0]) {
-                    let data = Mummu.CloneVertexData(datas[0]);
-                    Mummu.TranslateVertexDataInPlace(data, new BABYLON.Vector3(0, 0, axisZMin));
-                    data.applyToMesh(this.pivot);
-                }
-            });
 
             let wireHorizontal0 = new Wire(this);
             wireHorizontal0.colorIndex = 5;
@@ -153,6 +131,35 @@ namespace MarbleRunSimulatorCore {
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+
+        protected async instantiateMachineSpecific(): Promise<void> {
+            let anchorDatas: BABYLON.VertexData[] = [];
+            let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: 0.001, diameter: 0.01 });
+            let q = BABYLON.Quaternion.Identity();
+            Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
+            Mummu.RotateVertexDataInPlace(tmpVertexData, q);
+            Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, 0.015));
+            anchorDatas.push(tmpVertexData);
+
+            this.axisZMin = -this.wireGauge * 0.6;
+            this.axisZMax = 0.015 - 0.001 * 0.5;
+            tmpVertexData = BABYLON.CreateCylinderVertexData({ height: this.axisZMax - this.axisZMin, diameter: 0.001 });
+            Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
+            Mummu.RotateVertexDataInPlace(tmpVertexData, q);
+            Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (this.axisZMax + this.axisZMin) * 0.5));
+            anchorDatas.push(tmpVertexData);
+
+            this.anchor.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(this.anchor);
+
+            let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
+            if (arrowData) {
+                arrowData = Mummu.CloneVertexData(arrowData);
+                Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
+                arrowData.applyToMesh(this.pivot);
+            }
+            this.pivot.material = this.game.materials.getMetalMaterial(this.getColor(4));
         }
 
         public static GenerateTemplate(mirrorX: boolean) {

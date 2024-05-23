@@ -650,6 +650,7 @@ declare namespace MarbleRunSimulatorCore {
         animateKickerArm: (target: number, duration: number) => Promise<void>;
         animateKickerKick: (target: number, duration: number) => Promise<void>;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
@@ -681,10 +682,14 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Split extends MachinePart {
         private _animatePivot;
+        anchor: BABYLON.Mesh;
         pivot: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
         clicSound: BABYLON.Sound;
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
