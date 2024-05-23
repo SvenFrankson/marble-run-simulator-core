@@ -117,7 +117,8 @@ namespace MarbleRunSimulatorCore {
 
         protected async instantiateMachineSpecific(): Promise<void> {
             for (let i = 0; i < this.boxesCount; i++) {
-                let l = this.boxesColliders[i].position.y - -tileHeight * (this.h - 2 + 1.5) + this.stepH - 0.002;
+                let fY = (i + 0.5) / this.boxesCount;
+                let l = ((1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.5) - -tileHeight * (this.h - 2 + 1.5) + this.stepH - 0.002;
                 let vertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-bielle.babylon", 0);
                 vertexData = Mummu.CloneVertexData(vertexData);
                 let positions = vertexData.positions;
