@@ -30,6 +30,8 @@ namespace MarbleRunSimulatorCore {
 
         public kicker: BABYLON.Mesh;
         public kickerCollider: BABYLON.Mesh;
+        public kickerBody: BABYLON.Mesh;
+        public kickerWeight: BABYLON.Mesh;
         public kickerRadius: number = 0.0025;
         public kickerLength: number = 0.04;
         public kickerYIdle: number = 0;
@@ -76,6 +78,12 @@ namespace MarbleRunSimulatorCore {
             this.kickerCollider = new BABYLON.Mesh("collider-kicker");
             this.kickerCollider.parent = this.kicker;
             this.kickerCollider.isVisible = false;
+            
+            this.kickerBody = new BABYLON.Mesh("kicker-body");
+            this.kickerBody.parent = this.kicker;
+
+            this.kickerWeight = new BABYLON.Mesh("kicker-weight");
+            this.kickerWeight.parent = this.kicker;
 
             let cupR = 0.006;
             let dH = 0.001;
@@ -138,20 +146,16 @@ namespace MarbleRunSimulatorCore {
                 kickerDatas[0].applyToMesh(this.kicker);
                 this.kicker.material = this.game.materials.plasticBlack;
             }
-
-            let body = new BABYLON.Mesh("kicker-body");
-            body.parent = this.kicker;
+            
             if (kickerDatas[1]) {
-                kickerDatas[1].applyToMesh(body);
+                kickerDatas[1].applyToMesh(this.kickerBody);
             }
-            body.material = this.game.materials.getMaterial(this.getColor(1));
+            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(1));
 
-            let weight = new BABYLON.Mesh("kicker-weight");
-            weight.parent = this.kicker;
             if (kickerDatas[2]) {
-                kickerDatas[2].applyToMesh(weight);
+                kickerDatas[2].applyToMesh(this.kickerWeight);
             }
-            weight.material = this.game.materials.getMaterial(this.getColor(3));
+            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(3));
 
             if (kickerDatas[4]) {
                 kickerDatas[4].applyToMesh(this.base);

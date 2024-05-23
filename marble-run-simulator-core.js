@@ -1075,6 +1075,7 @@ var MarbleRunSimulatorCore;
             this.parts = [];
             this.balls = [];
             this.instantiated = false;
+            this.minimalAutoQualityFailed = GraphicQuality.Ultra + 1;
             this.playing = false;
             this.onStopCallbacks = new Nabu.UniqueList();
             this.margin = 0.05;
@@ -1682,6 +1683,7 @@ var MarbleRunSimulatorCore;
             return data;
         }
         deserialize(data) {
+            this.minimalAutoQualityFailed = GraphicQuality.Ultra + 1;
             if (data) {
                 let version;
                 if (isFinite(data.v)) {
@@ -4786,6 +4788,10 @@ var MarbleRunSimulatorCore;
             this.kickerCollider = new BABYLON.Mesh("collider-kicker");
             this.kickerCollider.parent = this.kicker;
             this.kickerCollider.isVisible = false;
+            this.kickerBody = new BABYLON.Mesh("kicker-body");
+            this.kickerBody.parent = this.kicker;
+            this.kickerWeight = new BABYLON.Mesh("kicker-weight");
+            this.kickerWeight.parent = this.kicker;
             let cupR = 0.006;
             let dH = 0.001;
             this.kickerYIdle = -MarbleRunSimulatorCore.tileHeight * (this.h - 2) - dH - cupR * 0.8 - 0.004;
@@ -4825,18 +4831,14 @@ var MarbleRunSimulatorCore;
                 kickerDatas[0].applyToMesh(this.kicker);
                 this.kicker.material = this.game.materials.plasticBlack;
             }
-            let body = new BABYLON.Mesh("kicker-body");
-            body.parent = this.kicker;
             if (kickerDatas[1]) {
-                kickerDatas[1].applyToMesh(body);
+                kickerDatas[1].applyToMesh(this.kickerBody);
             }
-            body.material = this.game.materials.getMaterial(this.getColor(1));
-            let weight = new BABYLON.Mesh("kicker-weight");
-            weight.parent = this.kicker;
+            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(1));
             if (kickerDatas[2]) {
-                kickerDatas[2].applyToMesh(weight);
+                kickerDatas[2].applyToMesh(this.kickerWeight);
             }
-            weight.material = this.game.materials.getMaterial(this.getColor(3));
+            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(3));
             if (kickerDatas[4]) {
                 kickerDatas[4].applyToMesh(this.base);
             }

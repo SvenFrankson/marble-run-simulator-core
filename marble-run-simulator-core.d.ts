@@ -229,6 +229,7 @@ declare namespace MarbleRunSimulatorCore {
         templateManager: TemplateManager;
         sleeperVertexData: BABYLON.VertexData[];
         instantiated: boolean;
+        minimalAutoQualityFailed: number;
         playing: boolean;
         exitShooter: Shooter;
         exitTrack: Start;
@@ -664,6 +665,8 @@ declare namespace MarbleRunSimulatorCore {
         velocityKick: number;
         kicker: BABYLON.Mesh;
         kickerCollider: BABYLON.Mesh;
+        kickerBody: BABYLON.Mesh;
+        kickerWeight: BABYLON.Mesh;
         kickerRadius: number;
         kickerLength: number;
         kickerYIdle: number;

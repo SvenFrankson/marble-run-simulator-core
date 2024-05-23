@@ -108,6 +108,7 @@ namespace MarbleRunSimulatorCore {
         public sleeperVertexData: BABYLON.VertexData[];
 
         public instantiated: boolean = false;
+        public minimalAutoQualityFailed: number = GraphicQuality.Ultra + 1;
 
         public playing: boolean = false;
 
@@ -789,6 +790,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public deserialize(data: IMachineData): void {
+            this.minimalAutoQualityFailed = GraphicQuality.Ultra + 1;
             if (data) {
                 let version: number;
                 if (isFinite(data.v)) {
