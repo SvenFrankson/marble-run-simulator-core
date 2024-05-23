@@ -107,8 +107,8 @@ namespace MarbleRunSimulatorCore {
             let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 0);
             wheelData.applyToMesh(this.wheels[0]);
             wheelData.applyToMesh(this.wheels[1]);
-            this.wheels[0].material = this.game.materials.getMetalMaterial(0);
-            this.wheels[1].material = this.game.materials.getMetalMaterial(0);
+            this.wheels[0].material = this.game.materials.getMaterial(0);
+            this.wheels[1].material = this.game.materials.getMaterial(0);
         }
 
         public static GenerateTemplate(h: number, mirrorX: boolean) {

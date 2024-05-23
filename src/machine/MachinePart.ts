@@ -507,7 +507,7 @@ namespace MarbleRunSimulatorCore {
                     this.sleepersMeshes.set(colorIndex, sleeperMesh);
                 }
                 let sleeperMesh = this.sleepersMeshes.get(colorIndex);
-                sleeperMesh.material = this.game.materials.getMetalMaterial(colorIndex);
+                sleeperMesh.material = this.game.materials.getMaterial(colorIndex);
                 vData.applyToMesh(sleeperMesh);
                 sleeperMesh.freezeWorldMatrix();
             });

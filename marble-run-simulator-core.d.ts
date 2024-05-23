@@ -83,13 +83,13 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class MainMaterials {
         game: IGame;
-        private _metalMaterialsPBR;
-        private _metalMaterialsSTD;
-        getMetalMaterial(colorIndex: number, graphicQ?: number): BABYLON.Material;
+        private _materialsPBR;
+        private _materialsSTD;
+        getMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
         get metalMaterialsCount(): number;
         private _ballMaterialsPBR;
         private _ballMaterialsSTD;
-        getBallMaterial(colorIndex: number, graphicQ?: number): BABYLON.Material;
+        getBallMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
         get ballMaterialsCount(): number;
         velvetMaterial: BABYLON.StandardMaterial;
         logoMaterial: BABYLON.StandardMaterial;
@@ -105,8 +105,9 @@ declare namespace MarbleRunSimulatorCore {
         blueMaterial: BABYLON.StandardMaterial;
         whiteAutolitMaterial: BABYLON.StandardMaterial;
         whiteFullLitMaterial: BABYLON.StandardMaterial;
-        plasticBlack: BABYLON.StandardMaterial;
+        get plasticBlack(): BABYLON.Material;
         constructor(game: IGame);
+        private _generateMaterials;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -142,6 +143,21 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    enum GraphicQuality {
+        Low = 0,
+        Medium = 1,
+        High = 2,
+        Ultra = 3
+    }
+    enum GeometryQuality {
+        Low = 0,
+        Medium = 1,
+        High = 2
+    }
+    enum MaterialQuality {
+        Standard = 0,
+        PBR = 1
+    }
     interface IGame {
         scene: BABYLON.Scene;
         DEBUG_MODE: boolean;
@@ -152,7 +168,9 @@ declare namespace MarbleRunSimulatorCore {
         machine: Machine;
         mode: GameMode;
         shadowGenerator: BABYLON.ShadowGenerator;
-        getGraphicQ: () => number;
+        getGraphicQ: () => GraphicQuality;
+        getGeometryQ: () => GeometryQuality;
+        getMaterialQ: () => MaterialQuality;
         gridIMin: number;
         gridIMax: number;
         gridJMin: number;

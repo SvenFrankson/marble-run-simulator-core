@@ -17,7 +17,7 @@ namespace MarbleRunSimulatorCore {
                 props.groundAnchorsRelativeMaxY = 1;
             }
 
-            let q = part.game.getGraphicQ();
+            let q = part.game.getGeometryQ();
             let partialsDatas: BABYLON.VertexData[][] = [];
 
             for (let j = 0; j < part.tracks.length; j++) {

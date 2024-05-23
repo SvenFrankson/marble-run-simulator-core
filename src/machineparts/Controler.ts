@@ -114,29 +114,29 @@ namespace MarbleRunSimulatorCore {
             let supportData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 2);
             supportData = Mummu.MergeVertexDatas(axisControlerVertexData, axisPassVertexData, supportData);
             supportData.applyToMesh(this.support);
-            this.support.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            this.support.material = this.game.materials.getMaterial(this.getColor(4));
 
             let cog8Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 0);
             cog8Data = Mummu.CloneVertexData(cog8Data);
             Mummu.TranslateVertexDataInPlace(cog8Data, new BABYLON.Vector3(0, 0, - tileDepth * 0.5));
             cog8Data.applyToMesh(this.cog8);
-            this.cog8.material = this.game.materials.getMetalMaterial(this.getColor(5));
+            this.cog8.material = this.game.materials.getMaterial(this.getColor(5));
 
             let cog13Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 1);
             cog13Data = Mummu.CloneVertexData(cog13Data);
             Mummu.TranslateVertexDataInPlace(cog13Data, new BABYLON.Vector3(0, 0, - tileDepth * 0.5));
             cog13Data.applyToMesh(this.cog13);
-            this.cog13.material = this.game.materials.getMetalMaterial(this.getColor(5));
+            this.cog13.material = this.game.materials.getMaterial(this.getColor(5));
 
             let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
             arrowData = Mummu.CloneVertexData(arrowData);
             Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
             arrowData.applyToMesh(this.pivotPass);
-            this.pivotPass.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            this.pivotPass.material = this.game.materials.getMaterial(this.getColor(4));
 
             let triggerData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 0);
             triggerData.applyToMesh(this.pivotControler);
-            this.pivotControler.material = this.game.materials.getMetalMaterial(this.getColor(5));
+            this.pivotControler.material = this.game.materials.getMaterial(this.getColor(5));
             
             let triggerColliderData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 1);
             triggerColliderData.applyToMesh(this.pivotControlerCollider);

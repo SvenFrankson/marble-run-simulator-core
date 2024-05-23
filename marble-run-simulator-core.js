@@ -117,10 +117,10 @@ var MarbleRunSimulatorCore;
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
             let segmentsCount = 6;
-            if (this.game.getGraphicQ() === 1) {
+            if (this.game.getGeometryQ() === MarbleRunSimulatorCore.GeometryQuality.Medium) {
                 segmentsCount = 10;
             }
-            else if (this.game.getGraphicQ() === 2) {
+            else if (this.game.getGeometryQ() === MarbleRunSimulatorCore.GeometryQuality.High) {
                 segmentsCount = 14;
             }
             let data = BABYLON.CreateSphereVertexData({ diameter: this.size, segments: segmentsCount });
@@ -604,8 +604,8 @@ var MarbleRunSimulatorCore;
     class MainMaterials {
         constructor(game) {
             this.game = game;
-            this._metalMaterialsPBR = [];
-            this._metalMaterialsSTD = [];
+            this._materialsPBR = [];
+            this._materialsSTD = [];
             this._ballMaterialsPBR = [];
             this._ballMaterialsSTD = [];
             let envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
@@ -644,70 +644,7 @@ var MarbleRunSimulatorCore;
             this.whiteFullLitMaterial.diffuseColor = BABYLON.Color3.FromHexString("#baccc8");
             this.whiteFullLitMaterial.emissiveColor = BABYLON.Color3.FromHexString("#baccc8");
             this.whiteFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
-            let steelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("steel-pbr", this.game.scene);
-            steelMaterialPBR.baseColor = new BABYLON.Color3(0.5, 0.75, 1.0);
-            steelMaterialPBR.metallic = 1.0;
-            steelMaterialPBR.roughness = 0.15;
-            steelMaterialPBR.environmentTexture = envTexture;
-            let steelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
-            steelMaterialSTD.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7);
-            steelMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
-            steelMaterialSTD.emissiveColor = steelMaterialSTD.diffuseColor.scale(0.5);
-            steelMaterialSTD.roughness = 0.15;
-            let copperMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
-            copperMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#B87333");
-            copperMaterialPBR.metallic = 1.0;
-            copperMaterialPBR.roughness = 0.15;
-            copperMaterialPBR.environmentTexture = envTexture;
-            let copperMaterialSTD = new BABYLON.StandardMaterial("copper-std", this.game.scene);
-            copperMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#B87333");
-            copperMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
-            copperMaterialSTD.emissiveColor = copperMaterialSTD.diffuseColor.scale(0.5);
-            copperMaterialSTD.roughness = 0.15;
-            let blackSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("steel-pbr", this.game.scene);
-            blackSteelMaterialPBR.baseColor = new BABYLON.Color3(0.05, 0.04, 0.045);
-            blackSteelMaterialPBR.metallic = 0.85;
-            blackSteelMaterialPBR.roughness = 0.15;
-            blackSteelMaterialPBR.environmentTexture = envTexture;
-            let blackSteelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
-            blackSteelMaterialSTD.diffuseColor = new BABYLON.Color3(0.1, 0.11, 0.12);
-            blackSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-            blackSteelMaterialSTD.emissiveColor = blackSteelMaterialSTD.diffuseColor.scale(0.5);
-            blackSteelMaterialSTD.roughness = 0.25;
-            let redSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("red-steel-pbr", this.game.scene);
-            redSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#bf212f").scaleInPlace(0.5);
-            redSteelMaterialPBR.metallic = 0.8;
-            redSteelMaterialPBR.roughness = 0.2;
-            redSteelMaterialPBR.environmentTexture = envTexture;
-            let redSteelMaterialSTD = new BABYLON.StandardMaterial("red-steel-std", this.game.scene);
-            redSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#bf212f").scaleInPlace(1);
-            redSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-            redSteelMaterialSTD.emissiveColor = redSteelMaterialSTD.diffuseColor.scale(0.5);
-            redSteelMaterialSTD.roughness = 0.25;
-            let greenSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("green-steel-pbr", this.game.scene);
-            greenSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#006f3c").scaleInPlace(0.5);
-            greenSteelMaterialPBR.metallic = 0.8;
-            greenSteelMaterialPBR.roughness = 0.2;
-            greenSteelMaterialPBR.environmentTexture = envTexture;
-            let greenSteelMaterialSTD = new BABYLON.StandardMaterial("green-steel-std", this.game.scene);
-            greenSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#006f3c").scaleInPlace(1);
-            greenSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-            greenSteelMaterialSTD.emissiveColor = greenSteelMaterialSTD.diffuseColor.scale(0.5);
-            greenSteelMaterialSTD.roughness = 0.25;
-            let blueSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("blue-steel-pbr", this.game.scene);
-            blueSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#264b96").scaleInPlace(0.5);
-            blueSteelMaterialPBR.metallic = 0.8;
-            blueSteelMaterialPBR.roughness = 0.2;
-            blueSteelMaterialPBR.environmentTexture = envTexture;
-            let blueSteelMaterialSTD = new BABYLON.StandardMaterial("blue-steel-std", this.game.scene);
-            blueSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#264b96").scaleInPlace(1);
-            blueSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-            blueSteelMaterialSTD.emissiveColor = blueSteelMaterialSTD.diffuseColor.scale(0.5);
-            blueSteelMaterialSTD.roughness = 0.25;
-            this.plasticBlack = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
-            this.plasticBlack.diffuseColor = BABYLON.Color3.FromHexString("#282a33");
-            this.plasticBlack.specularColor.copyFromFloats(0.1, 0.1, 0.1);
-            this.plasticBlack.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
+            this._generateMaterials(envTexture);
             let plasticIndigo = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticIndigo.baseColor = BABYLON.Color3.FromHexString("#004777");
             plasticIndigo.metallic = 0;
@@ -733,8 +670,6 @@ var MarbleRunSimulatorCore;
             plasticGreen.metallic = 0;
             plasticGreen.roughness = 0.9;
             plasticGreen.environmentTexture = envTexture;
-            this._metalMaterialsPBR = [steelMaterialPBR, copperMaterialPBR, blackSteelMaterialPBR, redSteelMaterialPBR, greenSteelMaterialPBR, blueSteelMaterialPBR, this.plasticBlack];
-            this._metalMaterialsSTD = [steelMaterialSTD, copperMaterialSTD, blackSteelMaterialSTD, redSteelMaterialSTD, greenSteelMaterialSTD, blueSteelMaterialSTD, this.plasticBlack];
             this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);
             this.velvetMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/velvet.jpg");
@@ -788,8 +723,8 @@ var MarbleRunSimulatorCore;
                 return ballMaterial;
             };
             this._ballMaterialsPBR = [
-                this._metalMaterialsPBR[0],
-                this._metalMaterialsPBR[1],
+                this._materialsPBR[0],
+                this._materialsPBR[1],
                 makeBrandedBallMaterialPBR("square-red", "ball-square-red.png"),
                 makeBrandedBallMaterialPBR("circle-green", "ball-circle-green.png"),
                 makeBrandedBallMaterialPBR("star-blue", "ball-star-blue.png"),
@@ -799,8 +734,8 @@ var MarbleRunSimulatorCore;
                 makeBrandedBallMaterialPBR("html5", "ball-poki.png")
             ];
             this._ballMaterialsSTD = [
-                this._metalMaterialsSTD[0],
-                this._metalMaterialsSTD[1],
+                this._materialsSTD[0],
+                this._materialsSTD[1],
                 makeBrandedBallMaterialSTD("square-red", "ball-square-red.png"),
                 makeBrandedBallMaterialSTD("circle-green", "ball-circle-green.png"),
                 makeBrandedBallMaterialSTD("star-blue", "ball-star-blue.png"),
@@ -810,29 +745,114 @@ var MarbleRunSimulatorCore;
                 makeBrandedBallMaterialSTD("html5", "ball-poki.png")
             ];
         }
-        getMetalMaterial(colorIndex, graphicQ = -1) {
-            if (graphicQ === -1) {
-                graphicQ = this.game.getGraphicQ();
+        getMaterial(colorIndex, materialQ = -1) {
+            if (materialQ === -1) {
+                materialQ = this.game.getMaterialQ();
             }
-            if (graphicQ === 0) {
-                return this._metalMaterialsSTD[colorIndex % this._metalMaterialsSTD.length];
+            if (materialQ === MarbleRunSimulatorCore.MaterialQuality.PBR) {
+                return this._materialsPBR[colorIndex % this._materialsPBR.length];
             }
-            return this._metalMaterialsPBR[colorIndex % this._metalMaterialsPBR.length];
+            return this._materialsSTD[colorIndex % this._materialsSTD.length];
         }
         get metalMaterialsCount() {
-            return Math.min(this._metalMaterialsPBR.length, this._metalMaterialsSTD.length);
+            return Math.min(this._materialsPBR.length, this._materialsSTD.length);
         }
-        getBallMaterial(colorIndex, graphicQ = -1) {
-            if (graphicQ === -1) {
-                graphicQ = this.game.getGraphicQ();
+        getBallMaterial(colorIndex, materialQ = -1) {
+            if (materialQ === -1) {
+                materialQ = this.game.getMaterialQ();
             }
-            if (graphicQ === 0) {
-                return this._ballMaterialsSTD[colorIndex % this._ballMaterialsSTD.length];
+            if (materialQ === MarbleRunSimulatorCore.MaterialQuality.PBR) {
+                return this._ballMaterialsPBR[colorIndex % this._ballMaterialsPBR.length];
             }
-            return this._ballMaterialsPBR[colorIndex % this._ballMaterialsPBR.length];
+            return this._ballMaterialsSTD[colorIndex % this._ballMaterialsSTD.length];
         }
         get ballMaterialsCount() {
             return Math.min(this._ballMaterialsPBR.length, this._ballMaterialsSTD.length);
+        }
+        get plasticBlack() {
+            return this.getMaterial(6);
+        }
+        _generateMaterials(envTexture) {
+            this._materialsPBR = [];
+            this._materialsSTD = [];
+            let steelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("steel-pbr", this.game.scene);
+            steelMaterialPBR.baseColor = new BABYLON.Color3(0.5, 0.75, 1.0);
+            steelMaterialPBR.metallic = 1.0;
+            steelMaterialPBR.roughness = 0.15;
+            steelMaterialPBR.environmentTexture = envTexture;
+            let steelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
+            steelMaterialSTD.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7);
+            steelMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
+            steelMaterialSTD.emissiveColor = steelMaterialSTD.diffuseColor.scale(0.5);
+            steelMaterialSTD.roughness = 0.15;
+            this._materialsPBR.push(steelMaterialPBR);
+            this._materialsSTD.push(steelMaterialSTD);
+            let copperMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
+            copperMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#B87333");
+            copperMaterialPBR.metallic = 1.0;
+            copperMaterialPBR.roughness = 0.15;
+            copperMaterialPBR.environmentTexture = envTexture;
+            let copperMaterialSTD = new BABYLON.StandardMaterial("copper-std", this.game.scene);
+            copperMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#B87333");
+            copperMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
+            copperMaterialSTD.emissiveColor = copperMaterialSTD.diffuseColor.scale(0.5);
+            copperMaterialSTD.roughness = 0.15;
+            this._materialsPBR.push(copperMaterialPBR);
+            this._materialsSTD.push(copperMaterialSTD);
+            let blackSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("steel-pbr", this.game.scene);
+            blackSteelMaterialPBR.baseColor = new BABYLON.Color3(0.05, 0.04, 0.045);
+            blackSteelMaterialPBR.metallic = 0.85;
+            blackSteelMaterialPBR.roughness = 0.15;
+            blackSteelMaterialPBR.environmentTexture = envTexture;
+            let blackSteelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
+            blackSteelMaterialSTD.diffuseColor = new BABYLON.Color3(0.1, 0.11, 0.12);
+            blackSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            blackSteelMaterialSTD.emissiveColor = blackSteelMaterialSTD.diffuseColor.scale(0.5);
+            blackSteelMaterialSTD.roughness = 0.25;
+            this._materialsPBR.push(blackSteelMaterialPBR);
+            this._materialsSTD.push(blackSteelMaterialSTD);
+            let redSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("red-steel-pbr", this.game.scene);
+            redSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#bf212f").scaleInPlace(0.5);
+            redSteelMaterialPBR.metallic = 0.8;
+            redSteelMaterialPBR.roughness = 0.2;
+            redSteelMaterialPBR.environmentTexture = envTexture;
+            let redSteelMaterialSTD = new BABYLON.StandardMaterial("red-steel-std", this.game.scene);
+            redSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#bf212f").scaleInPlace(1);
+            redSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            redSteelMaterialSTD.emissiveColor = redSteelMaterialSTD.diffuseColor.scale(0.5);
+            redSteelMaterialSTD.roughness = 0.25;
+            this._materialsPBR.push(redSteelMaterialPBR);
+            this._materialsSTD.push(redSteelMaterialSTD);
+            let greenSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("green-steel-pbr", this.game.scene);
+            greenSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#006f3c").scaleInPlace(0.5);
+            greenSteelMaterialPBR.metallic = 0.8;
+            greenSteelMaterialPBR.roughness = 0.2;
+            greenSteelMaterialPBR.environmentTexture = envTexture;
+            let greenSteelMaterialSTD = new BABYLON.StandardMaterial("green-steel-std", this.game.scene);
+            greenSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#006f3c").scaleInPlace(1);
+            greenSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            greenSteelMaterialSTD.emissiveColor = greenSteelMaterialSTD.diffuseColor.scale(0.5);
+            greenSteelMaterialSTD.roughness = 0.25;
+            this._materialsPBR.push(greenSteelMaterialPBR);
+            this._materialsSTD.push(greenSteelMaterialSTD);
+            let blueSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("blue-steel-pbr", this.game.scene);
+            blueSteelMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#264b96").scaleInPlace(0.5);
+            blueSteelMaterialPBR.metallic = 0.8;
+            blueSteelMaterialPBR.roughness = 0.2;
+            blueSteelMaterialPBR.environmentTexture = envTexture;
+            let blueSteelMaterialSTD = new BABYLON.StandardMaterial("blue-steel-std", this.game.scene);
+            blueSteelMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#264b96").scaleInPlace(1);
+            blueSteelMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            blueSteelMaterialSTD.emissiveColor = blueSteelMaterialSTD.diffuseColor.scale(0.5);
+            blueSteelMaterialSTD.roughness = 0.25;
+            this._materialsPBR.push(blueSteelMaterialPBR);
+            this._materialsSTD.push(blueSteelMaterialSTD);
+            let plasticBlack = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
+            plasticBlack.diffuseColor = BABYLON.Color3.FromHexString("#282a33");
+            plasticBlack.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            plasticBlack.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
+            this._materialsPBR.push(plasticBlack);
+            this._materialsSTD.push(plasticBlack);
         }
     }
     MarbleRunSimulatorCore.MainMaterials = MainMaterials;
@@ -936,7 +956,7 @@ var MarbleRunSimulatorCore;
             }
         }
         async instantiate(color = 0) {
-            let q = this.track.game.getGraphicQ();
+            let q = this.track.game.getGeometryQ();
             while (this.getChildren().length > 0) {
                 this.getChildren()[0].dispose();
             }
@@ -989,7 +1009,7 @@ var MarbleRunSimulatorCore;
                 }
                 let wire = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 wire.parent = this;
-                wire.material = this.track.game.materials.getMetalMaterial(color);
+                wire.material = this.track.game.materials.getMaterial(color);
             }
             if (Wire.DEBUG_DISPLAY) {
                 for (let i = 0; i < this.path.length - 1; i++) {
@@ -1021,6 +1041,24 @@ var MarbleRunSimulatorCore;
     }
     var ballOffset = 23328; // it's 36 * 36 * 36 / 2
     var partOffset = 648; // it's 36 * 36 / 2
+    let GraphicQuality;
+    (function (GraphicQuality) {
+        GraphicQuality[GraphicQuality["Low"] = 0] = "Low";
+        GraphicQuality[GraphicQuality["Medium"] = 1] = "Medium";
+        GraphicQuality[GraphicQuality["High"] = 2] = "High";
+        GraphicQuality[GraphicQuality["Ultra"] = 3] = "Ultra";
+    })(GraphicQuality = MarbleRunSimulatorCore.GraphicQuality || (MarbleRunSimulatorCore.GraphicQuality = {}));
+    let GeometryQuality;
+    (function (GeometryQuality) {
+        GeometryQuality[GeometryQuality["Low"] = 0] = "Low";
+        GeometryQuality[GeometryQuality["Medium"] = 1] = "Medium";
+        GeometryQuality[GeometryQuality["High"] = 2] = "High";
+    })(GeometryQuality = MarbleRunSimulatorCore.GeometryQuality || (MarbleRunSimulatorCore.GeometryQuality = {}));
+    let MaterialQuality;
+    (function (MaterialQuality) {
+        MaterialQuality[MaterialQuality["Standard"] = 0] = "Standard";
+        MaterialQuality[MaterialQuality["PBR"] = 1] = "PBR";
+    })(MaterialQuality = MarbleRunSimulatorCore.MaterialQuality || (MarbleRunSimulatorCore.MaterialQuality = {}));
     let GameMode;
     (function (GameMode) {
         GameMode[GameMode["Home"] = 0] = "Home";
@@ -1279,7 +1317,7 @@ var MarbleRunSimulatorCore;
                 }
                 this.baseFrame = new BABYLON.Mesh("base-frame");
                 this.baseFrame.position.copyFrom(this.pedestalTop.position);
-                this.baseFrame.material = this.game.materials.getMetalMaterial(0);
+                this.baseFrame.material = this.game.materials.getMaterial(0);
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/base-frame.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
                 let positions = [...data.positions];
@@ -2416,7 +2454,7 @@ var MarbleRunSimulatorCore;
                     this.sleepersMeshes.set(colorIndex, sleeperMesh);
                 }
                 let sleeperMesh = this.sleepersMeshes.get(colorIndex);
-                sleeperMesh.material = this.game.materials.getMetalMaterial(colorIndex);
+                sleeperMesh.material = this.game.materials.getMaterial(colorIndex);
                 vData.applyToMesh(sleeperMesh);
                 sleeperMesh.freezeWorldMatrix();
             });
@@ -2695,7 +2733,7 @@ var MarbleRunSimulatorCore;
             if (!isFinite(props.groundAnchorsRelativeMaxY)) {
                 props.groundAnchorsRelativeMaxY = 1;
             }
-            let q = part.game.getGraphicQ();
+            let q = part.game.getGeometryQ();
             let partialsDatas = [];
             for (let j = 0; j < part.tracks.length; j++) {
                 let track = part.tracks[j];
@@ -3628,25 +3666,25 @@ var MarbleRunSimulatorCore;
             let supportData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 2);
             supportData = Mummu.MergeVertexDatas(axisControlerVertexData, axisPassVertexData, supportData);
             supportData.applyToMesh(this.support);
-            this.support.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            this.support.material = this.game.materials.getMaterial(this.getColor(4));
             let cog8Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 0);
             cog8Data = Mummu.CloneVertexData(cog8Data);
             Mummu.TranslateVertexDataInPlace(cog8Data, new BABYLON.Vector3(0, 0, -MarbleRunSimulatorCore.tileDepth * 0.5));
             cog8Data.applyToMesh(this.cog8);
-            this.cog8.material = this.game.materials.getMetalMaterial(this.getColor(5));
+            this.cog8.material = this.game.materials.getMaterial(this.getColor(5));
             let cog13Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 1);
             cog13Data = Mummu.CloneVertexData(cog13Data);
             Mummu.TranslateVertexDataInPlace(cog13Data, new BABYLON.Vector3(0, 0, -MarbleRunSimulatorCore.tileDepth * 0.5));
             cog13Data.applyToMesh(this.cog13);
-            this.cog13.material = this.game.materials.getMetalMaterial(this.getColor(5));
+            this.cog13.material = this.game.materials.getMaterial(this.getColor(5));
             let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
             arrowData = Mummu.CloneVertexData(arrowData);
             Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
             arrowData.applyToMesh(this.pivotPass);
-            this.pivotPass.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            this.pivotPass.material = this.game.materials.getMaterial(this.getColor(4));
             let triggerData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 0);
             triggerData.applyToMesh(this.pivotControler);
-            this.pivotControler.material = this.game.materials.getMetalMaterial(this.getColor(5));
+            this.pivotControler.material = this.game.materials.getMaterial(this.getColor(5));
             let triggerColliderData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 1);
             triggerColliderData.applyToMesh(this.pivotControlerCollider);
         }
@@ -3879,8 +3917,8 @@ var MarbleRunSimulatorCore;
             let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 0);
             wheelData.applyToMesh(this.wheels[0]);
             wheelData.applyToMesh(this.wheels[1]);
-            this.wheels[0].material = this.game.materials.getMetalMaterial(0);
-            this.wheels[1].material = this.game.materials.getMetalMaterial(0);
+            this.wheels[0].material = this.game.materials.getMaterial(0);
+            this.wheels[1].material = this.game.materials.getMaterial(0);
         }
         static GenerateTemplate(h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -4116,7 +4154,7 @@ var MarbleRunSimulatorCore;
             this.wellMesh = BABYLON.MeshBuilder.CreateLathe("gravitywell-mesh", { shape: this.wellPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
             this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
-            this.wellMesh.material = this.machine.game.materials.getMetalMaterial(0);
+            this.wellMesh.material = this.machine.game.materials.getMaterial(0);
             BABYLON.CreateTorusVertexData({ diameter: MarbleRunSimulatorCore.tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
             this.circleTop.material = this.wellMesh.material;
             BABYLON.CreateTorusVertexData({ diameter: 0.01 * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleBottom);
@@ -4622,19 +4660,19 @@ var MarbleRunSimulatorCore;
             shieldData = Mummu.CloneVertexData(shieldData);
             Mummu.ScaleVertexDataInPlace(shieldData, 0.024);
             shieldData.applyToMesh(this.shieldConnector);
-            this.shieldConnector.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            this.shieldConnector.material = this.game.materials.getMaterial(this.getColor(4));
             if (this.shieldConnectorUp) {
                 let shieldDataUp = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/uConnector.babylon", 0);
                 shieldDataUp = Mummu.CloneVertexData(shieldDataUp);
                 Mummu.ScaleVertexDataInPlace(shieldDataUp, 0.033);
                 shieldDataUp.applyToMesh(this.shieldConnectorUp);
-                this.shieldConnectorUp.material = this.game.materials.getMetalMaterial(this.getColor(4));
+                this.shieldConnectorUp.material = this.game.materials.getMaterial(this.getColor(4));
             }
             let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 1);
             wheelData = Mummu.CloneVertexData(wheelData);
             Mummu.ScaleVertexDataInPlace(wheelData, 1.05);
             wheelData.applyToMesh(this.wheel);
-            this.wheel.material = this.game.materials.getMetalMaterial(this.getColor(2));
+            this.wheel.material = this.game.materials.getMaterial(this.getColor(2));
         }
         static GenerateTemplate(w, h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -4787,17 +4825,17 @@ var MarbleRunSimulatorCore;
             if (kickerDatas[1]) {
                 kickerDatas[1].applyToMesh(body);
             }
-            body.material = this.game.materials.getMetalMaterial(this.getColor(1));
+            body.material = this.game.materials.getMaterial(this.getColor(1));
             let weight = new BABYLON.Mesh("kicker-weight");
             weight.parent = this.kicker;
             if (kickerDatas[2]) {
                 kickerDatas[2].applyToMesh(weight);
             }
-            weight.material = this.game.materials.getMetalMaterial(this.getColor(3));
+            weight.material = this.game.materials.getMaterial(this.getColor(3));
             if (kickerDatas[4]) {
                 kickerDatas[4].applyToMesh(this.base);
             }
-            this.base.material = this.game.materials.getMetalMaterial(this.getColor(2));
+            this.base.material = this.game.materials.getMaterial(this.getColor(2));
             if (kickerDatas[3]) {
                 kickerDatas[3].applyToMesh(this.kickerCollider);
                 this.kickerCollider.isVisible = false;
@@ -4806,7 +4844,7 @@ var MarbleRunSimulatorCore;
             if (shieldDatas[0]) {
                 shieldDatas[0].applyToMesh(this.shield);
             }
-            this.shield.material = this.game.materials.getMetalMaterial(this.getColor(3));
+            this.shield.material = this.game.materials.getMaterial(this.getColor(3));
             if (shieldDatas[1]) {
                 shieldDatas[1].applyToMesh(this.shieldCollider);
                 this.shieldCollider.isVisible = false;
@@ -5378,7 +5416,7 @@ var MarbleRunSimulatorCore;
             Mummu.RotateVertexDataInPlace(tmpVertexData, q);
             Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (this.axisZMax + this.axisZMin) * 0.5));
             anchorDatas.push(tmpVertexData);
-            this.anchor.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            this.anchor.material = this.game.materials.getMaterial(this.getColor(4));
             Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(this.anchor);
             let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
             if (arrowData) {
@@ -5386,7 +5424,7 @@ var MarbleRunSimulatorCore;
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
                 arrowData.applyToMesh(this.pivot);
             }
-            this.pivot.material = this.game.materials.getMetalMaterial(this.getColor(4));
+            this.pivot.material = this.game.materials.getMaterial(this.getColor(4));
         }
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -5615,7 +5653,7 @@ var MarbleRunSimulatorCore;
                 BABYLON.VertexData.ComputeNormals(vertexData.positions, vertexData.indices, normals);
                 vertexData.normals = normals;
                 vertexData.applyToMesh(this.bielles[i]);
-                this.bielles[i].material = this.game.materials.getMetalMaterial(this.getColor(2));
+                this.bielles[i].material = this.game.materials.getMaterial(this.getColor(2));
                 let stepVertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-step.babylon", 0);
                 stepVertexData = Mummu.CloneVertexData(stepVertexData);
                 positions = stepVertexData.positions;
@@ -5663,7 +5701,7 @@ var MarbleRunSimulatorCore;
                 stepVertexData.positions = positions;
                 stepVertexData.applyToMesh(this.boxesDisplayedMesh[i]);
                 this.boxesDisplayedMesh[i].parent = this.boxesColliders[i];
-                this.boxesDisplayedMesh[i].material = this.game.materials.getMetalMaterial(this.getColor(1));
+                this.boxesDisplayedMesh[i].material = this.game.materials.getMaterial(this.getColor(1));
             }
             let vertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-vil.babylon", 0);
             vertexData = Mummu.CloneVertexData(vertexData);
@@ -5708,7 +5746,7 @@ var MarbleRunSimulatorCore;
             Mummu.RotateVertexDataInPlace(wheel1Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI * 0.5));
             Mummu.TranslateVertexDataInPlace(wheel1Data, new BABYLON.Vector3(this.x1 + 0.001, 0, 0));
             Mummu.MergeVertexDatas(...vilPartsDatas, wheel0Data, wheel1Data).applyToMesh(this.vil);
-            this.vil.material = this.game.materials.getMetalMaterial(this.getColor(3));
+            this.vil.material = this.game.materials.getMaterial(this.getColor(3));
         }
         static GenerateTemplate(w, h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -6123,7 +6161,7 @@ var MarbleRunSimulatorCore;
             let note = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note);
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile.material = this.game.materials.getMetalMaterial(0);
+            tile.material = this.game.materials.getMaterial(0);
             tile.position.copyFrom(ting.position);
             tile.rotation.copyFrom(ting.rotation);
             tile.parent = this;
@@ -6189,7 +6227,7 @@ var MarbleRunSimulatorCore;
             let note = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note);
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile.material = this.game.materials.getMetalMaterial(0);
+            tile.material = this.game.materials.getMaterial(0);
             tile.position.copyFrom(ting.position);
             tile.rotation.copyFrom(ting.rotation);
             tile.parent = this;
@@ -6209,7 +6247,7 @@ var MarbleRunSimulatorCore;
             let note2 = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note2);
             let tile2 = BABYLON.MeshBuilder.CreateBox("tile2", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile2.material = this.game.materials.getMetalMaterial(0);
+            tile2.material = this.game.materials.getMaterial(0);
             tile2.position.copyFrom(ting2.position);
             tile2.rotation.copyFrom(ting2.rotation);
             tile2.parent = this;
@@ -6266,7 +6304,7 @@ var MarbleRunSimulatorCore;
                 let steel = new BABYLON.Mesh("steel");
                 vertexDatas[1].applyToMesh(steel);
                 steel.parent = this;
-                steel.material = this.room.game.materials.getMetalMaterial(0);
+                steel.material = this.room.game.materials.getMaterial(0);
                 steel.layerMask = 0x10000000;
             }
             if (vertexDatas && vertexDatas[2]) {
@@ -6337,7 +6375,7 @@ var MarbleRunSimulatorCore;
             this.wall.parent = this.ground;
             this.frame = new BABYLON.Mesh("room-frame");
             this.frame.layerMask = 0x10000000;
-            this.frame.material = this.game.materials.getMetalMaterial(0);
+            this.frame.material = this.game.materials.getMaterial(0);
             this.frame.parent = this.ground;
             this.light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 3, 0).normalize(), this.game.scene);
             this.light1.groundColor.copyFromFloats(0.3, 0.3, 0.3);
@@ -6401,12 +6439,12 @@ var MarbleRunSimulatorCore;
             paint41.position.copyFromFloats(-2.8, 0, 4.5);
             paint41.rotation.y = Math.PI;
             paint41.parent = this.ground;
-            let sculpt1 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMetalMaterial(0));
+            let sculpt1 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(0));
             sculpt1.instantiate();
             sculpt1.position.copyFromFloats(4.5, 0, 0);
             sculpt1.rotation.y = -0.5 * Math.PI;
             sculpt1.parent = this.ground;
-            let sculpt2 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMetalMaterial(1));
+            let sculpt2 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(1));
             sculpt2.instantiate();
             sculpt2.position.copyFromFloats(-4.5, 0, 0);
             sculpt2.rotation.y = 0.5 * Math.PI;

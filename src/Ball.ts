@@ -123,10 +123,10 @@ namespace MarbleRunSimulatorCore {
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
             let segmentsCount = 6;
-            if (this.game.getGraphicQ() === 1) {
+            if (this.game.getGeometryQ() === GeometryQuality.Medium) {
                 segmentsCount = 10;
             }
-            else if (this.game.getGraphicQ() === 2) {
+            else if (this.game.getGeometryQ() === GeometryQuality.High) {
                 segmentsCount = 14;
             }
             let data = BABYLON.CreateSphereVertexData({ diameter: this.size, segments: segmentsCount});

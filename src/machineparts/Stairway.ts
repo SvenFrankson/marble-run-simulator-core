@@ -135,7 +135,7 @@ namespace MarbleRunSimulatorCore {
                 vertexData.normals = normals;
                 vertexData.applyToMesh(this.bielles[i]);
 
-                this.bielles[i].material = this.game.materials.getMetalMaterial(this.getColor(2));
+                this.bielles[i].material = this.game.materials.getMaterial(this.getColor(2));
 
                 let stepVertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-step.babylon", 0);
                 stepVertexData = Mummu.CloneVertexData(stepVertexData);
@@ -185,7 +185,7 @@ namespace MarbleRunSimulatorCore {
                 stepVertexData.applyToMesh(this.boxesDisplayedMesh[i]);
                 this.boxesDisplayedMesh[i].parent = this.boxesColliders[i];
 
-                this.boxesDisplayedMesh[i].material = this.game.materials.getMetalMaterial(this.getColor(1));
+                this.boxesDisplayedMesh[i].material = this.game.materials.getMaterial(this.getColor(1));
             }
 
             let vertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-vil.babylon", 0);
@@ -240,7 +240,7 @@ namespace MarbleRunSimulatorCore {
 
             Mummu.MergeVertexDatas(...vilPartsDatas, wheel0Data, wheel1Data).applyToMesh(this.vil);
 
-            this.vil.material = this.game.materials.getMetalMaterial(this.getColor(3));
+            this.vil.material = this.game.materials.getMaterial(this.getColor(3));
         }
 
         public static GenerateTemplate(w: number, h: number, mirrorX: boolean) {

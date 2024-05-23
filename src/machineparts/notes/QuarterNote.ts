@@ -37,7 +37,7 @@ namespace MarbleRunSimulatorCore {
             this.notes.push(note);
 
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile.material = this.game.materials.getMetalMaterial(0);
+            tile.material = this.game.materials.getMaterial(0);
             tile.position.copyFrom(ting.position);
             tile.rotation.copyFrom(ting.rotation);
             tile.parent = this;
@@ -121,7 +121,7 @@ namespace MarbleRunSimulatorCore {
             this.notes.push(note);
 
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile.material = this.game.materials.getMetalMaterial(0);
+            tile.material = this.game.materials.getMaterial(0);
             tile.position.copyFrom(ting.position);
             tile.rotation.copyFrom(ting.rotation);
             tile.parent = this;
@@ -145,7 +145,7 @@ namespace MarbleRunSimulatorCore {
             this.notes.push(note2);
 
             let tile2 = BABYLON.MeshBuilder.CreateBox("tile2", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile2.material = this.game.materials.getMetalMaterial(0);
+            tile2.material = this.game.materials.getMaterial(0);
             tile2.position.copyFrom(ting2.position);
             tile2.rotation.copyFrom(ting2.rotation);
             tile2.parent = this;

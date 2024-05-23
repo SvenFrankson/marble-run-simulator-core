@@ -26,7 +26,7 @@ namespace MarbleRunSimulatorCore {
 
             this.frame = new BABYLON.Mesh("room-frame");
             this.frame.layerMask = 0x10000000;
-            this.frame.material = this.game.materials.getMetalMaterial(0);
+            this.frame.material = this.game.materials.getMaterial(0);
             this.frame.parent = this.ground;
 
             this.light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 3, 0).normalize(), this.game.scene);
@@ -105,13 +105,13 @@ namespace MarbleRunSimulatorCore {
             paint41.rotation.y = Math.PI;
             paint41.parent = this.ground;
 
-            let sculpt1 = new Sculpt(this, this.game.materials.getMetalMaterial(0));
+            let sculpt1 = new Sculpt(this, this.game.materials.getMaterial(0));
             sculpt1.instantiate();
             sculpt1.position.copyFromFloats(4.5, 0, 0);
             sculpt1.rotation.y = -0.5 * Math.PI;
             sculpt1.parent = this.ground;
 
-            let sculpt2 = new Sculpt(this, this.game.materials.getMetalMaterial(1));
+            let sculpt2 = new Sculpt(this, this.game.materials.getMaterial(1));
             sculpt2.instantiate();
             sculpt2.position.copyFromFloats(-4.5, 0, 0);
             sculpt2.rotation.y = 0.5 * Math.PI;

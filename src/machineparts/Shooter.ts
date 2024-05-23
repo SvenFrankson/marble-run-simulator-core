@@ -144,19 +144,19 @@ namespace MarbleRunSimulatorCore {
             if (kickerDatas[1]) {
                 kickerDatas[1].applyToMesh(body);
             }
-            body.material = this.game.materials.getMetalMaterial(this.getColor(1));
+            body.material = this.game.materials.getMaterial(this.getColor(1));
 
             let weight = new BABYLON.Mesh("kicker-weight");
             weight.parent = this.kicker;
             if (kickerDatas[2]) {
                 kickerDatas[2].applyToMesh(weight);
             }
-            weight.material = this.game.materials.getMetalMaterial(this.getColor(3));
+            weight.material = this.game.materials.getMaterial(this.getColor(3));
 
             if (kickerDatas[4]) {
                 kickerDatas[4].applyToMesh(this.base);
             }
-            this.base.material = this.game.materials.getMetalMaterial(this.getColor(2));
+            this.base.material = this.game.materials.getMaterial(this.getColor(2));
 
             if (kickerDatas[3]) {
                 kickerDatas[3].applyToMesh(this.kickerCollider);
@@ -168,7 +168,7 @@ namespace MarbleRunSimulatorCore {
             if (shieldDatas[0]) {
                 shieldDatas[0].applyToMesh(this.shield);
             }
-            this.shield.material = this.game.materials.getMetalMaterial(this.getColor(3));
+            this.shield.material = this.game.materials.getMaterial(this.getColor(3));
             
             if (shieldDatas[1]) {
                 shieldDatas[1].applyToMesh(this.shieldCollider);

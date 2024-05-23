@@ -11,6 +11,24 @@ namespace MarbleRunSimulatorCore {
     var ballOffset = 23328; // it's 36 * 36 * 36 / 2
     var partOffset = 648; // it's 36 * 36 / 2
 
+    export enum GraphicQuality {
+        Low,
+        Medium,
+        High,
+        Ultra
+    }
+
+    export enum GeometryQuality {
+        Low,
+        Medium,
+        High
+    }
+
+    export enum MaterialQuality {
+        Standard,
+        PBR
+    }
+
     export interface IGame {
         scene: BABYLON.Scene;
         DEBUG_MODE: boolean;
@@ -21,7 +39,9 @@ namespace MarbleRunSimulatorCore {
         machine: Machine;
         mode: GameMode;
         shadowGenerator: BABYLON.ShadowGenerator;
-        getGraphicQ: () => number;
+        getGraphicQ: () => GraphicQuality;
+        getGeometryQ: () => GeometryQuality;
+        getMaterialQ: () => MaterialQuality;
         gridIMin: number;
         gridIMax: number;
         gridJMin: number;
@@ -366,7 +386,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 this.baseFrame = new BABYLON.Mesh("base-frame");
                 this.baseFrame.position.copyFrom(this.pedestalTop.position);
-                this.baseFrame.material = this.game.materials.getMetalMaterial(0);
+                this.baseFrame.material = this.game.materials.getMaterial(0);
 
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/base-frame.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);

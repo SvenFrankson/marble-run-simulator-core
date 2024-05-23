@@ -14,7 +14,7 @@ namespace MarbleRunSimulatorCore {
                 let steel = new BABYLON.Mesh("steel");
                 vertexDatas[1].applyToMesh(steel);
                 steel.parent = this;
-                steel.material = this.room.game.materials.getMetalMaterial(0);
+                steel.material = this.room.game.materials.getMaterial(0);
                 steel.layerMask = 0x10000000;
             }
             if (vertexDatas && vertexDatas[2]) {

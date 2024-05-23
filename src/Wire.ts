@@ -59,7 +59,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(color: number = 0): Promise<void> {
-            let q = this.track.game.getGraphicQ();
+            let q = this.track.game.getGeometryQ();
 
             while (this.getChildren().length > 0) {
                 this.getChildren()[0].dispose();
@@ -117,7 +117,7 @@ namespace MarbleRunSimulatorCore {
 
                 let wire = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 wire.parent = this;
-                wire.material = this.track.game.materials.getMetalMaterial(color);
+                wire.material = this.track.game.materials.getMaterial(color);
             }
 
             if (Wire.DEBUG_DISPLAY) {
