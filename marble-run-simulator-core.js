@@ -1961,6 +1961,11 @@ var MarbleRunSimulatorCore;
                         this.game.shadowGenerator.addShadowCaster(this.parts[i], true);
                     }
                 }
+                for (let i = 0; i < 10; i++) {
+                    if (i < this.balls.length) {
+                        this.game.shadowGenerator.addShadowCaster(this.balls[i], true);
+                    }
+                }
             }
         }
     }
