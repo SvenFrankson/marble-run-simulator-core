@@ -523,9 +523,15 @@ declare namespace MarbleRunSimulatorCore {
         pivotPass: BABYLON.Mesh;
         pivotControler: BABYLON.Mesh;
         pivotControlerCollider: BABYLON.Mesh;
+        support: BABYLON.Mesh;
+        cog13: BABYLON.Mesh;
+        cog8: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
         clicSound: BABYLON.Sound;
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;

@@ -5,6 +5,12 @@ namespace MarbleRunSimulatorCore {
         public pivotPass: BABYLON.Mesh;
         public pivotControler: BABYLON.Mesh;
         public pivotControlerCollider: BABYLON.Mesh;
+        public support: BABYLON.Mesh;
+        public cog13: BABYLON.Mesh;
+        public cog8: BABYLON.Mesh;
+
+        public axisZMin: number = 0;
+        public axisZMax: number = 1;
         
         public clicSound: BABYLON.Sound;
 
@@ -25,74 +31,31 @@ namespace MarbleRunSimulatorCore {
 
             let rCurb = Controler.pivotL * 0.3;
 
-            let axisZMin = - this.wireGauge * 0.6 - tileDepth;
-            let axisZMax = this.wireGauge * 0.6;
-
-            let q = Mummu.QuaternionFromYZAxis(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0));
-            let axisPassVertexData = BABYLON.CreateCylinderVertexData({ height: tileDepth * 0.5 + this.wireGauge * 1.2, diameter: 0.001 });
-            Mummu.RotateVertexDataInPlace(axisPassVertexData, q);
-            Mummu.TranslateVertexDataInPlace(axisPassVertexData, new BABYLON.Vector3(0, 0, - 0.25 * tileDepth));
-
-            let axisControlerVertexData = BABYLON.CreateCylinderVertexData({ height: tileDepth * 0.5 + this.wireGauge * 1.2, diameter: 0.001 });
-            Mummu.RotateVertexDataInPlace(axisControlerVertexData, q);
-            Mummu.TranslateVertexDataInPlace(axisControlerVertexData, new BABYLON.Vector3(0, tileHeight, 0.25 * tileDepth));
+            this.axisZMin = - this.wireGauge * 0.6 - tileDepth;
+            this.axisZMax = this.wireGauge * 0.6;
 
             this.pivotPass = new BABYLON.Mesh("pivotPass");
             this.pivotPass.position.copyFromFloats(0, -tileHeight * 0.5, 0);
-            this.pivotPass.material = this.game.materials.getMetalMaterial(this.getColor(4));
             this.pivotPass.parent = this;
             let dz = this.wireGauge * 0.5;
 
-            let cog13 = new BABYLON.Mesh("cog13");
-            cog13.material = this.game.materials.getMetalMaterial(this.getColor(5));
-            cog13.parent = this.pivotPass;
+            this.cog13 = new BABYLON.Mesh("cog13");
+            this.cog13.parent = this.pivotPass;
 
             this.pivotControler = new BABYLON.Mesh("pivotControler");
             this.pivotControler.position.copyFromFloats(0, tileHeight * 0.5, 0);
-            this.pivotControler.material = this.game.materials.getMetalMaterial(this.getColor(5));
             this.pivotControler.parent = this;
 
             this.pivotControlerCollider = new BABYLON.Mesh("collider-trigger");
             this.pivotControlerCollider.isVisible = false;
             this.pivotControlerCollider.parent = this.pivotControler;
 
-            let cog8 = new BABYLON.Mesh("cog8");
-            cog8.material = this.game.materials.getMetalMaterial(this.getColor(5));
-            cog8.parent = this.pivotControler;
+            this.cog8 = new BABYLON.Mesh("cog8");
+            this.cog8.parent = this.pivotControler;
 
-            let support = new BABYLON.Mesh("support");
-            support.position.copyFromFloats(0, -tileHeight * 0.5, - tileDepth * 0.5);
-            support.parent = this;
-            support.material = this.game.materials.getMetalMaterial(this.getColor(4));
-
-            let loadMeshes = async () => {
-                let supportData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 2);
-                supportData = Mummu.MergeVertexDatas(axisControlerVertexData, axisPassVertexData, supportData);
-                supportData.applyToMesh(support);
-
-                let cog8Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 0);
-                cog8Data = Mummu.CloneVertexData(cog8Data);
-                Mummu.TranslateVertexDataInPlace(cog8Data, new BABYLON.Vector3(0, 0, - tileDepth * 0.5));
-                cog8Data.applyToMesh(cog8);
-
-                let cog13Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 1);
-                cog13Data = Mummu.CloneVertexData(cog13Data);
-                Mummu.TranslateVertexDataInPlace(cog13Data, new BABYLON.Vector3(0, 0, - tileDepth * 0.5));
-                cog13Data.applyToMesh(cog13);
-
-                let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
-                arrowData = Mummu.CloneVertexData(arrowData);
-                Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, axisZMin));
-                arrowData.applyToMesh(this.pivotPass);
-
-                let triggerData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 0);
-                triggerData.applyToMesh(this.pivotControler);
-                
-                let triggerColliderData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 1);
-                triggerColliderData.applyToMesh(this.pivotControlerCollider);
-            }
-
-            loadMeshes();
+            this.support = new BABYLON.Mesh("support");
+            this.support.position.copyFromFloats(0, -tileHeight * 0.5, - tileDepth * 0.5);
+            this.support.parent = this;
 
             let wireVertical0 = new Wire(this);
             wireVertical0.colorIndex = 5;
@@ -136,6 +99,47 @@ namespace MarbleRunSimulatorCore {
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+
+        protected async instantiateMachineSpecific(): Promise<void> {
+            let q = Mummu.QuaternionFromYZAxis(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0));
+            let axisPassVertexData = BABYLON.CreateCylinderVertexData({ height: tileDepth * 0.5 + this.wireGauge * 1.2, diameter: 0.001 });
+            Mummu.RotateVertexDataInPlace(axisPassVertexData, q);
+            Mummu.TranslateVertexDataInPlace(axisPassVertexData, new BABYLON.Vector3(0, 0, - 0.25 * tileDepth));
+
+            let axisControlerVertexData = BABYLON.CreateCylinderVertexData({ height: tileDepth * 0.5 + this.wireGauge * 1.2, diameter: 0.001 });
+            Mummu.RotateVertexDataInPlace(axisControlerVertexData, q);
+            Mummu.TranslateVertexDataInPlace(axisControlerVertexData, new BABYLON.Vector3(0, tileHeight, 0.25 * tileDepth));
+
+            let supportData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 2);
+            supportData = Mummu.MergeVertexDatas(axisControlerVertexData, axisPassVertexData, supportData);
+            supportData.applyToMesh(this.support);
+            this.support.material = this.game.materials.getMetalMaterial(this.getColor(4));
+
+            let cog8Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 0);
+            cog8Data = Mummu.CloneVertexData(cog8Data);
+            Mummu.TranslateVertexDataInPlace(cog8Data, new BABYLON.Vector3(0, 0, - tileDepth * 0.5));
+            cog8Data.applyToMesh(this.cog8);
+            this.cog8.material = this.game.materials.getMetalMaterial(this.getColor(5));
+
+            let cog13Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 1);
+            cog13Data = Mummu.CloneVertexData(cog13Data);
+            Mummu.TranslateVertexDataInPlace(cog13Data, new BABYLON.Vector3(0, 0, - tileDepth * 0.5));
+            cog13Data.applyToMesh(this.cog13);
+            this.cog13.material = this.game.materials.getMetalMaterial(this.getColor(5));
+
+            let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
+            arrowData = Mummu.CloneVertexData(arrowData);
+            Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
+            arrowData.applyToMesh(this.pivotPass);
+            this.pivotPass.material = this.game.materials.getMetalMaterial(this.getColor(4));
+
+            let triggerData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 0);
+            triggerData.applyToMesh(this.pivotControler);
+            this.pivotControler.material = this.game.materials.getMetalMaterial(this.getColor(5));
+            
+            let triggerColliderData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 1);
+            triggerColliderData.applyToMesh(this.pivotControlerCollider);
         }
 
         public static GenerateTemplate(mirrorX: boolean) {
