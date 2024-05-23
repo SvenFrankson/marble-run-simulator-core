@@ -371,9 +371,12 @@ namespace MarbleRunSimulatorCore {
                         ballArmed.flybackOrigin = ballArmed.position.clone();
                         ballArmed.flybackDestination = ballArmed.positionZero.clone();
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
-                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + 1.2;
+                        let d = BABYLON.Vector3.Distance(ballArmed.flybackOrigin, ballArmed.flybackDestination);
+                        d = Math.max(d, 0.4);
+                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + d * 2;
                         ballArmed.flyBackProgress = 0;
-                        ballArmed.flyBackDuration = BABYLON.Vector3.Distance(ballArmed.flybackOrigin, ballArmed.flybackDestination) * 2;
+                        ballArmed.flyBackDuration = d * 0.8;
+                        console.log("distance " + d);
                         ballArmed.collisionState = CollisionState.Flyback;
                         this.currentShootState = 4;
                     }
