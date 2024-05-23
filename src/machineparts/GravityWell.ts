@@ -2,6 +2,8 @@ namespace MarbleRunSimulatorCore {
     export class GravityWell extends MachinePart {
         public wellPath: BABYLON.Vector3[] = [];
         public wellMesh: BABYLON.Mesh;
+        public circleTop: BABYLON.Mesh;
+        public circleBottom: BABYLON.Mesh;
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
@@ -17,23 +19,38 @@ namespace MarbleRunSimulatorCore {
 
             this.wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
             this.wellPath.push(new BABYLON.Vector3(tileWidth, tileHeight * 1, 0));
-            this.wellMesh = BABYLON.MeshBuilder.CreateLathe("gravitywell-mesh", { shape: this.wellPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
-            this.wellMesh.material = machine.game.materials.getMetalMaterial(0);
 
+            this.wellMesh = new BABYLON.Mesh("gravitywell-mesh");
             this.wellMesh.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth);
             this.wellMesh.parent = this;
 
-            let wireTop = BABYLON.MeshBuilder.CreateTorus("wire-top", { diameter: tileWidth * 2, thickness: this.wireSize, tessellation: 32 });
-            wireTop.material = this.wellMesh.material;
-            wireTop.position.y = tileHeight * 1;
-            wireTop.parent = this.wellMesh;
+            this.circleTop = new BABYLON.Mesh("wire-top");
+            this.circleTop.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth).scaleInPlace;
+            this.circleTop.position.y += tileHeight * 1;
+            this.circleTop.parent = this;
 
-            let wireBottom = BABYLON.MeshBuilder.CreateTorus("wire-top", { diameter: 0.01 * 2, thickness: this.wireSize, tessellation: 32 });
-            wireBottom.material = this.wellMesh.material;
-            wireBottom.position.y = -0.01;
-            wireBottom.parent = this.wellMesh;
+            this.circleBottom = new BABYLON.Mesh("wire-top");
+            this.circleBottom.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth).scaleInPlace;
+            this.circleBottom.position.y += -0.01;
+            this.circleBottom.parent = this;
 
             this.generateWires();
+        }
+
+        protected async instantiateMachineSpecific(): Promise<void> {
+            if (this.wellMesh) {
+                this.wellMesh.dispose();
+            }
+            this.wellMesh = BABYLON.MeshBuilder.CreateLathe("gravitywell-mesh", { shape: this.wellPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            this.wellMesh.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth);
+            this.wellMesh.parent = this;
+            this.wellMesh.material = this.machine.game.materials.getMetalMaterial(0);
+            
+            BABYLON.CreateTorusVertexData({ diameter: tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
+            this.circleTop.material = this.wellMesh.material;
+            
+            BABYLON.CreateTorusVertexData({ diameter: 0.01 * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleBottom);
+            this.circleBottom.material = this.wellMesh.material;
         }
 
         public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {

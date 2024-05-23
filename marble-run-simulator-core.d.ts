@@ -576,7 +576,10 @@ declare namespace MarbleRunSimulatorCore {
     class GravityWell extends MachinePart {
         wellPath: BABYLON.Vector3[];
         wellMesh: BABYLON.Mesh;
+        circleTop: BABYLON.Mesh;
+        circleBottom: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
     }
 }
