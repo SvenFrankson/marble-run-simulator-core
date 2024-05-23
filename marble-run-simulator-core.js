@@ -205,12 +205,13 @@ var MarbleRunSimulatorCore;
             let sign = Math.sign(this.velocity.y);
             if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.2) {
                 this.collisionState = CollisionState.Inside;
+                this.marbleBowlInsideSound.setPlaybackRate(this.game.currentTimeFactor);
                 this.marbleBowlInsideSound.play();
                 setTimeout(() => {
                     this.collisionState = CollisionState.Exit;
                     this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
                     this.velocity.copyFromFloats(0, 0, -0.2);
-                }, 2700);
+                }, 2700 / this.game.currentTimeFactor);
             }
             this._timer += dt * this.game.currentTimeFactor;
             this._timer = Math.min(this._timer, 1);
@@ -489,6 +490,7 @@ var MarbleRunSimulatorCore;
                                 if (v > 0.15) {
                                     if (!this.marbleChocSound.isPlaying) {
                                         this.marbleChocSound.setVolume(((v - 0.15) / 0.85) * this.game.mainVolume);
+                                        this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.marbleChocSound.play();
                                     }
                                 }
@@ -515,12 +517,14 @@ var MarbleRunSimulatorCore;
                         if (this.bumpSurfaceIsRail) {
                             if (!this.railBumpSound.isPlaying) {
                                 this.railBumpSound.setVolume(v);
+                                this.railBumpSound.setPlaybackRate(this.game.currentTimeFactor);
                                 this.railBumpSound.play();
                             }
                         }
                         else {
                             if (!this.marbleChocSound.isPlaying) {
                                 this.marbleChocSound.setVolume(v * 4);
+                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                                 this.marbleChocSound.play();
                             }
                         }
@@ -559,7 +563,7 @@ var MarbleRunSimulatorCore;
             this.lastPosition.copyFrom(this.position);
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
-                    this.flyBackProgress += dt / this.flyBackDuration;
+                    this.flyBackProgress += dt * this.game.currentTimeFactor / this.flyBackDuration;
                     let dirOrigin = this.flybackPeak.subtract(this.flybackOrigin);
                     let dirDestination = this.flybackDestination.subtract(this.flybackPeak);
                     let f = this.flyBackProgress;
@@ -576,11 +580,13 @@ var MarbleRunSimulatorCore;
             }
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
-                this.marbleLoopSound.setVolume(4 * this.strReaction * f * this.game.timeFactor * this.game.mainVolume);
+                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor);
+                this.marbleLoopSound.setVolume(6 * this.strReaction * f * this.game.mainVolume);
                 this.marbleBowlLoopSound.setVolume(0, 0.5);
             }
             else if (this.surface === Surface.Bowl) {
-                this.marbleBowlLoopSound.setVolume(10 * this.strReaction * f * this.game.timeFactor * this.game.mainVolume);
+                this.marbleBowlLoopSound.setPlaybackRate(this.game.currentTimeFactor);
+                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume);
                 this.marbleLoopSound.setVolume(0, 0.5);
             }
             let sign2 = Math.sign(this.velocity.y);
@@ -1044,7 +1050,7 @@ var MarbleRunSimulatorCore;
             this.name = MachineName.GetRandom();
             this.trackFactory = new MarbleRunSimulatorCore.MachinePartFactory(this);
             this.templateManager = new MarbleRunSimulatorCore.TemplateManager(this);
-            this.exitShooter = new MarbleRunSimulatorCore.Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 4, 3] });
+            this.exitShooter = new MarbleRunSimulatorCore.Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 6, 3] });
             this.exitShooter.isSelectable = false;
             this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitShooter.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
@@ -4456,9 +4462,7 @@ var MarbleRunSimulatorCore;
                 for (let n = 1; n < template.trackTemplates[0].trackpoints.length - 1; n++) {
                     let trackpoint = template.trackTemplates[0].trackpoints[n];
                     let dx = (trackpoint.position.x - (-MarbleRunSimulatorCore.tileWidth * 0.5)) / widthInM;
-                    console.log(dx);
                     let tmpPoint = BABYLON.Vector3.Hermite(tmpStart, tmpDir, tmpEnd, tmpDir, dx);
-                    console.log(tmpPoint.y);
                     trackpoint.position.y = tmpPoint.y;
                 }
             }
@@ -4907,6 +4911,7 @@ var MarbleRunSimulatorCore;
                     this.shieldCollider.freezeWorldMatrix();
                 }
                 else {
+                    this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                     this.clicSound.play();
                     this.shield.position.y = this.shieldYClosed;
                     this.shield.freezeWorldMatrix();
@@ -4920,6 +4925,7 @@ var MarbleRunSimulatorCore;
                     this.shieldCollider.freezeWorldMatrix();
                 }
                 else {
+                    this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                     this.clicSound.play();
                     this.shield.position.y = this.shieldYClosed + this.shieldLength;
                     this.shield.freezeWorldMatrix();
@@ -4944,6 +4950,7 @@ var MarbleRunSimulatorCore;
                 this.hasCollidingKicker = true;
                 this.currentShootState = 1.5;
                 this.animateKickerArm(this.kickerYIdle - this.kickerLength, 1.5 / this.game.currentTimeFactor).then(() => {
+                    this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                     this.clicSound.play();
                     this.delayTimeout = setTimeout(() => {
                         this.currentShootState = 2;
@@ -4971,10 +4978,9 @@ var MarbleRunSimulatorCore;
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
                         let d = BABYLON.Vector3.Distance(ballArmed.flybackOrigin, ballArmed.flybackDestination);
                         d = Math.max(d, 0.4);
-                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + d * 2;
+                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + d * 3;
                         ballArmed.flyBackProgress = 0;
-                        ballArmed.flyBackDuration = d * 0.8;
-                        console.log("distance " + d);
+                        ballArmed.flyBackDuration = d * 1;
                         ballArmed.collisionState = MarbleRunSimulatorCore.CollisionState.Flyback;
                         this.currentShootState = 4;
                     }
@@ -4997,6 +5003,7 @@ var MarbleRunSimulatorCore;
                 let ballReady = this.getBallReady();
                 if (ballReady) {
                     ballReady.marbleChocSound.setVolume(2);
+                    ballReady.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                     ballReady.marbleChocSound.play();
                 }
                 this.animateKickerKick(this.kickerYIdle, 0.8 / this.game.currentTimeFactor).then(() => {
@@ -5454,6 +5461,7 @@ var MarbleRunSimulatorCore;
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
                                         this._moving = false;
                                     });
@@ -5464,6 +5472,7 @@ var MarbleRunSimulatorCore;
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
                                         this._moving = false;
                                     });

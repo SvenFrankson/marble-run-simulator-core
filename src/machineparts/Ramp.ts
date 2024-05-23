@@ -147,10 +147,8 @@ namespace MarbleRunSimulatorCore {
                 for (let n = 1; n < template.trackTemplates[0].trackpoints.length - 1; n++) {
                     let trackpoint = template.trackTemplates[0].trackpoints[n];
                     let dx = (trackpoint.position.x - (-tileWidth * 0.5)) / widthInM;
-                    console.log(dx);
 
                     let tmpPoint = BABYLON.Vector3.Hermite(tmpStart, tmpDir, tmpEnd, tmpDir, dx);
-                    console.log(tmpPoint.y);
                     trackpoint.position.y = tmpPoint.y;
                 }
             }

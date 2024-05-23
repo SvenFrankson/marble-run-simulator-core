@@ -261,7 +261,7 @@ namespace MarbleRunSimulatorCore {
             this.shield.position.y = this.shieldYClosed + this.shieldLength;
             this.shield.freezeWorldMatrix();
             this.shieldCollider.freezeWorldMatrix();
-            
+
             this.currentShootState = 0;
             let x = 1;
             if (this.mirrorX) {
@@ -317,6 +317,7 @@ namespace MarbleRunSimulatorCore {
                     this.shieldCollider.freezeWorldMatrix();
                 }
                 else {
+                    this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                     this.clicSound.play();
                     this.shield.position.y = this.shieldYClosed;
                     this.shield.freezeWorldMatrix();
@@ -330,6 +331,7 @@ namespace MarbleRunSimulatorCore {
                     this.shieldCollider.freezeWorldMatrix();
                 }
                 else {
+                    this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                     this.clicSound.play();
                     this.shield.position.y = this.shieldYClosed + this.shieldLength;
                     this.shield.freezeWorldMatrix();
@@ -357,6 +359,7 @@ namespace MarbleRunSimulatorCore {
 
                 this.currentShootState = 1.5;
                 this.animateKickerArm(this.kickerYIdle - this.kickerLength, 1.5  / this.game.currentTimeFactor).then(() => {
+                    this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                     this.clicSound.play();
                     this.delayTimeout = setTimeout(() => {
                         this.currentShootState = 2;
@@ -386,10 +389,9 @@ namespace MarbleRunSimulatorCore {
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
                         let d = BABYLON.Vector3.Distance(ballArmed.flybackOrigin, ballArmed.flybackDestination);
                         d = Math.max(d, 0.4);
-                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + d * 2;
+                        ballArmed.flybackPeak.y = Math.max(ballArmed.flybackOrigin.y, ballArmed.flybackDestination.y) + d * 3;
                         ballArmed.flyBackProgress = 0;
-                        ballArmed.flyBackDuration = d * 0.8;
-                        console.log("distance " + d);
+                        ballArmed.flyBackDuration = d * 1;
                         ballArmed.collisionState = CollisionState.Flyback;
                         this.currentShootState = 4;
                     }
@@ -413,6 +415,7 @@ namespace MarbleRunSimulatorCore {
                 let ballReady = this.getBallReady();
                 if (ballReady) {
                     ballReady.marbleChocSound.setVolume(2);
+                    ballReady.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                     ballReady.marbleChocSound.play();
                 }
                 this.animateKickerKick(this.kickerYIdle, 0.8  / this.game.currentTimeFactor).then(() => {

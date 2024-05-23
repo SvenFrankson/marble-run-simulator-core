@@ -264,6 +264,7 @@ namespace MarbleRunSimulatorCore {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play()
                                         this._moving = false;
                                     });
@@ -273,6 +274,7 @@ namespace MarbleRunSimulatorCore {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                        this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
                                         this._moving = false;
                                     });

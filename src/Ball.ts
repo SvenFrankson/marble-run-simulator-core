@@ -237,12 +237,13 @@ namespace MarbleRunSimulatorCore {
             let sign = Math.sign(this.velocity.y);
             if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.2) {
                 this.collisionState = CollisionState.Inside;
+                this.marbleBowlInsideSound.setPlaybackRate(this.game.currentTimeFactor);
                 this.marbleBowlInsideSound.play();
                 setTimeout(() => {
                     this.collisionState = CollisionState.Exit;
                     this.position.copyFrom(this.machine.exitHoleOut.absolutePosition);
                     this.velocity.copyFromFloats(0, 0, - 0.2);
-                }, 2700);
+                }, 2700 / this.game.currentTimeFactor);
             }
 
             this._timer += dt * this.game.currentTimeFactor;
@@ -539,6 +540,7 @@ namespace MarbleRunSimulatorCore {
                                 if (v > 0.15) {
                                     if (!this.marbleChocSound.isPlaying) {
                                         this.marbleChocSound.setVolume(((v - 0.15) / 0.85) * this.game.mainVolume);
+                                        this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.marbleChocSound.play();
                                     }
                                 }
@@ -568,12 +570,14 @@ namespace MarbleRunSimulatorCore {
                         if (this.bumpSurfaceIsRail) {
                             if (!this.railBumpSound.isPlaying) {
                                 this.railBumpSound.setVolume(v);
+                                this.railBumpSound.setPlaybackRate(this.game.currentTimeFactor);
                                 this.railBumpSound.play();
                             }
                         }
                         else {
                             if (!this.marbleChocSound.isPlaying) {
                                 this.marbleChocSound.setVolume(v * 4);
+                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                                 this.marbleChocSound.play();
                             }
                         }
@@ -618,7 +622,7 @@ namespace MarbleRunSimulatorCore {
 
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
-                    this.flyBackProgress += dt / this.flyBackDuration;
+                    this.flyBackProgress += dt * this.game.currentTimeFactor / this.flyBackDuration;
                     let dirOrigin = this.flybackPeak.subtract(this.flybackOrigin);
                     let dirDestination = this.flybackDestination.subtract(this.flybackPeak);
                     let f = this.flyBackProgress;
@@ -636,10 +640,12 @@ namespace MarbleRunSimulatorCore {
 
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
-                this.marbleLoopSound.setVolume(4 * this.strReaction * f * this.game.timeFactor * this.game.mainVolume);
+                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor);
+                this.marbleLoopSound.setVolume(6 * this.strReaction * f * this.game.mainVolume);
                 this.marbleBowlLoopSound.setVolume(0, 0.5);
             } else if (this.surface === Surface.Bowl) {
-                this.marbleBowlLoopSound.setVolume(10 * this.strReaction * f * this.game.timeFactor * this.game.mainVolume);
+                this.marbleBowlLoopSound.setPlaybackRate(this.game.currentTimeFactor);
+                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume);
                 this.marbleLoopSound.setVolume(0, 0.5);
             }
             let sign2 = Math.sign(this.velocity.y);
