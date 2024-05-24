@@ -183,10 +183,10 @@ namespace MarbleRunSimulatorCore {
         public get i(): number {
             return this._i;
         }
-        public setI(v: number) {
+        public setI(v: number, doNotCheckGridLimits?: boolean) {
             if (this._i != v) {
                 this._i = v;
-                if (this.game.mode === GameMode.Challenge) {
+                if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
                     let i = this._i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax);
                     if (isFinite(i)) {
                         this._i = i;
@@ -206,10 +206,10 @@ namespace MarbleRunSimulatorCore {
         public get j(): number {
             return this._j;
         }
-        public setJ(v: number) {
+        public setJ(v: number, doNotCheckGridLimits?: boolean) {
             if (this._j != v) {
                 this._j = v;
-                if (this.game.mode === GameMode.Challenge) {
+                if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
                     let j = this._j = Nabu.MinMax(this._j, this.game.gridJMin, this.game.gridJMax);
                     if (isFinite(j)) {
                         this._j = j;
@@ -229,10 +229,10 @@ namespace MarbleRunSimulatorCore {
         public get k(): number {
             return this._k;
         }
-        public setK(v: number) {
+        public setK(v: number, doNotCheckGridLimits?: boolean) {
             if (this._k != v) {
                 this._k = v;
-                if (this.game.mode === GameMode.Challenge) {
+                if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
                     let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax);
                     if (isFinite(k)) {
                         this._k = k;

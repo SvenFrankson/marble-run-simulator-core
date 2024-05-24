@@ -216,6 +216,24 @@ namespace MarbleRunSimulatorCore {
             ]
         }
 
+        private _makePlasticPBR(name: string, color: BABYLON.Color3, envTexture: BABYLON.CubeTexture): BABYLON.Material {
+            let plastic = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
+            plastic.baseColor = color;
+            plastic.roughness = 1;
+            plastic.environmentTexture = envTexture;
+
+            return plastic;
+        }
+
+        private _makePlasticSTD(name: string, color: BABYLON.Color3): BABYLON.StandardMaterial {
+            let plastic = new BABYLON.StandardMaterial(name, this.game.scene);
+            plastic.diffuseColor = color;
+            plastic.emissiveColor = plastic.diffuseColor.scale(0.4).add(new BABYLON.Color3(0.1, 0.1, 0.1));
+            plastic.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+
+            return plastic;
+        }
+
         private _generateMaterials(envTexture: BABYLON.CubeTexture): void {
             this._materialsPBR = [];
             this._materialsSTD = [];
@@ -315,7 +333,6 @@ namespace MarbleRunSimulatorCore {
             this._materialsPBR.push(blueSteelMaterialPBR);
             this._materialsSTD.push(blueSteelMaterialSTD);
 
-
             let plasticBlack = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
             plasticBlack.diffuseColor = BABYLON.Color3.FromHexString("#282a33");
             plasticBlack.specularColor.copyFromFloats(0.1, 0.1, 0.1);
@@ -323,6 +340,32 @@ namespace MarbleRunSimulatorCore {
 
             this._materialsPBR.push(plasticBlack);
             this._materialsSTD.push(plasticBlack);
+
+            /*#e6261f,#eb7532,#f7d038,#a3e048,#49da9a,#34bbe6,#4355db,#d23be7*/
+            
+            this._materialsPBR.push(this._makePlasticPBR("red-plastic-pbr", BABYLON.Color3.FromHexString("#e6261f"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("red-plastic-std", BABYLON.Color3.FromHexString("#e6261f")));
+            
+            this._materialsPBR.push(this._makePlasticPBR("orange-plastic-pbr", BABYLON.Color3.FromHexString("#eb7532"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("orange-plastic-std", BABYLON.Color3.FromHexString("#eb7532")));
+            
+            this._materialsPBR.push(this._makePlasticPBR("yellow-plastic-pbr", BABYLON.Color3.FromHexString("#f7d038"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("yellow-plastic-std", BABYLON.Color3.FromHexString("#f7d038")));
+            
+            this._materialsPBR.push(this._makePlasticPBR("green-plastic-pbr", BABYLON.Color3.FromHexString("#a3e048"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("green-plastic-std", BABYLON.Color3.FromHexString("#a3e048")));
+            
+            this._materialsPBR.push(this._makePlasticPBR("eucalyptus-plastic-pbr", BABYLON.Color3.FromHexString("#49da9a"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("eucalyptus-plastic-std", BABYLON.Color3.FromHexString("#49da9a")));
+            
+            this._materialsPBR.push(this._makePlasticPBR("blue-plastic-pbr", BABYLON.Color3.FromHexString("#34bbe6"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("blue-plastic-std", BABYLON.Color3.FromHexString("#34bbe6")));
+            
+            this._materialsPBR.push(this._makePlasticPBR("royal-blue-plastic-pbr", BABYLON.Color3.FromHexString("#4355db"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("royal-blue-plastic-std", BABYLON.Color3.FromHexString("#4355db")));
+            
+            this._materialsPBR.push(this._makePlasticPBR("pink-plastic-pbr", BABYLON.Color3.FromHexString("#d23be7"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("pink-plastic-std", BABYLON.Color3.FromHexString("#d23be7")));
         }
     }
 }

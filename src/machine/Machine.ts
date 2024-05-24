@@ -12,10 +12,10 @@ namespace MarbleRunSimulatorCore {
     var partOffset = 648; // it's 36 * 36 / 2
 
     export enum GraphicQuality {
+        VeryLow,
         Low,
         Medium,
-        High,
-        Ultra
+        High
     }
 
     export enum GeometryQuality {
@@ -108,7 +108,7 @@ namespace MarbleRunSimulatorCore {
         public sleeperVertexData: BABYLON.VertexData[];
 
         public instantiated: boolean = false;
-        public minimalAutoQualityFailed: number = GraphicQuality.Ultra + 1;
+        public minimalAutoQualityFailed: number = GraphicQuality.High + 1;
 
         public playing: boolean = false;
 
@@ -343,7 +343,9 @@ namespace MarbleRunSimulatorCore {
             let maxJ = - 1;
             let maxK = 1;
             for (let i = 0; i < this.parts.length; i++) {
+                console.log("tic");
                 let track = this.parts[i];
+                console.log(track.i + " " + track.j + " " + track.k);
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - tileWidth * 0.5);
                 this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.position.x + tileWidth * (track.w - 0.5));
                 this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
@@ -524,18 +526,20 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (this.exitShooter) {
-                this.exitShooter.setI(maxI - 2);
-                this.exitShooter.setJ(maxJ + 3);
-                this.exitShooter.setK(maxK + 1);
+                this.exitShooter.setI(maxI - 2, true);
+                this.exitShooter.setJ(maxJ + 3, true);
+                this.exitShooter.setK(maxK + 1, true);
                 this.exitShooter.recomputeAbsolutePath();
                 this.exitShooter.refreshEncloseMeshAndAABB();
+                console.log("alpha " + maxI + " " + maxJ + " " + maxK)
             }
             if (this.exitTrack) {
-                this.exitTrack.setI(maxI - 1);
-                this.exitTrack.setJ(maxJ + 4);
-                this.exitTrack.setK(maxK + 1);
+                this.exitTrack.setI(maxI - 1, true);
+                this.exitTrack.setJ(maxJ + 4, true);
+                this.exitTrack.setK(maxK + 1, true);
                 this.exitTrack.recomputeAbsolutePath();
                 this.exitTrack.refreshEncloseMeshAndAABB();
+                console.log("bravo " + maxI + " " + maxJ + " " + maxK)
             }
             if (this.exitHoleIn) {
                 this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;
@@ -790,7 +794,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public deserialize(data: IMachineData): void {
-            this.minimalAutoQualityFailed = GraphicQuality.Ultra + 1;
+            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
             if (data) {
                 let version: number;
                 if (isFinite(data.v)) {

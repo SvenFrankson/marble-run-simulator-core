@@ -108,6 +108,8 @@ declare namespace MarbleRunSimulatorCore {
         whiteFullLitMaterial: BABYLON.StandardMaterial;
         get plasticBlack(): BABYLON.Material;
         constructor(game: IGame);
+        private _makePlasticPBR;
+        private _makePlasticSTD;
         private _generateMaterials;
     }
 }
@@ -145,10 +147,10 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     enum GraphicQuality {
-        Low = 0,
-        Medium = 1,
-        High = 2,
-        Ultra = 3
+        VeryLow = 0,
+        Low = 1,
+        Medium = 2,
+        High = 3
     }
     enum GeometryQuality {
         Low = 0,
@@ -376,13 +378,13 @@ declare namespace MarbleRunSimulatorCore {
         offsetPosition: BABYLON.Vector3;
         private _i;
         get i(): number;
-        setI(v: number): void;
+        setI(v: number, doNotCheckGridLimits?: boolean): void;
         private _j;
         get j(): number;
-        setJ(v: number): void;
+        setJ(v: number, doNotCheckGridLimits?: boolean): void;
         private _k;
         get k(): number;
-        setK(v: number): void;
+        setK(v: number, doNotCheckGridLimits?: boolean): void;
         setIsVisible(isVisible: boolean): void;
         private _partVisibilityMode;
         get partVisilibityMode(): PartVisibilityMode;

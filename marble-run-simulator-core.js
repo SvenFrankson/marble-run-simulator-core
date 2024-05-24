@@ -777,6 +777,20 @@ var MarbleRunSimulatorCore;
         get plasticBlack() {
             return this.getMaterial(6);
         }
+        _makePlasticPBR(name, color, envTexture) {
+            let plastic = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
+            plastic.baseColor = color;
+            plastic.roughness = 1;
+            plastic.environmentTexture = envTexture;
+            return plastic;
+        }
+        _makePlasticSTD(name, color) {
+            let plastic = new BABYLON.StandardMaterial(name, this.game.scene);
+            plastic.diffuseColor = color;
+            plastic.emissiveColor = plastic.diffuseColor.scale(0.4).add(new BABYLON.Color3(0.1, 0.1, 0.1));
+            plastic.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            return plastic;
+        }
         _generateMaterials(envTexture) {
             this._materialsPBR = [];
             this._materialsSTD = [];
@@ -858,6 +872,23 @@ var MarbleRunSimulatorCore;
             plasticBlack.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
             this._materialsPBR.push(plasticBlack);
             this._materialsSTD.push(plasticBlack);
+            /*#e6261f,#eb7532,#f7d038,#a3e048,#49da9a,#34bbe6,#4355db,#d23be7*/
+            this._materialsPBR.push(this._makePlasticPBR("red-plastic-pbr", BABYLON.Color3.FromHexString("#e6261f"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("red-plastic-std", BABYLON.Color3.FromHexString("#e6261f")));
+            this._materialsPBR.push(this._makePlasticPBR("orange-plastic-pbr", BABYLON.Color3.FromHexString("#eb7532"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("orange-plastic-std", BABYLON.Color3.FromHexString("#eb7532")));
+            this._materialsPBR.push(this._makePlasticPBR("yellow-plastic-pbr", BABYLON.Color3.FromHexString("#f7d038"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("yellow-plastic-std", BABYLON.Color3.FromHexString("#f7d038")));
+            this._materialsPBR.push(this._makePlasticPBR("green-plastic-pbr", BABYLON.Color3.FromHexString("#a3e048"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("green-plastic-std", BABYLON.Color3.FromHexString("#a3e048")));
+            this._materialsPBR.push(this._makePlasticPBR("eucalyptus-plastic-pbr", BABYLON.Color3.FromHexString("#49da9a"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("eucalyptus-plastic-std", BABYLON.Color3.FromHexString("#49da9a")));
+            this._materialsPBR.push(this._makePlasticPBR("blue-plastic-pbr", BABYLON.Color3.FromHexString("#34bbe6"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("blue-plastic-std", BABYLON.Color3.FromHexString("#34bbe6")));
+            this._materialsPBR.push(this._makePlasticPBR("royal-blue-plastic-pbr", BABYLON.Color3.FromHexString("#4355db"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("royal-blue-plastic-std", BABYLON.Color3.FromHexString("#4355db")));
+            this._materialsPBR.push(this._makePlasticPBR("pink-plastic-pbr", BABYLON.Color3.FromHexString("#d23be7"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("pink-plastic-std", BABYLON.Color3.FromHexString("#d23be7")));
         }
     }
     MarbleRunSimulatorCore.MainMaterials = MainMaterials;
@@ -1048,10 +1079,10 @@ var MarbleRunSimulatorCore;
     var partOffset = 648; // it's 36 * 36 / 2
     let GraphicQuality;
     (function (GraphicQuality) {
-        GraphicQuality[GraphicQuality["Low"] = 0] = "Low";
-        GraphicQuality[GraphicQuality["Medium"] = 1] = "Medium";
-        GraphicQuality[GraphicQuality["High"] = 2] = "High";
-        GraphicQuality[GraphicQuality["Ultra"] = 3] = "Ultra";
+        GraphicQuality[GraphicQuality["VeryLow"] = 0] = "VeryLow";
+        GraphicQuality[GraphicQuality["Low"] = 1] = "Low";
+        GraphicQuality[GraphicQuality["Medium"] = 2] = "Medium";
+        GraphicQuality[GraphicQuality["High"] = 3] = "High";
     })(GraphicQuality = MarbleRunSimulatorCore.GraphicQuality || (MarbleRunSimulatorCore.GraphicQuality = {}));
     let GeometryQuality;
     (function (GeometryQuality) {
@@ -1080,7 +1111,7 @@ var MarbleRunSimulatorCore;
             this.parts = [];
             this.balls = [];
             this.instantiated = false;
-            this.minimalAutoQualityFailed = GraphicQuality.Ultra + 1;
+            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
             this.playing = false;
             this.onStopCallbacks = new Nabu.UniqueList();
             this.margin = 0.05;
@@ -1284,7 +1315,9 @@ var MarbleRunSimulatorCore;
             let maxJ = -1;
             let maxK = 1;
             for (let i = 0; i < this.parts.length; i++) {
+                console.log("tic");
                 let track = this.parts[i];
+                console.log(track.i + " " + track.j + " " + track.k);
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - MarbleRunSimulatorCore.tileWidth * 0.5);
                 this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.position.x + MarbleRunSimulatorCore.tileWidth * (track.w - 0.5));
                 this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - MarbleRunSimulatorCore.tileHeight * (track.h + 1));
@@ -1450,18 +1483,20 @@ var MarbleRunSimulatorCore;
                 this.game.room.setGroundHeight(this.baseMeshMinY - 0.8);
             }
             if (this.exitShooter) {
-                this.exitShooter.setI(maxI - 2);
-                this.exitShooter.setJ(maxJ + 3);
-                this.exitShooter.setK(maxK + 1);
+                this.exitShooter.setI(maxI - 2, true);
+                this.exitShooter.setJ(maxJ + 3, true);
+                this.exitShooter.setK(maxK + 1, true);
                 this.exitShooter.recomputeAbsolutePath();
                 this.exitShooter.refreshEncloseMeshAndAABB();
+                console.log("alpha " + maxI + " " + maxJ + " " + maxK);
             }
             if (this.exitTrack) {
-                this.exitTrack.setI(maxI - 1);
-                this.exitTrack.setJ(maxJ + 4);
-                this.exitTrack.setK(maxK + 1);
+                this.exitTrack.setI(maxI - 1, true);
+                this.exitTrack.setJ(maxJ + 4, true);
+                this.exitTrack.setK(maxK + 1, true);
                 this.exitTrack.recomputeAbsolutePath();
                 this.exitTrack.refreshEncloseMeshAndAABB();
+                console.log("bravo " + maxI + " " + maxJ + " " + maxK);
             }
             if (this.exitHoleIn) {
                 this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;
@@ -1688,7 +1723,7 @@ var MarbleRunSimulatorCore;
             return data;
         }
         deserialize(data) {
-            this.minimalAutoQualityFailed = GraphicQuality.Ultra + 1;
+            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
             if (data) {
                 let version;
                 if (isFinite(data.v)) {
@@ -2176,10 +2211,10 @@ var MarbleRunSimulatorCore;
         get i() {
             return this._i;
         }
-        setI(v) {
+        setI(v, doNotCheckGridLimits) {
             if (this._i != v) {
                 this._i = v;
-                if (this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
+                if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
                     let i = this._i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax);
                     if (isFinite(i)) {
                         this._i = i;
@@ -2197,10 +2232,10 @@ var MarbleRunSimulatorCore;
         get j() {
             return this._j;
         }
-        setJ(v) {
+        setJ(v, doNotCheckGridLimits) {
             if (this._j != v) {
                 this._j = v;
-                if (this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
+                if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
                     let j = this._j = Nabu.MinMax(this._j, this.game.gridJMin, this.game.gridJMax);
                     if (isFinite(j)) {
                         this._j = j;
@@ -2218,10 +2253,10 @@ var MarbleRunSimulatorCore;
         get k() {
             return this._k;
         }
-        setK(v) {
+        setK(v, doNotCheckGridLimits) {
             if (this._k != v) {
                 this._k = v;
-                if (this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
+                if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
                     let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax);
                     if (isFinite(k)) {
                         this._k = k;
@@ -5023,6 +5058,7 @@ var MarbleRunSimulatorCore;
                 let ballArmed = this.getBallArmed();
                 if (ballArmed) {
                     if (this.h === 3) {
+                        // This is not real physic. It just works.
                         ballArmed.flybackOrigin = ballArmed.position.clone();
                         ballArmed.flybackDestination = ballArmed.positionZero.clone();
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
