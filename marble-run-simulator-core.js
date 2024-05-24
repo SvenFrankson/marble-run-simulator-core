@@ -2874,7 +2874,7 @@ var MarbleRunSimulatorCore;
                             partialsDatas[colorIndex] = [];
                         }
                         partialsDatas[colorIndex].push(tmp);
-                        if (props.drawWallAnchors || props.forceDrawWallAnchors) {
+                        if (track.part.isPlaced && (props.drawWallAnchors || props.forceDrawWallAnchors)) {
                             let addAnchor = false;
                             if ((part.k === 0 || props.forceDrawWallAnchors) && (n - 1.5) % 3 === 0 && up.y > 0.1) {
                                 if (anchor.z > -0.01) {
@@ -2921,7 +2921,7 @@ var MarbleRunSimulatorCore;
                                 tmp.dispose();
                             }
                         }
-                        if (props.drawGroundAnchors && q > 0) {
+                        if (track.part.isPlaced && (props.drawGroundAnchors && q > 0)) {
                             if (((n - 1.5) % 6 === 0 || count === 1) && up.y > 0.1) {
                                 let anchorYWorld = anchor.y + part.position.y;
                                 let anchorBase = anchor.clone();
