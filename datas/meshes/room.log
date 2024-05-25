@@ -9,7 +9,7 @@ Exporter version: 6.4.5, Blender version: 2.90.1
 		Vert Color Precision:  3
 		Mat Weight Precision:  2
 		Keep Z-up r-handed  :  no
-		Texture directory   :  C:\Users\svent\Documents\sven-frankson\marble-fall\meshes\
+		Texture directory   :  C:\Users\svent\Documents\sven-frankson\marble-run-simulator-core\datas\meshes\
 	Python World class constructor completed
 	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
 	processing begun of mesh:  0-ground
@@ -23,26 +23,26 @@ Exporter version: 6.4.5, Blender version: 2.90.1
 		num triangles      :  2
 	processing begun of mesh:  2-frame
 		WARNING: No materials have been assigned: 
-		num positions      :  2796
-		num normals        :  2796
+		num positions      :  2797
+		num normals        :  2797
 		num tangents       :  0
-		num uvs            :  5592
+		num uvs            :  5594
 		num uvs2           :  0
 		num colors         :  0
 		num triangles      :  2196
 	processing begun of mesh:  1-wall
 		WARNING: No materials have been assigned: 
-		num positions      :  288
-		num normals        :  288
+		num positions      :  232
+		num normals        :  232
 		num tangents       :  0
-		num uvs            :  576
+		num uvs            :  464
 		num uvs2           :  0
 		num colors         :  0
-		num triangles      :  520
+		num triangles      :  384
 ========= Writing of JSON file started =========
 	writing mesh:  0-ground
 	writing mesh:  2-frame
 	writing mesh:  1-wall
 ========= Writing of JSON file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.1504 secs
+elapsed time:  0 min, 0.1513 secs

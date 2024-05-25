@@ -37,6 +37,8 @@ namespace MarbleRunSimulatorCore {
         public baseAxisMaterial: BABYLON.StandardMaterial;
         public whiteMaterial: BABYLON.StandardMaterial;
         public paintingLight: BABYLON.StandardMaterial;
+        public wallShadow: BABYLON.StandardMaterial;
+        public groundMaterial: BABYLON.StandardMaterial;
         public handleMaterial: BABYLON.StandardMaterial;
         public ghostMaterial: BABYLON.StandardMaterial;
         public gridMaterial: BABYLON.StandardMaterial;
@@ -157,6 +159,17 @@ namespace MarbleRunSimulatorCore {
             this.paintingLight.diffuseColor.copyFromFloats(1, 1, 1);
             this.paintingLight.emissiveTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/painting-light.png");
             this.paintingLight.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+
+            this.wallShadow = new BABYLON.StandardMaterial("autolit-material");
+            this.wallShadow.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
+            this.wallShadow.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.wallShadow.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
+
+
+            this.groundMaterial = new BABYLON.StandardMaterial("ground-material");
+            this.groundMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/concrete.png");
+            this.groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#3f4c52");
+            this.groundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
 
             /*
             let makeMetalBallMaterial = (name: string, textureName: string) => {

@@ -1,7 +1,33 @@
 namespace MarbleRunSimulatorCore {
-    export class Painting extends BABYLON.Mesh {
+    export class Painting extends BABYLON.Mesh implements IRoomDecor {
+
+        private _steelFrame: BABYLON.Mesh;
+        private _lightedPlane: BABYLON.Mesh;
+        private _paintBody: BABYLON.Mesh;
+        private _paintPlane: BABYLON.Mesh;
+
         constructor(public room: Room, public paintingName: string, public size: number = 0.5) {
             super("painting-" + paintingName);
+            this._steelFrame = new BABYLON.Mesh("steel");
+            this._steelFrame.layerMask = 0x10000000;
+            this._steelFrame.parent = this;
+
+            this._lightedPlane = new BABYLON.Mesh("lighted-plane");
+            this._lightedPlane.layerMask = 0x10000000;
+            this._lightedPlane.parent = this;
+
+            this._paintBody = new BABYLON.Mesh("paint-body");
+            this._paintBody.layerMask = 0x10000000;
+            this._paintBody.position.y = 1.2;
+            this._paintBody.parent = this;
+
+            this._paintPlane = new BABYLON.Mesh("paint-plane");
+            this._paintPlane.layerMask = 0x10000000;
+            this._paintPlane.position.y = 1.2;
+            this._paintPlane.position.z = 0.021;
+            this._paintPlane.rotation.y = Math.PI;
+            this._paintPlane.parent = this;
+
             this.layerMask = 0x10000000;
         }
 
@@ -11,18 +37,12 @@ namespace MarbleRunSimulatorCore {
                 vertexDatas[0].applyToMesh(this);
             }
             if (vertexDatas && vertexDatas[1]) {
-                let steel = new BABYLON.Mesh("steel");
-                vertexDatas[1].applyToMesh(steel);
-                steel.parent = this;
-                steel.material = this.room.game.materials.getMaterial(0);
-                steel.layerMask = 0x10000000;
+                vertexDatas[1].applyToMesh(this._steelFrame);
+                this._steelFrame.material = this.room.game.materials.getMaterial(0);
             }
             if (vertexDatas && vertexDatas[2]) {
-                let lightedPlane = new BABYLON.Mesh("lighted-plane");
-                vertexDatas[2].applyToMesh(lightedPlane);
-                lightedPlane.parent = this;
-                lightedPlane.material = this.room.game.materials.paintingLight;
-                lightedPlane.layerMask = 0x10000000;
+                vertexDatas[2].applyToMesh(this._lightedPlane);
+                this._lightedPlane.material = this.room.game.materials.paintingLight;
             }
 
             let texture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + this.paintingName + ".jpg");
@@ -40,21 +60,16 @@ namespace MarbleRunSimulatorCore {
                         } else {
                             wMesh *= r;
                         }
-                        let body = BABYLON.MeshBuilder.CreateBox("paint-body", { width: wMesh + 0.04, height: hMesh + 0.04, depth: 0.04 });
-                        body.layerMask = 0x10000000;
-                        body.position.y = 1.2;
-                        body.parent = this;
 
-                        let plane = BABYLON.MeshBuilder.CreatePlane("paint", { width: wMesh, height: hMesh });
-                        plane.layerMask = 0x10000000;
+                        BABYLON.CreateBoxVertexData({ width: wMesh + 0.04, height: hMesh + 0.04, depth: 0.04 }).applyToMesh(this._paintBody);
+
+                        BABYLON.CreatePlaneVertexData({ width: wMesh, height: hMesh }).applyToMesh(this._paintPlane);
+
                         let mat = new BABYLON.StandardMaterial(this.name + "-material");
                         mat.diffuseTexture = texture;
                         mat.emissiveColor = new BABYLON.Color3(0.25, 0.25, 0.25);
-                        plane.material = mat;
-                        plane.position.y = 1.2;
-                        plane.position.z = 0.021;
-                        plane.rotation.y = Math.PI;
-                        plane.parent = this;
+
+                        this._paintPlane.material = mat;
 
                         resolve();
                     } else {
@@ -62,6 +77,13 @@ namespace MarbleRunSimulatorCore {
                     }
                 };
                 checkTextureLoaded();
+            });
+        }
+
+        public setLayerMask(mask: number): void {
+            this.layerMask = mask;
+            this.getChildMeshes().forEach(mesh => {
+                mesh.layerMask = mask;
             });
         }
     }

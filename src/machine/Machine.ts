@@ -343,9 +343,7 @@ namespace MarbleRunSimulatorCore {
             let maxJ = - 1;
             let maxK = 1;
             for (let i = 0; i < this.parts.length; i++) {
-                console.log("tic");
                 let track = this.parts[i];
-                console.log(track.i + " " + track.j + " " + track.k);
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - tileWidth * 0.5);
                 this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.position.x + tileWidth * (track.w - 0.5));
                 this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
@@ -531,7 +529,6 @@ namespace MarbleRunSimulatorCore {
                 this.exitShooter.setK(maxK + 1, true);
                 this.exitShooter.recomputeAbsolutePath();
                 this.exitShooter.refreshEncloseMeshAndAABB();
-                console.log("alpha " + maxI + " " + maxJ + " " + maxK)
             }
             if (this.exitTrack) {
                 this.exitTrack.setI(maxI - 1, true);
@@ -539,7 +536,6 @@ namespace MarbleRunSimulatorCore {
                 this.exitTrack.setK(maxK + 1, true);
                 this.exitTrack.recomputeAbsolutePath();
                 this.exitTrack.refreshEncloseMeshAndAABB();
-                console.log("bravo " + maxI + " " + maxJ + " " + maxK)
             }
             if (this.exitHoleIn) {
                 this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;

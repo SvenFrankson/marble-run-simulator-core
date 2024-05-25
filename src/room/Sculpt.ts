@@ -1,5 +1,5 @@
 namespace MarbleRunSimulatorCore {
-    export class Sculpt extends BABYLON.Mesh {
+    export class Sculpt extends BABYLON.Mesh implements IRoomDecor {
         constructor(public room: Room, public mat: BABYLON.Material) {
             super("sculpt");
             this.layerMask = 0x10000000;
@@ -17,6 +17,13 @@ namespace MarbleRunSimulatorCore {
                 steel.material = this.mat;
                 steel.layerMask = 0x10000000;
             }
+        }
+
+        public setLayerMask(mask: number): void {
+            this.layerMask = mask;
+            this.getChildMeshes().forEach(mesh => {
+                mesh.layerMask = mask;
+            });
         }
     }
 }
