@@ -6501,13 +6501,13 @@ var MarbleRunSimulatorCore;
                     await this.instantiateMuseum();
                 }
                 else if (this._currentRoomIndex === 1) {
-                    let groundColor = new BABYLON.Color4(0.45, 0.5, 0.4, 1);
-                    let wallColor = new BABYLON.Color4(0.95, 1, 0.9, 1);
+                    let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
+                    let wallColor = BABYLON.Color4.FromHexString("#839099FF");
                     await this.instantiateSimple(groundColor, wallColor);
                 }
                 else if (this._currentRoomIndex === 2) {
-                    let groundColor = new BABYLON.Color4(0.45, 0.5, 0.4, 1);
-                    let wallColor = new BABYLON.Color4(0.75, 0.5, 1, 1);
+                    let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
+                    let wallColor = BABYLON.Color4.FromHexString("#839099FF");
                     await this.instantiateSimple(groundColor, wallColor);
                 }
                 if (this.onRoomJustInstantiated) {
@@ -6517,8 +6517,12 @@ var MarbleRunSimulatorCore;
             }
         }
         contextualRoomIndex(n) {
-            if (n === 0 && this.game.getGraphicQ() === MarbleRunSimulatorCore.GraphicQuality.Low) {
+            // 1 is the lite version of 0
+            if (n === 0 && this.game.getGraphicQ() === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 1;
+            }
+            if (n === 1 && this.game.getGraphicQ() > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+                return 0;
             }
             return n;
         }
@@ -6528,23 +6532,24 @@ var MarbleRunSimulatorCore;
             });
             this.decors = [];
             this.frame.isVisible = false;
-            let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.05, color: groundColor });
+            let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.025, color: groundColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
             this.ground.material = this.game.materials.wallShadow;
-            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.05, color: wallColor });
+            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
             Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
-            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.05, color: wallColor });
+            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Right, Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Right, new BABYLON.Vector3(5, 0, 0));
-            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.05, color: wallColor });
+            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Back, Math.PI, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Back, new BABYLON.Vector3(0, 0, -5));
-            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.05, color: wallColor });
+            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Left, -Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Left, new BABYLON.Vector3(-5, 0, 0));
             Mummu.MergeVertexDatas(slice9Front, slice9Right, slice9Back, slice9Left).applyToMesh(this.wall);
-            let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.05, color: wallColor });
+            this.wall.material = this.game.materials.wallShadow;
+            let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.2, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, -Math.PI * 0.5, BABYLON.Axis.X);
             slice9Top.applyToMesh(this.ceiling);
             this.ceiling.material = this.game.materials.wallShadow;

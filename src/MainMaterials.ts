@@ -165,7 +165,6 @@ namespace MarbleRunSimulatorCore {
             this.wallShadow.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             this.wallShadow.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
 
-
             this.groundMaterial = new BABYLON.StandardMaterial("ground-material");
             this.groundMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/concrete.png");
             this.groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#3f4c52");
