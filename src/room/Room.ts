@@ -81,11 +81,13 @@ namespace MarbleRunSimulatorCore {
             this.light2.includeOnlyWithLayerMask = 0x10000000;
         }
 
+        public onRoomJustInstantiated: () => void;
+
         private _currentRoomIndex: number = 1;
         public get currentRoomIndex(): number {
             return this._currentRoomIndex;
         }
-        public async setRoomIndex(roomIndex: number, onRoomJustInstantiated?: () => void, forceAndskipAnimation?: boolean): Promise<void> {
+        public async setRoomIndex(roomIndex: number, forceAndskipAnimation?: boolean): Promise<void> {
             if (forceAndskipAnimation || roomIndex != this._currentRoomIndex) {
                 this._currentRoomIndex = roomIndex;
                 if (!forceAndskipAnimation) {
@@ -94,17 +96,31 @@ namespace MarbleRunSimulatorCore {
                 if (this._currentRoomIndex === 0) {
                     await this.instantiateMuseum();
                 }
-                else {
-                    await this.instantiateSimple();
+                else if (this._currentRoomIndex === 1) {
+                    let groundColor = new BABYLON.Color4(0.45, 0.5, 0.4, 1);
+                    let wallColor = new BABYLON.Color4(0.95, 1, 0.9, 1);
+                    await this.instantiateSimple(groundColor, wallColor);
                 }
-                if (onRoomJustInstantiated) {
-                    onRoomJustInstantiated();
+                else if (this._currentRoomIndex === 2) {
+                    let groundColor = new BABYLON.Color4(0.45, 0.5, 0.4, 1);
+                    let wallColor = new BABYLON.Color4(0.75, 0.5, 1, 1);
+                    await this.instantiateSimple(groundColor, wallColor);
+                }
+                if (this.onRoomJustInstantiated) {
+                    this.onRoomJustInstantiated();
                 }
                 await this.animateShow(forceAndskipAnimation ? 0 : 1);
             }
         }
 
-        public async instantiateSimple(): Promise<void> {
+        public contextualRoomIndex(n: number): number {
+            if (n === 0 && this.game.getGraphicQ() === GraphicQuality.Low) {
+                return 1;
+            }
+            return n;
+        }
+
+        public async instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4): Promise<void> {
             this.decors.forEach(decor => {
                 decor.dispose();
             });
@@ -112,13 +128,11 @@ namespace MarbleRunSimulatorCore {
 
             this.frame.isVisible = false;
 
-            let groundColor = new BABYLON.Color4(0.45, 0.5, 0.4, 1);
             let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.05, color: groundColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
             this.ground.material = this.game.materials.wallShadow;
 
-            let wallColor = new BABYLON.Color4(0.95, 1, 0.9, 1);
             let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.05, color: wallColor });
             Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
 

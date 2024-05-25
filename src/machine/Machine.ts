@@ -88,6 +88,7 @@ namespace MarbleRunSimulatorCore {
         balls?: IBallData[]; // v1 - deprecated
         parts?: IMachinePartData[]; // v1 - deprecated
         d?: string; // v2
+        r?: number; // v6 - RoomIndex
     }
 
     export class Machine {
@@ -117,6 +118,8 @@ namespace MarbleRunSimulatorCore {
         public exitHoleIn: BABYLON.Mesh;
         public exitHolePath: BABYLON.Vector3[];
         public exitHoleOut: BABYLON.Mesh;
+
+        public roomIndex: number = 0;
 
         constructor(public game: IGame) {
             this.name = MachineName.GetRandom();
@@ -182,6 +185,8 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(hotReload?: boolean): Promise<void> {
+            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
+
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             
             if (this.exitShooter) {
@@ -958,6 +963,12 @@ namespace MarbleRunSimulatorCore {
                 }
                 if (data.a) {
                     this.author = data.a;
+                }
+                if (data.r) {
+                    this.roomIndex = data.r;
+                }
+                else {
+                    this.roomIndex = 0;
                 }
             
                 this.balls = [];

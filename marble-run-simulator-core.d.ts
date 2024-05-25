@@ -218,6 +218,7 @@ declare namespace MarbleRunSimulatorCore {
         balls?: IBallData[];
         parts?: IMachinePartData[];
         d?: string;
+        r?: number;
     }
     class Machine {
         game: IGame;
@@ -241,6 +242,7 @@ declare namespace MarbleRunSimulatorCore {
         exitHoleIn: BABYLON.Mesh;
         exitHolePath: BABYLON.Vector3[];
         exitHoleOut: BABYLON.Mesh;
+        roomIndex: number;
         constructor(game: IGame);
         setAllIsSelectable(isSelectable: boolean): void;
         instantiate(hotReload?: boolean): Promise<void>;
@@ -848,10 +850,12 @@ declare namespace MarbleRunSimulatorCore {
         get isBlurred(): boolean;
         set isBlurred(v: boolean);
         constructor(game: IGame);
+        onRoomJustInstantiated: () => void;
         private _currentRoomIndex;
         get currentRoomIndex(): number;
-        setRoomIndex(roomIndex: number, onRoomJustInstantiated?: () => void, forceAndskipAnimation?: boolean): Promise<void>;
-        instantiateSimple(): Promise<void>;
+        setRoomIndex(roomIndex: number, forceAndskipAnimation?: boolean): Promise<void>;
+        contextualRoomIndex(n: number): number;
+        instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4): Promise<void>;
         instantiateMuseum(): Promise<void>;
         animateShow(duration?: number): Promise<void>;
         animateHide(duration?: number): Promise<void>;
