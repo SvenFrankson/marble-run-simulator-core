@@ -758,14 +758,21 @@ var MarbleRunSimulatorCore;
                 makeBrandedBallMaterialSTD("tiaratum", "ball-bjs.png"),
                 makeBrandedBallMaterialSTD("html5", "ball-poki.png")
             ];
-            let abstractBubblesMaterial = new BABYLON.StandardMaterial("abstract-bubble-material");
+            this._wallpapers = [];
+            let abstractBubblesMaterial = new BABYLON.StandardMaterial("abstract-bubbles-material");
             abstractBubblesMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wallpapers/abstract-bubbles.png");
             abstractBubblesMaterial.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
             abstractBubblesMaterial.ambientTexture.coordinatesIndex = 1;
             abstractBubblesMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             abstractBubblesMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
-            this._wallpapers = [];
             this._wallpapers[0] = abstractBubblesMaterial;
+            let abstractSquaresMaterial = new BABYLON.StandardMaterial("abstract-squares-material");
+            abstractSquaresMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wallpapers/abstract-squares.png");
+            abstractSquaresMaterial.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
+            abstractSquaresMaterial.ambientTexture.coordinatesIndex = 1;
+            abstractSquaresMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            abstractSquaresMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
+            this._wallpapers[1] = abstractSquaresMaterial;
         }
         getMaterial(colorIndex, materialQ = -1) {
             if (materialQ === -1) {
@@ -2092,13 +2099,19 @@ var MarbleRunSimulatorCore;
         PartVisibilityMode[PartVisibilityMode["Selected"] = 1] = "Selected";
         PartVisibilityMode[PartVisibilityMode["Ghost"] = 2] = "Ghost";
     })(PartVisibilityMode = MarbleRunSimulatorCore.PartVisibilityMode || (MarbleRunSimulatorCore.PartVisibilityMode = {}));
-    var radius = (0.014 * 1.5) / 2;
-    var selectorHullShape = [];
+    var selectorHullShapeDisplay = [];
     for (let i = 0; i < 6; i++) {
         let a = (i / 6) * 2 * Math.PI;
         let cosa = Math.cos(a);
         let sina = Math.sin(a);
-        selectorHullShape[i] = new BABYLON.Vector3(cosa * radius, sina * radius, 0);
+        selectorHullShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.007 * 1.5, sina * 0.007 * 1.5, 0);
+    }
+    var selectorHullShapeLogic = [];
+    for (let i = 0; i < 6; i++) {
+        let a = (i / 6) * 2 * Math.PI;
+        let cosa = Math.cos(a);
+        let sina = Math.sin(a);
+        selectorHullShapeLogic[i] = new BABYLON.Vector3(cosa * 0.007 * 2.7, sina * 0.007 * 2.7, 0);
     }
     class MachinePartSelectorMesh extends BABYLON.Mesh {
         constructor(part) {
@@ -2324,16 +2337,16 @@ var MarbleRunSimulatorCore;
             }
         }
         select() {
-            if (this.selectorMesh) {
-                this.selectorMesh.visibility = 0.2;
+            if (this.selectorMeshDisplay) {
+                this.selectorMeshDisplay.visibility = 0.2;
             }
             if (this.encloseMesh) {
                 this.encloseMesh.visibility = 1;
             }
         }
         unselect() {
-            if (this.selectorMesh) {
-                this.selectorMesh.visibility = 0;
+            if (this.selectorMeshDisplay) {
+                this.selectorMeshDisplay.visibility = 0;
             }
             if (this.encloseMesh) {
                 this.encloseMesh.visibility = 0;
@@ -2385,21 +2398,46 @@ var MarbleRunSimulatorCore;
                 let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
                 points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
                 points[points.length - 1].addInPlace(dirEnd.scale(this.wireGauge * 0.5));
-                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShape, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 let data = BABYLON.VertexData.ExtractFromMesh(tmp);
                 datas.push(data);
                 tmp.dispose();
             }
-            if (this.selectorMesh) {
-                this.selectorMesh.dispose();
+            if (this.selectorMeshDisplay) {
+                this.selectorMeshDisplay.dispose();
             }
-            this.selectorMesh = new MachinePartSelectorMesh(this);
-            this.selectorMesh.material = this.game.materials.cyanMaterial;
-            this.selectorMesh.parent = this;
+            this.selectorMeshDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
+            this.selectorMeshDisplay.material = this.game.materials.cyanMaterial;
+            this.selectorMeshDisplay.parent = this;
             if (datas.length) {
-                Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMesh);
+                Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMeshDisplay);
             }
-            this.selectorMesh.visibility = 0;
+            this.selectorMeshDisplay.visibility = 0;
+            datas = [];
+            for (let n = 0; n < this.tracks.length; n++) {
+                let points = [...this.tracks[n].templateInterpolatedPoints].map((p) => {
+                    return p.clone();
+                });
+                Mummu.DecimatePathInPlace(points, (10 / 180) * Math.PI);
+                let dirStart = points[1].subtract(points[0]).normalize();
+                let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
+                points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
+                points[points.length - 1].addInPlace(dirEnd.scale(this.wireGauge * 0.5));
+                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeLogic, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                let data = BABYLON.VertexData.ExtractFromMesh(tmp);
+                datas.push(data);
+                tmp.dispose();
+            }
+            if (this.selectorMeshLogic) {
+                this.selectorMeshLogic.dispose();
+            }
+            this.selectorMeshLogic = new MachinePartSelectorMesh(this);
+            this.selectorMeshLogic.material = this.game.materials.cyanMaterial;
+            this.selectorMeshLogic.parent = this;
+            if (datas.length) {
+                Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMeshLogic);
+            }
+            this.selectorMeshLogic.visibility = 0;
             this.refreshEncloseMeshAndAABB();
             await this.instantiateMachineSpecific();
             this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
@@ -6525,7 +6563,7 @@ var MarbleRunSimulatorCore;
                 else if (this._currentRoomIndex === 1) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
-                    await this.instantiateSimple(groundColor, wallColor);
+                    await this.instantiateSimple(groundColor, wallColor, 0);
                 }
                 else if (this._currentRoomIndex >= 2 && this._currentRoomIndex < 7) {
                     let f = (this._currentRoomIndex - 2) / 6;
@@ -6533,7 +6571,7 @@ var MarbleRunSimulatorCore;
                     let wallColor = BABYLON.Color3.FromHSV((Math.floor(f * 360) + 180) % 360, 0.3, 1);
                     console.log("GroundColor " + groundColor.toHexString());
                     console.log("WallColor " + wallColor.toHexString());
-                    await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4());
+                    await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4(), this._currentRoomIndex % 2);
                 }
                 else if (this._currentRoomIndex === 7) {
                     await this.instantiateMuseum(false, "./lib/marble-run-simulator-core/datas/skyboxes/icescape_low_res.png");
@@ -6541,7 +6579,7 @@ var MarbleRunSimulatorCore;
                 else if (this._currentRoomIndex === 8) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
-                    await this.instantiateSimple(groundColor, wallColor);
+                    await this.instantiateSimple(groundColor, wallColor, 1);
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
@@ -6566,29 +6604,29 @@ var MarbleRunSimulatorCore;
             }
             return n;
         }
-        async instantiateSimple(groundColor, wallColor) {
+        async instantiateSimple(groundColor, wallColor, wallPaperIndex) {
             this.decors.forEach(decor => {
                 decor.dispose();
             });
             this.decors = [];
             this.frame.isVisible = false;
-            let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.025, color: groundColor });
+            let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.1, color: groundColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
-            this.ground.material = this.game.materials.wallShadow;
-            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
+            this.ground.material = this.game.materials.groundMaterial;
+            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
-            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
+            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Right, Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Right, new BABYLON.Vector3(5, 0, 0));
-            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
+            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Back, Math.PI, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Back, new BABYLON.Vector3(0, 0, -5));
-            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
+            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Left, -Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Left, new BABYLON.Vector3(-5, 0, 0));
             Mummu.MergeVertexDatas(slice9Front, slice9Right, slice9Back, slice9Left).applyToMesh(this.wall);
-            this.wall.material = this.game.materials.getWallpaperMaterial(0);
+            this.wall.material = this.game.materials.wallShadow;
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.2, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, -Math.PI * 0.5, BABYLON.Axis.X);
             slice9Top.applyToMesh(this.ceiling);

@@ -114,7 +114,7 @@ namespace MarbleRunSimulatorCore {
                 else if (this._currentRoomIndex === 1) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
-                    await this.instantiateSimple(groundColor, wallColor);
+                    await this.instantiateSimple(groundColor, wallColor, 0);
                 }
                 else if (this._currentRoomIndex >= 2 && this._currentRoomIndex < 7) {
                     let f = (this._currentRoomIndex - 2) / 6;
@@ -122,7 +122,7 @@ namespace MarbleRunSimulatorCore {
                     let wallColor = BABYLON.Color3.FromHSV((Math.floor(f * 360) + 180) % 360, 0.3, 1);
                     console.log("GroundColor " + groundColor.toHexString());
                     console.log("WallColor " + wallColor.toHexString());
-                    await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4());
+                    await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4(), this._currentRoomIndex % 2);
                 }
                 else if (this._currentRoomIndex === 7) {
                     await this.instantiateMuseum(false, "./lib/marble-run-simulator-core/datas/skyboxes/icescape_low_res.png");
@@ -130,7 +130,7 @@ namespace MarbleRunSimulatorCore {
                 else if (this._currentRoomIndex === 8) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
-                    await this.instantiateSimple(groundColor, wallColor);
+                    await this.instantiateSimple(groundColor, wallColor, 1);
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
@@ -157,7 +157,7 @@ namespace MarbleRunSimulatorCore {
             return n;
         }
 
-        public async instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4): Promise<void> {
+        public async instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, wallPaperIndex: number): Promise<void> {
             this.decors.forEach(decor => {
                 decor.dispose();
             });
@@ -165,28 +165,28 @@ namespace MarbleRunSimulatorCore {
 
             this.frame.isVisible = false;
 
-            let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.025, color: groundColor });
+            let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.1, color: groundColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
-            this.ground.material = this.game.materials.wallShadow;
+            this.ground.material = this.game.materials.groundMaterial;
 
-            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
+            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
 
-            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
+            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Right, Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Right, new BABYLON.Vector3(5, 0, 0));
 
-            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
+            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Back, Math.PI, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Back, new BABYLON.Vector3(0, 0, -5));
 
-            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
+            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Left, - Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Left, new BABYLON.Vector3(- 5, 0, 0));
 
             Mummu.MergeVertexDatas(slice9Front, slice9Right, slice9Back, slice9Left).applyToMesh(this.wall);
-            this.wall.material = this.game.materials.getWallpaperMaterial(0);
+            this.wall.material = this.game.materials.wallShadow;
             
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.2, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, - Math.PI * 0.5, BABYLON.Axis.X);

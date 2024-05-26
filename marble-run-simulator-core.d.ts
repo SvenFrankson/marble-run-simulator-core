@@ -343,7 +343,8 @@ declare namespace MarbleRunSimulatorCore {
         colors: number[];
         getColor(index: number): number;
         sleepersMeshes: Map<number, BABYLON.Mesh>;
-        selectorMesh: MachinePartSelectorMesh;
+        selectorMeshDisplay: BABYLON.Mesh;
+        selectorMeshLogic: MachinePartSelectorMesh;
         encloseMesh: BABYLON.Mesh;
         isSelectable: boolean;
         summedLength: number[];
@@ -859,7 +860,7 @@ declare namespace MarbleRunSimulatorCore {
         get currentRoomIndex(): number;
         setRoomIndex(roomIndex: number, forceAndskipAnimation?: boolean): Promise<void>;
         contextualRoomIndex(n: number): number;
-        instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4): Promise<void>;
+        instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, wallPaperIndex: number): Promise<void>;
         instantiateMuseum(useDecors?: boolean, skyboxPath?: string): Promise<void>;
         animateShow(duration?: number): Promise<void>;
         animateHide(duration?: number): Promise<void>;

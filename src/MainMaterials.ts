@@ -232,14 +232,24 @@ namespace MarbleRunSimulatorCore {
                 makeBrandedBallMaterialSTD("html5", "ball-poki.png")
             ]
 
-            let abstractBubblesMaterial = new BABYLON.StandardMaterial("abstract-bubble-material");
+            this._wallpapers = [];
+
+            let abstractBubblesMaterial = new BABYLON.StandardMaterial("abstract-bubbles-material");
             abstractBubblesMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wallpapers/abstract-bubbles.png");
             abstractBubblesMaterial.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
             abstractBubblesMaterial.ambientTexture.coordinatesIndex = 1;
             abstractBubblesMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             abstractBubblesMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
-            this._wallpapers = [];
             this._wallpapers[0] = abstractBubblesMaterial;
+            
+
+            let abstractSquaresMaterial = new BABYLON.StandardMaterial("abstract-squares-material");
+            abstractSquaresMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wallpapers/abstract-squares.png");
+            abstractSquaresMaterial.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
+            abstractSquaresMaterial.ambientTexture.coordinatesIndex = 1;
+            abstractSquaresMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            abstractSquaresMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
+            this._wallpapers[1] = abstractSquaresMaterial;
         }
 
         private _makePlasticPBR(name: string, color: BABYLON.Color3, envTexture: BABYLON.CubeTexture): BABYLON.Material {

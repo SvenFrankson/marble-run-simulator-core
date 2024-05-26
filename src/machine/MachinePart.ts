@@ -23,13 +23,20 @@ namespace MarbleRunSimulatorCore {
         points: ITrackPointData[];
     }
 
-    var radius = (0.014 * 1.5) / 2;
-    var selectorHullShape: BABYLON.Vector3[] = [];
+    var selectorHullShapeDisplay: BABYLON.Vector3[] = [];
     for (let i = 0; i < 6; i++) {
         let a = (i / 6) * 2 * Math.PI;
         let cosa = Math.cos(a);
         let sina = Math.sin(a);
-        selectorHullShape[i] = new BABYLON.Vector3(cosa * radius, sina * radius, 0);
+        selectorHullShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.007 * 1.5, sina * 0.007 * 1.5, 0);
+    }
+    
+    var selectorHullShapeLogic: BABYLON.Vector3[] = [];
+    for (let i = 0; i < 6; i++) {
+        let a = (i / 6) * 2 * Math.PI;
+        let cosa = Math.cos(a);
+        let sina = Math.sin(a);
+        selectorHullShapeLogic[i] = new BABYLON.Vector3(cosa * 0.007 * 2.7, sina * 0.007 * 2.7, 0);
     }
 
     export class MachinePartSelectorMesh extends BABYLON.Mesh {
@@ -62,7 +69,8 @@ namespace MarbleRunSimulatorCore {
             return this.colors[index];
         }
         public sleepersMeshes: Map<number, BABYLON.Mesh> = new Map<number, BABYLON.Mesh>();
-        public selectorMesh: MachinePartSelectorMesh;
+        public selectorMeshDisplay: BABYLON.Mesh;
+        public selectorMeshLogic: MachinePartSelectorMesh;
         public encloseMesh: BABYLON.Mesh;
         public isSelectable: boolean = true;
 
@@ -280,8 +288,8 @@ namespace MarbleRunSimulatorCore {
         }
 
         public select(): void {
-            if (this.selectorMesh) {
-                this.selectorMesh.visibility = 0.2;
+            if (this.selectorMeshDisplay) {
+                this.selectorMeshDisplay.visibility = 0.2;
             }
             if (this.encloseMesh) {
                 this.encloseMesh.visibility = 1;
@@ -289,8 +297,8 @@ namespace MarbleRunSimulatorCore {
         }
 
         public unselect(): void {
-            if (this.selectorMesh) {
-                this.selectorMesh.visibility = 0;
+            if (this.selectorMeshDisplay) {
+                this.selectorMeshDisplay.visibility = 0;
             }
             if (this.encloseMesh) {
                 this.encloseMesh.visibility = 0;
@@ -347,22 +355,49 @@ namespace MarbleRunSimulatorCore {
                 let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
                 points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
                 points[points.length - 1].addInPlace(dirEnd.scale(this.wireGauge * 0.5));
-                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShape, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 let data = BABYLON.VertexData.ExtractFromMesh(tmp);
                 datas.push(data);
                 tmp.dispose();
             }
 
-            if (this.selectorMesh) {
-                this.selectorMesh.dispose();
+            if (this.selectorMeshDisplay) {
+                this.selectorMeshDisplay.dispose();
             }
-            this.selectorMesh = new MachinePartSelectorMesh(this);
-            this.selectorMesh.material = this.game.materials.cyanMaterial;
-            this.selectorMesh.parent = this;
+            this.selectorMeshDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
+            this.selectorMeshDisplay.material = this.game.materials.cyanMaterial;
+            this.selectorMeshDisplay.parent = this;
             if (datas.length) {
-                Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMesh);
+                Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMeshDisplay);
             }
-            this.selectorMesh.visibility = 0;
+            this.selectorMeshDisplay.visibility = 0;
+
+            datas = [];
+            for (let n = 0; n < this.tracks.length; n++) {
+                let points = [...this.tracks[n].templateInterpolatedPoints].map((p) => {
+                    return p.clone();
+                });
+                Mummu.DecimatePathInPlace(points, (10 / 180) * Math.PI);
+                let dirStart = points[1].subtract(points[0]).normalize();
+                let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
+                points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
+                points[points.length - 1].addInPlace(dirEnd.scale(this.wireGauge * 0.5));
+                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeLogic, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                let data = BABYLON.VertexData.ExtractFromMesh(tmp);
+                datas.push(data);
+                tmp.dispose();
+            }
+
+            if (this.selectorMeshLogic) {
+                this.selectorMeshLogic.dispose();
+            }
+            this.selectorMeshLogic = new MachinePartSelectorMesh(this);
+            this.selectorMeshLogic.material = this.game.materials.cyanMaterial;
+            this.selectorMeshLogic.parent = this;
+            if (datas.length) {
+                Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMeshLogic);
+            }
+            this.selectorMeshLogic.visibility = 0;
 
             this.refreshEncloseMeshAndAABB();
 
