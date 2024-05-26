@@ -170,23 +170,23 @@ namespace MarbleRunSimulatorCore {
             slice9Ground.applyToMesh(this.ground);
             this.ground.material = this.game.materials.wallShadow;
 
-            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
+            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
             Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
 
-            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
+            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Right, Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Right, new BABYLON.Vector3(5, 0, 0));
 
-            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
+            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Back, Math.PI, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Back, new BABYLON.Vector3(0, 0, -5));
 
-            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
+            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Left, - Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Left, new BABYLON.Vector3(- 5, 0, 0));
 
             Mummu.MergeVertexDatas(slice9Front, slice9Right, slice9Back, slice9Left).applyToMesh(this.wall);
-            this.wall.material = this.game.materials.wallShadow;
+            this.wall.material = this.game.materials.getWallpaperMaterial(0);
             
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.2, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, - Math.PI * 0.5, BABYLON.Axis.X);

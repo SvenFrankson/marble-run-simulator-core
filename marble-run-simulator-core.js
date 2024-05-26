@@ -613,6 +613,7 @@ var MarbleRunSimulatorCore;
             this._materialsSTD = [];
             this._ballMaterialsPBR = [];
             this._ballMaterialsSTD = [];
+            this._wallpapers = [];
             let envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
             this.handleMaterial = new BABYLON.StandardMaterial("handle-material");
             this.handleMaterial.diffuseColor.copyFromFloats(0, 0, 0);
@@ -757,6 +758,14 @@ var MarbleRunSimulatorCore;
                 makeBrandedBallMaterialSTD("tiaratum", "ball-bjs.png"),
                 makeBrandedBallMaterialSTD("html5", "ball-poki.png")
             ];
+            let abstractBubblesMaterial = new BABYLON.StandardMaterial("abstract-bubble-material");
+            abstractBubblesMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wallpapers/abstract-bubbles.png");
+            abstractBubblesMaterial.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
+            abstractBubblesMaterial.ambientTexture.coordinatesIndex = 1;
+            abstractBubblesMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            abstractBubblesMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
+            this._wallpapers = [];
+            this._wallpapers[0] = abstractBubblesMaterial;
         }
         getMaterial(colorIndex, materialQ = -1) {
             if (materialQ === -1) {
@@ -781,6 +790,9 @@ var MarbleRunSimulatorCore;
         }
         get ballMaterialsCount() {
             return Math.min(this._ballMaterialsPBR.length, this._ballMaterialsSTD.length);
+        }
+        getWallpaperMaterial(index) {
+            return this._wallpapers[index];
         }
         get plasticBlack() {
             return this.getMaterial(6);
@@ -6564,19 +6576,19 @@ var MarbleRunSimulatorCore;
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
             this.ground.material = this.game.materials.wallShadow;
-            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
+            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
             Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
-            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
+            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Right, Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Right, new BABYLON.Vector3(5, 0, 0));
-            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
+            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Back, Math.PI, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Back, new BABYLON.Vector3(0, 0, -5));
-            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.025, color: wallColor });
+            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Left, -Math.PI * 0.5, BABYLON.Axis.Y);
             Mummu.TranslateVertexDataInPlace(slice9Left, new BABYLON.Vector3(-5, 0, 0));
             Mummu.MergeVertexDatas(slice9Front, slice9Right, slice9Back, slice9Left).applyToMesh(this.wall);
-            this.wall.material = this.game.materials.wallShadow;
+            this.wall.material = this.game.materials.getWallpaperMaterial(0);
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.2, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, -Math.PI * 0.5, BABYLON.Axis.X);
             slice9Top.applyToMesh(this.ceiling);

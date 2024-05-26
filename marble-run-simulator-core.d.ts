@@ -92,6 +92,8 @@ declare namespace MarbleRunSimulatorCore {
         private _ballMaterialsSTD;
         getBallMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
         get ballMaterialsCount(): number;
+        private _wallpapers;
+        getWallpaperMaterial(index: number): BABYLON.Material;
         velvetMaterial: BABYLON.StandardMaterial;
         logoMaterial: BABYLON.StandardMaterial;
         baseAxisMaterial: BABYLON.StandardMaterial;

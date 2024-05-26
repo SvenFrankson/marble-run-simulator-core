@@ -32,6 +32,11 @@ namespace MarbleRunSimulatorCore {
             return Math.min(this._ballMaterialsPBR.length, this._ballMaterialsSTD.length);
         }
 
+        private _wallpapers: BABYLON.Material[] = [];
+        public getWallpaperMaterial(index: number): BABYLON.Material {
+            return this._wallpapers[index];
+        }
+
         public velvetMaterial: BABYLON.StandardMaterial;
         public logoMaterial: BABYLON.StandardMaterial;
         public baseAxisMaterial: BABYLON.StandardMaterial;
@@ -226,6 +231,15 @@ namespace MarbleRunSimulatorCore {
                 makeBrandedBallMaterialSTD("tiaratum", "ball-bjs.png"),
                 makeBrandedBallMaterialSTD("html5", "ball-poki.png")
             ]
+
+            let abstractBubblesMaterial = new BABYLON.StandardMaterial("abstract-bubble-material");
+            abstractBubblesMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wallpapers/abstract-bubbles.png");
+            abstractBubblesMaterial.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
+            abstractBubblesMaterial.ambientTexture.coordinatesIndex = 1;
+            abstractBubblesMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            abstractBubblesMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
+            this._wallpapers = [];
+            this._wallpapers[0] = abstractBubblesMaterial;
         }
 
         private _makePlasticPBR(name: string, color: BABYLON.Color3, envTexture: BABYLON.CubeTexture): BABYLON.Material {

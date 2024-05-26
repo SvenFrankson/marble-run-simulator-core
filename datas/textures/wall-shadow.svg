@@ -22,15 +22,15 @@
     <filter
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
-       id="filter862"
-       x="-0.3"
-       width="1.6"
-       y="-0.3"
-       height="1.6">
+       id="filter1150"
+       x="-0.013827444"
+       width="1.0276549"
+       y="-0.013827444"
+       height="1.0276549">
       <feGaussianBlur
          inkscape:collect="always"
-         stdDeviation="9.260417"
-         id="feGaussianBlur864" />
+         stdDeviation="0.42682633"
+         id="feGaussianBlur1152" />
     </filter>
   </defs>
   <sodipodi:namedview
@@ -70,22 +70,23 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#ebebeb;fill-opacity:1;stroke:none;stroke-width:10.5833;stroke-linecap:round;stroke-linejoin:round"
+       style="fill:#838383;fill-opacity:1;stroke:none;stroke-width:10.5833;stroke-linecap:round;stroke-linejoin:round"
        id="rect835"
        width="79.375"
        height="79.375"
        x="0"
        y="0"
        inkscape:export-xdpi="163"
-       inkscape:export-ydpi="163" />
+       inkscape:export-ydpi="163"
+       ry="0" />
     <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:16.0578;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;filter:url(#filter862)"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:10.3146;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;filter:url(#filter1150)"
        id="rect833"
        width="74.083336"
        height="74.083336"
        x="8.2020836"
        y="8.2020836"
-       ry="24.4475"
-       transform="matrix(0.65907688,0,0,0.65907688,9.8683894,9.8683894)" />
+       ry="3.6360674"
+       transform="matrix(1.0260498,0,0,1.0260498,-6.7348421,-6.7348421)" />
   </g>
 </svg>
