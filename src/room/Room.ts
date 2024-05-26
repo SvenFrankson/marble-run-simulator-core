@@ -18,6 +18,7 @@ namespace MarbleRunSimulatorCore {
         
 
         public skybox: BABYLON.Mesh;
+        public skyboxMaterial: BABYLON.StandardMaterial;
         public ground: BABYLON.Mesh;
         public wall: BABYLON.Mesh;
         public ceiling: BABYLON.Mesh;
@@ -86,14 +87,12 @@ namespace MarbleRunSimulatorCore {
 
             this.skybox = BABYLON.MeshBuilder.CreateSphere("skyBox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE, arc: 12 }, this.game.scene);
             this.skybox.layerMask = 0x10000000;
-            let skyboxMaterial: BABYLON.StandardMaterial = new BABYLON.StandardMaterial("skyBox", this.game.scene);
-            skyboxMaterial.backFaceCulling = false;
-            let skyTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/skyboxes/icescape_low_res.png");
-            skyboxMaterial.diffuseTexture = skyTexture;
-            skyboxMaterial.diffuseColor.copyFromFloats(0.25, 0.25, 0.25);
-            skyboxMaterial.emissiveColor.copyFromFloats(0.25, 0.25, 0.25);
-            skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-            this.skybox.material = skyboxMaterial;
+            this.skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.game.scene);
+            this.skyboxMaterial.backFaceCulling = false;
+            this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.skyboxMaterial.emissiveColor.copyFromFloats(0, 0, 0);
+            this.skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+            this.skybox.material = this.skyboxMaterial;
             this.skybox.rotation.y = 0.16 * Math.PI;
         }
 
@@ -110,7 +109,7 @@ namespace MarbleRunSimulatorCore {
                     await this.animateHide(1);
                 }
                 if (this._currentRoomIndex === 0) {
-                    await this.instantiateMuseum(true);
+                    await this.instantiateMuseum(true, "./lib/marble-run-simulator-core/datas/skyboxes/city_night_low_res.png");
                 }
                 else if (this._currentRoomIndex === 1) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
@@ -126,7 +125,7 @@ namespace MarbleRunSimulatorCore {
                     await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4());
                 }
                 else if (this._currentRoomIndex === 7) {
-                    await this.instantiateMuseum(false);
+                    await this.instantiateMuseum(false, "./lib/marble-run-simulator-core/datas/skyboxes/icescape_low_res.png");
                 }
                 else if (this._currentRoomIndex === 8) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
@@ -201,13 +200,16 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public async instantiateMuseum(useDecors?: boolean): Promise<void> {
+        public async instantiateMuseum(useDecors?: boolean, skyboxPath?: string): Promise<void> {
             this.decors.forEach(decor => {
                 decor.dispose();
             });
             this.decors = [];
 
             this.frame.isVisible = true;
+
+            let skyTexture = new BABYLON.Texture(skyboxPath);
+            this.skyboxMaterial.diffuseTexture = skyTexture;
 
             let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/room.babylon");
 
@@ -313,6 +315,9 @@ namespace MarbleRunSimulatorCore {
                             decor.scaling.copyFromFloats(1, 1, 1);
                         });
                         
+                        this.skyboxMaterial.diffuseColor.copyFromFloats(1, 1, 1);
+                        this.skyboxMaterial.emissiveColor.copyFromFloats(0.3, 0.3, 0.3);
+
                         this.ground.rotation.y = 0;
                         this.ground.scaling.copyFromFloats(1, 1, 1);
 
@@ -332,6 +337,9 @@ namespace MarbleRunSimulatorCore {
                             decor.position.y = this.ground.position.y - 2 * (1 - f);
                             decor.scaling.copyFromFloats(f, f, f);
                         });
+                        
+                        this.skyboxMaterial.diffuseColor.copyFromFloats(f, f, f);
+                        this.skyboxMaterial.emissiveColor.copyFromFloats(0.3 * f, 0.3 * f, 0.3 * f);
                         
                         this.ground.rotation.y = - 0.5 * Math.PI * (1 - f);
                         this.ground.scaling.copyFromFloats(f, f, f);
@@ -361,6 +369,9 @@ namespace MarbleRunSimulatorCore {
                             decor.scaling.copyFromFloats(0, 0, 0);
                         });
 
+                        this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+                        this.skyboxMaterial.emissiveColor.copyFromFloats(0, 0, 0);
+                        
                         this.ground.rotation.y = - 0.5 * Math.PI;
                         this.ground.scaling.copyFromFloats(0, 0, 0);
 
@@ -381,6 +392,9 @@ namespace MarbleRunSimulatorCore {
                             decor.scaling.copyFromFloats(1 - f, 1 - f, 1 - f);
                         });
                         
+                        this.skyboxMaterial.diffuseColor.copyFromFloats(1 - f, 1 - f, 1 - f);
+                        this.skyboxMaterial.emissiveColor.copyFromFloats(0.3 * (1 - f), 0.3 * (1 - f), 0.3 * (1 - f));
+
                         this.ground.rotation.y = - 0.5 * Math.PI * f;
                         this.ground.scaling.copyFromFloats(1 - f, 1 - f, 1 - f);
 
