@@ -12,6 +12,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "start";
+            template.h = 0;
 
             template.mirrorX = mirrorX;
 

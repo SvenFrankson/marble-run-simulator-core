@@ -4147,26 +4147,29 @@ var MarbleRunSimulatorCore;
             template.w = 2;
             template.mirrorX = mirrorX;
             template.xMirrorable = true;
-            let x0 = MarbleRunSimulatorCore.tileWidth * 0.3;
+            let x0 = MarbleRunSimulatorCore.tileWidth * 0.4;
             let y0 = -1.4 * MarbleRunSimulatorCore.tileHeight;
-            let w = MarbleRunSimulatorCore.tileWidth * 0.6;
+            let w = MarbleRunSimulatorCore.tileWidth * 0.5;
             let r = 0.01;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.2 + MarbleRunSimulatorCore.tileWidth * 0.5, -0.01, 0), MarbleRunSimulatorCore.Tools.V3Dir(120))];
+            template.trackTemplates[0].trackpoints = [
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0, -0.01, 0), MarbleRunSimulatorCore.Tools.V3Dir(120))
+            ];
             template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
             template.trackTemplates[1].trackpoints = [
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - w + MarbleRunSimulatorCore.tileWidth * 0.5, y0 + 1.6 * r, 0), MarbleRunSimulatorCore.Tools.V3Dir(180), MarbleRunSimulatorCore.Tools.V3Dir(90)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - w + MarbleRunSimulatorCore.tileWidth * 0.5, y0 + r, 0), MarbleRunSimulatorCore.Tools.V3Dir(180)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - w + r + MarbleRunSimulatorCore.tileWidth * 0.5, y0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - 0.012 + MarbleRunSimulatorCore.tileWidth * 0.5, y0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - 0.001 + MarbleRunSimulatorCore.tileWidth * 0.5, y0 - 0.005, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + MarbleRunSimulatorCore.tileWidth * 0.5, y0 - 0.005, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + 0.001 + MarbleRunSimulatorCore.tileWidth * 0.5, y0 - 0.005, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + 0.012 + MarbleRunSimulatorCore.tileWidth * 0.5, y0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w - r + MarbleRunSimulatorCore.tileWidth * 0.5, y0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w + MarbleRunSimulatorCore.tileWidth * 0.5, y0 + r, 0), MarbleRunSimulatorCore.Tools.V3Dir(0)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w + MarbleRunSimulatorCore.tileWidth * 0.5, y0 + 1.6 * r, 0), MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(-90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - w, y0 + 1.6 * r, 0), MarbleRunSimulatorCore.Tools.V3Dir(180), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - w, y0 + r, 0), MarbleRunSimulatorCore.Tools.V3Dir(180)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - w + r, y0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - 0.012, y0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 - 0.001, y0 - 0.005, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0, y0 - 0.005, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + 0.001, y0 - 0.005, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + 0.012, y0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w - r, y0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w, y0 + r, 0), MarbleRunSimulatorCore.Tools.V3Dir(0)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w, y0 + 1.6 * r, 0), MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(-90)),
             ];
             template.trackTemplates[1].drawStartTip = true;
             template.trackTemplates[1].drawEndTip = true;
@@ -5961,6 +5964,7 @@ var MarbleRunSimulatorCore;
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "start";
+            template.h = 0;
             template.mirrorX = mirrorX;
             template.xMirrorable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
