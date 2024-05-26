@@ -1,0 +1,11 @@
+Model Information:
+* title:	Icescape 1 Alien Moon Skybox
+* source:	https://sketchfab.com/3d-models/icescape-1-alien-moon-skybox-bfc9a041814f4112b016904edfaad0c5
+* author:	Luis Vidal (https://sketchfab.com/Luis_Vidal)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Icescape 1 Alien Moon Skybox" (https://sketchfab.com/3d-models/icescape-1-alien-moon-skybox-bfc9a041814f4112b016904edfaad0c5) by Luis Vidal (https://sketchfab.com/Luis_Vidal) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

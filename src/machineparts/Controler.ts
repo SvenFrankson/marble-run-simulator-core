@@ -22,7 +22,7 @@ namespace MarbleRunSimulatorCore {
             let partName = "controler";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
-            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
 
             for (let i = this.colors.length; i < 6; i++) {

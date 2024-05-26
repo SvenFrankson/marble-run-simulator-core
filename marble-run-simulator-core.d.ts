@@ -839,6 +839,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class Room {
         game: IGame;
+        skybox: BABYLON.Mesh;
         ground: BABYLON.Mesh;
         wall: BABYLON.Mesh;
         ceiling: BABYLON.Mesh;
@@ -856,7 +857,7 @@ declare namespace MarbleRunSimulatorCore {
         setRoomIndex(roomIndex: number, forceAndskipAnimation?: boolean): Promise<void>;
         contextualRoomIndex(n: number): number;
         instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4): Promise<void>;
-        instantiateMuseum(): Promise<void>;
+        instantiateMuseum(useDecors?: boolean): Promise<void>;
         animateShow(duration?: number): Promise<void>;
         animateHide(duration?: number): Promise<void>;
         setGroundHeight(h: number): void;

@@ -51,13 +51,13 @@ var MarbleRunSimulatorCore;
             this.visibleVelocity = BABYLON.Vector3.Zero();
             this.collisionState = CollisionState.Normal;
             this.constructorIndex = Ball.ConstructorIndex++;
-            this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
-            this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
-            this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./datas/sounds/marble-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
+            this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./lib/marble-run-simulator-core/datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
             this.marbleLoopSound.setVolume(0);
-            this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
+            this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
             this.marbleBowlLoopSound.setVolume(0);
-            this.marbleBowlInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.marbleBowlInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.marbleBowlInsideSound.setVolume(0.2);
             this.animatePosition = Mummu.AnimationFactory.CreateVector3(this, this, "position");
         }
@@ -3658,7 +3658,7 @@ var MarbleRunSimulatorCore;
             this._moving = false;
             let partName = "controler";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
-            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
             for (let i = this.colors.length; i < 6; i++) {
                 this.colors[i] = 0;
@@ -4832,7 +4832,7 @@ var MarbleRunSimulatorCore;
                 x = -1;
             }
             this.generateWires();
-            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
             this.velocityKick = Shooter.velocityKicks[this.h];
             this.base = new BABYLON.Mesh("base");
@@ -5381,7 +5381,7 @@ var MarbleRunSimulatorCore;
             this._moving = false;
             let partName = "split";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
-            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
             for (let i = this.colors.length; i < 5; i++) {
                 this.colors[i] = 0;
@@ -6464,6 +6464,17 @@ var MarbleRunSimulatorCore;
             this.light2.groundColor.copyFromFloats(0.3, 0.3, 0.3);
             this.light2.intensity = 0.2;
             this.light2.includeOnlyWithLayerMask = 0x10000000;
+            this.skybox = BABYLON.MeshBuilder.CreateSphere("skyBox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE, arc: 12 }, this.game.scene);
+            this.skybox.layerMask = 0x10000000;
+            let skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.game.scene);
+            skyboxMaterial.backFaceCulling = false;
+            let skyTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/skyboxes/icescape_low_res.png");
+            skyboxMaterial.diffuseTexture = skyTexture;
+            skyboxMaterial.diffuseColor.copyFromFloats(0.25, 0.25, 0.25);
+            skyboxMaterial.emissiveColor.copyFromFloats(0.25, 0.25, 0.25);
+            skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+            this.skybox.material = skyboxMaterial;
+            this.skybox.rotation.y = 0.16 * Math.PI;
         }
         get isBlurred() {
             return this._isBlurred;
@@ -6480,6 +6491,7 @@ var MarbleRunSimulatorCore;
                 this.light1.includeOnlyWithLayerMask = 0;
                 this.light2.includeOnlyWithLayerMask = 0;
             }
+            this.skybox.layerMask = layerMask;
             this.ground.layerMask = layerMask;
             this.wall.layerMask = layerMask;
             this.frame.layerMask = layerMask;
@@ -6498,14 +6510,25 @@ var MarbleRunSimulatorCore;
                     await this.animateHide(1);
                 }
                 if (this._currentRoomIndex === 0) {
-                    await this.instantiateMuseum();
+                    await this.instantiateMuseum(true);
                 }
                 else if (this._currentRoomIndex === 1) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
                     await this.instantiateSimple(groundColor, wallColor);
                 }
-                else if (this._currentRoomIndex === 2) {
+                else if (this._currentRoomIndex >= 2 && this._currentRoomIndex < 7) {
+                    let f = (this._currentRoomIndex - 2) / 6;
+                    let groundColor = BABYLON.Color3.FromHSV(Math.floor(f * 360), 0.3, 1);
+                    let wallColor = BABYLON.Color3.FromHSV((Math.floor(f * 360) + 180) % 360, 0.3, 1);
+                    console.log("GroundColor " + groundColor.toHexString());
+                    console.log("WallColor " + wallColor.toHexString());
+                    await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4());
+                }
+                else if (this._currentRoomIndex === 7) {
+                    await this.instantiateMuseum(false);
+                }
+                else if (this._currentRoomIndex === 8) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
                     await this.instantiateSimple(groundColor, wallColor);
@@ -6523,6 +6546,13 @@ var MarbleRunSimulatorCore;
             }
             if (n === 1 && this.game.getGraphicQ() > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 0;
+            }
+            // 8 is the lite version of 7
+            if (n === 7 && this.game.getGraphicQ() === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+                return 8;
+            }
+            if (n === 8 && this.game.getGraphicQ() > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+                return 7;
             }
             return n;
         }
@@ -6558,7 +6588,7 @@ var MarbleRunSimulatorCore;
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
             }
         }
-        async instantiateMuseum() {
+        async instantiateMuseum(useDecors) {
             this.decors.forEach(decor => {
                 decor.dispose();
             });
@@ -6579,59 +6609,61 @@ var MarbleRunSimulatorCore;
             let randomPainting = () => {
                 return paintingNames[n++];
             };
-            let paint1 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint1.instantiate();
-            paint1.position.copyFromFloats(4, 0, 4);
-            paint1.rotation.y = -0.75 * Math.PI;
-            this.decors.push(paint1);
-            let paint11 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint11.instantiate();
-            paint11.position.copyFromFloats(2.8, 0, 4.5);
-            paint11.rotation.y = -Math.PI;
-            this.decors.push(paint11);
-            let paint2 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint2.instantiate();
-            paint2.position.copyFromFloats(4, 0, -4);
-            paint2.rotation.y = -0.25 * Math.PI;
-            this.decors.push(paint2);
-            let paint21 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint21.instantiate();
-            paint21.position.copyFromFloats(2.8, 0, -4.5);
-            this.decors.push(paint21);
-            let paint3 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint3.instantiate();
-            paint3.position.copyFromFloats(-4, 0, -4);
-            paint3.rotation.y = 0.25 * Math.PI;
-            this.decors.push(paint3);
-            let paint31 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint31.instantiate();
-            paint31.position.copyFromFloats(-4.5, 0, -2.8);
-            paint31.rotation.y = 0.5 * Math.PI;
-            this.decors.push(paint31);
-            let paint32 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint32.instantiate();
-            paint32.position.copyFromFloats(-2.8, 0, -4.5);
-            this.decors.push(paint32);
-            let paint4 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint4.instantiate();
-            paint4.position.copyFromFloats(-4, 0, 4);
-            paint4.rotation.y = 0.75 * Math.PI;
-            this.decors.push(paint4);
-            let paint41 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
-            await paint41.instantiate();
-            paint41.position.copyFromFloats(-2.8, 0, 4.5);
-            paint41.rotation.y = Math.PI;
-            this.decors.push(paint41);
-            let sculpt1 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(0));
-            await sculpt1.instantiate();
-            sculpt1.position.copyFromFloats(4.5, 0, 0);
-            sculpt1.rotation.y = -0.5 * Math.PI;
-            this.decors.push(sculpt1);
-            let sculpt2 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(1));
-            await sculpt2.instantiate();
-            sculpt2.position.copyFromFloats(-4.5, 0, 0);
-            sculpt2.rotation.y = 0.5 * Math.PI;
-            this.decors.push(sculpt2);
+            if (useDecors) {
+                let paint1 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint1.instantiate();
+                paint1.position.copyFromFloats(4, 0, 4);
+                paint1.rotation.y = -0.75 * Math.PI;
+                this.decors.push(paint1);
+                let paint11 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint11.instantiate();
+                paint11.position.copyFromFloats(2.8, 0, 4.5);
+                paint11.rotation.y = -Math.PI;
+                this.decors.push(paint11);
+                let paint2 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint2.instantiate();
+                paint2.position.copyFromFloats(4, 0, -4);
+                paint2.rotation.y = -0.25 * Math.PI;
+                this.decors.push(paint2);
+                let paint21 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint21.instantiate();
+                paint21.position.copyFromFloats(2.8, 0, -4.5);
+                this.decors.push(paint21);
+                let paint3 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint3.instantiate();
+                paint3.position.copyFromFloats(-4, 0, -4);
+                paint3.rotation.y = 0.25 * Math.PI;
+                this.decors.push(paint3);
+                let paint31 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint31.instantiate();
+                paint31.position.copyFromFloats(-4.5, 0, -2.8);
+                paint31.rotation.y = 0.5 * Math.PI;
+                this.decors.push(paint31);
+                let paint32 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint32.instantiate();
+                paint32.position.copyFromFloats(-2.8, 0, -4.5);
+                this.decors.push(paint32);
+                let paint4 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint4.instantiate();
+                paint4.position.copyFromFloats(-4, 0, 4);
+                paint4.rotation.y = 0.75 * Math.PI;
+                this.decors.push(paint4);
+                let paint41 = new MarbleRunSimulatorCore.Painting(this, randomPainting(), 0.8);
+                await paint41.instantiate();
+                paint41.position.copyFromFloats(-2.8, 0, 4.5);
+                paint41.rotation.y = Math.PI;
+                this.decors.push(paint41);
+                let sculpt1 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(0));
+                await sculpt1.instantiate();
+                sculpt1.position.copyFromFloats(4.5, 0, 0);
+                sculpt1.rotation.y = -0.5 * Math.PI;
+                this.decors.push(sculpt1);
+                let sculpt2 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(1));
+                await sculpt2.instantiate();
+                sculpt2.position.copyFromFloats(-4.5, 0, 0);
+                sculpt2.rotation.y = 0.5 * Math.PI;
+                this.decors.push(sculpt2);
+            }
             this.isBlurred = true;
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);

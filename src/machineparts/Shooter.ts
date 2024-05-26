@@ -67,7 +67,7 @@ namespace MarbleRunSimulatorCore {
 
             this.generateWires();
 
-            this.clicSound = new BABYLON.Sound("clic-sound", "./datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
 
             this.velocityKick = Shooter.velocityKicks[this.h];
