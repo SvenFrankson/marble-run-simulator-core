@@ -307,8 +307,9 @@ namespace MarbleRunSimulatorCore {
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
                     data = Wall.GenerateTemplate(h, d, mirrorX);
                 }
-                else if (partName === "uturnsharp") {
-                    data = UTurnSharp.GenerateTemplate(mirrorX);
+                else if (partName.startsWith("uturnsharp")) {
+                    let h = parseInt(partName.split("-")[1].split(".")[0]);
+                    data = UTurnSharp.GenerateTemplate(h, mirrorX);
                 }
                 else if (partName.startsWith("ramp-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);

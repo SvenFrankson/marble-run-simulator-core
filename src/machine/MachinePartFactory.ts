@@ -8,7 +8,7 @@ namespace MarbleRunSimulatorCore {
         "split",
         "uturn-0.2",
         "wall-3.3",
-        "uturnsharp",
+        "uturnsharp-1",
         "loop-2.1.1",
         "spiral-1.2",
         "elevator-4",
@@ -117,7 +117,9 @@ namespace MarbleRunSimulatorCore {
                     return new Wall(this.machine, prop);
                 }
             }
-            if (partName === "uturnsharp") {
+            if (partName === "uturnsharp" || partName.startsWith("uturnsharp-")) {
+                let h = parseInt(partName.split("-")[1].split(".")[0]);
+                prop.h = h;
                 return new UTurnSharp(this.machine, prop);
             }
             if (partName === "start") {

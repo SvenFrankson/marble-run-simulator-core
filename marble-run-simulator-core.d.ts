@@ -780,7 +780,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class UTurnSharp extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number, mirrorX?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

@@ -3,7 +3,11 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "uturnsharp";
+            if (isNaN(prop.h)) {
+                prop.h = 1;
+            }
+
+            let partName = "uturnsharp-" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             for (let i = this.colors.length; i < 2; i++) {
@@ -13,13 +17,18 @@ namespace MarbleRunSimulatorCore {
             this.generateWires();
         }
 
-        public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(h: number, mirrorX?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "uturnsharp";
-            template.w = 1;
-            template.h = 1;
+            if (isNaN(h)) {
+                h = 1;
+            }
+            template.partName = "uturnsharp-" + h.toFixed(0);
+            template.h = h;
+            template.w = 1 + Math.floor((template.h + 1) / 5);
 
+
+            template.yExtendable = true;
             template.mirrorX = mirrorX;
             template.xMirrorable = true;
 
@@ -28,6 +37,14 @@ namespace MarbleRunSimulatorCore {
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
+            let dY = 0.014;
+            let yIn = 0;
+            let yOut = - tileHeight * template.h;
+
+            let cY = (yIn + yOut + dY) * 0.5;
+            let rIn = Math.abs(yIn - cY);
+            let rOut = Math.abs(yOut - cY);
+
             let endAngle = 120;
             let dirJoin = Tools.V3Dir(endAngle);
             let nJoin = Tools.V3Dir(endAngle - 90);
@@ -35,38 +52,44 @@ namespace MarbleRunSimulatorCore {
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
-            template.trackTemplates[0].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, 0, 0), dir),
-                new TrackPoint(template.trackTemplates[0], pEnd, dirJoin)
-            ];
+            template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, yIn, 0), Tools.V3Dir(90), Tools.V3Dir(0))];
 
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
-            template.trackTemplates[1].trackpoints = [
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(- tileWidth * 0.4, 0.014, 0), Tools.V3Dir(90), Tools.V3Dir(180)),
-            ];
+            template.trackTemplates[1].trackpoints = [];
+            template.trackTemplates[1].drawStartTip = true;
 
-            let a0 = (endAngle - 90) / 180 * Math.PI;
             for (let a = 0; a <= 4; a++) {
                 let f = a / 4;
-                let angle = a0 * (1 - f) + Math.PI * f;
-                let r = 0.014 * (1 - f) + tileHeight * 0.7 * f;
+                let angle = Math.PI * f;
                 let cosa = Math.cos(angle);
                 let sina = Math.sin(angle);
 
-                let p = pEnd.clone();
-                p.x += sina * r;
-                p.y += cosa * r;
+                let norm: BABYLON.Vector3;
+                let dir: BABYLON.Vector3;
+                if (a === 0) {
+                    dir = Tools.V3Dir(90);
+                    norm = Tools.V3Dir(0);
+                }
+                if (a === 4) {
+                    dir = Tools.V3Dir(-90);
+                    norm = Tools.V3Dir(180);
+                }
 
-                template.trackTemplates[1].trackpoints.push(
-                    new TrackPoint(template.trackTemplates[1], p)
-                )
+                let p = new BABYLON.Vector3(- tileWidth * 0.5 + dY, cY, 0);
+                p.x += sina * rIn;
+                p.y += cosa * rIn;
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], p, dir, norm));
+
+                p = new BABYLON.Vector3(- tileWidth * 0.5 + dY, cY, 0);
+                p.x += sina * rOut;
+                p.y += cosa * rOut;
+                template.trackTemplates[1].trackpoints.push(new TrackPoint(template.trackTemplates[1], p, dir, norm ? norm.scale(-1) : undefined));
             }
 
-            template.trackTemplates[1].trackpoints.push(
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(- tileWidth * 0.5, -tileHeight * template.h, 0), dir.scale(-1), new BABYLON.Vector3(0, 1, 0))
-            )
-            template.trackTemplates[1].drawStartTip = true;
+            template.trackTemplates[0].trackpoints.push();
+            template.trackTemplates[0].drawEndTip = true;
+            template.trackTemplates[1].trackpoints.push(new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(- tileWidth * 0.5, yOut, 0), Tools.V3Dir(- 90), Tools.V3Dir(0)));
 
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
