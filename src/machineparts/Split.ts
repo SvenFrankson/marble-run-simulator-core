@@ -16,7 +16,7 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
 
             let partName = "split";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -114,7 +114,7 @@ namespace MarbleRunSimulatorCore {
                 "z",
                 () => {
                     if (!this.machine.playing) {
-                        this.pivot.rotation.z = Math.PI / 4;
+                        this.pivot.rotation.z = (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
                     }
                     this.pivot.freezeWorldMatrix();
                     this.pivot.getChildMeshes().forEach((child) => {
@@ -162,7 +162,7 @@ namespace MarbleRunSimulatorCore {
             this.pivot.material = this.game.materials.getMaterial(this.getColor(4));
         }
 
-        public static GenerateTemplate(mirrorX: boolean) {
+        public static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean) {
             let template = new MachinePartTemplate();
 
             template.partName = "split";
@@ -170,8 +170,10 @@ namespace MarbleRunSimulatorCore {
             template.w = 1;
             template.h = 1;
             template.mirrorX = mirrorX;
+            template.mirrorZ = mirrorZ;
 
             template.xMirrorable = true;
+            template.zMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -232,12 +234,12 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
-            this._exitLeft = !this.mirrorX;
+            this._exitLeft = !this.mirrorX && !this.mirrorZ;
             this._moving = false;
             if (this.mirrorX) {
-                this.pivot.rotation.z = -Math.PI / 4;
+                this.pivot.rotation.z = - (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
             } else {
-                this.pivot.rotation.z = Math.PI / 4;
+                this.pivot.rotation.z = (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
             }
             this.pivot.freezeWorldMatrix();
             this.pivot.getChildMeshes().forEach((child) => {

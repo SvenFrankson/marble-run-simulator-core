@@ -195,7 +195,7 @@ namespace MarbleRunSimulatorCore {
             if (this._i != v) {
                 this._i = v;
                 if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let i = this._i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax);
+                    let i = this._i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax - (this.w - 1));
                     if (isFinite(i)) {
                         this._i = i;
                     }
@@ -218,7 +218,7 @@ namespace MarbleRunSimulatorCore {
             if (this._j != v) {
                 this._j = v;
                 if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let j = this._j = Nabu.MinMax(this._j, this.game.gridJMin, this.game.gridJMax);
+                    let j = this._j = Nabu.MinMax(this._j, this.game.gridJMin, this.game.gridJMax - this.h);
                     if (isFinite(j)) {
                         this._j = j;
                     }
@@ -241,7 +241,7 @@ namespace MarbleRunSimulatorCore {
             if (this._k != v) {
                 this._k = v;
                 if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax);
+                    let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax - (this.d - 1));
                     if (isFinite(k)) {
                         this._k = k;
                     }

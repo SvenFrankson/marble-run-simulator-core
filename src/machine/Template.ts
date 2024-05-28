@@ -332,8 +332,9 @@ namespace MarbleRunSimulatorCore {
                     data = Elevator.GenerateTemplate(h, mirrorX);
                 }
                 else if (partName.startsWith("shooter-")) {
-                    let h = parseInt(partName.split("-")[1]);
-                    data = Shooter.GenerateTemplate(h, mirrorX);
+                    let h = parseInt(partName.split("-")[1].split(".")[0]);
+                    let n = parseInt(partName.split("-")[1].split(".")[1]);
+                    data = Shooter.GenerateTemplate(h, n, mirrorX);
                 }
                 else if (partName.startsWith("stairway-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
@@ -346,7 +347,7 @@ namespace MarbleRunSimulatorCore {
                     data = Screw.GenerateTemplate(w, h, mirrorX);
                 }
                 else if (partName === "split") {
-                    data = Split.GenerateTemplate(mirrorX);
+                    data = Split.GenerateTemplate(mirrorX, mirrorZ);
                 }
                 else if (partName === "controler") {
                     data = Controler.GenerateTemplate(mirrorX);
@@ -386,6 +387,12 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName === "gravitywell") {
                     data = GravityWell.GenerateTemplate(mirrorX);
+                }
+                else if (partName === "screen") {
+                    data = Screen.GenerateTemplate(mirrorX);
+                }
+                else if (partName === "speeder") {
+                    data = Speeder.GenerateTemplate(mirrorX);
                 }
                 datas[mirrorIndex] = data;
             }

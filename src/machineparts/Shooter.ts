@@ -52,8 +52,11 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
 
             prop.h = Nabu.MinMax(prop.h, 3, 22);
+            if (isNaN(prop.n)) {
+                prop.n = 1;
+            }
 
-            let partName = "shooter-" + prop.h.toFixed(0);
+            let partName = "shooter-" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             for (let i = this.colors.length; i < 4; i++) {
@@ -180,21 +183,23 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public static GenerateTemplate(h: number, mirrorX: boolean) {
+        public static GenerateTemplate(h: number, n: number, mirrorX: boolean) {
             let template = new MachinePartTemplate();
 
-            template.partName = "shooter-" + h.toFixed(0);
+            template.partName = "shooter-" + h.toFixed(0) + "." + n.toFixed(0);
             template.w = 1;
             template.h = h;
+            template.n = n;
             template.mirrorX = mirrorX;
 
             template.yExtendable = true;
+            template.nExtendable = true;
             template.xMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
-            let n = new BABYLON.Vector3(0, 1, 0);
-            n.normalize();
+            let norm = new BABYLON.Vector3(0, 1, 0);
+            norm.normalize();
 
             let dirLeft = new BABYLON.Vector3(1, 0, 0);
             dirLeft.normalize();
@@ -216,9 +221,9 @@ namespace MarbleRunSimulatorCore {
     
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 1.6 * cupR, -tileHeight * (h - 2) - dH, 0), dir),
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 0, -tileHeight * (h - 2) - dH - cupR * 0.8, 0), dir),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, -tileHeight * (h - 2) - dH, 0), n),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, -tileHeight * (h - 2) - dH, 0), norm),
     
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, - tileHeight, 0), n),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, - tileHeight, 0), norm),
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR - 0.015, 0.035 - tileHeight, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
                 ];
                 template.trackTemplates[0].drawEndTip = true;
@@ -236,9 +241,9 @@ namespace MarbleRunSimulatorCore {
     
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 1.6 * cupR, -tileHeight * (h - 2) - dH, 0), dir),
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 0, -tileHeight * (h - 2) - dH - cupR * 0.8, 0), dir),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, -tileHeight * (h - 2) - dH, 0), n),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, -tileHeight * (h - 2) - dH, 0), norm),
     
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, tileHeight * 0.5, 0), n),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, tileHeight * 0.5, 0), norm),
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR + 0.01, 0.025 + tileHeight * 0.5, 0), Tools.V3Dir(45), Tools.V3Dir(- 45)),
                 ];
                 template.trackTemplates[0].drawEndTip = true;
@@ -434,7 +439,10 @@ namespace MarbleRunSimulatorCore {
                     ballReady.marbleChocSound.play();
                 }
                 this.animateKickerKick(this.kickerYIdle, 0.8  / this.game.currentTimeFactor).then(() => {
-                    this.currentShootState = 5;
+                    this.delayTimeout = setTimeout(() => {
+                        console.log("reset kicker");
+                        this.currentShootState = 5;
+                    }, this.n * 1000 / this.game.currentTimeFactor);
                 });
             }
             else if (this.currentShootState === 5) {

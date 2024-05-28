@@ -438,6 +438,40 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
                             }
+                            if (part instanceof Screen) {
+                                let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.cameInCollider);
+                                if (col.hit) {
+                                    // Move away from collision
+                                    forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                    if (this.velocity.length() > 0.5) {
+                                        this.velocity.scaleInPlace(0.99);
+                                    }
+                                }
+                                else if (part.isMoving) {
+                                    col = Mummu.SphereMeshIntersection(this.position, this.radius, part.cameOutCollider);
+                                    if (col.hit) {
+                                        //this.setLastHit(wire, col.index);
+                                        col.normal.y = 0;
+                                        let colDig = col.normal.scale(-1);
+                                        // Move away from collision
+                                        forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                        // Cancel depth component of speed
+                                        let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                        if (depthSpeed > 0) {
+                                            canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                        }
+                                        // Add ground reaction
+                                        let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                        reactions.addInPlace(reaction);
+                                        reactionsCount++;
+                                    }
+                                }
+                            }
+                            if (part instanceof Speeder) {
+                                if (this.velocity.length() < 1) {
+                                    this.velocity.scaleInPlace(1.01);
+                                }
+                            }
                             /*
                         if (part instanceof QuarterNote || part instanceof DoubleNote) {
                             part.tings.forEach(ting => {

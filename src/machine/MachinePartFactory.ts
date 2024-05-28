@@ -20,6 +20,8 @@ namespace MarbleRunSimulatorCore {
         "gravitywell",
         "shooter-8",
         "controler",
+        "screen",
+        "speeder"
     ];
 
     export interface IMachinePartProp {
@@ -170,8 +172,10 @@ namespace MarbleRunSimulatorCore {
                 return new Elevator(this.machine, prop);
             }
             if (partName.startsWith("shooter-")) {
-                let h = parseInt(partName.split("-")[1]);
+                let h = parseInt(partName.split("-")[1].split(".")[0]);
+                let n = parseInt(partName.split("-")[1].split(".")[1]);
                 prop.h = h;
+                prop.n = n;
                 return new Shooter(this.machine, prop);
             }
             if (partName.startsWith("stairway-")) {
@@ -193,6 +197,12 @@ namespace MarbleRunSimulatorCore {
             }
             if (partName === "double") {
                 return new DoubleNote(this.machine, prop);
+            }
+            if (partName === "screen") {
+                return new Screen(this.machine, prop);
+            }
+            if (partName === "speeder") {
+                return new Speeder(this.machine, prop);
             }
         }
 
@@ -262,6 +272,12 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "double") {
                 return new DoubleNote(this.machine, prop);
+            }
+            if (baseName === "screen") {
+                return new Screen(this.machine, prop);
+            }
+            if (baseName === "speeder") {
+                return new Speeder(this.machine, prop);
             }
         }
     }

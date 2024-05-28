@@ -643,6 +643,23 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Screen extends MachinePart {
+        private _animatePivot;
+        pixels: BABYLON.Mesh[];
+        value: number;
+        came: BABYLON.Mesh;
+        cameInCollider: BABYLON.Mesh;
+        cameOutCollider: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        rotatePixels(origin: number, target: number, duration: number, easing?: (v: number) => number): Promise<void>;
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+        private _moving;
+        get isMoving(): boolean;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class Screw extends MachinePart {
         rotor: BABYLON.Mesh;
         screwWire: Wire;
@@ -691,7 +708,7 @@ declare namespace MarbleRunSimulatorCore {
         animateKickerKick: (target: number, duration: number) => Promise<void>;
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number, n: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         get shieldOpened(): boolean;
@@ -714,6 +731,12 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Speeder extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class Spiral extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(w: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
@@ -730,7 +753,7 @@ declare namespace MarbleRunSimulatorCore {
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
+        static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         private _exitLeft;
