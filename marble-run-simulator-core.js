@@ -403,7 +403,7 @@ var MarbleRunSimulatorCore;
                                         this.velocity.scaleInPlace(0.99);
                                     }
                                 }
-                                else if (part.isMoving) {
+                                else if (part.isMoving && !part.isInside(this)) {
                                     col = Mummu.SphereMeshIntersection(this.position, this.radius, part.cameOutCollider);
                                     if (col.hit) {
                                         //this.setLastHit(wire, col.index);
@@ -4730,6 +4730,8 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             this._animatePivot = Mummu.AnimationFactory.EmptyNumberCallback;
+            this._animateLock0 = Mummu.AnimationFactory.EmptyNumberCallback;
+            this._animateLock2 = Mummu.AnimationFactory.EmptyNumberCallback;
             this.pixels = [];
             this.value = 0;
             this._moving = false;
@@ -4744,14 +4746,20 @@ var MarbleRunSimulatorCore;
                 new BABYLON.Mesh("pixel-2"),
                 new BABYLON.Mesh("pixel-3")
             ];
+            this.lock0 = new BABYLON.Mesh("lock-0");
+            this.lock0.position.copyFromFloats(0, -0.007, 0.01);
+            this.lock0.parent = this.pixels[0];
+            this.lock2 = new BABYLON.Mesh("lock-1");
+            this.lock2.position.copyFromFloats(0, -0.007, -0.01);
+            this.lock2.parent = this.pixels[2];
             this.pixels[0].parent = this;
-            this.pixels[0].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, 0, -MarbleRunSimulatorCore.tileDepth / 4);
+            this.pixels[0].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -0.001, -MarbleRunSimulatorCore.tileDepth / 4 + 0.001);
             this.pixels[1].parent = this;
-            this.pixels[1].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, 0, MarbleRunSimulatorCore.tileDepth / 4);
+            this.pixels[1].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -0.001, MarbleRunSimulatorCore.tileDepth / 4 - 0.001);
             this.pixels[2].parent = this;
-            this.pixels[2].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight, MarbleRunSimulatorCore.tileDepth / 4);
+            this.pixels[2].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight + 0.001, MarbleRunSimulatorCore.tileDepth / 4 - 0.001);
             this.pixels[3].parent = this;
-            this.pixels[3].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight, -MarbleRunSimulatorCore.tileDepth / 4);
+            this.pixels[3].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight + 0.001, -MarbleRunSimulatorCore.tileDepth / 4 + 0.001);
             this.came = new BABYLON.Mesh("came");
             this.came.parent = this;
             this.came.position.copyFromFloats(-MarbleRunSimulatorCore.tileWidth * 0.5 + 0.014, -MarbleRunSimulatorCore.tileHeight * 0.25, 0);
@@ -4767,19 +4775,27 @@ var MarbleRunSimulatorCore;
                 this.came.getChildMeshes().forEach((child) => {
                     child.freezeWorldMatrix();
                 });
-            }, false, Nabu.Easing.easeInSquare);
+            }, false, Nabu.Easing.easePendulum);
+            this._animateLock0 = Mummu.AnimationFactory.CreateNumber(this.lock0, this.lock0.rotation, "x", () => {
+                this.lock0.freezeWorldMatrix();
+            }, false, Nabu.Easing.easeInCubic);
+            this._animateLock2 = Mummu.AnimationFactory.CreateNumber(this.lock2, this.lock2.rotation, "x", () => {
+                this.lock2.freezeWorldMatrix();
+            }, false, Nabu.Easing.easeInCubic);
         }
         rotatePixels(origin, target, duration, easing) {
             return new Promise(resolve => {
-                let rz0s = [0, 0, 0, 0];
-                let rz1s = [0, 0, 0, 0];
+                let lock0Target = 0;
+                let lock2Target = 0;
+                let rz0s = [2 * Math.PI, 2 * Math.PI, 0, 0];
+                let rz1s = [2 * Math.PI, 2 * Math.PI, 0, 0];
                 if (origin & 0b1) {
                     rz0s[0] = Math.PI;
-                    rz1s[0] = 2 * Math.PI;
+                    rz1s[0] = 0;
                 }
                 if (origin & 0b10) {
                     rz0s[1] = Math.PI;
-                    rz1s[1] = 2 * Math.PI;
+                    rz1s[1] = 0;
                 }
                 if (origin & 0b100) {
                     rz0s[2] = Math.PI;
@@ -4791,16 +4807,22 @@ var MarbleRunSimulatorCore;
                 }
                 if (target & 0b1) {
                     rz1s[0] = Math.PI;
+                    lock0Target = -Math.PI * 0.5;
                 }
                 if (target & 0b10) {
                     rz1s[1] = Math.PI;
                 }
                 if (target & 0b100) {
                     rz1s[2] = Math.PI;
+                    lock2Target = Math.PI * 0.5;
                 }
                 if (target & 0b1000) {
                     rz1s[3] = Math.PI;
                 }
+                setTimeout(() => {
+                    this._animateLock0(lock0Target, 1);
+                    this._animateLock2(lock2Target, 1);
+                }, duration * 1000 * 0.4);
                 let t0 = performance.now();
                 if (this["rotatePixels_animation"]) {
                     this.game.scene.onBeforeRenderObservable.removeCallback(this["rotatePixels_animation"]);
@@ -4815,6 +4837,8 @@ var MarbleRunSimulatorCore;
                             this.pixels[i].rotation.z = rz0s[i] * (1 - f) + rz1s[i] * f;
                             this.pixels[i].freezeWorldMatrix();
                         }
+                        this.lock0.freezeWorldMatrix();
+                        this.lock2.freezeWorldMatrix();
                     }
                     else {
                         for (let i = 0; i < 4; i++) {
@@ -4837,9 +4861,13 @@ var MarbleRunSimulatorCore;
             screenData[1].applyToMesh(this.cameInCollider);
             screenData[2].applyToMesh(this.cameOutCollider);
             for (let i = 0; i < 4; i++) {
-                screenData[3].applyToMesh(this.pixels[i]);
+                screenData[3 + i].applyToMesh(this.pixels[i]);
                 this.pixels[i].material = this.game.materials.whiteAutolitMaterial;
             }
+            screenData[7].applyToMesh(this.lock0);
+            this.lock0.material = this.game.materials.getMaterial(0);
+            screenData[7].applyToMesh(this.lock2);
+            this.lock2.material = this.game.materials.getMaterial(0);
         }
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -4897,16 +4925,24 @@ var MarbleRunSimulatorCore;
             template.initialize();
             return template;
         }
-        get isMoving() {
-            return this._moving;
-        }
-        update(dt) {
+        isInside(ball) {
             let dY = 0.014;
             let yIn = 0;
             let yOut = -MarbleRunSimulatorCore.tileHeight;
             let cY = (yIn + yOut + dY) * 0.5;
             let center = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY, 0);
             center.addInPlace(this.position);
+            let delta = ball.position.subtract(this.position);
+            if (Math.abs(delta.z) < 0.03) {
+                if (Math.abs(delta.y) < 0.03) {
+                    return delta.x > 0 && delta.x < 0.05;
+                }
+            }
+        }
+        get isMoving() {
+            return this._moving;
+        }
+        update(dt) {
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
@@ -4917,14 +4953,14 @@ var MarbleRunSimulatorCore;
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
                                 ball.marbleChocSound.play();
-                                this._animatePivot(-2 * Math.PI, 0.5 / this.game.currentTimeFactor).then(() => {
+                                this._animatePivot(-2 * Math.PI, 2 / this.game.currentTimeFactor).then(() => {
                                     //this.clicSound.play();
                                     this.came.rotation.z = 0;
                                     setTimeout(() => {
                                         this._moving = false;
                                     }, 100 / this.game.currentTimeFactor);
                                 });
-                                this.rotatePixels(this.value, (this.value + 1) % 16, 0.5 / this.game.currentTimeFactor);
+                                this.rotatePixels(this.value, (this.value + 1) % 16, 2 / this.game.currentTimeFactor, Nabu.Easing.easePendulum);
                                 this.value = (this.value + 1) % 16;
                                 return;
                             }

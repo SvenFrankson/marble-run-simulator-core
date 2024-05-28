@@ -447,7 +447,7 @@ namespace MarbleRunSimulatorCore {
                                         this.velocity.scaleInPlace(0.99);
                                     }
                                 }
-                                else if (part.isMoving) {
+                                else if (part.isMoving && !part.isInside(this)) {
                                     col = Mummu.SphereMeshIntersection(this.position, this.radius, part.cameOutCollider);
                                     if (col.hit) {
                                         //this.setLastHit(wire, col.index);
