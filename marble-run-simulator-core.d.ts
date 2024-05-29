@@ -334,6 +334,9 @@ declare namespace MarbleRunSimulatorCore {
         localPosition: BABYLON.Vector3;
         machinePart: MachinePart;
         connectedEndPoint: MachinePartEndpoint;
+        i: number;
+        j: number;
+        k: number;
         constructor(localPosition: BABYLON.Vector3, machinePart: MachinePart);
         get leftSide(): boolean;
         private _absolutePosition;

@@ -2182,7 +2182,13 @@ var MarbleRunSimulatorCore;
         constructor(localPosition, machinePart) {
             this.localPosition = localPosition;
             this.machinePart = machinePart;
+            this.i = 0;
+            this.j = 0;
+            this.k = 0;
             this._absolutePosition = BABYLON.Vector3.Zero();
+            this.i = Math.round((localPosition.x + MarbleRunSimulatorCore.tileWidth * 0.5) / MarbleRunSimulatorCore.tileWidth);
+            this.j = -Math.round((localPosition.y) / MarbleRunSimulatorCore.tileHeight);
+            this.k = -Math.round((localPosition.z) / MarbleRunSimulatorCore.tileDepth);
         }
         get leftSide() {
             return this.localPosition.x < 0;

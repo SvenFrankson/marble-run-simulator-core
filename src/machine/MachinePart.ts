@@ -48,12 +48,17 @@ namespace MarbleRunSimulatorCore {
     export class MachinePartEndpoint {
 
         public connectedEndPoint: MachinePartEndpoint;
+        public i: number = 0;
+        public j: number = 0;
+        public k: number = 0;
 
         constructor(
             public localPosition: BABYLON.Vector3,
             public machinePart: MachinePart
         ) {
-
+            this.i = Math.round((localPosition.x + tileWidth * 0.5) / tileWidth);
+            this.j = - Math.round((localPosition.y) / tileHeight);
+            this.k = - Math.round((localPosition.z) / tileDepth);
         }
 
         public get leftSide(): boolean {
