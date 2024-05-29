@@ -185,6 +185,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(hotReload?: boolean): Promise<void> {
+            this.instantiated = false;
             this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
 
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
