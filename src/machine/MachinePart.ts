@@ -45,6 +45,41 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
+    export class MachinePartEndpoint {
+
+        public connectedEndPoint: MachinePartEndpoint;
+
+        constructor(
+            public localPosition: BABYLON.Vector3,
+            public machinePart: MachinePart
+        ) {
+
+        }
+
+        public get leftSide(): boolean {
+            return this.localPosition.x < 0;
+        }
+
+        private _absolutePosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public get absolutePosition(): BABYLON.Vector3 {
+            this._absolutePosition.copyFrom(this.localPosition);
+            this._absolutePosition.addInPlace(this.machinePart.position);
+            return this._absolutePosition;
+        }
+
+        public connectTo(endPoint: MachinePartEndpoint) {
+            this.connectedEndPoint = endPoint;
+            endPoint.connectedEndPoint = this;
+        }
+
+        public disconnect(): void {
+            if (this.connectedEndPoint) {
+                this.connectedEndPoint.connectedEndPoint = undefined;
+            }
+            this.connectedEndPoint = undefined;
+        }
+    }
+
     export class MachinePart extends BABYLON.Mesh {
         public fullPartName: string = "";
 
@@ -85,12 +120,29 @@ namespace MarbleRunSimulatorCore {
         public enclose23: BABYLON.Vector3 = BABYLON.Vector3.One().scaleInPlace(2 / 3);
         public encloseEnd: BABYLON.Vector3 = BABYLON.Vector3.One();
 
+        public endPoints: MachinePartEndpoint[] = [];
         public neighbours: Nabu.UniqueList<MachinePart> = new Nabu.UniqueList<MachinePart>();
         public addNeighbour(other: MachinePart): void {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let thisEndpoint = this.endPoints[i];
+                for (let j = 0; j < other.endPoints.length; j++) {
+                    let otherEndpoint = other.endPoints[j];
+                    if (BABYLON.Vector3.Distance(thisEndpoint.absolutePosition, otherEndpoint.absolutePosition) < 0.001) {
+                        thisEndpoint.disconnect();
+                        thisEndpoint.connectTo(otherEndpoint);
+                    }
+                }
+            }
             this.neighbours.push(other);
             other.neighbours.push(this);
         }
         public removeNeighbour(other: MachinePart): void {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let thisEndpoint = this.endPoints[i];
+                if (thisEndpoint.connectedEndPoint && thisEndpoint.connectedEndPoint.machinePart === other) {
+                    thisEndpoint.disconnect();
+                }
+            }
             this.neighbours.remove(other);
             other.neighbours.remove(this);
         }
@@ -162,6 +214,10 @@ namespace MarbleRunSimulatorCore {
         }
         public setTemplate(template: MachinePartTemplate) {
             this._template = template;
+            this.endPoints = [];
+            for (let i = 0; i < this._template.endPoints.length; i++) {
+                this.endPoints[i] = new MachinePartEndpoint(this._template.endPoints[i], this);
+            }
         }
 
         public sleepersMeshProp: ISleeperMeshProps;

@@ -51,6 +51,16 @@ namespace MarbleRunSimulatorCore {
 
         public onNormalEvaluated: (n: BABYLON.Vector3, p?: BABYLON.Vector3, relativeIndex?: number) => void;
         public initialize(): void {
+            if (this.trackpoints[0] && this.trackpoints[this.trackpoints.length - 1]) {
+                let start = this.trackpoints[0].position;
+                if (Tools.IsWorldPosAConnexion(start)) {
+                    this.partTemplate.endPoints.push(start.clone());
+                }
+                let end = this.trackpoints[this.trackpoints.length - 1].position;
+                if (Tools.IsWorldPosAConnexion(end)) {
+                    this.partTemplate.endPoints.push(end.clone());
+                }
+            }
             for (let i = 1; i < this.trackpoints.length - 1; i++) {
                 let prevTrackPoint = this.trackpoints[i - 1];
                 let trackPoint = this.trackpoints[i];
@@ -262,6 +272,8 @@ namespace MarbleRunSimulatorCore {
 
         public trackTemplates: TrackTemplate[] = [];
 
+        public endPoints: BABYLON.Vector3[] = [];
+
         public mirrorXTrackPointsInPlace(): void {
             for (let i = 0; i < this.trackTemplates.length; i++) {
                 this.trackTemplates[i].mirrorXTrackPointsInPlace();
@@ -278,6 +290,7 @@ namespace MarbleRunSimulatorCore {
             this.trackTemplates.forEach((trackTemplate) => {
                 trackTemplate.initialize();
             });
+            console.log(this.partName + " has " + this.endPoints.length + " endpoints");
         }
     }
 

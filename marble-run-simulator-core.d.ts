@@ -122,6 +122,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Tools {
         static V3Dir(angleInDegrees: number, length?: number): BABYLON.Vector3;
+        static IsWorldPosAConnexion(worldPos: BABYLON.Vector3): boolean;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -329,6 +330,17 @@ declare namespace MarbleRunSimulatorCore {
         part: MachinePart;
         constructor(part: MachinePart);
     }
+    class MachinePartEndpoint {
+        localPosition: BABYLON.Vector3;
+        machinePart: MachinePart;
+        connectedEndPoint: MachinePartEndpoint;
+        constructor(localPosition: BABYLON.Vector3, machinePart: MachinePart);
+        get leftSide(): boolean;
+        private _absolutePosition;
+        get absolutePosition(): BABYLON.Vector3;
+        connectTo(endPoint: MachinePartEndpoint): void;
+        disconnect(): void;
+    }
     class MachinePart extends BABYLON.Mesh {
         machine: Machine;
         isPlaced: boolean;
@@ -357,6 +369,7 @@ declare namespace MarbleRunSimulatorCore {
         encloseMid: BABYLON.Vector3;
         enclose23: BABYLON.Vector3;
         encloseEnd: BABYLON.Vector3;
+        endPoints: MachinePartEndpoint[];
         neighbours: Nabu.UniqueList<MachinePart>;
         addNeighbour(other: MachinePart): void;
         removeNeighbour(other: MachinePart): void;
@@ -499,6 +512,7 @@ declare namespace MarbleRunSimulatorCore {
         zMirrorable: boolean;
         hasOriginDestinationHandles: boolean;
         trackTemplates: TrackTemplate[];
+        endPoints: BABYLON.Vector3[];
         mirrorXTrackPointsInPlace(): void;
         mirrorZTrackPointsInPlace(): void;
         initialize(): void;

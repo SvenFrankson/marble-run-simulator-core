@@ -1011,6 +1011,21 @@ var MarbleRunSimulatorCore;
         static V3Dir(angleInDegrees, length = 1) {
             return new BABYLON.Vector3(Math.sin((angleInDegrees / 180) * Math.PI) * length, Math.cos((angleInDegrees / 180) * Math.PI) * length, 0);
         }
+        static IsWorldPosAConnexion(worldPos) {
+            let dx = Math.abs((worldPos.x + MarbleRunSimulatorCore.tileWidth * 0.5) - Math.round((worldPos.x + MarbleRunSimulatorCore.tileWidth * 0.5) / MarbleRunSimulatorCore.tileWidth) * MarbleRunSimulatorCore.tileWidth);
+            if (dx > 0.001) {
+                return false;
+            }
+            let dy = Math.abs(worldPos.y - Math.round(worldPos.y / MarbleRunSimulatorCore.tileHeight) * MarbleRunSimulatorCore.tileHeight);
+            if (dy > 0.001) {
+                return false;
+            }
+            let dz = Math.abs(worldPos.z - Math.round(worldPos.z / MarbleRunSimulatorCore.tileDepth) * MarbleRunSimulatorCore.tileDepth);
+            if (dz > 0.001) {
+                return false;
+            }
+            return true;
+        }
     }
     MarbleRunSimulatorCore.Tools = Tools;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
@@ -2163,6 +2178,32 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.MachinePartSelectorMesh = MachinePartSelectorMesh;
+    class MachinePartEndpoint {
+        constructor(localPosition, machinePart) {
+            this.localPosition = localPosition;
+            this.machinePart = machinePart;
+            this._absolutePosition = BABYLON.Vector3.Zero();
+        }
+        get leftSide() {
+            return this.localPosition.x < 0;
+        }
+        get absolutePosition() {
+            this._absolutePosition.copyFrom(this.localPosition);
+            this._absolutePosition.addInPlace(this.machinePart.position);
+            return this._absolutePosition;
+        }
+        connectTo(endPoint) {
+            this.connectedEndPoint = endPoint;
+            endPoint.connectedEndPoint = this;
+        }
+        disconnect() {
+            if (this.connectedEndPoint) {
+                this.connectedEndPoint.connectedEndPoint = undefined;
+            }
+            this.connectedEndPoint = undefined;
+        }
+    }
+    MarbleRunSimulatorCore.MachinePartEndpoint = MachinePartEndpoint;
     class MachinePart extends BABYLON.Mesh {
         constructor(machine, prop, isPlaced = true) {
             super("track", machine.game.scene);
@@ -2187,6 +2228,7 @@ var MarbleRunSimulatorCore;
             this.encloseMid = BABYLON.Vector3.One().scaleInPlace(0.5);
             this.enclose23 = BABYLON.Vector3.One().scaleInPlace(2 / 3);
             this.encloseEnd = BABYLON.Vector3.One();
+            this.endPoints = [];
             this.neighbours = new Nabu.UniqueList();
             this.offsetPosition = BABYLON.Vector3.Zero();
             this._i = 0;
@@ -2222,10 +2264,26 @@ var MarbleRunSimulatorCore;
             return this.colors[index];
         }
         addNeighbour(other) {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let thisEndpoint = this.endPoints[i];
+                for (let j = 0; j < other.endPoints.length; j++) {
+                    let otherEndpoint = other.endPoints[j];
+                    if (BABYLON.Vector3.Distance(thisEndpoint.absolutePosition, otherEndpoint.absolutePosition) < 0.001) {
+                        thisEndpoint.disconnect();
+                        thisEndpoint.connectTo(otherEndpoint);
+                    }
+                }
+            }
             this.neighbours.push(other);
             other.neighbours.push(this);
         }
         removeNeighbour(other) {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let thisEndpoint = this.endPoints[i];
+                if (thisEndpoint.connectedEndPoint && thisEndpoint.connectedEndPoint.machinePart === other) {
+                    thisEndpoint.disconnect();
+                }
+            }
             this.neighbours.remove(other);
             other.neighbours.remove(this);
         }
@@ -2293,6 +2351,10 @@ var MarbleRunSimulatorCore;
         }
         setTemplate(template) {
             this._template = template;
+            this.endPoints = [];
+            for (let i = 0; i < this._template.endPoints.length; i++) {
+                this.endPoints[i] = new MachinePartEndpoint(this._template.endPoints[i], this);
+            }
         }
         get i() {
             return this._i;
@@ -3149,6 +3211,16 @@ var MarbleRunSimulatorCore;
             }
         }
         initialize() {
+            if (this.trackpoints[0] && this.trackpoints[this.trackpoints.length - 1]) {
+                let start = this.trackpoints[0].position;
+                if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(start)) {
+                    this.partTemplate.endPoints.push(start.clone());
+                }
+                let end = this.trackpoints[this.trackpoints.length - 1].position;
+                if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(end)) {
+                    this.partTemplate.endPoints.push(end.clone());
+                }
+            }
             for (let i = 1; i < this.trackpoints.length - 1; i++) {
                 let prevTrackPoint = this.trackpoints[i - 1];
                 let trackPoint = this.trackpoints[i];
@@ -3336,6 +3408,7 @@ var MarbleRunSimulatorCore;
             this.zMirrorable = false;
             this.hasOriginDestinationHandles = false;
             this.trackTemplates = [];
+            this.endPoints = [];
         }
         mirrorXTrackPointsInPlace() {
             for (let i = 0; i < this.trackTemplates.length; i++) {
@@ -3351,6 +3424,7 @@ var MarbleRunSimulatorCore;
             this.trackTemplates.forEach((trackTemplate) => {
                 trackTemplate.initialize();
             });
+            console.log(this.partName + " has " + this.endPoints.length + " endpoints");
         }
     }
     MarbleRunSimulatorCore.MachinePartTemplate = MachinePartTemplate;
