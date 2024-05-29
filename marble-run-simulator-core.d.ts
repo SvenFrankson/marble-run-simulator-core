@@ -647,7 +647,10 @@ declare namespace MarbleRunSimulatorCore {
         private _animatePivot;
         private _animateLock0;
         private _animateLock2;
+        private _animateTingle2Out;
+        private _animateTingle2In;
         pixels: BABYLON.Mesh[];
+        pixelPictures: BABYLON.Mesh[];
         lock0: BABYLON.Mesh;
         lock2: BABYLON.Mesh;
         value: number;
@@ -655,6 +658,7 @@ declare namespace MarbleRunSimulatorCore {
         cameInCollider: BABYLON.Mesh;
         cameOutCollider: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        tingle2(duration: number): Promise<void>;
         rotatePixels(origin: number, target: number, duration: number, easing?: (v: number) => number): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
