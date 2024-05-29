@@ -53,7 +53,7 @@ namespace MarbleRunSimulatorCore {
 
             prop.h = Nabu.MinMax(prop.h, 3, 22);
             if (isNaN(prop.n)) {
-                prop.n = 1;
+                prop.n = 0;
             }
 
             let partName = "shooter-" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
@@ -193,7 +193,10 @@ namespace MarbleRunSimulatorCore {
             template.mirrorX = mirrorX;
 
             template.yExtendable = true;
+            template.minH = 4;
             template.nExtendable = true;
+            template.minN = 0;
+            template.maxN = 10;
             template.xMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);

@@ -10,6 +10,7 @@ namespace MarbleRunSimulatorCore {
 
         public preferedStartBank: number = 0;
         public preferedEndBank: number = 0;
+        public cutOutSleeper: (n: number) => boolean;
 
         public colorIndex: number = 0;
 
@@ -253,6 +254,8 @@ namespace MarbleRunSimulatorCore {
         public minH: number = 0;
         public minD: number = 1;
         public maxD: number = 10;
+        public minN: number = 1;
+        public maxN: number = 1;
         public xMirrorable: boolean = false;
         public zMirrorable: boolean = false;
         public hasOriginDestinationHandles: boolean = false;

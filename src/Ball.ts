@@ -97,7 +97,7 @@ namespace MarbleRunSimulatorCore {
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./lib/marble-run-simulator-core/datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
-            this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
+            this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop-2.wav", this.getScene(), undefined, { loop: true, autoplay: true });
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
             this.marbleBowlLoopSound.setVolume(0);
@@ -252,15 +252,15 @@ namespace MarbleRunSimulatorCore {
                 });
             }
 
-            this._timer += dt * this.game.currentTimeFactor;
+            this._timer += dt;
             this._timer = Math.min(this._timer, 1);
 
             while (this._timer > 0) {
                 let m = this.mass;
-                let dt = this.game.physicDT;
+                let physicDT = this.game.physicDT;
                 let f = this.velocity.length();
                 f = Math.max(Math.min(f, 1), 0.4);
-                this._timer -= dt / f;
+                this._timer -= physicDT / f;
 
                 let weight = new BABYLON.Vector3(0, -9 * m, 0);
                 let reactions = BABYLON.Vector3.Zero();
@@ -622,8 +622,8 @@ namespace MarbleRunSimulatorCore {
                             }
                         }
                     }
-                    this.strReaction = this.strReaction * 0.98;
-                    this.strReaction += reactions.length() * 0.02;
+                    this.strReaction = this.strReaction * 0.2;
+                    this.strReaction += reactions.length() * 0.8;
                     this.velocity.subtractInPlace(canceledSpeed);
                     //this.velocity.addInPlace(forcedDisplacement.scale(0.1 * 1 / dt));
                     this.position.addInPlace(forcedDisplacement);
@@ -637,19 +637,18 @@ namespace MarbleRunSimulatorCore {
                         .add(reactions)
                         .add(friction)
                         .scaleInPlace(1 / m);
-                    this.velocity.addInPlace(acceleration.scale(dt));
+                    this.velocity.addInPlace(acceleration.scale(physicDT));
     
-                    this.position.addInPlace(this.velocity.scale(dt));
-                }
+                    this.position.addInPlace(this.velocity.scale(physicDT));
 
-                if (reactions.length() > 0) {
-                    BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis).normalize();
-                    this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
-                    if (reactionsCount > 2) {
-                        this.rotationSpeed /= 3;
+                    if (reactions.length() > 0) {
+                        BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis).normalize();
+                        this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
+                        if (reactionsCount > 2) {
+                            this.rotationSpeed /= 4;
+                        }
                     }
                 }
-                this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
             }
 
             if (this.lastPosition) {
@@ -660,9 +659,12 @@ namespace MarbleRunSimulatorCore {
             }
             this.lastPosition.copyFrom(this.position);
 
+            
+            this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
+
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
-                    this.flyBackProgress += dt * this.game.currentTimeFactor / this.flyBackDuration;
+                    this.flyBackProgress += dt / this.flyBackDuration;
                     let dirOrigin = this.flybackPeak.subtract(this.flybackOrigin);
                     let dirDestination = this.flybackDestination.subtract(this.flybackPeak);
                     let f = this.flyBackProgress;
@@ -680,12 +682,12 @@ namespace MarbleRunSimulatorCore {
 
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
-                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor);
-                this.marbleLoopSound.setVolume(6 * this.strReaction * f * this.game.mainVolume);
+                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 5) + 0.8);
+                this.marbleLoopSound.setVolume(12 * this.strReaction * f * this.game.mainVolume, 0.1);
                 this.marbleBowlLoopSound.setVolume(0, 0.5);
             } else if (this.surface === Surface.Bowl) {
                 this.marbleBowlLoopSound.setPlaybackRate(this.game.currentTimeFactor);
-                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume);
+                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume, 0.1);
                 this.marbleLoopSound.setVolume(0, 0.5);
             }
             let sign2 = Math.sign(this.velocity.y);

@@ -99,6 +99,10 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
 
+                    if (track.template.cutOutSleeper && track.template.cutOutSleeper(i)) {
+                        addSleeper = false;
+                    }
+
                     let anchor: BABYLON.Vector3 = BABYLON.Vector3.Zero();
                     if (addSleeper && sleeperPieceVertexData) {
                         anchor = new BABYLON.Vector3(0, - radiusPath, 0);

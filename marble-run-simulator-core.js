@@ -53,7 +53,7 @@ var MarbleRunSimulatorCore;
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./lib/marble-run-simulator-core/datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
-            this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
+            this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop-2.wav", this.getScene(), undefined, { loop: true, autoplay: true });
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
             this.marbleBowlLoopSound.setVolume(0);
@@ -218,14 +218,14 @@ var MarbleRunSimulatorCore;
                     });
                 });
             }
-            this._timer += dt * this.game.currentTimeFactor;
+            this._timer += dt;
             this._timer = Math.min(this._timer, 1);
             while (this._timer > 0) {
                 let m = this.mass;
-                let dt = this.game.physicDT;
+                let physicDT = this.game.physicDT;
                 let f = this.velocity.length();
                 f = Math.max(Math.min(f, 1), 0.4);
-                this._timer -= dt / f;
+                this._timer -= physicDT / f;
                 let weight = new BABYLON.Vector3(0, -9 * m, 0);
                 let reactions = BABYLON.Vector3.Zero();
                 let reactionsCount = 0;
@@ -568,8 +568,8 @@ var MarbleRunSimulatorCore;
                             }
                         }
                     }
-                    this.strReaction = this.strReaction * 0.98;
-                    this.strReaction += reactions.length() * 0.02;
+                    this.strReaction = this.strReaction * 0.2;
+                    this.strReaction += reactions.length() * 0.8;
                     this.velocity.subtractInPlace(canceledSpeed);
                     //this.velocity.addInPlace(forcedDisplacement.scale(0.1 * 1 / dt));
                     this.position.addInPlace(forcedDisplacement);
@@ -581,17 +581,16 @@ var MarbleRunSimulatorCore;
                         .add(reactions)
                         .add(friction)
                         .scaleInPlace(1 / m);
-                    this.velocity.addInPlace(acceleration.scale(dt));
-                    this.position.addInPlace(this.velocity.scale(dt));
-                }
-                if (reactions.length() > 0) {
-                    BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis).normalize();
-                    this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
-                    if (reactionsCount > 2) {
-                        this.rotationSpeed /= 3;
+                    this.velocity.addInPlace(acceleration.scale(physicDT));
+                    this.position.addInPlace(this.velocity.scale(physicDT));
+                    if (reactions.length() > 0) {
+                        BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis).normalize();
+                        this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
+                        if (reactionsCount > 2) {
+                            this.rotationSpeed /= 4;
+                        }
                     }
                 }
-                this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
             }
             if (this.lastPosition) {
                 this.visibleVelocity.copyFrom(this.position).subtractInPlace(this.lastPosition).scaleInPlace(1 / dt);
@@ -600,9 +599,10 @@ var MarbleRunSimulatorCore;
                 }
             }
             this.lastPosition.copyFrom(this.position);
+            this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
-                    this.flyBackProgress += dt * this.game.currentTimeFactor / this.flyBackDuration;
+                    this.flyBackProgress += dt / this.flyBackDuration;
                     let dirOrigin = this.flybackPeak.subtract(this.flybackOrigin);
                     let dirDestination = this.flybackDestination.subtract(this.flybackPeak);
                     let f = this.flyBackProgress;
@@ -619,13 +619,13 @@ var MarbleRunSimulatorCore;
             }
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
-                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor);
-                this.marbleLoopSound.setVolume(6 * this.strReaction * f * this.game.mainVolume);
+                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 5) + 0.8);
+                this.marbleLoopSound.setVolume(12 * this.strReaction * f * this.game.mainVolume, 0.1);
                 this.marbleBowlLoopSound.setVolume(0, 0.5);
             }
             else if (this.surface === Surface.Bowl) {
                 this.marbleBowlLoopSound.setPlaybackRate(this.game.currentTimeFactor);
-                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume);
+                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume, 0.1);
                 this.marbleLoopSound.setVolume(0, 0.5);
             }
             let sign2 = Math.sign(this.velocity.y);
@@ -1339,7 +1339,7 @@ var MarbleRunSimulatorCore;
                 let dt = this.game.scene.deltaTime / 1000;
                 if (isFinite(dt)) {
                     for (let i = 0; i < this.balls.length; i++) {
-                        this.balls[i].update(dt);
+                        this.balls[i].update(dt * this.game.currentTimeFactor);
                     }
                     for (let i = 0; i < this.parts.length; i++) {
                         this.parts[i].update(dt);
@@ -2266,6 +2266,12 @@ var MarbleRunSimulatorCore;
         get maxD() {
             return this.template.maxD;
         }
+        get minN() {
+            return this.template.minN;
+        }
+        get maxN() {
+            return this.template.maxN;
+        }
         get xMirrorable() {
             return this.template.xMirrorable;
         }
@@ -2977,6 +2983,9 @@ var MarbleRunSimulatorCore;
                             addSleeper = true;
                         }
                     }
+                    if (track.template.cutOutSleeper && track.template.cutOutSleeper(i)) {
+                        addSleeper = false;
+                    }
                     let anchor = BABYLON.Vector3.Zero();
                     if (addSleeper && sleeperPieceVertexData) {
                         anchor = new BABYLON.Vector3(0, -radiusPath, 0);
@@ -3314,6 +3323,8 @@ var MarbleRunSimulatorCore;
             this.minH = 0;
             this.minD = 1;
             this.maxD = 10;
+            this.minN = 1;
+            this.maxN = 1;
             this.xMirrorable = false;
             this.zMirrorable = false;
             this.hasOriginDestinationHandles = false;
@@ -4733,13 +4744,13 @@ var MarbleRunSimulatorCore;
             this._animateLock0 = Mummu.AnimationFactory.EmptyNumberCallback;
             this._animateLock2 = Mummu.AnimationFactory.EmptyNumberCallback;
             this._animateTingle2Out = Mummu.AnimationFactory.EmptyNumberCallback;
-            this._animateTingle2Back = Mummu.AnimationFactory.EmptyNumberCallback;
             this.pixels = [];
             this.pixelPictures = [];
             this.value = 0;
             this.engraine12Up = false;
             this.engraine12Down = false;
             this.reset = () => {
+                this.value = 0;
                 let rz1s = [2 * Math.PI, 2 * Math.PI, 0, 0];
                 let lock0Target = 0;
                 let lock2Target = 0;
@@ -4768,6 +4779,8 @@ var MarbleRunSimulatorCore;
                 this.lock2.freezeWorldMatrix();
             };
             this._moving = false;
+            this._lastCamRotZ = 0;
+            this._visibleAngularSpeed = 0;
             let partName = "screen";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             for (let i = this.colors.length; i < 2; i++) {
@@ -4780,10 +4793,10 @@ var MarbleRunSimulatorCore;
                 new BABYLON.Mesh("pixel-3")
             ];
             this.lock0 = new BABYLON.Mesh("lock-0");
-            this.lock0.position.copyFromFloats(0.001, -0.007, 0.012);
+            this.lock0.position.copyFromFloats(0.0015, -0.009, 0.0115);
             this.lock0.parent = this.pixels[0];
             this.lock2 = new BABYLON.Mesh("lock-1");
-            this.lock2.position.copyFromFloats(0.001, -0.007, -0.012);
+            this.lock2.position.copyFromFloats(0.0015, -0.009, -0.0115);
             this.lock2.parent = this.pixels[2];
             this.pixels[0].parent = this;
             this.pixels[0].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, 0, -MarbleRunSimulatorCore.tileDepth / 4);
@@ -4795,9 +4808,8 @@ var MarbleRunSimulatorCore;
             this.pixels[3].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight, -MarbleRunSimulatorCore.tileDepth / 4);
             for (let i = 0; i < 4; i++) {
                 this.pixelPictures[i] = BABYLON.MeshBuilder.CreatePlane("pixel-pic", { width: 0.025, height: 0.026 });
-                this.pixelPictures[i].rotation.y = Math.PI * 0.5;
+                this.pixelPictures[i].rotation.y = Math.PI;
                 this.pixelPictures[i].parent = this.pixels[i];
-                this.pixelPictures[i].position.copyFromFloats(-0.0012, 0, 0);
             }
             this.pixelPictures[0].position.z = 0.0005;
             this.pixelPictures[1].position.z = -0.0005;
@@ -4817,6 +4829,8 @@ var MarbleRunSimulatorCore;
             this.cable.position.copyFrom(this.came.position);
             console.log(this.pixels[0].position.subtract(this.came.position));
             this.generateWires();
+            this.turnLoopSound = new BABYLON.Sound("screen-turn-sound", "./lib/marble-run-simulator-core/datas/sounds/screen-came.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.turnLoopSound.setVolume(0.2);
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
@@ -4837,23 +4851,15 @@ var MarbleRunSimulatorCore;
                 this.pixelPictures[2].freezeWorldMatrix();
                 this.lock2.freezeWorldMatrix();
             }, false, Nabu.Easing.easeOutSine);
-            this._animateTingle2Back = Mummu.AnimationFactory.CreateNumber(this.pixels[2], this.pixels[2].rotation, "z", () => {
-                this.pixels[2].freezeWorldMatrix();
-                this.pixelPictures[2].freezeWorldMatrix();
-                this.lock2.freezeWorldMatrix();
-            }, false, Nabu.Easing.easeInOutSine);
         }
         async tingle2(pixel2Value, duration) {
             let originZ = this.pixels[2].rotation.z;
             await this._animateTingle2Out(originZ + Math.PI / 4, duration * 0.18);
-            Mummu.DrawDebugPoint(this.pixels[2].absolutePosition.add(new BABYLON.Vector3(0, 0, 0.02)), 30, BABYLON.Color3.Red(), 0.01);
             if (pixel2Value) {
                 this.engraine12Up = true;
                 this.engraine12Down = false;
-                console.log("engraine12Up");
             }
             else {
-                console.log("engraine12Down");
                 this.engraine12Up = false;
                 this.engraine12Down = true;
             }
@@ -4901,9 +4907,9 @@ var MarbleRunSimulatorCore;
                     }, duration * 1000 * 0.32);
                 }
                 setTimeout(() => {
-                    this._animateLock0(lock0Target, duration * 0.15);
-                    this._animateLock2(lock2Target, duration * 0.15);
-                }, duration * 1000 * 0.5);
+                    this._animateLock0(lock0Target, duration * 0.1);
+                    this._animateLock2(lock2Target, duration * 0.1);
+                }, duration * 1000 * 0.7);
                 let t0 = performance.now();
                 if (this["rotatePixels_animation"]) {
                     this.game.scene.onBeforeRenderObservable.removeCallback(this["rotatePixels_animation"]);
@@ -4913,6 +4919,7 @@ var MarbleRunSimulatorCore;
                     if (f < 1) {
                         if (easing) {
                             f = easing(f);
+                            console.log((performance.now() - t0).toFixed(0) + "    " + f.toFixed(4));
                         }
                         for (let i = 0; i < 4; i++) {
                             if (i === 2 && tingle2Case) {
@@ -4962,7 +4969,8 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < 4; i++) {
                 screenData[3 + i].applyToMesh(this.pixels[i]);
                 this.pixels[i].material = this.game.materials.getMaterial(2);
-                this.pixelPictures[i].material = this.game.materials.whiteFullLitMaterial;
+                screenData[9].applyToMesh(this.pixelPictures[i]);
+                this.pixelPictures[i].material = this.game.materials.getMaterial(0);
             }
             screenData[7].applyToMesh(this.lock0);
             this.lock0.material = this.game.materials.getMaterial(2);
@@ -4992,6 +5000,7 @@ var MarbleRunSimulatorCore;
             let aMaxIn = Math.PI;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
+            template.trackTemplates[0].cutOutSleeper = () => { return true; };
             template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yIn, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0))];
             template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
@@ -5055,6 +5064,8 @@ var MarbleRunSimulatorCore;
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
                                 ball.marbleChocSound.play();
+                                this.turnLoopSound.setPlaybackRate(this.game.currentTimeFactor);
+                                this.turnLoopSound.play();
                                 this._animatePivot(-2 * Math.PI, 2 / this.game.currentTimeFactor).then(() => {
                                     //this.clicSound.play();
                                     this.came.rotation.z = 0;
@@ -5291,7 +5302,7 @@ var MarbleRunSimulatorCore;
             this.delayTimeout = 0;
             prop.h = Nabu.MinMax(prop.h, 3, 22);
             if (isNaN(prop.n)) {
-                prop.n = 1;
+                prop.n = 0;
             }
             let partName = "shooter-" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
@@ -5388,7 +5399,10 @@ var MarbleRunSimulatorCore;
             template.n = n;
             template.mirrorX = mirrorX;
             template.yExtendable = true;
+            template.minH = 4;
             template.nExtendable = true;
+            template.minN = 0;
+            template.maxN = 10;
             template.xMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();

@@ -374,6 +374,8 @@ declare namespace MarbleRunSimulatorCore {
         get minH(): number;
         get minD(): number;
         get maxD(): number;
+        get minN(): number;
+        get maxN(): number;
         get xMirrorable(): boolean;
         get zMirrorable(): boolean;
         get hasOriginDestinationHandles(): boolean;
@@ -460,6 +462,7 @@ declare namespace MarbleRunSimulatorCore {
         drawEndTip: boolean;
         preferedStartBank: number;
         preferedEndBank: number;
+        cutOutSleeper: (n: number) => boolean;
         colorIndex: number;
         summedLength: number[];
         totalLength: number;
@@ -490,6 +493,8 @@ declare namespace MarbleRunSimulatorCore {
         minH: number;
         minD: number;
         maxD: number;
+        minN: number;
+        maxN: number;
         xMirrorable: boolean;
         zMirrorable: boolean;
         hasOriginDestinationHandles: boolean;
@@ -648,7 +653,6 @@ declare namespace MarbleRunSimulatorCore {
         private _animateLock0;
         private _animateLock2;
         private _animateTingle2Out;
-        private _animateTingle2Back;
         pixels: BABYLON.Mesh[];
         pixelPictures: BABYLON.Mesh[];
         lock0: BABYLON.Mesh;
@@ -658,6 +662,7 @@ declare namespace MarbleRunSimulatorCore {
         cameInCollider: BABYLON.Mesh;
         cameOutCollider: BABYLON.Mesh;
         cable: BABYLON.Mesh;
+        turnLoopSound: BABYLON.Sound;
         constructor(machine: Machine, prop: IMachinePartProp);
         engraine12Up: boolean;
         engraine12Down: boolean;
@@ -669,6 +674,8 @@ declare namespace MarbleRunSimulatorCore {
         isInside(ball: Ball): boolean;
         private _moving;
         get isMoving(): boolean;
+        private _lastCamRotZ;
+        private _visibleAngularSpeed;
         update(dt: number): void;
     }
 }

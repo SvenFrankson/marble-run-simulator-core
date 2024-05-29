@@ -5,7 +5,6 @@ namespace MarbleRunSimulatorCore {
         private _animateLock0 = Mummu.AnimationFactory.EmptyNumberCallback;
         private _animateLock2 = Mummu.AnimationFactory.EmptyNumberCallback;
         private _animateTingle2Out = Mummu.AnimationFactory.EmptyNumberCallback;
-        private _animateTingle2Back = Mummu.AnimationFactory.EmptyNumberCallback;
 
         public pixels: BABYLON.Mesh[] = [];
         public pixelPictures: BABYLON.Mesh[] = [];
@@ -16,6 +15,7 @@ namespace MarbleRunSimulatorCore {
         public cameInCollider: BABYLON.Mesh;
         public cameOutCollider: BABYLON.Mesh;
         public cable: BABYLON.Mesh;
+        public turnLoopSound: BABYLON.Sound;
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
@@ -34,10 +34,10 @@ namespace MarbleRunSimulatorCore {
                 new BABYLON.Mesh("pixel-3")
             ]
             this.lock0 = new BABYLON.Mesh("lock-0");
-            this.lock0.position.copyFromFloats(0.001, -0.007, 0.012);
+            this.lock0.position.copyFromFloats(0.0015, -0.009, 0.0115);
             this.lock0.parent = this.pixels[0];
             this.lock2 = new BABYLON.Mesh("lock-1");
-            this.lock2.position.copyFromFloats(0.001, -0.007, - 0.012);
+            this.lock2.position.copyFromFloats(0.0015, -0.009, - 0.0115);
             this.lock2.parent = this.pixels[2];
             this.pixels[0].parent = this;
             this.pixels[0].position.copyFromFloats(tileWidth * 0.5 - 0.02, 0, - tileDepth / 4);
@@ -50,9 +50,8 @@ namespace MarbleRunSimulatorCore {
 
             for (let i = 0; i < 4; i++) {
                 this.pixelPictures[i] = BABYLON.MeshBuilder.CreatePlane("pixel-pic", { width: 0.025, height: 0.026 });
-                this.pixelPictures[i].rotation.y = Math.PI * 0.5;
+                this.pixelPictures[i].rotation.y = Math.PI;
                 this.pixelPictures[i].parent = this.pixels[i];
-                this.pixelPictures[i].position.copyFromFloats(- 0.0012, 0, 0);
             }
             this.pixelPictures[0].position.z = 0.0005;
             this.pixelPictures[1].position.z = - 0.0005;
@@ -76,6 +75,9 @@ namespace MarbleRunSimulatorCore {
             console.log(this.pixels[0].position.subtract(this.came.position));
 
             this.generateWires();
+
+            this.turnLoopSound = new BABYLON.Sound("screen-turn-sound", "./lib/marble-run-simulator-core/datas/sounds/screen-came.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.turnLoopSound.setVolume(0.2);
 
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
@@ -129,18 +131,6 @@ namespace MarbleRunSimulatorCore {
                 false,
                 Nabu.Easing.easeOutSine
             );
-            this._animateTingle2Back = Mummu.AnimationFactory.CreateNumber(
-                this.pixels[2],
-                this.pixels[2].rotation,
-                "z",
-                () => {
-                    this.pixels[2].freezeWorldMatrix();
-                    this.pixelPictures[2].freezeWorldMatrix();
-                    this.lock2.freezeWorldMatrix();
-                },
-                false,
-                Nabu.Easing.easeInOutSine
-            );
         }
 
         public engraine12Up = false;
@@ -148,14 +138,11 @@ namespace MarbleRunSimulatorCore {
         public async tingle2(pixel2Value: boolean, duration: number): Promise<void> {
             let originZ = this.pixels[2].rotation.z;
             await this._animateTingle2Out(originZ + Math.PI / 4, duration * 0.18);
-            Mummu.DrawDebugPoint(this.pixels[2].absolutePosition.add(new BABYLON.Vector3(0, 0, 0.02)), 30, BABYLON.Color3.Red(), 0.01);
             if (pixel2Value) {
                 this.engraine12Up = true;
                 this.engraine12Down = false;
-                console.log("engraine12Up")
             }
             else {
-                console.log("engraine12Down")
                 this.engraine12Up = false;
                 this.engraine12Down = true;
             }
@@ -214,9 +201,9 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 setTimeout(() => {
-                    this._animateLock0(lock0Target, duration * 0.15);
-                    this._animateLock2(lock2Target, duration * 0.15);
-                }, duration * 1000 * 0.5);
+                    this._animateLock0(lock0Target, duration * 0.1);
+                    this._animateLock2(lock2Target, duration * 0.1);
+                }, duration * 1000 * 0.7);
 
                 let t0 = performance.now();
                 if (this["rotatePixels_animation"]) {
@@ -227,6 +214,7 @@ namespace MarbleRunSimulatorCore {
                     if (f < 1) {
                         if (easing) {
                             f = easing(f);
+                            console.log((performance.now() - t0).toFixed(0) + "    " + f.toFixed(4));
                         }
                         for (let i = 0; i < 4; i++) {
                             if (i === 2 && tingle2Case) {
@@ -278,7 +266,8 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < 4; i++) {
                 screenData[3 + i].applyToMesh(this.pixels[i]);
                 this.pixels[i].material = this.game.materials.getMaterial(2);
-                this.pixelPictures[i].material = this.game.materials.whiteFullLitMaterial;
+                screenData[9].applyToMesh(this.pixelPictures[i]);
+                this.pixelPictures[i].material = this.game.materials.getMaterial(0);
             }
             screenData[7].applyToMesh(this.lock0);
             this.lock0.material = this.game.materials.getMaterial(2);
@@ -316,6 +305,7 @@ namespace MarbleRunSimulatorCore {
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
+            template.trackTemplates[0].cutOutSleeper = () => { return true; };
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, yIn, 0), Tools.V3Dir(90), Tools.V3Dir(0))];
 
             template.trackTemplates[1] = new TrackTemplate(template);
@@ -374,6 +364,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
+            this.value = 0;
             let rz1s: number[] = [2 * Math.PI, 2 * Math.PI, 0, 0];
             let lock0Target: number = 0;
             let lock2Target: number = 0;
@@ -424,7 +415,10 @@ namespace MarbleRunSimulatorCore {
         public get isMoving(): boolean {
             return this._moving;
         }
+        private _lastCamRotZ: number = 0;
+        private _visibleAngularSpeed: number = 0;
         public update(dt: number): void {
+
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
@@ -435,6 +429,8 @@ namespace MarbleRunSimulatorCore {
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
                                 ball.marbleChocSound.play();
+                                this.turnLoopSound.setPlaybackRate(this.game.currentTimeFactor);
+                                this.turnLoopSound.play();
                                 this._animatePivot(- 2 * Math.PI, 2 / this.game.currentTimeFactor).then(() => {
                                     //this.clicSound.play();
                                     this.came.rotation.z = 0;

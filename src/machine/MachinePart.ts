@@ -140,6 +140,12 @@ namespace MarbleRunSimulatorCore {
         public get maxD(): number {
             return this.template.maxD;
         }
+        public get minN(): number {
+            return this.template.minN;
+        }
+        public get maxN(): number {
+            return this.template.maxN;
+        }
         public get xMirrorable(): boolean {
             return this.template.xMirrorable;
         }

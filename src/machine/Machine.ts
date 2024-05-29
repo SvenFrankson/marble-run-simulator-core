@@ -297,7 +297,7 @@ namespace MarbleRunSimulatorCore {
                 let dt = this.game.scene.deltaTime / 1000;
                 if (isFinite(dt)) {
                     for (let i = 0; i < this.balls.length; i++) {
-                        this.balls[i].update(dt);
+                        this.balls[i].update(dt * this.game.currentTimeFactor);
                     }
                     for (let i = 0; i < this.parts.length; i++) {
                         this.parts[i].update(dt);
