@@ -67,7 +67,10 @@ namespace MarbleRunSimulatorCore {
 
         public setPositionZero(p: BABYLON.Vector3): void {
             this.positionZero.copyFrom(p);
-            this.positionZeroGhost.position.copyFrom(p);
+            this.positionZero.x = Math.round(this.positionZero.x * 1000) / 1000;
+            this.positionZero.y = Math.round(this.positionZero.y * 1000) / 1000;
+            this.positionZero.z = Math.round(this.positionZero.z / tileDepth) * tileDepth;
+            this.positionZeroGhost.position.copyFrom(this.positionZero);
         }
 
         public get k(): number {
@@ -651,8 +654,11 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (this.lastPosition) {
+            if (this.lastPosition && dt > 0) {
                 this.visibleVelocity.copyFrom(this.position).subtractInPlace(this.lastPosition).scaleInPlace(1 / dt);
+                if (!Mummu.IsFinite(this.visibleVelocity)) {
+                    this.visibleVelocity.copyFromFloats(0, 0, 0);
+                }
                 if (this.visibleVelocity.lengthSquared() > 1) {
                     this.visibleVelocity.normalize();
                 }

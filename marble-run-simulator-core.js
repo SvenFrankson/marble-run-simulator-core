@@ -94,7 +94,10 @@ var MarbleRunSimulatorCore;
         }
         setPositionZero(p) {
             this.positionZero.copyFrom(p);
-            this.positionZeroGhost.position.copyFrom(p);
+            this.positionZero.x = Math.round(this.positionZero.x * 1000) / 1000;
+            this.positionZero.y = Math.round(this.positionZero.y * 1000) / 1000;
+            this.positionZero.z = Math.round(this.positionZero.z / MarbleRunSimulatorCore.tileDepth) * MarbleRunSimulatorCore.tileDepth;
+            this.positionZeroGhost.position.copyFrom(this.positionZero);
         }
         get k() {
             return -Math.round(this.positionZero.z / MarbleRunSimulatorCore.tileDepth);
@@ -592,8 +595,11 @@ var MarbleRunSimulatorCore;
                     }
                 }
             }
-            if (this.lastPosition) {
+            if (this.lastPosition && dt > 0) {
                 this.visibleVelocity.copyFrom(this.position).subtractInPlace(this.lastPosition).scaleInPlace(1 / dt);
+                if (!Mummu.IsFinite(this.visibleVelocity)) {
+                    this.visibleVelocity.copyFromFloats(0, 0, 0);
+                }
                 if (this.visibleVelocity.lengthSquared() > 1) {
                     this.visibleVelocity.normalize();
                 }
@@ -1236,6 +1242,7 @@ var MarbleRunSimulatorCore;
             }
         }
         async instantiate(hotReload) {
+            this.instantiated = false;
             this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             if (this.exitShooter) {
@@ -5468,8 +5475,10 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (Math.abs(ball.position.x - this.kickerCollider.absolutePosition.x) < ball.radius + this.kickerRadius + 0.001) {
-                    if (Math.abs(ball.position.z - this.kickerCollider.absolutePosition.z) < 0.001) {
-                        return ball;
+                    if (Math.abs(ball.position.y - (this.position.y + this.kickerYIdle)) < MarbleRunSimulatorCore.tileHeight * 0.5) {
+                        if (Math.abs(ball.position.z - this.kickerCollider.absolutePosition.z) < 0.001) {
+                            return ball;
+                        }
                     }
                 }
             }
