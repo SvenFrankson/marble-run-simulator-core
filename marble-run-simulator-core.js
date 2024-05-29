@@ -4733,10 +4733,40 @@ var MarbleRunSimulatorCore;
             this._animateLock0 = Mummu.AnimationFactory.EmptyNumberCallback;
             this._animateLock2 = Mummu.AnimationFactory.EmptyNumberCallback;
             this._animateTingle2Out = Mummu.AnimationFactory.EmptyNumberCallback;
-            this._animateTingle2In = Mummu.AnimationFactory.EmptyNumberCallback;
+            this._animateTingle2Back = Mummu.AnimationFactory.EmptyNumberCallback;
             this.pixels = [];
             this.pixelPictures = [];
             this.value = 0;
+            this.engraine12Up = false;
+            this.engraine12Down = false;
+            this.reset = () => {
+                let rz1s = [2 * Math.PI, 2 * Math.PI, 0, 0];
+                let lock0Target = 0;
+                let lock2Target = 0;
+                if (this.value & 0b1) {
+                    rz1s[0] = Math.PI;
+                    lock0Target = -Math.PI * 0.5;
+                }
+                if (this.value & 0b10) {
+                    rz1s[1] = Math.PI;
+                }
+                if (this.value & 0b100) {
+                    rz1s[2] = Math.PI;
+                    lock2Target = Math.PI * 0.5;
+                }
+                if (this.value & 0b1000) {
+                    rz1s[3] = Math.PI;
+                }
+                for (let i = 0; i < 4; i++) {
+                    this.pixels[i].rotation.z = rz1s[i];
+                    this.pixels[i].freezeWorldMatrix();
+                    this.pixelPictures[i].freezeWorldMatrix();
+                }
+                this.lock0.rotation.x = lock0Target;
+                this.lock0.freezeWorldMatrix();
+                this.lock2.rotation.x = lock2Target;
+                this.lock2.freezeWorldMatrix();
+            };
             this._moving = false;
             let partName = "screen";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
@@ -4750,10 +4780,10 @@ var MarbleRunSimulatorCore;
                 new BABYLON.Mesh("pixel-3")
             ];
             this.lock0 = new BABYLON.Mesh("lock-0");
-            this.lock0.position.copyFromFloats(0.001, -0.0075, 0.012);
+            this.lock0.position.copyFromFloats(0.001, -0.007, 0.012);
             this.lock0.parent = this.pixels[0];
             this.lock2 = new BABYLON.Mesh("lock-1");
-            this.lock2.position.copyFromFloats(0.001, -0.0075, -0.012);
+            this.lock2.position.copyFromFloats(0.001, -0.007, -0.012);
             this.lock2.parent = this.pixels[2];
             this.pixels[0].parent = this;
             this.pixels[0].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, 0, -MarbleRunSimulatorCore.tileDepth / 4);
@@ -4782,7 +4812,14 @@ var MarbleRunSimulatorCore;
             this.cameOutCollider = new BABYLON.Mesh("collider-came-out");
             this.cameOutCollider.isVisible = false;
             this.cameOutCollider.parent = this.came;
+            this.cable = new BABYLON.Mesh("cable");
+            this.cable.parent = this;
+            this.cable.position.copyFrom(this.came.position);
+            console.log(this.pixels[0].position.subtract(this.came.position));
             this.generateWires();
+            this.machine.onStopCallbacks.remove(this.reset);
+            this.machine.onStopCallbacks.push(this.reset);
+            this.reset();
             this._animatePivot = Mummu.AnimationFactory.CreateNumber(this, this.came.rotation, "z", () => {
                 this.came.freezeWorldMatrix();
                 this.came.getChildMeshes().forEach((child) => {
@@ -4799,17 +4836,27 @@ var MarbleRunSimulatorCore;
                 this.pixels[2].freezeWorldMatrix();
                 this.pixelPictures[2].freezeWorldMatrix();
                 this.lock2.freezeWorldMatrix();
-            }, false, Nabu.Easing.easeOutCubic);
-            this._animateTingle2In = Mummu.AnimationFactory.CreateNumber(this.pixels[2], this.pixels[2].rotation, "z", () => {
+            }, false, Nabu.Easing.easeOutSine);
+            this._animateTingle2Back = Mummu.AnimationFactory.CreateNumber(this.pixels[2], this.pixels[2].rotation, "z", () => {
                 this.pixels[2].freezeWorldMatrix();
                 this.pixelPictures[2].freezeWorldMatrix();
                 this.lock2.freezeWorldMatrix();
-            }, false, Nabu.Easing.easePendulum);
+            }, false, Nabu.Easing.easeInOutSine);
         }
-        async tingle2(duration) {
+        async tingle2(pixel2Value, duration) {
             let originZ = this.pixels[2].rotation.z;
-            await this._animateTingle2Out(this.pixels[2].rotation.z + Math.PI / 6, duration * 0.5);
-            await this._animateTingle2In(originZ, duration * 1.2);
+            await this._animateTingle2Out(originZ + Math.PI / 4, duration * 0.18);
+            Mummu.DrawDebugPoint(this.pixels[2].absolutePosition.add(new BABYLON.Vector3(0, 0, 0.02)), 30, BABYLON.Color3.Red(), 0.01);
+            if (pixel2Value) {
+                this.engraine12Up = true;
+                this.engraine12Down = false;
+                console.log("engraine12Up");
+            }
+            else {
+                console.log("engraine12Down");
+                this.engraine12Up = false;
+                this.engraine12Down = true;
+            }
         }
         rotatePixels(origin, target, duration, easing) {
             return new Promise(resolve => {
@@ -4850,8 +4897,8 @@ var MarbleRunSimulatorCore;
                 let tingle2Case = ((origin & 0b100) === (target & 0b100)) && ((origin & 0b10) === 0 && (target & 0b10) > 0);
                 if (tingle2Case) {
                     setTimeout(() => {
-                        this.tingle2(duration * 0.25);
-                    }, duration * 1000 * 0.35);
+                        this.tingle2((target & 0b100) === 0, duration);
+                    }, duration * 1000 * 0.32);
                 }
                 setTimeout(() => {
                     this._animateLock0(lock0Target, duration * 0.15);
@@ -4868,7 +4915,17 @@ var MarbleRunSimulatorCore;
                             f = easing(f);
                         }
                         for (let i = 0; i < 4; i++) {
-                            if (i === 3 && tingle2Case) {
+                            if (i === 2 && tingle2Case) {
+                                if (this.engraine12Up) {
+                                    this.pixels[2].rotation.z = this.pixels[2].rotation.z * 0.5 - (this.pixels[1].rotation.z - Math.PI) * 0.5;
+                                    this.pixels[2].freezeWorldMatrix();
+                                    this.pixelPictures[2].freezeWorldMatrix();
+                                }
+                                if (this.engraine12Down) {
+                                    this.pixels[2].rotation.z = this.pixels[2].rotation.z * 0.5 - (this.pixels[1].rotation.z - 2 * Math.PI) * 0.5;
+                                    this.pixels[2].freezeWorldMatrix();
+                                    this.pixelPictures[2].freezeWorldMatrix();
+                                }
                             }
                             else {
                                 this.pixels[i].rotation.z = rz0s[i] * (1 - f) + rz1s[i] * f;
@@ -4880,6 +4937,8 @@ var MarbleRunSimulatorCore;
                         this.lock2.freezeWorldMatrix();
                     }
                     else {
+                        this.engraine12Up = false;
+                        this.engraine12Down = false;
                         for (let i = 0; i < 4; i++) {
                             this.pixels[i].rotation.z = rz1s[i];
                             this.pixels[i].freezeWorldMatrix();
@@ -4909,6 +4968,8 @@ var MarbleRunSimulatorCore;
             this.lock0.material = this.game.materials.getMaterial(2);
             screenData[7].applyToMesh(this.lock2);
             this.lock2.material = this.game.materials.getMaterial(2);
+            screenData[8].applyToMesh(this.cable);
+            this.cable.material = this.game.materials.plasticBlack;
         }
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
