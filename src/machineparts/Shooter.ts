@@ -295,8 +295,10 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (Math.abs(ball.position.x - this.kickerCollider.absolutePosition.x) < ball.radius + this.kickerRadius + 0.001) {
-                    if (Math.abs(ball.position.z - this.kickerCollider.absolutePosition.z) < 0.001) {
-                        return ball;
+                    if (Math.abs(ball.position.y - (this.position.y + this.kickerYIdle)) < tileHeight * 0.5) {
+                        if (Math.abs(ball.position.z - this.kickerCollider.absolutePosition.z) < 0.001) {
+                            return ball;
+                        }
                     }
                 }
             }
