@@ -227,6 +227,14 @@ namespace MarbleRunSimulatorCore {
             });
         }
 
+        public reset(): void {
+            this.dispose();
+            
+            this.name = MachineName.GetRandom();
+            this.roomIndex = 0;
+            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
+        }
+        
         public dispose(): void {
             while (this.balls.length > 0) {
                 this.balls[0].dispose();

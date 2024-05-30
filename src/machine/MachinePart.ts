@@ -326,7 +326,6 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
                 this.position.x = this._i * tileWidth + this.offsetPosition.x;
-                this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -349,7 +348,6 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
                 this.position.y = -this._j * tileHeight + this.offsetPosition.y;
-                this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -372,7 +370,6 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
                 this.position.z = -this._k * tileDepth + this.offsetPosition.z;
-                this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();

@@ -249,6 +249,7 @@ declare namespace MarbleRunSimulatorCore {
         constructor(game: IGame);
         setAllIsSelectable(isSelectable: boolean): void;
         instantiate(hotReload?: boolean): Promise<void>;
+        reset(): void;
         dispose(): void;
         getBallPos(): any;
         applyBallPos(save: any): void;

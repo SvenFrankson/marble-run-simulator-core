@@ -50,6 +50,7 @@ var MarbleRunSimulatorCore;
             this.lastPosition = BABYLON.Vector3.Zero();
             this.visibleVelocity = BABYLON.Vector3.Zero();
             this.collisionState = CollisionState.Normal;
+            this.rotationQuaternion = BABYLON.Quaternion.Identity();
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./lib/marble-run-simulator-core/datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -587,10 +588,12 @@ var MarbleRunSimulatorCore;
                     this.velocity.addInPlace(acceleration.scale(physicDT));
                     this.position.addInPlace(this.velocity.scale(physicDT));
                     if (reactions.length() > 0) {
-                        BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis).normalize();
-                        this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
-                        if (reactionsCount > 2) {
-                            this.rotationSpeed /= 4;
+                        BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis);
+                        if (this.rotationAxis.lengthSquared() > 0) {
+                            this.rotationAxis.normalize();
+                        }
+                        else {
+                            this.rotationAxis.copyFromFloats(1, 0, 0);
                         }
                     }
                 }
@@ -605,7 +608,10 @@ var MarbleRunSimulatorCore;
                 }
             }
             this.lastPosition.copyFrom(this.position);
-            this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
+            this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
+            let axis = this.rotationAxis;
+            let angle = this.rotationSpeed * 2 * Math.PI * dt;
+            this.rotate(axis, angle, BABYLON.Space.WORLD);
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
                     this.flyBackProgress += dt / this.flyBackDuration;
@@ -1292,6 +1298,12 @@ var MarbleRunSimulatorCore;
                     resolve();
                 });
             });
+        }
+        reset() {
+            this.dispose();
+            this.name = MachineName.GetRandom();
+            this.roomIndex = 0;
+            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
         }
         dispose() {
             while (this.balls.length > 0) {
@@ -2427,7 +2439,6 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 this.position.x = this._i * MarbleRunSimulatorCore.tileWidth + this.offsetPosition.x;
-                this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -2448,7 +2459,6 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y;
-                this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -2469,7 +2479,6 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth + this.offsetPosition.z;
-                this.isPlaced = true;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -3485,7 +3494,6 @@ var MarbleRunSimulatorCore;
             this.trackTemplates.forEach((trackTemplate) => {
                 trackTemplate.initialize();
             });
-            console.log(this.partName + " has " + this.endPoints.length + " endpoints");
         }
     }
     MarbleRunSimulatorCore.MachinePartTemplate = MachinePartTemplate;

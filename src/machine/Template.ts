@@ -295,7 +295,6 @@ namespace MarbleRunSimulatorCore {
             this.trackTemplates.forEach((trackTemplate) => {
                 trackTemplate.initialize();
             });
-            console.log(this.partName + " has " + this.endPoints.length + " endpoints");
         }
     }
 

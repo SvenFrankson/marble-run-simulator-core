@@ -97,6 +97,7 @@ namespace MarbleRunSimulatorCore {
 
         constructor(public positionZero: BABYLON.Vector3, public machine: Machine, private _materialIndex: number = 0) {
             super("ball");
+            this.rotationQuaternion = BABYLON.Quaternion.Identity();
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./lib/marble-run-simulator-core/datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -645,10 +646,12 @@ namespace MarbleRunSimulatorCore {
                     this.position.addInPlace(this.velocity.scale(physicDT));
 
                     if (reactions.length() > 0) {
-                        BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis).normalize();
-                        this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
-                        if (reactionsCount > 2) {
-                            this.rotationSpeed /= 4;
+                        BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis);
+                        if (this.rotationAxis.lengthSquared() > 0) {
+                            this.rotationAxis.normalize();
+                        }
+                        else {
+                            this.rotationAxis.copyFromFloats(1, 0, 0);
                         }
                     }
                 }
@@ -664,9 +667,11 @@ namespace MarbleRunSimulatorCore {
                 }
             }
             this.lastPosition.copyFrom(this.position);
+            this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
 
-            
-            this.rotate(this.rotationAxis, this.rotationSpeed * 2 * Math.PI * dt, BABYLON.Space.WORLD);
+            let axis = this.rotationAxis;
+            let angle = this.rotationSpeed * 2 * Math.PI * dt
+            this.rotate(axis, angle, BABYLON.Space.WORLD);
 
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {
