@@ -2193,6 +2193,12 @@ var MarbleRunSimulatorCore;
         get leftSide() {
             return this.localPosition.x < 0;
         }
+        get upperSide() {
+            return this.localPosition.y > this.machinePart.encloseMid.y;
+        }
+        get farSide() {
+            return this.localPosition.z > this.machinePart.encloseMid.z;
+        }
         get absolutePosition() {
             this._absolutePosition.copyFrom(this.localPosition);
             this._absolutePosition.addInPlace(this.machinePart.position);
@@ -2234,6 +2240,7 @@ var MarbleRunSimulatorCore;
             this.encloseMid = BABYLON.Vector3.One().scaleInPlace(0.5);
             this.enclose23 = BABYLON.Vector3.One().scaleInPlace(2 / 3);
             this.encloseEnd = BABYLON.Vector3.One();
+            this.localCenter = BABYLON.Vector3.Zero();
             this.endPoints = [];
             this.neighbours = new Nabu.UniqueList();
             this.offsetPosition = BABYLON.Vector3.Zero();
@@ -2298,6 +2305,42 @@ var MarbleRunSimulatorCore;
                 this.removeNeighbour(this.neighbours.get(0));
             }
         }
+        get isRightConnected() {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let endpoint = this.endPoints[i];
+                if (!endpoint.leftSide && endpoint.connectedEndPoint) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        get isUpConnected() {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let endpoint = this.endPoints[i];
+                if (endpoint.upperSide && endpoint.connectedEndPoint) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        get isDownConnected() {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let endpoint = this.endPoints[i];
+                if (!endpoint.upperSide && endpoint.connectedEndPoint) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        get isBackConnected() {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let endpoint = this.endPoints[i];
+                if (!endpoint.farSide && endpoint.connectedEndPoint) {
+                    return true;
+                }
+            }
+            return false;
+        }
         get w() {
             return this.template.w;
         }
@@ -2328,8 +2371,17 @@ var MarbleRunSimulatorCore;
         get nExtendable() {
             return this.template.nExtendable;
         }
+        get minW() {
+            return this.template.minW;
+        }
+        get maxW() {
+            return this.template.maxW;
+        }
         get minH() {
             return this.template.minH;
+        }
+        get maxH() {
+            return this.template.maxH;
         }
         get minD() {
             return this.template.minD;
@@ -3405,11 +3457,14 @@ var MarbleRunSimulatorCore;
             this.yExtendable = false;
             this.zExtendable = false;
             this.nExtendable = false;
+            this.minW = 1;
+            this.maxW = 35;
             this.minH = 0;
+            this.maxH = 35;
             this.minD = 1;
-            this.maxD = 10;
+            this.maxD = 35;
             this.minN = 1;
-            this.maxN = 1;
+            this.maxN = 35;
             this.xMirrorable = false;
             this.zMirrorable = false;
             this.hasOriginDestinationHandles = false;

@@ -263,7 +263,6 @@ declare namespace MarbleRunSimulatorCore {
         baseMeshMaxY: number;
         baseMeshMinZ: number;
         baseMeshMaxZ: number;
-        private debugWallLeft;
         generateBaseMesh(): Promise<void>;
         regenerateBaseAxis(): void;
         setBaseIsVisible(v: boolean): void;
@@ -339,6 +338,8 @@ declare namespace MarbleRunSimulatorCore {
         k: number;
         constructor(localPosition: BABYLON.Vector3, machinePart: MachinePart);
         get leftSide(): boolean;
+        get upperSide(): boolean;
+        get farSide(): boolean;
         private _absolutePosition;
         get absolutePosition(): BABYLON.Vector3;
         connectTo(endPoint: MachinePartEndpoint): void;
@@ -372,11 +373,16 @@ declare namespace MarbleRunSimulatorCore {
         encloseMid: BABYLON.Vector3;
         enclose23: BABYLON.Vector3;
         encloseEnd: BABYLON.Vector3;
+        localCenter: BABYLON.Vector3;
         endPoints: MachinePartEndpoint[];
         neighbours: Nabu.UniqueList<MachinePart>;
         addNeighbour(other: MachinePart): void;
         removeNeighbour(other: MachinePart): void;
         removeAllNeighbours(): void;
+        get isRightConnected(): boolean;
+        get isUpConnected(): boolean;
+        get isDownConnected(): boolean;
+        get isBackConnected(): boolean;
         get w(): number;
         get h(): number;
         get d(): number;
@@ -387,7 +393,10 @@ declare namespace MarbleRunSimulatorCore {
         get yExtendable(): boolean;
         get zExtendable(): boolean;
         get nExtendable(): boolean;
+        get minW(): number;
+        get maxW(): number;
         get minH(): number;
+        get maxH(): number;
         get minD(): number;
         get maxD(): number;
         get minN(): number;
@@ -506,7 +515,10 @@ declare namespace MarbleRunSimulatorCore {
         yExtendable: boolean;
         zExtendable: boolean;
         nExtendable: boolean;
+        minW: number;
+        maxW: number;
         minH: number;
+        maxH: number;
         minD: number;
         maxD: number;
         minN: number;

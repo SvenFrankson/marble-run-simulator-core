@@ -65,6 +65,14 @@ namespace MarbleRunSimulatorCore {
             return this.localPosition.x < 0;
         }
 
+        public get upperSide(): boolean {
+            return this.localPosition.y > this.machinePart.encloseMid.y;
+        }
+
+        public get farSide(): boolean {
+            return this.localPosition.z > this.machinePart.encloseMid.z;
+        }
+
         private _absolutePosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public get absolutePosition(): BABYLON.Vector3 {
             this._absolutePosition.copyFrom(this.localPosition);
@@ -124,6 +132,7 @@ namespace MarbleRunSimulatorCore {
         public encloseMid: BABYLON.Vector3 = BABYLON.Vector3.One().scaleInPlace(0.5);
         public enclose23: BABYLON.Vector3 = BABYLON.Vector3.One().scaleInPlace(2 / 3);
         public encloseEnd: BABYLON.Vector3 = BABYLON.Vector3.One();
+        public localCenter: BABYLON.Vector3 = BABYLON.Vector3.Zero();
 
         public endPoints: MachinePartEndpoint[] = [];
         public neighbours: Nabu.UniqueList<MachinePart> = new Nabu.UniqueList<MachinePart>();
@@ -157,6 +166,46 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        public get isRightConnected(): boolean {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let endpoint = this.endPoints[i];
+                if (!endpoint.leftSide && endpoint.connectedEndPoint) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public get isUpConnected(): boolean {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let endpoint = this.endPoints[i];
+                if (endpoint.upperSide && endpoint.connectedEndPoint) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public get isDownConnected(): boolean {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let endpoint = this.endPoints[i];
+                if (!endpoint.upperSide && endpoint.connectedEndPoint) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public get isBackConnected(): boolean {
+            for (let i = 0; i < this.endPoints.length; i++) {
+                let endpoint = this.endPoints[i];
+                if (!endpoint.farSide && endpoint.connectedEndPoint) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public get w(): number {
             return this.template.w;
         }
@@ -188,8 +237,17 @@ namespace MarbleRunSimulatorCore {
         public get nExtendable(): boolean {
             return this.template.nExtendable;
         }
+        public get minW(): number {
+            return this.template.minW;
+        }
+        public get maxW(): number {
+            return this.template.maxW;
+        }
         public get minH(): number {
             return this.template.minH;
+        }
+        public get maxH(): number {
+            return this.template.maxH;
         }
         public get minD(): number {
             return this.template.minD;

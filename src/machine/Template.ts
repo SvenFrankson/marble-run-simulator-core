@@ -261,11 +261,14 @@ namespace MarbleRunSimulatorCore {
         public yExtendable: boolean = false;
         public zExtendable: boolean = false;
         public nExtendable: boolean = false;
+        public minW: number = 1;
+        public maxW: number = 35;
         public minH: number = 0;
+        public maxH: number = 35;
         public minD: number = 1;
-        public maxD: number = 10;
+        public maxD: number = 35;
         public minN: number = 1;
-        public maxN: number = 1;
+        public maxN: number = 35;
         public xMirrorable: boolean = false;
         public zMirrorable: boolean = false;
         public hasOriginDestinationHandles: boolean = false;

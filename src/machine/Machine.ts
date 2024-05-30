@@ -337,7 +337,6 @@ namespace MarbleRunSimulatorCore {
         public baseMeshMaxY: number = this.margin;
         public baseMeshMinZ: number = -this.margin;
         public baseMeshMaxZ: number = this.margin;
-        private debugWallLeft: BABYLON.Mesh;
         public async generateBaseMesh(): Promise<void> {
             let previousBaseMinY = this.baseMeshMinY;
 
