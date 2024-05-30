@@ -29,7 +29,9 @@ namespace MarbleRunSimulatorCore {
             template.mirrorZ = mirrorZ;
 
             template.xExtendable = true;
+            template.minW = 2;
             template.zExtendable = true;
+            template.minD = 2;
             template.nExtendable = true;
             template.xMirrorable = true;
             template.zMirrorable = true;

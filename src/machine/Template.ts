@@ -272,6 +272,8 @@ namespace MarbleRunSimulatorCore {
         public xMirrorable: boolean = false;
         public zMirrorable: boolean = false;
         public hasOriginDestinationHandles: boolean = false;
+        public getWidthForDepth: (d: number) => number;
+        public getDepthForWidth: (d: number) => number;
 
         public trackTemplates: TrackTemplate[] = [];
 

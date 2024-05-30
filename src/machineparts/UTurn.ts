@@ -10,14 +10,17 @@ namespace MarbleRunSimulatorCore {
 
         public static GenerateTemplate(h: number, d: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
+            template.getWidthForDepth = (argD) => {
+                if (argD >= 8) {
+                    return argD - 2;
+                }
+                return argD - 1;
+            }
 
             template.partName = "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 50;
 
-            template.w = d - 1;
-            if (d >= 8) {
-                template.w = d - 2;
-            }
+            template.w = template.getWidthForDepth(d);
             template.h = h; 
             template.d = d; 
             template.mirrorX = mirrorX; 

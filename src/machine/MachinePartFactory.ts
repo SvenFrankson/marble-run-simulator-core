@@ -9,7 +9,7 @@ namespace MarbleRunSimulatorCore {
         "uturn-0.2",
         "wall-3.3",
         "uturnsharp-1",
-        "loop-2.1.1",
+        "loop-2.2.1",
         "spiral-1.2",
         "elevator-4",
         "stairway-2.4",

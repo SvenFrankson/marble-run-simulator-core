@@ -2766,7 +2766,7 @@ var MarbleRunSimulatorCore;
         "uturn-0.2",
         "wall-3.3",
         "uturnsharp-1",
-        "loop-2.1.1",
+        "loop-2.2.1",
         "spiral-1.2",
         "elevator-4",
         "stairway-2.4",
@@ -4624,7 +4624,9 @@ var MarbleRunSimulatorCore;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
             template.xExtendable = true;
+            template.minW = 2;
             template.zExtendable = true;
+            template.minD = 2;
             template.nExtendable = true;
             template.xMirrorable = true;
             template.zMirrorable = true;
@@ -6606,12 +6608,15 @@ var MarbleRunSimulatorCore;
         }
         static GenerateTemplate(h, d, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
+            template.getWidthForDepth = (argD) => {
+                if (argD >= 8) {
+                    return argD - 2;
+                }
+                return argD - 1;
+            };
             template.partName = "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 50;
-            template.w = d - 1;
-            if (d >= 8) {
-                template.w = d - 2;
-            }
+            template.w = template.getWidthForDepth(d);
             template.h = h;
             template.d = d;
             template.mirrorX = mirrorX;
