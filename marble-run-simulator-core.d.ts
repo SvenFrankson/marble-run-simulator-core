@@ -239,6 +239,7 @@ declare namespace MarbleRunSimulatorCore {
         trackFactory: MachinePartFactory;
         templateManager: TemplateManager;
         sleeperVertexData: BABYLON.VertexData[];
+        ready: boolean;
         instantiated: boolean;
         minimalAutoQualityFailed: number;
         playing: boolean;

@@ -108,6 +108,7 @@ namespace MarbleRunSimulatorCore {
 
         public sleeperVertexData: BABYLON.VertexData[];
 
+        public ready: boolean = false;
         public instantiated: boolean = false;
         public minimalAutoQualityFailed: number = GraphicQuality.High + 1;
 
@@ -231,6 +232,7 @@ namespace MarbleRunSimulatorCore {
             this.dispose();
             
             this.name = MachineName.GetRandom();
+            this.author = "Me";
             this.roomIndex = 0;
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
         }
@@ -598,6 +600,10 @@ namespace MarbleRunSimulatorCore {
             this.game.spotLight.position.y = this.baseMeshMinY + 2.2;
             let dir = new BABYLON.Vector3((this.baseMeshMinX + this.baseMeshMaxX) * 0.5, -3, (this.baseMeshMinZ + this.baseMeshMaxZ) * 0.5).normalize();
             this.game.spotLight.direction = dir;
+
+            requestAnimationFrame(() => {
+                this.ready = true;
+            })
         }
 
         public regenerateBaseAxis(): void {
