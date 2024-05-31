@@ -2745,7 +2745,7 @@ var MarbleRunSimulatorCore;
             }
         }
         update(dt) { }
-        rebuildWireMeshes(rebuildNeighboursWireMeshes, forceDisconnexion) {
+        rebuildWireMeshes(rebuildNeighboursWireMeshes) {
             let neighboursToUpdate;
             if (rebuildNeighboursWireMeshes) {
                 neighboursToUpdate = this.neighbours.cloneAsArray();

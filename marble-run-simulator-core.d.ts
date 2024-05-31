@@ -445,7 +445,7 @@ declare namespace MarbleRunSimulatorCore {
         dispose(): void;
         generateWires(): void;
         update(dt: number): void;
-        rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean, forceDisconnexion?: boolean): void;
+        rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void;
         doSleepersMeshUpdate(): void;
         getTriCount(): number;
     }
