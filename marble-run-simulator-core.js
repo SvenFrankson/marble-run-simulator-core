@@ -696,6 +696,14 @@ var MarbleRunSimulatorCore;
             this.whiteFullLitMaterial.diffuseColor = BABYLON.Color3.FromHexString("#baccc8");
             this.whiteFullLitMaterial.emissiveColor = BABYLON.Color3.FromHexString("#baccc8");
             this.whiteFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
+            this.steelFullLitMaterial = new BABYLON.StandardMaterial("steel-fulllit-material");
+            this.steelFullLitMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7);
+            this.steelFullLitMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.6, 0.7);
+            this.steelFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
+            this.copperFullLitMaterial = new BABYLON.StandardMaterial("copper-fulllit-material");
+            this.copperFullLitMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.6, 0.5);
+            this.copperFullLitMaterial.emissiveColor = new BABYLON.Color3(0.7, 0.6, 0.5);
+            this.copperFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
             this._generateMaterials(envTexture);
             let plasticIndigo = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticIndigo.baseColor = BABYLON.Color3.FromHexString("#004777");
@@ -2726,7 +2734,7 @@ var MarbleRunSimulatorCore;
             }
         }
         update(dt) { }
-        rebuildWireMeshes(rebuildNeighboursWireMeshes) {
+        rebuildWireMeshes(rebuildNeighboursWireMeshes, forceDisconnexion) {
             let neighboursToUpdate;
             if (rebuildNeighboursWireMeshes) {
                 neighboursToUpdate = this.neighbours.cloneAsArray();
@@ -3731,7 +3739,7 @@ var MarbleRunSimulatorCore;
             BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.part.getWorldMatrix(), this.AABBMin);
             BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.part.getWorldMatrix(), this.AABBMax);
         }
-        recomputeWiresPath() {
+        recomputeWiresPath(forceDisconnexion) {
             let N = this.templateInterpolatedPoints.length;
             let angles = [...this.template.angles];
             this.trackInterpolatedNormals = this.template.interpolatedNormals.map((v) => {
@@ -3739,29 +3747,33 @@ var MarbleRunSimulatorCore;
             });
             //Mummu.DrawDebugPoint(this.startWorldPosition.add(this.endWorldPosition).scale(0.5), 60, BABYLON.Color3.Blue());
             let startBank = this.preferedStartBank;
-            let otherS = this.part.machine.getBankAt(this.startWorldPosition, this.part);
-            if (otherS) {
-                this.part.addNeighbour(otherS.part);
-                //Mummu.DrawDebugPoint(this.startWorldPosition, 60, BABYLON.Color3.Green());
-                let otherBank = otherS.bank * (otherS.isEnd ? 1 : -1);
-                if (this.preferedStartBank * otherBank >= 0) {
-                    startBank = Math.sign(this.preferedStartBank + otherBank) * Math.max(Math.abs(this.preferedStartBank), Math.abs(otherBank));
-                }
-                else {
-                    startBank = this.preferedStartBank * 0.5 + otherBank * 0.5;
+            if (!forceDisconnexion) {
+                let otherS = this.part.machine.getBankAt(this.startWorldPosition, this.part);
+                if (otherS) {
+                    this.part.addNeighbour(otherS.part);
+                    //Mummu.DrawDebugPoint(this.startWorldPosition, 60, BABYLON.Color3.Green());
+                    let otherBank = otherS.bank * (otherS.isEnd ? 1 : -1);
+                    if (this.preferedStartBank * otherBank >= 0) {
+                        startBank = Math.sign(this.preferedStartBank + otherBank) * Math.max(Math.abs(this.preferedStartBank), Math.abs(otherBank));
+                    }
+                    else {
+                        startBank = this.preferedStartBank * 0.5 + otherBank * 0.5;
+                    }
                 }
             }
             let endBank = this.preferedEndBank;
-            let otherE = this.part.machine.getBankAt(this.endWorldPosition, this.part);
-            if (otherE) {
-                this.part.addNeighbour(otherE.part);
-                //Mummu.DrawDebugPoint(this.endWorldPosition, 60, BABYLON.Color3.Red());
-                let otherBank = otherE.bank * (otherE.isEnd ? -1 : 1);
-                if (this.preferedEndBank * otherBank >= 0) {
-                    endBank = Math.sign(this.preferedEndBank + otherBank) * Math.max(Math.abs(this.preferedEndBank), Math.abs(otherBank));
-                }
-                else {
-                    endBank = this.preferedEndBank * 0.5 + otherBank * 0.5;
+            if (!forceDisconnexion) {
+                let otherE = this.part.machine.getBankAt(this.endWorldPosition, this.part);
+                if (otherE) {
+                    this.part.addNeighbour(otherE.part);
+                    //Mummu.DrawDebugPoint(this.endWorldPosition, 60, BABYLON.Color3.Red());
+                    let otherBank = otherE.bank * (otherE.isEnd ? -1 : 1);
+                    if (this.preferedEndBank * otherBank >= 0) {
+                        endBank = Math.sign(this.preferedEndBank + otherBank) * Math.max(Math.abs(this.preferedEndBank), Math.abs(otherBank));
+                    }
+                    else {
+                        endBank = this.preferedEndBank * 0.5 + otherBank * 0.5;
+                    }
                 }
             }
             angles[0] = startBank;

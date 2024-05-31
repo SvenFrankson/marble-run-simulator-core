@@ -618,7 +618,7 @@ namespace MarbleRunSimulatorCore {
 
         public update(dt: number): void {}
 
-        public rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void {
+        public rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean, forceDisconnexion?: boolean): void {
             let neighboursToUpdate: MachinePart[];
             if (rebuildNeighboursWireMeshes) {
                 neighboursToUpdate = this.neighbours.cloneAsArray();

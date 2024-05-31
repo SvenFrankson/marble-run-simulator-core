@@ -53,6 +53,8 @@ namespace MarbleRunSimulatorCore {
         public blueMaterial: BABYLON.StandardMaterial;
         public whiteAutolitMaterial: BABYLON.StandardMaterial;
         public whiteFullLitMaterial: BABYLON.StandardMaterial;
+        public steelFullLitMaterial: BABYLON.StandardMaterial;
+        public copperFullLitMaterial: BABYLON.StandardMaterial;
         public get plasticBlack() {
             return this.getMaterial(6);
         }
@@ -103,6 +105,16 @@ namespace MarbleRunSimulatorCore {
             this.whiteFullLitMaterial.diffuseColor = BABYLON.Color3.FromHexString("#baccc8");
             this.whiteFullLitMaterial.emissiveColor = BABYLON.Color3.FromHexString("#baccc8");
             this.whiteFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
+
+            this.steelFullLitMaterial = new BABYLON.StandardMaterial("steel-fulllit-material");
+            this.steelFullLitMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7);
+            this.steelFullLitMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.6, 0.7);
+            this.steelFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
+
+            this.copperFullLitMaterial = new BABYLON.StandardMaterial("copper-fulllit-material");
+            this.copperFullLitMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.6, 0.5);
+            this.copperFullLitMaterial.emissiveColor = new BABYLON.Color3(0.7, 0.6, 0.5);
+            this.copperFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
 
             this._generateMaterials(envTexture);
 

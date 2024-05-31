@@ -110,6 +110,8 @@ declare namespace MarbleRunSimulatorCore {
         blueMaterial: BABYLON.StandardMaterial;
         whiteAutolitMaterial: BABYLON.StandardMaterial;
         whiteFullLitMaterial: BABYLON.StandardMaterial;
+        steelFullLitMaterial: BABYLON.StandardMaterial;
+        copperFullLitMaterial: BABYLON.StandardMaterial;
         get plasticBlack(): BABYLON.Material;
         constructor(game: IGame);
         private _makePlasticPBR;
@@ -442,7 +444,7 @@ declare namespace MarbleRunSimulatorCore {
         dispose(): void;
         generateWires(): void;
         update(dt: number): void;
-        rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void;
+        rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean, forceDisconnexion?: boolean): void;
         doSleepersMeshUpdate(): void;
         getTriCount(): number;
     }
@@ -568,7 +570,7 @@ declare namespace MarbleRunSimulatorCore {
         getSlopeAt(index: number): number;
         getBankAt(index: number): number;
         initialize(template: TrackTemplate): void;
-        recomputeWiresPath(): void;
+        recomputeWiresPath(forceDisconnexion?: boolean): void;
         recomputeAbsolutePath(): void;
     }
 }
