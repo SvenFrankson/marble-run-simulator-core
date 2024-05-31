@@ -1208,6 +1208,7 @@ var MarbleRunSimulatorCore;
             this.balls = [];
             this.ready = false;
             this.instantiated = false;
+            this.hasBeenOpenedInEditor = false;
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
             this.playing = false;
             this.roomIndex = 0;
@@ -1279,6 +1280,7 @@ var MarbleRunSimulatorCore;
         }
         async instantiate(hotReload) {
             this.instantiated = false;
+            this.hasBeenOpenedInEditor = false;
             this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             if (this.exitShooter) {
@@ -1329,6 +1331,7 @@ var MarbleRunSimulatorCore;
                 this.parts[0].dispose();
             }
             this.instantiated = false;
+            this.hasBeenOpenedInEditor = false;
         }
         getBallPos() {
             let datas = {
@@ -2715,16 +2718,15 @@ var MarbleRunSimulatorCore;
             this.AABBMax.addInPlace(this.position);
         }
         dispose() {
+            if (this.onBeforeDispose) {
+                this.onBeforeDispose();
+            }
             super.dispose();
             this.removeAllNeighbours();
             let index = this.machine.parts.indexOf(this);
             if (index > -1) {
                 this.machine.parts.splice(index, 1);
             }
-            // REFACTO : MACHINE EDITOR DEPENDANCY
-            //if (this.game.mode === GameMode.Challenge) {
-            //    this.game.machineEditor.setItemCount(this.fullPartName, this.game.machineEditor.getItemCount(this.fullPartName) + 1);
-            //}
         }
         generateWires() {
             this.allWires = [...this.wires];

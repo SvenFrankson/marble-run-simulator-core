@@ -241,6 +241,7 @@ declare namespace MarbleRunSimulatorCore {
         sleeperVertexData: BABYLON.VertexData[];
         ready: boolean;
         instantiated: boolean;
+        hasBeenOpenedInEditor: boolean;
         minimalAutoQualityFailed: number;
         playing: boolean;
         exitShooter: Shooter;
@@ -442,6 +443,7 @@ declare namespace MarbleRunSimulatorCore {
         instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
         refreshEncloseMeshAndAABB(): void;
+        onBeforeDispose: () => void;
         dispose(): void;
         generateWires(): void;
         update(dt: number): void;

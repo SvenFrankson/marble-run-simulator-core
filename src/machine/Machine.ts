@@ -110,6 +110,7 @@ namespace MarbleRunSimulatorCore {
 
         public ready: boolean = false;
         public instantiated: boolean = false;
+        public hasBeenOpenedInEditor: boolean = false;
         public minimalAutoQualityFailed: number = GraphicQuality.High + 1;
 
         public playing: boolean = false;
@@ -187,6 +188,7 @@ namespace MarbleRunSimulatorCore {
 
         public async instantiate(hotReload?: boolean): Promise<void> {
             this.instantiated = false;
+            this.hasBeenOpenedInEditor = false;
             this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
 
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
@@ -245,6 +247,7 @@ namespace MarbleRunSimulatorCore {
                 this.parts[0].dispose();
             }
             this.instantiated = false;
+            this.hasBeenOpenedInEditor = false;
         }
 
         public getBallPos(): any {
