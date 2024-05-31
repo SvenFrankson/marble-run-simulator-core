@@ -141,9 +141,11 @@ namespace MarbleRunSimulatorCore {
                 let thisEndpoint = this.endPoints[i];
                 for (let j = 0; j < other.endPoints.length; j++) {
                     let otherEndpoint = other.endPoints[j];
-                    if (BABYLON.Vector3.Distance(thisEndpoint.absolutePosition, otherEndpoint.absolutePosition) < 0.001) {
-                        thisEndpoint.disconnect();
-                        thisEndpoint.connectTo(otherEndpoint);
+                    if (thisEndpoint.leftSide != otherEndpoint.leftSide) {
+                        if (BABYLON.Vector3.Distance(thisEndpoint.absolutePosition, otherEndpoint.absolutePosition) < 0.001) {
+                            thisEndpoint.disconnect();
+                            thisEndpoint.connectTo(otherEndpoint);
+                        }
                     }
                 }
             }

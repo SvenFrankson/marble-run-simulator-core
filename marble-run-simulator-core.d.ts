@@ -264,6 +264,12 @@ declare namespace MarbleRunSimulatorCore {
         baseMeshMaxY: number;
         baseMeshMinZ: number;
         baseMeshMaxZ: number;
+        tracksMinX: number;
+        tracksMaxX: number;
+        tracksMinY: number;
+        tracksMaxY: number;
+        tracksMinZ: number;
+        tracksMaxZ: number;
         generateBaseMesh(): Promise<void>;
         regenerateBaseAxis(): void;
         setBaseIsVisible(v: boolean): void;

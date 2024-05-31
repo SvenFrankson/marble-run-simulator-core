@@ -1210,6 +1210,12 @@ var MarbleRunSimulatorCore;
             this.baseMeshMaxY = this.margin;
             this.baseMeshMinZ = -this.margin;
             this.baseMeshMaxZ = this.margin;
+            this.tracksMinX = 0;
+            this.tracksMaxX = 0;
+            this.tracksMinY = 0;
+            this.tracksMaxY = 0;
+            this.tracksMinZ = 0;
+            this.tracksMaxZ = 0;
             this.requestUpdateShadow = false;
             this.name = MachineName.GetRandom();
             this.trackFactory = new MarbleRunSimulatorCore.MachinePartFactory(this);
@@ -1410,6 +1416,20 @@ var MarbleRunSimulatorCore;
             this.baseMeshMaxY = MarbleRunSimulatorCore.tileHeight;
             this.baseMeshMinZ = -MarbleRunSimulatorCore.tileDepth * 0.5;
             this.baseMeshMaxZ = MarbleRunSimulatorCore.tileDepth * 0.5;
+            this.tracksMinX = Infinity;
+            this.tracksMaxX = -Infinity;
+            this.tracksMinY = Infinity;
+            this.tracksMaxY = -Infinity;
+            this.tracksMinZ = Infinity;
+            this.tracksMaxZ = -Infinity;
+            if (this.parts.length === 0) {
+                this.tracksMinX = 0;
+                this.tracksMaxX = 0;
+                this.tracksMinY = 0;
+                this.tracksMaxY = 0;
+                this.tracksMinZ = 0;
+                this.tracksMaxZ = 0;
+            }
             let maxI = 1;
             let maxJ = -1;
             let maxK = 1;
@@ -1421,6 +1441,12 @@ var MarbleRunSimulatorCore;
                 this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
                 this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.position.z - MarbleRunSimulatorCore.tileDepth * (track.d - 0.5));
                 this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z + MarbleRunSimulatorCore.tileDepth * 0.5);
+                this.tracksMinX = Math.min(this.tracksMinX, track.position.x - MarbleRunSimulatorCore.tileWidth * 0.5);
+                this.tracksMaxX = Math.max(this.tracksMaxX, track.position.x + MarbleRunSimulatorCore.tileWidth * (track.w - 0.5));
+                this.tracksMinY = Math.min(this.tracksMinY, track.position.y - MarbleRunSimulatorCore.tileHeight * (track.h + 1));
+                this.tracksMaxY = Math.max(this.tracksMaxY, track.position.y);
+                this.tracksMinZ = Math.min(this.tracksMinZ, track.position.z - MarbleRunSimulatorCore.tileDepth * (track.d - 0.5));
+                this.tracksMaxZ = Math.max(this.tracksMaxZ, track.position.z + MarbleRunSimulatorCore.tileDepth * 0.5);
                 maxI = Math.max(maxI, track.i + track.w);
                 maxJ = Math.max(maxJ, track.j + track.h);
                 maxK = Math.max(maxK, track.k + track.d);
@@ -2293,9 +2319,11 @@ var MarbleRunSimulatorCore;
                 let thisEndpoint = this.endPoints[i];
                 for (let j = 0; j < other.endPoints.length; j++) {
                     let otherEndpoint = other.endPoints[j];
-                    if (BABYLON.Vector3.Distance(thisEndpoint.absolutePosition, otherEndpoint.absolutePosition) < 0.001) {
-                        thisEndpoint.disconnect();
-                        thisEndpoint.connectTo(otherEndpoint);
+                    if (thisEndpoint.leftSide != otherEndpoint.leftSide) {
+                        if (BABYLON.Vector3.Distance(thisEndpoint.absolutePosition, otherEndpoint.absolutePosition) < 0.001) {
+                            thisEndpoint.disconnect();
+                            thisEndpoint.connectTo(otherEndpoint);
+                        }
                     }
                 }
             }
