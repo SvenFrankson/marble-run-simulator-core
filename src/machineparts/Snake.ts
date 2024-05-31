@@ -10,7 +10,7 @@ namespace MarbleRunSimulatorCore {
             this.generateWires();
         }
 
-        public static GenerateTemplate(w: number = 1, mirrorZ?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(w: number = 1, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
             template.partName = "snake-" + w.toFixed(0);
@@ -20,9 +20,11 @@ namespace MarbleRunSimulatorCore {
             template.w = w;
             template.h = 0;
             template.d = 3;
+            template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
 
             template.xExtendable = true;
+            template.xMirrorable = true;
             template.zMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
@@ -97,6 +99,9 @@ namespace MarbleRunSimulatorCore {
             }
             template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], end, dir, undefined, 1));
 
+            if (mirrorX) {
+                template.mirrorXTrackPointsInPlace();
+            }
             if (mirrorZ) {
                 template.mirrorZTrackPointsInPlace();
             }

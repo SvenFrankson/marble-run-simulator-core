@@ -3580,7 +3580,7 @@ var MarbleRunSimulatorCore;
                 }
                 else if (partName.startsWith("snake-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    data = MarbleRunSimulatorCore.Snake.GenerateTemplate(w, mirrorZ);
+                    data = MarbleRunSimulatorCore.Snake.GenerateTemplate(w, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("elevator-")) {
                     let h = parseInt(partName.split("-")[1]);
@@ -5853,7 +5853,7 @@ var MarbleRunSimulatorCore;
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
-        static GenerateTemplate(w = 1, mirrorZ) {
+        static GenerateTemplate(w = 1, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "snake-" + w.toFixed(0);
             template.angleSmoothSteps = 40;
@@ -5861,8 +5861,10 @@ var MarbleRunSimulatorCore;
             template.w = w;
             template.h = 0;
             template.d = 3;
+            template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
             template.xExtendable = true;
+            template.xMirrorable = true;
             template.zMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -5931,6 +5933,9 @@ var MarbleRunSimulatorCore;
                 }
             }
             template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], end, dir, undefined, 1));
+            if (mirrorX) {
+                template.mirrorXTrackPointsInPlace();
+            }
             if (mirrorZ) {
                 template.mirrorZTrackPointsInPlace();
             }

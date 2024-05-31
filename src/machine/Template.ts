@@ -345,7 +345,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName.startsWith("snake-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    data = Snake.GenerateTemplate(w, mirrorZ);
+                    data = Snake.GenerateTemplate(w, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("elevator-")) {
                     let h = parseInt(partName.split("-")[1]);
