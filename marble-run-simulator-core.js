@@ -2116,6 +2116,9 @@ var MarbleRunSimulatorCore;
                 encloseStart.y = Math.max(encloseStart.y, part.position.y + part.encloseStart.y);
                 encloseStart.z = Math.max(encloseStart.z, part.position.z + part.encloseStart.z);
             });
+            if (!Mummu.IsFinite(encloseStart)) {
+                encloseStart.copyFromFloats(0, 0, 0);
+            }
             return encloseStart;
         }
         getEncloseEnd() {
@@ -2125,6 +2128,9 @@ var MarbleRunSimulatorCore;
                 encloseEnd.y = Math.min(encloseEnd.y, part.position.y + part.encloseEnd.y);
                 encloseEnd.z = Math.min(encloseEnd.z, part.position.z + part.encloseEnd.z);
             });
+            if (!Mummu.IsFinite(encloseEnd)) {
+                encloseEnd.copyFromFloats(0, 0, 0);
+            }
             return encloseEnd;
         }
         updateShadow() {
