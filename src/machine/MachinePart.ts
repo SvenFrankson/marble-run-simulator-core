@@ -585,17 +585,17 @@ namespace MarbleRunSimulatorCore {
             this.AABBMax.addInPlace(this.position);
         }
 
+        public onBeforeDispose: () => void;
         public dispose(): void {
+            if (this.onBeforeDispose) {
+                this.onBeforeDispose();
+            }
             super.dispose();
             this.removeAllNeighbours();
             let index = this.machine.parts.indexOf(this);
             if (index > -1) {
                 this.machine.parts.splice(index, 1);
             }
-            // REFACTO : MACHINE EDITOR DEPENDANCY
-            //if (this.game.mode === GameMode.Challenge) {
-            //    this.game.machineEditor.setItemCount(this.fullPartName, this.game.machineEditor.getItemCount(this.fullPartName) + 1);
-            //}
         }
 
         public generateWires(): void {
