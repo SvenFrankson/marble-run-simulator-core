@@ -5783,10 +5783,16 @@ var MarbleRunSimulatorCore;
                         let tPeak = v0 / 9.8;
                         ballArmed.flyBackDuration = tPeak * 1.7;
                         ballArmed.collisionState = MarbleRunSimulatorCore.CollisionState.Flyback;
+                        ballArmed.marbleChocSound.setVolume(2);
+                        ballArmed.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
+                        ballArmed.marbleChocSound.play();
                         this.currentShootState = 4;
                     }
                     else {
                         ballArmed.velocity.copyFromFloats(0, this.velocityKick, 0);
+                        ballArmed.marbleChocSound.setVolume(2);
+                        ballArmed.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
+                        ballArmed.marbleChocSound.play();
                         this.currentShootState = 4;
                     }
                 }
@@ -5801,12 +5807,6 @@ var MarbleRunSimulatorCore;
                 this.shieldClose = true;
                 this.hasCollidingKicker = false;
                 this.currentShootState = 4.5;
-                let ballReady = this.getBallReady();
-                if (ballReady) {
-                    ballReady.marbleChocSound.setVolume(2);
-                    ballReady.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
-                    ballReady.marbleChocSound.play();
-                }
                 this.animateKickerKick(this.kickerYIdle, 0.8 / this.game.currentTimeFactor).then(() => {
                     this.delayTimeout = setTimeout(() => {
                         console.log("reset kicker");
