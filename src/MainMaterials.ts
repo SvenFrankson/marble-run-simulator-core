@@ -87,7 +87,7 @@ namespace MarbleRunSimulatorCore {
             this.whiteAutolitMaterial.specularColor.copyFromFloats(0, 0, 0);
 
             this.whiteFullLitMaterial = new BABYLON.StandardMaterial("white-autolit-material");
-            this.whiteAutolitMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.whiteFullLitMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.whiteFullLitMaterial.emissiveColor.copyFromFloats(1, 1, 1);
             this.whiteFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
 

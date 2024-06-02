@@ -475,12 +475,28 @@ namespace MarbleRunSimulatorCore {
                     return p.clone();
                 });
                 Mummu.DecimatePathInPlace(points, (10 / 180) * Math.PI);
-                let dirStart = points[1].subtract(points[0]).normalize();
-                let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
-                points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
-                points[points.length - 1].addInPlace(dirEnd.scale(this.wireGauge * 0.5));
-                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                if (this instanceof Ramp) {
+                    let startTip: BABYLON.Vector3[] = [];
+                    Mummu.RemoveFromStartForDistanceInPlace(points, 0.03, startTip);
+                    
+                    let tmpStartTipMesh = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: startTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    let dataStartTip = BABYLON.VertexData.ExtractFromMesh(tmpStartTipMesh);
+                    Mummu.ColorizeVertexDataInPlace(dataStartTip, BABYLON.Color3.Red());
+                    datas.push(dataStartTip);
+                    tmpStartTipMesh.dispose();
+
+                    let endTip: BABYLON.Vector3[] = [];
+                    Mummu.RemoveFromEndForDistanceInPlace(points, 0.03, endTip);
+                    
+                    let tmpEndTipMesh = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: endTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    let dataEndTip = BABYLON.VertexData.ExtractFromMesh(tmpEndTipMesh);
+                    Mummu.ColorizeVertexDataInPlace(dataEndTip, BABYLON.Color3.Green());
+                    datas.push(dataEndTip);
+                    tmpEndTipMesh.dispose();
+                }
+                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 let data = BABYLON.VertexData.ExtractFromMesh(tmp);
+                Mummu.ColorizeVertexDataInPlace(data, BABYLON.Color3.Blue());
                 datas.push(data);
                 tmp.dispose();
             }
@@ -489,7 +505,7 @@ namespace MarbleRunSimulatorCore {
                 this.selectorMeshDisplay.dispose();
             }
             this.selectorMeshDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
-            this.selectorMeshDisplay.material = this.game.materials.cyanMaterial;
+            this.selectorMeshDisplay.material = this.game.materials.whiteFullLitMaterial;
             this.selectorMeshDisplay.parent = this;
             if (datas.length) {
                 Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMeshDisplay);
@@ -502,11 +518,11 @@ namespace MarbleRunSimulatorCore {
                     return p.clone();
                 });
                 Mummu.DecimatePathInPlace(points, (10 / 180) * Math.PI);
-                let dirStart = points[1].subtract(points[0]).normalize();
-                let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
-                points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
-                points[points.length - 1].addInPlace(dirEnd.scale(this.wireGauge * 0.5));
-                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeLogic, path: this.tracks[n].templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                //let dirStart = points[1].subtract(points[0]).normalize();
+                //let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
+                //points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
+                //points[points.length - 1].addInPlace(dirEnd.scale(this.wireGauge * 0.5));
+                let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeLogic, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 let data = BABYLON.VertexData.ExtractFromMesh(tmp);
                 datas.push(data);
                 tmp.dispose();
