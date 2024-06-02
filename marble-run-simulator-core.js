@@ -1298,7 +1298,7 @@ var MarbleRunSimulatorCore;
                 if (!(hotReload && !this.parts[i].isPlaced)) {
                     await this.parts[i].instantiate();
                     this.parts[i].isPlaced = true;
-                    await Nabu.Wait(2);
+                    await Nabu.Wait(1);
                 }
             }
             for (let i = 0; i < this.balls.length; i++) {
