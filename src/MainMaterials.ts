@@ -81,29 +81,14 @@ namespace MarbleRunSimulatorCore {
             this.cyanMaterial.diffuseColor = BABYLON.Color3.FromHexString("#00FFFF");
             this.cyanMaterial.specularColor.copyFromFloats(0, 0, 0);
 
-            this.redMaterial = new BABYLON.StandardMaterial("red-material");
-            this.redMaterial.diffuseColor = BABYLON.Color3.FromHexString("#bf212f");
-            this.redMaterial.emissiveColor = BABYLON.Color3.FromHexString("#bf212f");
-            this.redMaterial.specularColor.copyFromFloats(0, 0, 0);
-
-            this.greenMaterial = new BABYLON.StandardMaterial("green-material");
-            this.greenMaterial.diffuseColor = BABYLON.Color3.FromHexString("#006f3c");
-            this.greenMaterial.emissiveColor = BABYLON.Color3.FromHexString("#006f3c");
-            this.greenMaterial.specularColor.copyFromFloats(0, 0, 0);
-
-            this.blueMaterial = new BABYLON.StandardMaterial("blue-material");
-            this.blueMaterial.diffuseColor = BABYLON.Color3.FromHexString("#264b96");
-            this.blueMaterial.emissiveColor = BABYLON.Color3.FromHexString("#264b96");
-            this.blueMaterial.specularColor.copyFromFloats(0, 0, 0);
-
             this.whiteAutolitMaterial = new BABYLON.StandardMaterial("white-autolit-material");
             this.whiteAutolitMaterial.diffuseColor = BABYLON.Color3.FromHexString("#baccc8");
             this.whiteAutolitMaterial.emissiveColor = BABYLON.Color3.FromHexString("#baccc8").scaleInPlace(0.5);
             this.whiteAutolitMaterial.specularColor.copyFromFloats(0, 0, 0);
 
             this.whiteFullLitMaterial = new BABYLON.StandardMaterial("white-autolit-material");
-            this.whiteFullLitMaterial.diffuseColor = BABYLON.Color3.FromHexString("#baccc8");
-            this.whiteFullLitMaterial.emissiveColor = BABYLON.Color3.FromHexString("#baccc8");
+            this.whiteAutolitMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.whiteFullLitMaterial.emissiveColor.copyFromFloats(1, 1, 1);
             this.whiteFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
 
             this.steelFullLitMaterial = new BABYLON.StandardMaterial("steel-fulllit-material");
