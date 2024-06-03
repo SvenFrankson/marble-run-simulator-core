@@ -622,6 +622,7 @@ namespace MarbleRunSimulatorCore {
                 .copyFrom(this.encloseStart)
                 .scaleInPlace(1 / 3)
                 .addInPlace(this.encloseEnd.scale(2 / 3));
+            let color = new BABYLON.Color4(1, 1, 1, 0.2);
             this.encloseMesh = BABYLON.MeshBuilder.CreateLineSystem(
                 "enclose-mesh",
                 {
@@ -633,6 +634,14 @@ namespace MarbleRunSimulatorCore {
                         [new BABYLON.Vector3(x0, y1, z0), new BABYLON.Vector3(x0, y1, z1)],
                         [new BABYLON.Vector3(x0, y0, z1), new BABYLON.Vector3(x1, y0, z1), new BABYLON.Vector3(x1, y1, z1), new BABYLON.Vector3(x0, y1, z1), new BABYLON.Vector3(x0, y0, z1)],
                     ],
+                    colors: [
+                        [color, color, color, color, color],
+                        [color, color],
+                        [color, color],
+                        [color, color],
+                        [color, color],
+                        [color, color, color, color, color],
+                    ]
                 },
                 this.getScene()
             );
