@@ -80,18 +80,19 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (!Wire.DEBUG_DISPLAY) {
-                let path = this.path;
+                let path = [...this.path];
                 if (q < 2) {
                     path = [];
-                    for (let i = 0; i < this.path.length; i++) {
-                        if (i % 3 === 0 || i === this.path.length - 1) {
-                            path.push(this.path[i]);
+                    for (let i = 0; i < path.length; i++) {
+                        if (i % 3 === 0 || i === path.length - 1) {
+                            path.push(path[i]);
                         }
                     }
                 }
 
                 if (this.startTipDir) {
                     let d = this.startTipDir
+                        .clone()
                         .normalize()
                         .scaleInPlace(-1)
                         .scaleInPlace(this.track.wireGauge * 0.5);
@@ -105,7 +106,7 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 if (this.endTipDir) {
-                    let d = this.endTipDir.normalize().scaleInPlace(this.track.wireGauge * 0.5);
+                    let d = this.endTipDir.clone().normalize().scaleInPlace(this.track.wireGauge * 0.5);
                     Mummu.RotateInPlace(d, this.endTipNormal, -Math.PI / 2);
                     let tipPath: BABYLON.Vector3[] = [];
                     for (let i = 0; i < 8; i++) {
