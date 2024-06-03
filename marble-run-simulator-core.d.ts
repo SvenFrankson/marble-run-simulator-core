@@ -707,6 +707,7 @@ declare namespace MarbleRunSimulatorCore {
         private _animateLock0;
         private _animateLock2;
         private _animateTingle2Out;
+        container: BABYLON.Mesh;
         pixels: BABYLON.Mesh[];
         pixelPictures: BABYLON.Mesh[];
         lock0: BABYLON.Mesh;

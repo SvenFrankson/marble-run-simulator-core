@@ -5036,6 +5036,11 @@ var MarbleRunSimulatorCore;
             for (let i = this.colors.length; i < 2; i++) {
                 this.colors[i] = 0;
             }
+            this.container = new BABYLON.Mesh("screen-container");
+            this.container.parent = this;
+            if (this.mirrorX) {
+                this.container.rotation.y = Math.PI;
+            }
             this.pixels = [
                 new BABYLON.Mesh("pixel-0"),
                 new BABYLON.Mesh("pixel-1"),
@@ -5048,13 +5053,13 @@ var MarbleRunSimulatorCore;
             this.lock2 = new BABYLON.Mesh("lock-1");
             this.lock2.position.copyFromFloats(0.0015, -0.009, -0.0115);
             this.lock2.parent = this.pixels[2];
-            this.pixels[0].parent = this;
+            this.pixels[0].parent = this.container;
             this.pixels[0].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, 0, -MarbleRunSimulatorCore.tileDepth / 4);
-            this.pixels[1].parent = this;
+            this.pixels[1].parent = this.container;
             this.pixels[1].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, 0, MarbleRunSimulatorCore.tileDepth / 4);
-            this.pixels[2].parent = this;
+            this.pixels[2].parent = this.container;
             this.pixels[2].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight, MarbleRunSimulatorCore.tileDepth / 4);
-            this.pixels[3].parent = this;
+            this.pixels[3].parent = this.container;
             this.pixels[3].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight, -MarbleRunSimulatorCore.tileDepth / 4);
             for (let i = 0; i < 4; i++) {
                 this.pixelPictures[i] = BABYLON.MeshBuilder.CreatePlane("pixel-pic", { width: 0.025, height: 0.026 });
@@ -5066,7 +5071,7 @@ var MarbleRunSimulatorCore;
             this.pixelPictures[2].position.z = -0.0005;
             this.pixelPictures[3].position.z = 0.0005;
             this.came = new BABYLON.Mesh("came");
-            this.came.parent = this;
+            this.came.parent = this.container;
             this.came.position.copyFromFloats(-MarbleRunSimulatorCore.tileWidth * 0.5 + 0.014, -MarbleRunSimulatorCore.tileHeight * 0.25, 0);
             this.cameInCollider = new BABYLON.Mesh("collider-came-in");
             this.cameInCollider.isVisible = false;
@@ -5075,9 +5080,8 @@ var MarbleRunSimulatorCore;
             this.cameOutCollider.isVisible = false;
             this.cameOutCollider.parent = this.came;
             this.cable = new BABYLON.Mesh("cable");
-            this.cable.parent = this;
+            this.cable.parent = this.container;
             this.cable.position.copyFrom(this.came.position);
-            console.log(this.pixels[0].position.subtract(this.came.position));
             this.generateWires();
             this.turnLoopSound = new BABYLON.Sound("screen-turn-sound", "./lib/marble-run-simulator-core/datas/sounds/screen-came.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.turnLoopSound.setVolume(0.2);
@@ -5296,7 +5300,12 @@ var MarbleRunSimulatorCore;
             let delta = ball.position.subtract(this.position);
             if (Math.abs(delta.z) < 0.03) {
                 if (Math.abs(delta.y) < 0.03) {
-                    return delta.x > 0 && delta.x < 0.05;
+                    if (this.mirrorX) {
+                        return delta.x > 0 && delta.x < 0.05;
+                    }
+                    else {
+                        return delta.x < 0 && delta.x > -0.05;
+                    }
                 }
             }
         }
@@ -5308,8 +5317,9 @@ var MarbleRunSimulatorCore;
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
                     if (Math.abs(ball.position.z - this.position.z) < 0.002) {
+                        let sx = this.mirrorX ? -1 : 1;
                         let relativePos = ball.position.subtract(this.position);
-                        if (Math.abs(relativePos.x + 0.022) < 0.003) {
+                        if (Math.abs(relativePos.x + sx * 0.022) < 0.003) {
                             if (Math.abs(relativePos.y - 0.007) < 0.003) {
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
