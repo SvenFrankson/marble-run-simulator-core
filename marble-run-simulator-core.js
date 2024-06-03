@@ -6786,12 +6786,15 @@ var MarbleRunSimulatorCore;
         }
         static GenerateTemplate(h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
+            template.getWidthForHeight = (argH) => {
+                return 1 + Math.floor((argH + 1) / 5);
+            };
             if (isNaN(h)) {
                 h = 1;
             }
             template.partName = "uturnsharp-" + h.toFixed(0);
+            template.w = template.getWidthForHeight(h);
             template.h = h;
-            template.w = 1 + Math.floor((template.h + 1) / 5);
             template.yExtendable = true;
             template.mirrorX = mirrorX;
             template.xMirrorable = true;

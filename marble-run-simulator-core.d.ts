@@ -545,6 +545,7 @@ declare namespace MarbleRunSimulatorCore {
         zMirrorable: boolean;
         hasOriginDestinationHandles: boolean;
         getWidthForDepth: (d: number) => number;
+        getWidthForHeight: (h: number) => number;
         getDepthForWidth: (d: number) => number;
         trackTemplates: TrackTemplate[];
         endPoints: BABYLON.Vector3[];
