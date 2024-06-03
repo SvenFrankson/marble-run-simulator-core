@@ -94,6 +94,7 @@ declare namespace MarbleRunSimulatorCore {
         get ballMaterialsCount(): number;
         private _wallpapers;
         getWallpaperMaterial(index: number): BABYLON.Material;
+        cableMaterial: BABYLON.Material;
         velvetMaterial: BABYLON.StandardMaterial;
         logoMaterial: BABYLON.StandardMaterial;
         baseAxisMaterial: BABYLON.StandardMaterial;
@@ -636,6 +637,7 @@ declare namespace MarbleRunSimulatorCore {
         static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
+        baseCableUVs: number[];
         x: number;
         l: number;
         p: number;

@@ -66,6 +66,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             let rCable = 0.00075;
+            let cablePerimeter = 2 * Math.PI * rCable;
             let nCable = 8;
             let cableShape: BABYLON.Vector3[] = [];
             for (let i = 0; i < nCable; i++) {
@@ -85,13 +86,24 @@ namespace MarbleRunSimulatorCore {
             }
             x0 = this.wheels[1].position.x;
             y0 = this.wheels[1].position.y;
-            for (let i = 0; i <= 16; i++) {
+            for (let i = 0; i < 16; i++) {
                 let a = (i / 16) * Math.PI;
                 let cosa = Math.cos(a);
                 let sina = Math.sin(a);
                 pathCable.push(new BABYLON.Vector3(x0 - cosa * this.rWheel, y0 + sina * this.rWheel));
             }
-            this.cable = BABYLON.ExtrudeShape("wire", { shape: cableShape, path: pathCable, closeShape: true, closePath: true });
+            this.cable = new BABYLON.Mesh("cable");
+            //this.cable = BABYLON.ExtrudeShape("wire", { shape: cableShape, path: pathCable, closeShape: true, closePath: true, updatable: true });
+            //let data = BABYLON.VertexData.ExtractFromMesh(this.cable);
+            //this.baseCableUVs = [...data.uvs];
+            //for (let i = 0; i < this.baseCableUVs.length / 2; i++) {
+            //    this.baseCableUVs[2 * i + 1] *= this.chainLength / cablePerimeter;
+            //}
+            //data.uvs = this.baseCableUVs;
+            //data.applyToMesh(this.cable);
+            let data2 = Mummu.CreateWireVertexData({ path: pathCable, radius: 0.00075, color: new BABYLON.Color4(1, 1, 1, 1), closed: true, textureRatio: 4 });
+            this.baseCableUVs = [...data2.uvs];
+            data2.applyToMesh(this.cable, true);
             this.cable.parent = this;
 
             this.generateWires();
@@ -102,7 +114,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {
-            this.cable.material = this.game.materials.plasticBlack;
+            this.cable.material = this.game.materials.cableMaterial;
 
             let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 0);
             wheelData.applyToMesh(this.wheels[0]);
@@ -181,6 +193,7 @@ namespace MarbleRunSimulatorCore {
             }
         };
 
+        public baseCableUVs: number[];
         public x: number = 0;
         public l: number = 0;
         public p: number = 0;
@@ -198,6 +211,14 @@ namespace MarbleRunSimulatorCore {
             while (this.x > this.chainLength) {
                 this.x -= this.chainLength;
             }
+
+            let rCable = 0.00075;
+            let cablePerimeter = 2 * Math.PI * rCable;
+            let newCablesUvs = [...this.baseCableUVs];
+            for (let i = 0; i < newCablesUvs.length / 2; i++) {
+                newCablesUvs[2 * i + 1] -= (this.x / cablePerimeter) / 4;
+            }
+            this.cable.setVerticesData(BABYLON.VertexBuffer.UVKind, newCablesUvs);
 
             for (let i = 0; i < this.boxesCount; i++) {
                 this.boxX[i] = this.x + (i / this.boxesCount) * this.chainLength;

@@ -203,7 +203,6 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
-            console.log("reset screw");
             this.a = 0;
             this.update(0);
         };

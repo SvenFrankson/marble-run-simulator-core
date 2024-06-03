@@ -37,6 +37,7 @@ namespace MarbleRunSimulatorCore {
             return this._wallpapers[index];
         }
 
+        public cableMaterial: BABYLON.Material;
         public velvetMaterial: BABYLON.StandardMaterial;
         public logoMaterial: BABYLON.StandardMaterial;
         public baseAxisMaterial: BABYLON.StandardMaterial;
@@ -172,6 +173,19 @@ namespace MarbleRunSimulatorCore {
             this.groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#3f4c52");
             this.groundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
 
+            let cableMaterial = new BABYLON.StandardMaterial("cable-material");
+            cableMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
+            cableMaterial.emissiveTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
+            cableMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+
+            let cableMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("steel-pbr", this.game.scene);
+            cableMaterialPBR.baseColor = new BABYLON.Color3(0.5, 0.75, 1.0);
+            cableMaterialPBR.metallic = 0.8;
+            cableMaterialPBR.roughness = 0.4;
+            cableMaterialPBR.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
+            cableMaterialPBR.environmentTexture = envTexture;
+
+            this.cableMaterial = cableMaterialPBR;
             /*
             let makeMetalBallMaterial = (name: string, textureName: string) => {
                 let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
