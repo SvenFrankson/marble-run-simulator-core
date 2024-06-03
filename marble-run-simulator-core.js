@@ -2498,6 +2498,7 @@ var MarbleRunSimulatorCore;
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
                 });
+                this.update(0);
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -2518,6 +2519,7 @@ var MarbleRunSimulatorCore;
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
                 });
+                this.update(0);
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -2538,6 +2540,7 @@ var MarbleRunSimulatorCore;
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
                 });
+                this.update(0);
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -6401,9 +6404,6 @@ var MarbleRunSimulatorCore;
                 for (let i = 0; i < this.boxesCount; i++) {
                     this.a = Math.PI * 0.5;
                     this.update(0);
-                    requestAnimationFrame(() => {
-                        this.update(0);
-                    });
                 }
             };
             this.l = 0;

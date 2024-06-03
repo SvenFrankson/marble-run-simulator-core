@@ -350,6 +350,7 @@ namespace MarbleRunSimulatorCore {
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
                 });
+                this.update(0);
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -372,6 +373,7 @@ namespace MarbleRunSimulatorCore {
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
                 });
+                this.update(0);
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -394,6 +396,7 @@ namespace MarbleRunSimulatorCore {
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
                 });
+                this.update(0);
                 this.machine.requestUpdateShadow = true;
             }
         }

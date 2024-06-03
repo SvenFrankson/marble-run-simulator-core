@@ -308,9 +308,6 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.boxesCount; i++) {
                 this.a = Math.PI * 0.5;
                 this.update(0);
-                requestAnimationFrame(() => {
-                    this.update(0);
-                });
             }
         };
 
