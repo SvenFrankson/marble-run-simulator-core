@@ -305,10 +305,8 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
-            for (let i = 0; i < this.boxesCount; i++) {
-                this.a = Math.PI * 0.5;
-                this.update(0);
-            }
+            this.a = Math.PI * 0.5;
+            this.update(0);
         };
 
         public l: number = 0;

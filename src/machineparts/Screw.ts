@@ -202,7 +202,11 @@ namespace MarbleRunSimulatorCore {
             this.machine.onStopCallbacks.remove(this.reset);
         }
 
-        public reset = () => {};
+        public reset = () => {
+            console.log("reset screw");
+            this.a = 0;
+            this.update(0);
+        };
 
         public l: number = 0;
         public p: number = 0;
@@ -221,7 +225,12 @@ namespace MarbleRunSimulatorCore {
                 this.a -= 2 * Math.PI;
             }
 
-            this.rotor.rotate(BABYLON.Axis.X, -dA);
+            if (this.a === 0) {
+                Mummu.QuaternionFromXYAxisToRef(this.dir, BABYLON.Axis.Y, this.rotor.rotationQuaternion);
+            }
+            else {
+                this.rotor.rotate(BABYLON.Axis.X, - dA);
+            }
 
             this.rotor.freezeWorldMatrix();
             this.rotor.getChildMeshes().forEach((child) => {

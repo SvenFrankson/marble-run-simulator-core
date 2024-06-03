@@ -5360,7 +5360,11 @@ var MarbleRunSimulatorCore;
             this.y1 = 0;
             this.stepH = 0;
             this.dH = 0.002;
-            this.reset = () => { };
+            this.reset = () => {
+                console.log("reset screw");
+                this.a = 0;
+                this.update(0);
+            };
             this.l = 0;
             this.p = 0;
             this.speed = 2 * Math.PI; // in m/s
@@ -5521,7 +5525,12 @@ var MarbleRunSimulatorCore;
             while (this.a > 2 * Math.PI) {
                 this.a -= 2 * Math.PI;
             }
-            this.rotor.rotate(BABYLON.Axis.X, -dA);
+            if (this.a === 0) {
+                Mummu.QuaternionFromXYAxisToRef(this.dir, BABYLON.Axis.Y, this.rotor.rotationQuaternion);
+            }
+            else {
+                this.rotor.rotate(BABYLON.Axis.X, -dA);
+            }
             this.rotor.freezeWorldMatrix();
             this.rotor.getChildMeshes().forEach((child) => {
                 child.freezeWorldMatrix();
@@ -6401,10 +6410,8 @@ var MarbleRunSimulatorCore;
             this.stepH = 0;
             this.dH = 0.002;
             this.reset = () => {
-                for (let i = 0; i < this.boxesCount; i++) {
-                    this.a = Math.PI * 0.5;
-                    this.update(0);
-                }
+                this.a = Math.PI * 0.5;
+                this.update(0);
             };
             this.l = 0;
             this.p = 0;
