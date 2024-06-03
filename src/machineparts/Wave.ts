@@ -19,12 +19,6 @@ namespace MarbleRunSimulatorCore {
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
 
-            template.xExtendable = true;
-            template.yExtendable = true;
-            template.zExtendable = true;
-            template.xMirrorable = true;
-            template.zMirrorable = true;
-
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);

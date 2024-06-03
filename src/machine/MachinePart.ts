@@ -23,12 +23,20 @@ namespace MarbleRunSimulatorCore {
         points: ITrackPointData[];
     }
 
-    var selectorHullShapeDisplay: BABYLON.Vector3[] = [];
-    for (let i = 0; i < 6; i++) {
-        let a = (i / 6) * 2 * Math.PI;
+    var selectorHullShapeDisplayTip: BABYLON.Vector3[] = [];
+    for (let i = 0; i < 10; i++) {
+        let a = (i / 10) * 2 * Math.PI;
         let cosa = Math.cos(a);
         let sina = Math.sin(a);
-        selectorHullShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.007 * 1.5, sina * 0.007 * 1.5, 0);
+        selectorHullShapeDisplayTip[i] = new BABYLON.Vector3(cosa * 0.01, sina * 0.01, 0);
+    }
+
+    var selectorHullShapeDisplay: BABYLON.Vector3[] = [];
+    for (let i = 0; i < 10; i++) {
+        let a = (i / 10) * 2 * Math.PI;
+        let cosa = Math.cos(a);
+        let sina = Math.sin(a);
+        selectorHullShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0);
     }
     
     var selectorHullShapeLogic: BABYLON.Vector3[] = [];
@@ -45,12 +53,21 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
+    export class EndpointSelectorMesh extends BABYLON.Mesh {
+        constructor(public endpoint: MachinePartEndpoint) {
+            super("endpoint-selector");
+        }
+    }
+
     export class MachinePartEndpoint {
 
         public connectedEndPoint: MachinePartEndpoint;
         public i: number = 0;
         public j: number = 0;
         public k: number = 0;
+        public index: number = - 1;
+
+        public selectorMeshDisplay: BABYLON.Mesh;
 
         constructor(
             public localPosition: BABYLON.Vector3,
@@ -282,6 +299,7 @@ namespace MarbleRunSimulatorCore {
             this.endPoints = [];
             for (let i = 0; i < this._template.endPoints.length; i++) {
                 this.endPoints[i] = new MachinePartEndpoint(this._template.endPoints[i], this);
+                this.endPoints[i].index = i;
             }
         }
 
@@ -469,34 +487,56 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void> {
+            let DEBUG_logicColliderVisibility: number = 0;
             let datas: BABYLON.VertexData[] = [];
             for (let n = 0; n < this.tracks.length; n++) {
                 let points = [...this.tracks[n].templateInterpolatedPoints].map((p) => {
                     return p.clone();
                 });
-                Mummu.DecimatePathInPlace(points, (10 / 180) * Math.PI);
-                if (this instanceof Ramp) {
-                    let startTip: BABYLON.Vector3[] = [];
-                    Mummu.RemoveFromStartForDistanceInPlace(points, 0.03, startTip);
+                Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI);
+                if (this instanceof MachinePartWithOriginDestination) {
+                    let originTip: BABYLON.Vector3[] = [];
+                    Mummu.RemoveFromStartForDistanceInPlace(points, 0.032, originTip);
+                    Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.004);
                     
-                    let tmpStartTipMesh = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: startTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                    let dataStartTip = BABYLON.VertexData.ExtractFromMesh(tmpStartTipMesh);
-                    Mummu.ColorizeVertexDataInPlace(dataStartTip, BABYLON.Color3.Red());
-                    datas.push(dataStartTip);
-                    tmpStartTipMesh.dispose();
+                    let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
+                    datas.push(dataOriginTip);
+                    
+                    if (this.selectorOriginMeshLogic) {
+                        this.selectorOriginMeshLogic.dispose();
+                    }
+                    this.selectorOriginMeshLogic = new EndpointSelectorMesh(this.endPoints[0]);
+                    this.selectorOriginMeshLogic.material = this.game.materials.whiteFullLitMaterial;
+                    this.selectorOriginMeshLogic.parent = this;
+                    this.selectorOriginMeshLogic.visibility = DEBUG_logicColliderVisibility;
+                    let selectorOriginVertexDataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    Mummu.ColorizeVertexDataInPlace(selectorOriginVertexDataLogic, BABYLON.Color3.Magenta());
+                    selectorOriginVertexDataLogic.applyToMesh(this.selectorOriginMeshLogic);
 
-                    let endTip: BABYLON.Vector3[] = [];
-                    Mummu.RemoveFromEndForDistanceInPlace(points, 0.03, endTip);
+
+                    let destinationTip: BABYLON.Vector3[] = [];
+                    Mummu.RemoveFromEndForDistanceInPlace(points, 0.032, destinationTip);
+                    Mummu.RemoveFromStartForDistanceInPlace(destinationTip, 0.004);
                     
-                    let tmpEndTipMesh = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: endTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                    let dataEndTip = BABYLON.VertexData.ExtractFromMesh(tmpEndTipMesh);
-                    Mummu.ColorizeVertexDataInPlace(dataEndTip, BABYLON.Color3.Green());
-                    datas.push(dataEndTip);
-                    tmpEndTipMesh.dispose();
+                    let dataDestinationTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    Mummu.ColorizeVertexDataInPlace(dataDestinationTip, BABYLON.Color3.FromHexString("#80FFFF"));
+                    datas.push(dataDestinationTip);
+                    
+                    if (this.selectorDestinationMeshLogic) {
+                        this.selectorDestinationMeshLogic.dispose();
+                    }
+                    this.selectorDestinationMeshLogic = new EndpointSelectorMesh(this.endPoints[1]);
+                    this.selectorDestinationMeshLogic.material = this.game.materials.whiteFullLitMaterial;
+                    this.selectorDestinationMeshLogic.parent = this;
+                    this.selectorDestinationMeshLogic.visibility = DEBUG_logicColliderVisibility;
+                    let selectorDestinationVertexDataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    Mummu.ColorizeVertexDataInPlace(selectorDestinationVertexDataLogic, BABYLON.Color3.Magenta());
+                    selectorDestinationVertexDataLogic.applyToMesh(this.selectorDestinationMeshLogic);
                 }
                 let tmp = BABYLON.ExtrudeShape("wire", { shape: selectorHullShapeDisplay, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 let data = BABYLON.VertexData.ExtractFromMesh(tmp);
-                Mummu.ColorizeVertexDataInPlace(data, BABYLON.Color3.Blue());
+                Mummu.ColorizeVertexDataInPlace(data, BABYLON.Color3.FromHexString("#00FFFF"));
                 datas.push(data);
                 tmp.dispose();
             }
@@ -517,7 +557,11 @@ namespace MarbleRunSimulatorCore {
                 let points = [...this.tracks[n].templateInterpolatedPoints].map((p) => {
                     return p.clone();
                 });
-                Mummu.DecimatePathInPlace(points, (10 / 180) * Math.PI);
+                Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI);
+                if (this instanceof MachinePartWithOriginDestination) {
+                    Mummu.RemoveFromStartForDistanceInPlace(points, 0.028);
+                    Mummu.RemoveFromEndForDistanceInPlace(points, 0.028);
+                }
                 //let dirStart = points[1].subtract(points[0]).normalize();
                 //let dirEnd = points[points.length - 1].subtract(points[points.length - 2]).normalize();
                 //points[0].subtractInPlace(dirStart.scale(this.wireGauge * 0.5));
@@ -532,12 +576,12 @@ namespace MarbleRunSimulatorCore {
                 this.selectorMeshLogic.dispose();
             }
             this.selectorMeshLogic = new MachinePartSelectorMesh(this);
-            this.selectorMeshLogic.material = this.game.materials.cyanMaterial;
+            this.selectorMeshLogic.material = this.game.materials.whiteFullLitMaterial;
             this.selectorMeshLogic.parent = this;
             if (datas.length) {
                 Mummu.MergeVertexDatas(...datas).applyToMesh(this.selectorMeshLogic);
             }
-            this.selectorMeshLogic.visibility = 0;
+            this.selectorMeshLogic.visibility = DEBUG_logicColliderVisibility;
 
             this.refreshEncloseMeshAndAABB();
 

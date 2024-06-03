@@ -1,5 +1,11 @@
 namespace MarbleRunSimulatorCore {
     export abstract class MachinePartWithOriginDestination extends MachinePart {
+        
+        public selectorOriginMeshDisplay: BABYLON.Mesh;
+        public selectorDestinationMeshDisplay: BABYLON.Mesh;
+        public selectorOriginMeshLogic: EndpointSelectorMesh;
+        public selectorDestinationMeshLogic: EndpointSelectorMesh;
+
         public abstract recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): MachinePartWithOriginDestination;
 
         public getOrigin(): Nabu.IJK {
@@ -80,12 +86,6 @@ namespace MarbleRunSimulatorCore {
             template.d = d;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
-
-            template.xExtendable = true;
-            template.yExtendable = true;
-            template.zExtendable = true;
-            template.xMirrorable = true;
-            template.zMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();

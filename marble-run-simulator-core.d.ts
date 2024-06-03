@@ -340,6 +340,10 @@ declare namespace MarbleRunSimulatorCore {
         part: MachinePart;
         constructor(part: MachinePart);
     }
+    class EndpointSelectorMesh extends BABYLON.Mesh {
+        endpoint: MachinePartEndpoint;
+        constructor(endpoint: MachinePartEndpoint);
+    }
     class MachinePartEndpoint {
         localPosition: BABYLON.Vector3;
         machinePart: MachinePart;
@@ -347,6 +351,8 @@ declare namespace MarbleRunSimulatorCore {
         i: number;
         j: number;
         k: number;
+        index: number;
+        selectorMeshDisplay: BABYLON.Mesh;
         constructor(localPosition: BABYLON.Vector3, machinePart: MachinePart);
         get leftSide(): boolean;
         get upperSide(): boolean;
@@ -680,6 +686,10 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     abstract class MachinePartWithOriginDestination extends MachinePart {
+        selectorOriginMeshDisplay: BABYLON.Mesh;
+        selectorDestinationMeshDisplay: BABYLON.Mesh;
+        selectorOriginMeshLogic: EndpointSelectorMesh;
+        selectorDestinationMeshLogic: EndpointSelectorMesh;
         abstract recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): MachinePartWithOriginDestination;
         getOrigin(): Nabu.IJK;
         getDestination(): Nabu.IJK;
