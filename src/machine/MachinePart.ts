@@ -489,7 +489,9 @@ namespace MarbleRunSimulatorCore {
             });
         }
 
+        public instantiated = false;
         public async instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void> {
+            this.instantiated = false;
             let DEBUG_logicColliderVisibility: number = 0;
             let datas: BABYLON.VertexData[] = [];
             for (let n = 0; n < this.tracks.length; n++) {
@@ -597,6 +599,7 @@ namespace MarbleRunSimulatorCore {
                 m.freezeWorldMatrix();
             });
             this.machine.requestUpdateShadow = true;
+            this.instantiated = true;
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {}
@@ -730,7 +733,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public doSleepersMeshUpdate(): void {
-            if (this.isDisposed()) {
+            if (!this.instantiated || this.isDisposed()) {
                 return;
             }
             let datas = SleeperMeshBuilder.GenerateSleepersVertexData(this, this.sleepersMeshProp);
