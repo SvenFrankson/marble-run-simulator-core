@@ -427,11 +427,6 @@ var MarbleRunSimulatorCore;
                                     }
                                 }
                             }
-                            if (part instanceof MarbleRunSimulatorCore.Speeder) {
-                                if (this.velocity.length() < 1) {
-                                    this.velocity.scaleInPlace(1.01);
-                                }
-                            }
                             /*
                         if (part instanceof QuarterNote || part instanceof DoubleNote) {
                             part.tings.forEach(ting => {
@@ -752,15 +747,18 @@ var MarbleRunSimulatorCore;
             this.groundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             let cableMaterial = new BABYLON.StandardMaterial("cable-material");
             cableMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
-            cableMaterial.emissiveTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
+            cableMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7).scale(0.75);
+            cableMaterial.specularColor = new BABYLON.Color3(1, 1, 1).scale(0.5);
+            cableMaterial.emissiveColor = cableMaterial.diffuseColor.scale(0.5);
+            cableMaterial.roughness = 0.15;
             cableMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             let cableMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("steel-pbr", this.game.scene);
             cableMaterialPBR.baseColor = new BABYLON.Color3(0.5, 0.75, 1.0);
             cableMaterialPBR.metallic = 0.8;
             cableMaterialPBR.roughness = 0.4;
-            cableMaterialPBR.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
+            cableMaterialPBR.lightmapTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
             cableMaterialPBR.environmentTexture = envTexture;
-            this.cableMaterial = cableMaterialPBR;
+            this.cableMaterial = cableMaterial;
             /*
             let makeMetalBallMaterial = (name: string, textureName: string) => {
                 let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
@@ -1109,9 +1107,9 @@ var MarbleRunSimulatorCore;
                 let path = [...this.path];
                 if (q < 2) {
                     path = [];
-                    for (let i = 0; i < path.length; i++) {
-                        if (i % 3 === 0 || i === path.length - 1) {
-                            path.push(path[i]);
+                    for (let i = 0; i < this.path.length; i++) {
+                        if (i % 3 === 0 || i === this.path.length - 1) {
+                            path.push(this.path[i]);
                         }
                     }
                 }
@@ -1298,7 +1296,7 @@ var MarbleRunSimulatorCore;
                 if (!(hotReload && !this.parts[i].isPlaced)) {
                     await this.parts[i].instantiate();
                     this.parts[i].isPlaced = true;
-                    await Nabu.Wait(1);
+                    await Nabu.Wait(2);
                 }
             }
             for (let i = 0; i < this.balls.length; i++) {
@@ -2007,6 +2005,10 @@ var MarbleRunSimulatorCore;
             if (dataString) {
                 if (data.n) {
                     this.name = data.n;
+                    // Lol
+                    if (this.name === "Cable Management Final") {
+                        this.minimalAutoQualityFailed = GraphicQuality.High;
+                    }
                 }
                 if (data.a) {
                     this.author = data.a;
@@ -2323,6 +2325,7 @@ var MarbleRunSimulatorCore;
             this._j = 0;
             this._k = 0;
             this._partVisibilityMode = PartVisibilityMode.Default;
+            this.instantiated = false;
             if (prop.fullPartName) {
                 this.fullPartName = prop.fullPartName;
             }
@@ -2635,6 +2638,7 @@ var MarbleRunSimulatorCore;
             });
         }
         async instantiate(rebuildNeighboursWireMeshes) {
+            this.instantiated = false;
             let DEBUG_logicColliderVisibility = 0;
             let datas = [];
             for (let n = 0; n < this.tracks.length; n++) {
@@ -2729,6 +2733,7 @@ var MarbleRunSimulatorCore;
                 m.freezeWorldMatrix();
             });
             this.machine.requestUpdateShadow = true;
+            this.instantiated = true;
         }
         async instantiateMachineSpecific() { }
         refreshEncloseMeshAndAABB() {
@@ -2846,7 +2851,7 @@ var MarbleRunSimulatorCore;
             this.machine.requestUpdateShadow = true;
         }
         doSleepersMeshUpdate() {
-            if (this.isDisposed()) {
+            if (!this.instantiated || this.isDisposed()) {
                 return;
             }
             let datas = MarbleRunSimulatorCore.SleeperMeshBuilder.GenerateSleepersVertexData(this, this.sleepersMeshProp);
@@ -6090,9 +6095,37 @@ var MarbleRunSimulatorCore;
     class Speeder extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this._rotationSpeed = 0;
             let partName = "speeder";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             this.generateWires();
+            this.base = new BABYLON.Mesh("base");
+            this.base.material = this.game.materials.getMaterial(this.getColor(0));
+            this.base.parent = this;
+            this.wheel0 = new BABYLON.Mesh("wheel0");
+            this.wheel0.parent = this;
+            this.wheel0.position.y = 0.006;
+            this.wheel0.position.z = -0.008 - 0.006;
+            this.wheel1 = new BABYLON.Mesh("wheel1");
+            this.wheel1.parent = this;
+            this.wheel1.position.y = 0.006;
+            this.wheel1.position.z = 0.008 + 0.007;
+            this.rubber0 = new BABYLON.Mesh("rubber0");
+            this.rubber0.parent = this.wheel0;
+            this.rubber1 = new BABYLON.Mesh("rubber1");
+            this.rubber1.parent = this.wheel1;
+        }
+        async instantiateMachineSpecific() {
+            let speederDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/speeder.babylon");
+            speederDatas[0].applyToMesh(this.rubber0);
+            this.rubber0.material = this.game.materials.plasticBlack;
+            speederDatas[0].applyToMesh(this.rubber1);
+            this.rubber1.material = this.game.materials.plasticBlack;
+            speederDatas[1].applyToMesh(this.wheel0);
+            this.wheel0.material = this.game.materials.getMaterial(0);
+            speederDatas[1].applyToMesh(this.wheel1);
+            this.wheel1.material = this.game.materials.getMaterial(0);
+            speederDatas[2].applyToMesh(this.base);
         }
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -6111,6 +6144,30 @@ var MarbleRunSimulatorCore;
             }
             template.initialize();
             return template;
+        }
+        update(dt) {
+            if (Math.abs(this._rotationSpeed) > 0.01) {
+                let fps = 1 / dt;
+                this._rotationSpeed = Nabu.Easing.smooth2Sec(fps) * this._rotationSpeed;
+                this.wheel0.rotation.y += this._rotationSpeed * 2 * Math.PI * dt;
+                this.wheel0.freezeWorldMatrix();
+                this.wheel1.rotation.y -= this._rotationSpeed * 2 * Math.PI * dt;
+                this.wheel1.freezeWorldMatrix();
+            }
+            for (let i = 0; i < this.machine.balls.length; i++) {
+                let ball = this.machine.balls[i];
+                let deltaPos = ball.position.subtract(this.position);
+                if (Math.abs(deltaPos.x) < 0.02) {
+                    if (Math.abs(deltaPos.y) < MarbleRunSimulatorCore.tileHeight * 0.5) {
+                        if (Math.abs(deltaPos.z) < 0.001) {
+                            if (ball.velocity.length() < 1) {
+                                ball.velocity.normalize().scaleInPlace(1);
+                            }
+                            this._rotationSpeed = 20 * Math.sign(ball.velocity.x);
+                        }
+                    }
+                }
+            }
         }
     }
     MarbleRunSimulatorCore.Speeder = Speeder;

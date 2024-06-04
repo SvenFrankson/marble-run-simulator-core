@@ -471,11 +471,6 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
                             }
-                            if (part instanceof Speeder) {
-                                if (this.velocity.length() < 1) {
-                                    this.velocity.scaleInPlace(1.01);
-                                }
-                            }
                             /*
                         if (part instanceof QuarterNote || part instanceof DoubleNote) {
                             part.tings.forEach(ting => {

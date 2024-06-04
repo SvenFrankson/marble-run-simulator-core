@@ -447,6 +447,7 @@ declare namespace MarbleRunSimulatorCore {
         getBankAt(index: number, trackIndex?: number): number;
         getBarycenter(): BABYLON.Vector3;
         recomputeAbsolutePath(): void;
+        instantiated: boolean;
         instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
         refreshEncloseMeshAndAABB(): void;
@@ -809,8 +810,16 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class Speeder extends MachinePart {
+        base: BABYLON.Mesh;
+        wheel0: BABYLON.Mesh;
+        wheel1: BABYLON.Mesh;
+        rubber0: BABYLON.Mesh;
+        rubber1: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+        private _rotationSpeed;
+        update(dt: number): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
