@@ -209,7 +209,7 @@ namespace MarbleRunSimulatorCore {
                 if (!(hotReload && !this.parts[i].isPlaced)) {
                     await this.parts[i].instantiate();
                     this.parts[i].isPlaced = true;
-                    await Nabu.Wait(1);
+                    await Nabu.Wait(2);
                 }
             }
 
@@ -1011,6 +1011,10 @@ namespace MarbleRunSimulatorCore {
             if (dataString) {
                 if (data.n) {
                     this.name = data.n;
+                    // Lol
+                    if (this.name === "Cable Management Final") {
+                        this.minimalAutoQualityFailed = GraphicQuality.High;
+                    }
                 }
                 if (data.a) {
                     this.author = data.a;
