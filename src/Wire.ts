@@ -83,9 +83,9 @@ namespace MarbleRunSimulatorCore {
                 let path = [...this.path];
                 if (q < 2) {
                     path = [];
-                    for (let i = 0; i < path.length; i++) {
-                        if (i % 3 === 0 || i === path.length - 1) {
-                            path.push(path[i]);
+                    for (let i = 0; i < this.path.length; i++) {
+                        if (i % 3 === 0 || i === this.path.length - 1) {
+                            path.push(this.path[i]);
                         }
                     }
                 }
