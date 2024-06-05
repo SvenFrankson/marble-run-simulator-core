@@ -59,7 +59,7 @@ namespace MarbleRunSimulatorCore {
             let partName = "shooter-" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
-            for (let i = this.colors.length; i < 4; i++) {
+            for (let i = this.colors.length; i < 5; i++) {
                 this.colors[i] = 0;
             }
 
@@ -153,17 +153,17 @@ namespace MarbleRunSimulatorCore {
             if (kickerDatas[1]) {
                 kickerDatas[1].applyToMesh(this.kickerBody);
             }
-            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(1));
+            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(2));
 
             if (kickerDatas[2]) {
                 kickerDatas[2].applyToMesh(this.kickerWeight);
             }
-            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(3));
+            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(4));
 
             if (kickerDatas[4]) {
                 kickerDatas[4].applyToMesh(this.base);
             }
-            this.base.material = this.game.materials.getMaterial(this.getColor(2));
+            this.base.material = this.game.materials.getMaterial(this.getColor(3));
 
             if (kickerDatas[3]) {
                 kickerDatas[3].applyToMesh(this.kickerCollider);
@@ -175,7 +175,7 @@ namespace MarbleRunSimulatorCore {
             if (shieldDatas[0]) {
                 shieldDatas[0].applyToMesh(this.shield);
             }
-            this.shield.material = this.game.materials.getMaterial(this.getColor(3));
+            this.shield.material = this.game.materials.getMaterial(this.getColor(4));
             
             if (shieldDatas[1]) {
                 shieldDatas[1].applyToMesh(this.shieldCollider);
@@ -219,6 +219,7 @@ namespace MarbleRunSimulatorCore {
 
             if (h > 3) {
                 template.trackTemplates[0] = new TrackTemplate(template);
+                template.trackTemplates[0].colorIndex = 0;
                 template.trackTemplates[0].trackpoints = [
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * (h - 2), 0), dir),
     
@@ -232,6 +233,7 @@ namespace MarbleRunSimulatorCore {
                 template.trackTemplates[0].drawEndTip = true;
 
                 template.trackTemplates[1] = new TrackTemplate(template);
+                template.trackTemplates[1].colorIndex = 1;
                 template.trackTemplates[1].trackpoints = [
                     new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dirLeft),
                     new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(tileWidth * 0.4 + cupR -0.02, -tileHeight * 0.6, 0), dirRight)

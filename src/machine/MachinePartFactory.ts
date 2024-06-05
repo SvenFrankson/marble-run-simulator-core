@@ -48,23 +48,8 @@ namespace MarbleRunSimulatorCore {
             props.fullPartName = trackname; // hacky but work
 
             trackname = trackname.split("-")[0];
-            let whdn = "";
-            if (isFinite(props.w)) {
-                whdn += props.w.toFixed(0) + ".";
-            }
-            if (isFinite(props.h)) {
-                whdn += props.h.toFixed(0) + ".";
-            }
-            if (isFinite(props.d)) {
-                whdn += props.d.toFixed(0) + ".";
-            }
-            if (isFinite(props.n)) {
-                whdn += props.n.toFixed(0) + ".";
-            }
-            whdn = whdn.substring(0, whdn.length - 1);
-            if (whdn.length > 0) {
-                trackname += "-" + whdn;
-            }
+
+            console.log("createTrackWHDN " + trackname)
             return this.createTrack(trackname, props);
         }
 
@@ -78,50 +63,64 @@ namespace MarbleRunSimulatorCore {
                 partName = partName.replace("_Z", "");
             }
 
-            if (partName.startsWith("ramp-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                let d = parseInt(partName.split("-")[1].split(".")[2]);
-                prop.w = w;
-                prop.h = h;
-                prop.d = d;
+            if (partName === "ramp" || partName.startsWith("ramp-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    let d = parseInt(argStr.split(".")[2]);
+                    prop.w = w;
+                    prop.h = h;
+                    prop.d = d;
+                }
                 return new Ramp(this.machine, prop);
             }
-            if (partName.startsWith("wave-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                let d = parseInt(partName.split("-")[1].split(".")[2]);
-                prop.w = w;
-                prop.h = h;
-                prop.d = d;
+            if (partName === "wave" || partName.startsWith("wave-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    let d = parseInt(argStr.split(".")[2]);
+                    prop.w = w;
+                    prop.h = h;
+                    prop.d = d;
+                }
                 return new Wave(this.machine, prop);
             }
-            if (partName.startsWith("snake-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                prop.w = w;
+            if (partName === "snake" || partName.startsWith("snake-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    prop.w = w;
+                }
                 return new Snake(this.machine, prop);
             }
-            if (partName.startsWith("uturn-")) {
-                let h = parseInt(partName.split("-")[1].split(".")[0]);
-                let d = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.h = h;
-                prop.d = d;
-                if (isFinite(h) && isFinite(d)) {
-                    return new UTurn(this.machine, prop);
+            if (partName === "uturn" || partName.startsWith("uturn-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.d = d;
                 }
+                return new UTurn(this.machine, prop);
             }
-            if (partName.startsWith("wall-")) {
-                let h = parseInt(partName.split("-")[1].split(".")[0]);
-                let d = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.h = h;
-                prop.d = d;
-                if (isFinite(h) && isFinite(d)) {
-                    return new Wall(this.machine, prop);
+            if (partName === "wall" || partName.startsWith("wall-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.d = d;
                 }
+                return new Wall(this.machine, prop);
             }
             if (partName === "uturnsharp" || partName.startsWith("uturnsharp-")) {
-                let h = parseInt(partName.split("-")[1].split(".")[0]);
-                prop.h = h;
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    prop.h = h;
+                }
                 return new UTurnSharp(this.machine, prop);
             }
             if (partName === "start") {
@@ -130,28 +129,37 @@ namespace MarbleRunSimulatorCore {
             if (partName === "end") {
                 return new End(this.machine, prop);
             }
-            if (partName.startsWith("jumper-")) {
-                let n = parseInt(partName.split("-")[1].split(".")[0]);
-                prop.n = n;
+            if (partName === "jumper" || partName.startsWith("jumper-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let n = parseInt(argStr.split(".")[0]);
+                    prop.n = n;
+                }
                 return new Jumper(this.machine, prop);
             }
             if (partName === "gravitywell") {
                 return new GravityWell(this.machine, prop);
             }
-            if (partName.startsWith("loop-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let d = parseInt(partName.split("-")[1].split(".")[1]);
-                let n = parseInt(partName.split("-")[1].split(".")[2]);
-                prop.w = w;
-                prop.d = d;
-                prop.n = n;
+            if (partName === "loop" || partName.startsWith("loop-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    let n = parseInt(argStr.split(".")[2]);
+                    prop.w = w;
+                    prop.d = d;
+                    prop.n = n;
+                }
                 return new Loop(this.machine, prop);
             }
-            if (partName.startsWith("spiral-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.w = w;
-                prop.h = h;
+            if (partName === "spiral" || partName.startsWith("spiral-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.w = w;
+                    prop.h = h;
+                }
                 return new Spiral(this.machine, prop);
             }
             if (partName === "join") {
@@ -166,30 +174,42 @@ namespace MarbleRunSimulatorCore {
             if (partName === "controler") {
                 return new Controler(this.machine, prop);
             }
-            if (partName.startsWith("elevator-")) {
-                let h = parseInt(partName.split("-")[1]);
-                prop.h = h;
+            if (partName === "elevator" || partName.startsWith("elevator-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr);
+                    prop.h = h;
+                }
                 return new Elevator(this.machine, prop);
             }
-            if (partName.startsWith("shooter-")) {
-                let h = parseInt(partName.split("-")[1].split(".")[0]);
-                let n = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.h = h;
-                prop.n = n;
+            if (partName === "shooter" || partName.startsWith("shooter-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let n = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.n = n;
+                }
                 return new Shooter(this.machine, prop);
             }
-            if (partName.startsWith("stairway-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.w = w;
-                prop.h = h;
+            if (partName === "stairway" || partName.startsWith("stairway-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.w = w;
+                    prop.h = h;
+                }
                 return new Stairway(this.machine, prop);
             }
-            if (partName.startsWith("screw-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.w = w;
-                prop.h = h;
+            if (partName === "screw" || partName.startsWith("screw-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.w = w;
+                    prop.h = h;
+                }
                 return new Screw(this.machine, prop);
             }
             if (partName === "quarter") {

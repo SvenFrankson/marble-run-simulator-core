@@ -192,7 +192,6 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset(): void {
-            this.position.copyFrom(this.positionZero);
             if (this.rotationQuaternion) {
                 this.rotationQuaternion.copyFromFloats(0, 0, 0, 1);
             }
@@ -201,6 +200,7 @@ namespace MarbleRunSimulatorCore {
             this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
+            this.animatePosition(this.positionZero, 0);
         }
 
         private memCount = 2;

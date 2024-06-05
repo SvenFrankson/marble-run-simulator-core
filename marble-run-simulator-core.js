@@ -178,7 +178,6 @@ var MarbleRunSimulatorCore;
             }
         }
         reset() {
-            this.position.copyFrom(this.positionZero);
             if (this.rotationQuaternion) {
                 this.rotationQuaternion.copyFromFloats(0, 0, 0, 1);
             }
@@ -187,6 +186,7 @@ var MarbleRunSimulatorCore;
             this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
+            this.animatePosition(this.positionZero, 0);
         }
         getLastIndex(wire) {
             for (let i = 0; i < this.memCount; i++) {
@@ -1228,7 +1228,7 @@ var MarbleRunSimulatorCore;
             this.name = MachineName.GetRandom();
             this.trackFactory = new MarbleRunSimulatorCore.MachinePartFactory(this);
             this.templateManager = new MarbleRunSimulatorCore.TemplateManager(this);
-            this.exitShooter = new MarbleRunSimulatorCore.Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 6, 3] });
+            this.exitShooter = new MarbleRunSimulatorCore.Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 0, 6, 3] });
             this.exitShooter.isSelectable = false;
             this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitShooter.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
@@ -2917,23 +2917,7 @@ var MarbleRunSimulatorCore;
             }
             props.fullPartName = trackname; // hacky but work
             trackname = trackname.split("-")[0];
-            let whdn = "";
-            if (isFinite(props.w)) {
-                whdn += props.w.toFixed(0) + ".";
-            }
-            if (isFinite(props.h)) {
-                whdn += props.h.toFixed(0) + ".";
-            }
-            if (isFinite(props.d)) {
-                whdn += props.d.toFixed(0) + ".";
-            }
-            if (isFinite(props.n)) {
-                whdn += props.n.toFixed(0) + ".";
-            }
-            whdn = whdn.substring(0, whdn.length - 1);
-            if (whdn.length > 0) {
-                trackname += "-" + whdn;
-            }
+            console.log("createTrackWHDN " + trackname);
             return this.createTrack(trackname, props);
         }
         createTrack(partName, prop) {
@@ -2945,50 +2929,64 @@ var MarbleRunSimulatorCore;
                 prop.mirrorX = true;
                 partName = partName.replace("_Z", "");
             }
-            if (partName.startsWith("ramp-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                let d = parseInt(partName.split("-")[1].split(".")[2]);
-                prop.w = w;
-                prop.h = h;
-                prop.d = d;
+            if (partName === "ramp" || partName.startsWith("ramp-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    let d = parseInt(argStr.split(".")[2]);
+                    prop.w = w;
+                    prop.h = h;
+                    prop.d = d;
+                }
                 return new MarbleRunSimulatorCore.Ramp(this.machine, prop);
             }
-            if (partName.startsWith("wave-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                let d = parseInt(partName.split("-")[1].split(".")[2]);
-                prop.w = w;
-                prop.h = h;
-                prop.d = d;
+            if (partName === "wave" || partName.startsWith("wave-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    let d = parseInt(argStr.split(".")[2]);
+                    prop.w = w;
+                    prop.h = h;
+                    prop.d = d;
+                }
                 return new MarbleRunSimulatorCore.Wave(this.machine, prop);
             }
-            if (partName.startsWith("snake-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                prop.w = w;
+            if (partName === "snake" || partName.startsWith("snake-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    prop.w = w;
+                }
                 return new MarbleRunSimulatorCore.Snake(this.machine, prop);
             }
-            if (partName.startsWith("uturn-")) {
-                let h = parseInt(partName.split("-")[1].split(".")[0]);
-                let d = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.h = h;
-                prop.d = d;
-                if (isFinite(h) && isFinite(d)) {
-                    return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
+            if (partName === "uturn" || partName.startsWith("uturn-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.d = d;
                 }
+                return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
             }
-            if (partName.startsWith("wall-")) {
-                let h = parseInt(partName.split("-")[1].split(".")[0]);
-                let d = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.h = h;
-                prop.d = d;
-                if (isFinite(h) && isFinite(d)) {
-                    return new MarbleRunSimulatorCore.Wall(this.machine, prop);
+            if (partName === "wall" || partName.startsWith("wall-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.d = d;
                 }
+                return new MarbleRunSimulatorCore.Wall(this.machine, prop);
             }
             if (partName === "uturnsharp" || partName.startsWith("uturnsharp-")) {
-                let h = parseInt(partName.split("-")[1].split(".")[0]);
-                prop.h = h;
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    prop.h = h;
+                }
                 return new MarbleRunSimulatorCore.UTurnSharp(this.machine, prop);
             }
             if (partName === "start") {
@@ -2997,28 +2995,37 @@ var MarbleRunSimulatorCore;
             if (partName === "end") {
                 return new MarbleRunSimulatorCore.End(this.machine, prop);
             }
-            if (partName.startsWith("jumper-")) {
-                let n = parseInt(partName.split("-")[1].split(".")[0]);
-                prop.n = n;
+            if (partName === "jumper" || partName.startsWith("jumper-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let n = parseInt(argStr.split(".")[0]);
+                    prop.n = n;
+                }
                 return new MarbleRunSimulatorCore.Jumper(this.machine, prop);
             }
             if (partName === "gravitywell") {
                 return new MarbleRunSimulatorCore.GravityWell(this.machine, prop);
             }
-            if (partName.startsWith("loop-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let d = parseInt(partName.split("-")[1].split(".")[1]);
-                let n = parseInt(partName.split("-")[1].split(".")[2]);
-                prop.w = w;
-                prop.d = d;
-                prop.n = n;
+            if (partName === "loop" || partName.startsWith("loop-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    let n = parseInt(argStr.split(".")[2]);
+                    prop.w = w;
+                    prop.d = d;
+                    prop.n = n;
+                }
                 return new MarbleRunSimulatorCore.Loop(this.machine, prop);
             }
-            if (partName.startsWith("spiral-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.w = w;
-                prop.h = h;
+            if (partName === "spiral" || partName.startsWith("spiral-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.w = w;
+                    prop.h = h;
+                }
                 return new MarbleRunSimulatorCore.Spiral(this.machine, prop);
             }
             if (partName === "join") {
@@ -3033,30 +3040,42 @@ var MarbleRunSimulatorCore;
             if (partName === "controler") {
                 return new MarbleRunSimulatorCore.Controler(this.machine, prop);
             }
-            if (partName.startsWith("elevator-")) {
-                let h = parseInt(partName.split("-")[1]);
-                prop.h = h;
+            if (partName === "elevator" || partName.startsWith("elevator-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr);
+                    prop.h = h;
+                }
                 return new MarbleRunSimulatorCore.Elevator(this.machine, prop);
             }
-            if (partName.startsWith("shooter-")) {
-                let h = parseInt(partName.split("-")[1].split(".")[0]);
-                let n = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.h = h;
-                prop.n = n;
+            if (partName === "shooter" || partName.startsWith("shooter-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let n = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.n = n;
+                }
                 return new MarbleRunSimulatorCore.Shooter(this.machine, prop);
             }
-            if (partName.startsWith("stairway-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.w = w;
-                prop.h = h;
+            if (partName === "stairway" || partName.startsWith("stairway-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.w = w;
+                    prop.h = h;
+                }
                 return new MarbleRunSimulatorCore.Stairway(this.machine, prop);
             }
-            if (partName.startsWith("screw-")) {
-                let w = parseInt(partName.split("-")[1].split(".")[0]);
-                let h = parseInt(partName.split("-")[1].split(".")[1]);
-                prop.w = w;
-                prop.h = h;
+            if (partName === "screw" || partName.startsWith("screw-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.w = w;
+                    prop.h = h;
+                }
                 return new MarbleRunSimulatorCore.Screw(this.machine, prop);
             }
             if (partName === "quarter") {
@@ -5612,7 +5631,7 @@ var MarbleRunSimulatorCore;
             }
             let partName = "shooter-" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
-            for (let i = this.colors.length; i < 4; i++) {
+            for (let i = this.colors.length; i < 5; i++) {
                 this.colors[i] = 0;
             }
             let x = 1;
@@ -5674,15 +5693,15 @@ var MarbleRunSimulatorCore;
             if (kickerDatas[1]) {
                 kickerDatas[1].applyToMesh(this.kickerBody);
             }
-            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(1));
+            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(2));
             if (kickerDatas[2]) {
                 kickerDatas[2].applyToMesh(this.kickerWeight);
             }
-            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(3));
+            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(4));
             if (kickerDatas[4]) {
                 kickerDatas[4].applyToMesh(this.base);
             }
-            this.base.material = this.game.materials.getMaterial(this.getColor(2));
+            this.base.material = this.game.materials.getMaterial(this.getColor(3));
             if (kickerDatas[3]) {
                 kickerDatas[3].applyToMesh(this.kickerCollider);
                 this.kickerCollider.isVisible = false;
@@ -5691,7 +5710,7 @@ var MarbleRunSimulatorCore;
             if (shieldDatas[0]) {
                 shieldDatas[0].applyToMesh(this.shield);
             }
-            this.shield.material = this.game.materials.getMaterial(this.getColor(3));
+            this.shield.material = this.game.materials.getMaterial(this.getColor(4));
             if (shieldDatas[1]) {
                 shieldDatas[1].applyToMesh(this.shieldCollider);
                 this.shieldCollider.isVisible = false;
@@ -5726,6 +5745,7 @@ var MarbleRunSimulatorCore;
             let dH = 0.001;
             if (h > 3) {
                 template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[0].colorIndex = 0;
                 template.trackTemplates[0].trackpoints = [
                     new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * (h - 2), 0), dir),
                     new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 1.6 * cupR, -MarbleRunSimulatorCore.tileHeight * (h - 2) - dH, 0), dir),
@@ -5736,6 +5756,7 @@ var MarbleRunSimulatorCore;
                 ];
                 template.trackTemplates[0].drawEndTip = true;
                 template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[1].colorIndex = 1;
                 template.trackTemplates[1].trackpoints = [
                     new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight, 0), dirLeft),
                     new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.02, -MarbleRunSimulatorCore.tileHeight * 0.6, 0), dirRight)
