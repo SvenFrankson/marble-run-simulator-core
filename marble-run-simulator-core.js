@@ -1202,6 +1202,7 @@ var MarbleRunSimulatorCore;
             this.game = game;
             this.name = "Unnamed Machine";
             this.author = "Unknown Author";
+            this.isChallengeMachine = false;
             this.parts = [];
             this.balls = [];
             this.ready = false;
@@ -1316,6 +1317,7 @@ var MarbleRunSimulatorCore;
         }
         reset() {
             this.dispose();
+            this.isChallengeMachine = false;
             this.name = MachineName.GetRandom();
             this.author = "Me";
             this.roomIndex = 0;

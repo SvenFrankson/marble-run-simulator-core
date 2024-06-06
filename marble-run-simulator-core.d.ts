@@ -230,6 +230,7 @@ declare namespace MarbleRunSimulatorCore {
         game: IGame;
         name: string;
         author: string;
+        isChallengeMachine: boolean;
         pedestalTop: BABYLON.Mesh;
         baseFrame: BABYLON.Mesh;
         baseLogo: BABYLON.Mesh;

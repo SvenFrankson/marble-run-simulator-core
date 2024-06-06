@@ -94,6 +94,7 @@ namespace MarbleRunSimulatorCore {
     export class Machine {
         public name: string = "Unnamed Machine";
         public author: string = "Unknown Author";
+        public isChallengeMachine: boolean = false;
 
         public pedestalTop: BABYLON.Mesh;
         public baseFrame: BABYLON.Mesh;
@@ -233,6 +234,7 @@ namespace MarbleRunSimulatorCore {
         public reset(): void {
             this.dispose();
             
+            this.isChallengeMachine = false;
             this.name = MachineName.GetRandom();
             this.author = "Me";
             this.roomIndex = 0;
