@@ -2291,6 +2291,56 @@ var MarbleRunSimulatorCore;
             }
             this.connectedEndPoint = undefined;
         }
+        showHelperMesh() {
+            if (!this.helperMesh) {
+                let data = BABYLON.CreateCylinderVertexData({ height: 0.01, tessellation: 10, diameter: 0.02 });
+                Mummu.RotateAngleAxisVertexDataInPlace(data, Math.PI * 0.5, BABYLON.Axis.Z);
+                Mummu.TranslateVertexDataInPlace(data, new BABYLON.Vector3(this.leftSide ? 0.02 : -0.02, 0, 0));
+                Mummu.ColorizeVertexDataInPlace(data, BABYLON.Color3.FromHexString("#80FFFF"));
+                this.helperMesh = new BABYLON.Mesh("helper-mesh");
+                this.helperMesh.material = this.machinePart.game.materials.whiteFullLitMaterial;
+                this.helperMesh.alphaIndex = 1;
+                data.applyToMesh(this.helperMesh);
+            }
+        }
+        hideHelperMesh() {
+            if (this.helperMesh) {
+                this.helperMesh.dispose();
+                this.helperMesh = undefined;
+            }
+        }
+        updateHelperMesh(mode, timer) {
+            if (this.helperMesh) {
+                if (mode === 0) {
+                    let sign = this.leftSide ? 1 : -1;
+                    this.helperMesh.position.copyFrom(this.absolutePosition);
+                    this.helperMesh.position.x -= sign * 0.5 * 0.015;
+                    this.helperMesh.visibility = Math.sin(timer * Math.PI) * 0.5;
+                }
+                else if (mode === 1) {
+                    let sign = this.leftSide ? 1 : -1;
+                    let fPos = timer * 4 / 3;
+                    fPos = Nabu.MinMax(fPos, 0, 1);
+                    this.helperMesh.position.copyFrom(this.absolutePosition);
+                    this.helperMesh.position.x -= sign * Nabu.Easing.easeOutCubic(fPos) * 0.015;
+                    let fAlpha = timer;
+                    if (fAlpha < 0.2) {
+                        this.helperMesh.visibility = Nabu.Easing.easeInOutSine(fAlpha) * 0.5;
+                    }
+                    else if (fAlpha < 0.6) {
+                        this.helperMesh.visibility = 0.3;
+                    }
+                    else if (fAlpha < 0.8) {
+                        let fAlpha2 = Nabu.Easing.easeInOutSine((fAlpha - 0.6) / 0.2);
+                        this.helperMesh.visibility = 0.3 * (1 - fAlpha2) + 0.7 * fAlpha2;
+                    }
+                    else {
+                        let fAlpha2 = Nabu.Easing.easeInOutSine((fAlpha - 0.8) / 0.2);
+                        this.helperMesh.visibility = 0.7 * (1 - fAlpha2) + 0 * fAlpha2;
+                    }
+                }
+            }
+        }
     }
     MarbleRunSimulatorCore.MachinePartEndpoint = MachinePartEndpoint;
     class MachinePart extends BABYLON.Mesh {
@@ -2790,6 +2840,9 @@ var MarbleRunSimulatorCore;
             if (this.onBeforeDispose) {
                 this.onBeforeDispose();
             }
+            this.endPoints.forEach(endpoint => {
+                endpoint.hideHelperMesh();
+            });
             super.dispose();
             this.removeAllNeighbours();
             let index = this.machine.parts.indexOf(this);

@@ -354,6 +354,7 @@ declare namespace MarbleRunSimulatorCore {
         k: number;
         index: number;
         selectorMeshDisplay: BABYLON.Mesh;
+        helperMesh: BABYLON.Mesh;
         constructor(localPosition: BABYLON.Vector3, machinePart: MachinePart);
         get leftSide(): boolean;
         get upperSide(): boolean;
@@ -362,6 +363,9 @@ declare namespace MarbleRunSimulatorCore {
         get absolutePosition(): BABYLON.Vector3;
         connectTo(endPoint: MachinePartEndpoint): void;
         disconnect(): void;
+        showHelperMesh(): void;
+        hideHelperMesh(): void;
+        updateHelperMesh(mode: number, timer: number): void;
     }
     class MachinePart extends BABYLON.Mesh {
         machine: Machine;
