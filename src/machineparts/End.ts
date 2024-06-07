@@ -5,6 +5,11 @@ namespace MarbleRunSimulatorCore {
 
             let partName = "end";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+
+            if (isNaN(this.colors[1])) {
+                this.colors[1] = 1;
+            }
+
             this.generateWires();
         }
 
@@ -23,6 +28,7 @@ namespace MarbleRunSimulatorCore {
             let w = tileWidth * 0.5;
             let r = 0.01;
             template.trackTemplates[0] = new TrackTemplate(template);
+            template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0, -0.01, 0), Tools.V3Dir(120))
