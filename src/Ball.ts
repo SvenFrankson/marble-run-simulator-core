@@ -242,7 +242,7 @@ namespace MarbleRunSimulatorCore {
         public recordedPositions: BABYLON.Vector3[] = [];
 
         public update(dt: number): void {
-            if (this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01) {
+            if (this.game.DEBUG_MODE && this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01 && this.recordedPositions.length < 1000) {
                 this.recordedPositions.push(this.position.clone());
             }
             let sign = Math.sign(this.velocity.y);
