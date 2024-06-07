@@ -847,6 +847,7 @@ namespace MarbleRunSimulatorCore {
 
         public deserialize(data: IMachineData): void {
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
+            this.isChallengeMachine = false;
             if (data) {
                 let version: number;
                 if (isFinite(data.v)) {

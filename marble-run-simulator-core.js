@@ -50,6 +50,7 @@ var MarbleRunSimulatorCore;
             this.lastPosition = BABYLON.Vector3.Zero();
             this.visibleVelocity = BABYLON.Vector3.Zero();
             this.collisionState = CollisionState.Normal;
+            this.recordedPositions = [];
             this.rotationQuaternion = BABYLON.Quaternion.Identity();
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -208,6 +209,9 @@ var MarbleRunSimulatorCore;
             this._lastWireIndexes[this._pouet] = index;
         }
         update(dt) {
+            if (this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01) {
+                this.recordedPositions.push(this.position.clone());
+            }
             let sign = Math.sign(this.velocity.y);
             if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.15) {
                 this.collisionState = CollisionState.Inside;
@@ -809,7 +813,9 @@ var MarbleRunSimulatorCore;
                 makeBrandedBallMaterialSTD("tiaratum", "ball-bjs.png"),
                 makeBrandedBallMaterialSTD("html5", "ball-poki.png")
             ];
+            /*
             this._wallpapers = [];
+
             let abstractBubblesMaterial = new BABYLON.StandardMaterial("abstract-bubbles-material");
             abstractBubblesMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wallpapers/abstract-bubbles.png");
             abstractBubblesMaterial.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
@@ -817,6 +823,8 @@ var MarbleRunSimulatorCore;
             abstractBubblesMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             abstractBubblesMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
             this._wallpapers[0] = abstractBubblesMaterial;
+            
+
             let abstractSquaresMaterial = new BABYLON.StandardMaterial("abstract-squares-material");
             abstractSquaresMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wallpapers/abstract-squares.png");
             abstractSquaresMaterial.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
@@ -824,6 +832,7 @@ var MarbleRunSimulatorCore;
             abstractSquaresMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             abstractSquaresMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
             this._wallpapers[1] = abstractSquaresMaterial;
+            */
         }
         getMaterial(colorIndex, materialQ = -1) {
             if (materialQ === -1) {
@@ -1859,6 +1868,7 @@ var MarbleRunSimulatorCore;
         }
         deserialize(data) {
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
+            this.isChallengeMachine = false;
             if (data) {
                 let version;
                 if (isFinite(data.v)) {

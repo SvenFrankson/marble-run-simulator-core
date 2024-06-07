@@ -239,8 +239,12 @@ namespace MarbleRunSimulatorCore {
         public lastPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public visibleVelocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public collisionState: number = CollisionState.Normal;
+        public recordedPositions: BABYLON.Vector3[] = [];
 
         public update(dt: number): void {
+            if (this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01) {
+                this.recordedPositions.push(this.position.clone());
+            }
             let sign = Math.sign(this.velocity.y);
             if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.15) {
                 this.collisionState = CollisionState.Inside;

@@ -246,6 +246,7 @@ namespace MarbleRunSimulatorCore {
                 makeBrandedBallMaterialSTD("html5", "ball-poki.png")
             ]
 
+            /*
             this._wallpapers = [];
 
             let abstractBubblesMaterial = new BABYLON.StandardMaterial("abstract-bubbles-material");
@@ -264,6 +265,7 @@ namespace MarbleRunSimulatorCore {
             abstractSquaresMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             abstractSquaresMaterial.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
             this._wallpapers[1] = abstractSquaresMaterial;
+            */
         }
 
         private _makePlasticPBR(name: string, color: BABYLON.Color3, envTexture: BABYLON.CubeTexture): BABYLON.Material {

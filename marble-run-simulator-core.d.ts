@@ -78,6 +78,7 @@ declare namespace MarbleRunSimulatorCore {
         lastPosition: BABYLON.Vector3;
         visibleVelocity: BABYLON.Vector3;
         collisionState: number;
+        recordedPositions: BABYLON.Vector3[];
         update(dt: number): void;
     }
 }
