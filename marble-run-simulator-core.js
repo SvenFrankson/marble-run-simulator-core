@@ -209,7 +209,7 @@ var MarbleRunSimulatorCore;
             this._lastWireIndexes[this._pouet] = index;
         }
         update(dt) {
-            if (this.game.DEBUG_MODE && this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01 && this.recordedPositions.length < 1000) {
+            if (this.game.DEBUG_MODE && (this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01 && this.recordedPositions.length < 1000)) {
                 this.recordedPositions.push(this.position.clone());
             }
             let sign = Math.sign(this.velocity.y);
@@ -4588,6 +4588,9 @@ var MarbleRunSimulatorCore;
             super(machine, prop);
             let partName = "end";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            if (isNaN(this.colors[1])) {
+                this.colors[1] = 1;
+            }
             this.generateWires();
         }
         static GenerateTemplate(mirrorX) {
@@ -4601,6 +4604,7 @@ var MarbleRunSimulatorCore;
             let w = MarbleRunSimulatorCore.tileWidth * 0.5;
             let r = 0.01;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+            template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0, -0.01, 0), MarbleRunSimulatorCore.Tools.V3Dir(120))

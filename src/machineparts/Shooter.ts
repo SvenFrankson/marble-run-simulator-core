@@ -447,7 +447,6 @@ namespace MarbleRunSimulatorCore {
                 this.currentShootState = 4.5;
                 this.animateKickerKick(this.kickerYIdle, 0.8  / this.game.currentTimeFactor).then(() => {
                     this.delayTimeout = setTimeout(() => {
-                        console.log("reset kicker");
                         this.currentShootState = 5;
                     }, this.n * 1000 / this.game.currentTimeFactor);
                 });
