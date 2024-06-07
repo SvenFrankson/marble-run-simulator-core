@@ -2881,9 +2881,6 @@ var MarbleRunSimulatorCore;
             this.AABBMax.addInPlace(this.position);
         }
         dispose() {
-            if (this.onBeforeDispose) {
-                this.onBeforeDispose();
-            }
             this.endPoints.forEach(endpoint => {
                 endpoint.hideHelperMesh();
             });

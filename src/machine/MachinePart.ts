@@ -195,6 +195,7 @@ namespace MarbleRunSimulatorCore {
         public selectorMeshLogic: MachinePartSelectorMesh;
         public encloseMesh: BABYLON.Mesh;
         public isSelectable: boolean = true;
+        public onBeforeDelete: () => void;
 
         public summedLength: number[] = [0];
         public totalLength: number = 0;
@@ -717,11 +718,7 @@ namespace MarbleRunSimulatorCore {
             this.AABBMax.addInPlace(this.position);
         }
 
-        public onBeforeDispose: () => void;
         public dispose(): void {
-            if (this.onBeforeDispose) {
-                this.onBeforeDispose();
-            }
             this.endPoints.forEach(endpoint => {
                 endpoint.hideHelperMesh();
             })

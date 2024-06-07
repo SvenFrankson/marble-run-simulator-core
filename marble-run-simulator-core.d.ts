@@ -391,6 +391,7 @@ declare namespace MarbleRunSimulatorCore {
         selectorMeshLogic: MachinePartSelectorMesh;
         encloseMesh: BABYLON.Mesh;
         isSelectable: boolean;
+        onBeforeDelete: () => void;
         summedLength: number[];
         totalLength: number;
         globalSlope: number;
@@ -461,7 +462,6 @@ declare namespace MarbleRunSimulatorCore {
         instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
         refreshEncloseMeshAndAABB(): void;
-        onBeforeDispose: () => void;
         dispose(): void;
         generateWires(): void;
         update(dt: number): void;
