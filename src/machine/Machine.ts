@@ -606,9 +606,7 @@ namespace MarbleRunSimulatorCore {
             let dir = new BABYLON.Vector3((this.baseMeshMinX + this.baseMeshMaxX) * 0.5, -3, (this.baseMeshMinZ + this.baseMeshMaxZ) * 0.5).normalize();
             this.game.spotLight.direction = dir;
 
-            requestAnimationFrame(() => {
-                this.ready = true;
-            })
+            this.ready = true;
         }
 
         public regenerateBaseAxis(): void {
