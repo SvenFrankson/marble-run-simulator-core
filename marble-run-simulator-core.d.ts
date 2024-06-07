@@ -193,6 +193,7 @@ declare namespace MarbleRunSimulatorCore {
         physicDT: number;
         timeFactor: number;
         mainVolume: number;
+        averagedFPS: number;
     }
     enum GameMode {
         Home = 0,
@@ -235,6 +236,9 @@ declare namespace MarbleRunSimulatorCore {
         pedestalTop: BABYLON.Mesh;
         baseFrame: BABYLON.Mesh;
         baseLogo: BABYLON.Mesh;
+        baseFPS: BABYLON.Mesh;
+        fpsMaterial: BABYLON.StandardMaterial;
+        fpsTexture: BABYLON.DynamicTexture;
         baseAxis: BABYLON.Mesh;
         parts: MachinePart[];
         balls: Ball[];

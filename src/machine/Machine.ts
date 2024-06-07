@@ -52,6 +52,7 @@ namespace MarbleRunSimulatorCore {
         physicDT: number;
         timeFactor: number;
         mainVolume: number;
+        averagedFPS: number;
     }
 
     export enum GameMode {
@@ -99,6 +100,9 @@ namespace MarbleRunSimulatorCore {
         public pedestalTop: BABYLON.Mesh;
         public baseFrame: BABYLON.Mesh;
         public baseLogo: BABYLON.Mesh;
+        public baseFPS: BABYLON.Mesh;
+        public fpsMaterial: BABYLON.StandardMaterial;
+        public fpsTexture: BABYLON.DynamicTexture;
         public baseAxis: BABYLON.Mesh;
         public parts: MachinePart[] = [];
         public balls: Ball[] = [];
@@ -179,6 +183,30 @@ namespace MarbleRunSimulatorCore {
             this.exitHoleOut.material = this.game.materials.plasticBlack;
             data.applyToMesh(this.exitHoleOut);
             this.exitHoleOut.rotation.x = - Math.PI * 0.5;
+
+            this.fpsTexture = new BABYLON.DynamicTexture("fps-texture", { width: 397, height: 106 });
+            let context = this.fpsTexture.getContext();
+            context.clearRect(0, 0, 397, 106);
+            context.fillStyle = "white";
+            context.font = "bold 100px monospace";
+            context.fillText("--- FPS", 8, 90);
+            this.fpsTexture.update();
+
+            setInterval(() => {
+                context.clearRect(0, 0, 397, 106);
+                context.fillStyle = "white";
+                context.font = "bold 100px monospace";
+                context.fillText(this.game.averagedFPS.toFixed(0).padStart(3, " ") + " FPS", 8, 90);
+                this.fpsTexture.update();
+            }, 1000);
+
+            this.fpsMaterial = new BABYLON.StandardMaterial("fps-material");
+            this.fpsMaterial.diffuseColor.copyFromFloats(1, 1, 1);
+            this.fpsMaterial.diffuseTexture = this.fpsTexture;
+            this.fpsMaterial.diffuseTexture.hasAlpha = true;
+            this.fpsMaterial.useAlphaFromDiffuseTexture = true;
+            this.fpsMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.fpsMaterial.alpha = 0.6;
         }
 
         public setAllIsSelectable(isSelectable: boolean): void {
@@ -563,6 +591,24 @@ namespace MarbleRunSimulatorCore {
 
                 Mummu.MergeVertexDatas(corner1Data, corner2Data).applyToMesh(this.baseLogo);
                 this.baseLogo.material = this.game.materials.logoMaterial;
+
+                
+                if (this.baseFPS) {
+                    this.baseFPS.dispose();
+                }
+                this.baseFPS = new BABYLON.Mesh("base-logo");
+                this.baseFPS.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+                this.baseFPS.position.y = this.baseMeshMinY + 0.0001;
+                this.baseFPS.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
+
+                let corner1DataFPS = Mummu.CloneVertexData(corner1Data);
+                Mummu.TranslateVertexDataInPlace(corner1DataFPS, new BABYLON.Vector3(0, 0, logoH));
+
+                let corner2DataFPS = Mummu.CloneVertexData(corner2Data);
+                Mummu.TranslateVertexDataInPlace(corner2DataFPS, new BABYLON.Vector3(0, 0, -logoH));
+
+                Mummu.MergeVertexDatas(corner1DataFPS, corner2DataFPS).applyToMesh(this.baseFPS);
+                this.baseFPS.material = this.fpsMaterial;
 
                 this.regenerateBaseAxis();
             }
