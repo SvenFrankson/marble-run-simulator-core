@@ -347,14 +347,13 @@ declare namespace MarbleRunSimulatorCore {
         part: MachinePart;
         constructor(part: MachinePart);
     }
-    enum EndpointSelectorMeshEditionMode {
+    enum EndpointEditionMode {
         None = 0,
         OriginDestination = 1,
         AxisY = 2
     }
     class EndpointSelectorMesh extends BABYLON.Mesh {
         endpoint: MachinePartEndpoint;
-        mode: EndpointSelectorMeshEditionMode;
         constructor(endpoint: MachinePartEndpoint);
     }
     class MachinePartEndpoint {
@@ -367,6 +366,7 @@ declare namespace MarbleRunSimulatorCore {
         index: number;
         selectorMeshDisplay: BABYLON.Mesh;
         helperMesh: BABYLON.Mesh;
+        mode: EndpointEditionMode;
         constructor(localPosition: BABYLON.Vector3, machinePart: MachinePart);
         get leftSide(): boolean;
         get upperSide(): boolean;
@@ -411,6 +411,7 @@ declare namespace MarbleRunSimulatorCore {
         encloseEnd: BABYLON.Vector3;
         localCenter: BABYLON.Vector3;
         endPoints: MachinePartEndpoint[];
+        findEndPoint(localPosition: BABYLON.Vector3): MachinePartEndpoint;
         neighbours: Nabu.UniqueList<MachinePart>;
         addNeighbour(other: MachinePart): void;
         removeNeighbour(other: MachinePart): void;

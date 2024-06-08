@@ -53,15 +53,13 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
-    export enum EndpointSelectorMeshEditionMode {
+    export enum EndpointEditionMode {
         None,
         OriginDestination,
         AxisY
     }
 
     export class EndpointSelectorMesh extends BABYLON.Mesh {
-
-        public mode: EndpointSelectorMeshEditionMode = EndpointSelectorMeshEditionMode.None;
 
         constructor(public endpoint: MachinePartEndpoint) {
             super("endpoint-selector");
@@ -79,6 +77,8 @@ namespace MarbleRunSimulatorCore {
         public selectorMeshDisplay: BABYLON.Mesh;
 
         public helperMesh: BABYLON.Mesh;
+
+        public mode: EndpointEditionMode = EndpointEditionMode.None;
 
         constructor(
             public localPosition: BABYLON.Vector3,
@@ -220,6 +220,9 @@ namespace MarbleRunSimulatorCore {
         public localCenter: BABYLON.Vector3 = BABYLON.Vector3.Zero();
 
         public endPoints: MachinePartEndpoint[] = [];
+        public findEndPoint(localPosition: BABYLON.Vector3): MachinePartEndpoint {
+            return this.endPoints.find(endpoint => { return BABYLON.Vector3.Distance(endpoint.localPosition, localPosition) < 0.001});
+        }
         public neighbours: Nabu.UniqueList<MachinePart> = new Nabu.UniqueList<MachinePart>();
         public addNeighbour(other: MachinePart): void {
             for (let i = 0; i < this.endPoints.length; i++) {
@@ -560,7 +563,7 @@ namespace MarbleRunSimulatorCore {
         public instantiated = false;
         public async instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void> {
             this.instantiated = false;
-            let DEBUG_logicColliderVisibility: number = 1;
+            let DEBUG_logicColliderVisibility: number = 0;
             let selectorMeshDisplayVertexDatas: BABYLON.VertexData[] = [];
             let selectorMeshLogicVertexDatas: BABYLON.VertexData[] = [];
             this.selectorEndpointsLogic.forEach(selectorEndpoint => {
@@ -572,8 +575,10 @@ namespace MarbleRunSimulatorCore {
                     return p.clone();
                 });
                 Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI);
-                if (this instanceof MachinePartWithOriginDestination || this instanceof Elevator) {
-                    if (Tools.IsWorldPosAConnexion(points[0])) {
+
+                if (Tools.IsWorldPosAConnexion(points[0])) {
+                    let endPoint = this.findEndPoint(points[0]);
+                    if (endPoint) {
                         let originTip: BABYLON.Vector3[] = [];
                         Mummu.RemoveFromStartForDistanceInPlace(points, 0.032, originTip);
                         Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.004);
@@ -582,7 +587,7 @@ namespace MarbleRunSimulatorCore {
                         Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
                         selectorMeshDisplayVertexDatas.push(dataOriginTip);
                         
-                        let selectorOriginMeshLogic = new EndpointSelectorMesh(this.endPoints[0]);
+                        let selectorOriginMeshLogic = new EndpointSelectorMesh(endPoint);
                         selectorOriginMeshLogic.material = this.game.materials.whiteFullLitMaterial;
                         selectorOriginMeshLogic.parent = this;
                         selectorOriginMeshLogic.visibility = DEBUG_logicColliderVisibility;
@@ -591,8 +596,11 @@ namespace MarbleRunSimulatorCore {
                         selectorOriginVertexDataLogic.applyToMesh(selectorOriginMeshLogic);
                         this.selectorEndpointsLogic.push(selectorOriginMeshLogic);
                     }
+                }
 
-                    if (Tools.IsWorldPosAConnexion(points[points.length - 1])) {
+                if (Tools.IsWorldPosAConnexion(points[points.length - 1])) {
+                    let endPoint = this.findEndPoint(points[points.length - 1]);
+                    if (endPoint) {
                         let destinationTip: BABYLON.Vector3[] = [];
                         Mummu.RemoveFromEndForDistanceInPlace(points, 0.032, destinationTip);
                         Mummu.RemoveFromStartForDistanceInPlace(destinationTip, 0.004);
@@ -601,7 +609,7 @@ namespace MarbleRunSimulatorCore {
                         Mummu.ColorizeVertexDataInPlace(dataDestinationTip, BABYLON.Color3.FromHexString("#80FFFF"));
                         selectorMeshDisplayVertexDatas.push(dataDestinationTip);
                         
-                        let selectorDestinationMeshLogic = new EndpointSelectorMesh(this.endPoints[1]);
+                        let selectorDestinationMeshLogic = new EndpointSelectorMesh(endPoint);
                         selectorDestinationMeshLogic.material = this.game.materials.whiteFullLitMaterial;
                         selectorDestinationMeshLogic.parent = this;
                         selectorDestinationMeshLogic.visibility = DEBUG_logicColliderVisibility;
@@ -611,13 +619,16 @@ namespace MarbleRunSimulatorCore {
                         this.selectorEndpointsLogic.push(selectorDestinationMeshLogic);
                     }
                 }
-                let dataDisplay = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplay, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#00FFFF"));
-                selectorMeshDisplayVertexDatas.push(dataDisplay);
-                
-                let dataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                Mummu.ColorizeVertexDataInPlace(dataLogic, BABYLON.Color3.FromHexString("#FFFFFF"));
-                selectorMeshLogicVertexDatas.push(dataLogic);
+
+                if (points.length >= 2) {
+                    let dataDisplay = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplay, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#00FFFF"));
+                    selectorMeshDisplayVertexDatas.push(dataDisplay);
+                    
+                    let dataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    Mummu.ColorizeVertexDataInPlace(dataLogic, BABYLON.Color3.FromHexString("#FFFFFF"));
+                    selectorMeshLogicVertexDatas.push(dataLogic);
+                }
             }
 
             if (this.selectorMeshDisplay) {
@@ -645,12 +656,12 @@ namespace MarbleRunSimulatorCore {
             // Assign EndpointManipulators logic
             if (this instanceof MachinePartWithOriginDestination) {
                 this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.mode = EndpointSelectorMeshEditionMode.OriginDestination;
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.OriginDestination;
                 })
             }
             else if (!this.xExtendable && this.yExtendable && !this.zExtendable) {
                 this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.mode = EndpointSelectorMeshEditionMode.AxisY;
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisY;
                 })
             }
 
