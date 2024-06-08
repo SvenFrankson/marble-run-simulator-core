@@ -79,6 +79,9 @@ namespace MarbleRunSimulatorCore {
             template.w = w;
             template.h = h;
             template.d = d;
+            template.xExtendable = true;
+            template.yExtendable = true;
+            template.zExtendable = true;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
 
@@ -161,6 +164,11 @@ namespace MarbleRunSimulatorCore {
         }
 
         public recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp {
+            if (origin.i > dest.i) {
+                let tmp = origin;
+                origin = dest;
+                dest = tmp;
+            }
             let i = Math.min(origin.i, dest.i);
             let j = Math.min(origin.j, dest.j);
             let k = Math.min(origin.k, dest.k);
@@ -177,6 +185,9 @@ namespace MarbleRunSimulatorCore {
                 if (origin.k > dest.k) {
                     mirrorZ = true;
                 }
+            }
+            if (!this.getIsNaNOrValidWHD(w, h, d)) {
+                return undefined;
             }
             return new Ramp(machine, {
                 i: i,

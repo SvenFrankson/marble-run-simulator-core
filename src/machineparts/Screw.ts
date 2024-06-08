@@ -1,5 +1,5 @@
 namespace MarbleRunSimulatorCore {
-    export class Screw extends MachinePart {
+    export class Screw extends MachinePartWithOriginDestination {
         public rotor: BABYLON.Mesh;
         public screwWire: Wire;
         public x0: number = 0;
@@ -169,7 +169,9 @@ namespace MarbleRunSimulatorCore {
             template.mirrorX = mirrorX;
 
             template.xExtendable = true;
+            template.minW = 1;
             template.yExtendable = true;
+            template.minH = 1;
             template.xMirrorable = true;
 
             let p0 = new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0);
@@ -236,6 +238,70 @@ namespace MarbleRunSimulatorCore {
                 child.freezeWorldMatrix();
             });
             this.screwWire.recomputeAbsolutePath();
+        }
+
+        public recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Screw {
+            if (origin.i > dest.i) {
+                let tmp = origin;
+                origin = dest;
+                dest = tmp;
+            }
+            let i = Math.min(origin.i, dest.i);
+            let j = Math.min(origin.j, dest.j);
+            let w = Math.abs(dest.i - origin.i);
+            let h = Math.abs(dest.j - origin.j);
+            let mirrorX = false;
+            if (origin.j < dest.j) {
+                mirrorX = true;
+            }
+            if (!this.getIsNaNOrValidWHD(w, h)) {
+                return undefined;
+            }
+            return new Screw(machine, {
+                i: i,
+                j: j,
+                k: this.k,
+                w: w,
+                h: h,
+                c: this.colors,
+                mirrorX: mirrorX,
+            });
+        }
+
+        public getOrigin(): Nabu.IJK {
+            let i = this.i;
+
+            let j: number;
+            if (this.mirrorX) {
+                j = this.j;
+            } else {
+                j = this.j + this.h;
+            }
+
+            let k = this.k;
+            return {
+                i: i,
+                j: j,
+                k: k,
+            };
+        }
+
+        public getDestination(): Nabu.IJK {
+            let i = this.i + this.w;
+
+            let j: number;
+            if (this.mirrorX) {
+                j = this.j + this.h;
+            } else {
+                j = this.j;
+            }
+
+            let k = this.k;
+            return {
+                i: i,
+                j: j,
+                k: k,
+            };
         }
     }
 }

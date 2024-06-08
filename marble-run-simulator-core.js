@@ -2295,7 +2295,9 @@ var MarbleRunSimulatorCore;
     (function (EndpointEditionMode) {
         EndpointEditionMode[EndpointEditionMode["None"] = 0] = "None";
         EndpointEditionMode[EndpointEditionMode["OriginDestination"] = 1] = "OriginDestination";
-        EndpointEditionMode[EndpointEditionMode["AxisY"] = 2] = "AxisY";
+        EndpointEditionMode[EndpointEditionMode["AxisX"] = 2] = "AxisX";
+        EndpointEditionMode[EndpointEditionMode["AxisY"] = 3] = "AxisY";
+        EndpointEditionMode[EndpointEditionMode["AxisZ"] = 4] = "AxisZ";
     })(EndpointEditionMode = MarbleRunSimulatorCore.EndpointEditionMode || (MarbleRunSimulatorCore.EndpointEditionMode = {}));
     class EndpointSelectorMesh extends BABYLON.Mesh {
         constructor(endpoint) {
@@ -2592,6 +2594,16 @@ var MarbleRunSimulatorCore;
         get hasOriginDestinationHandles() {
             return this.template.hasOriginDestinationHandles;
         }
+        getIsNaNOrValidWHD(w, h, d) {
+            if (isNaN(w) || w >= this.minW && w <= this.maxW) {
+                if (isNaN(h) || h >= this.minH && h <= this.maxH) {
+                    if (isNaN(d) || d >= this.minD && d <= this.maxD) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
         get template() {
             return this._template;
         }
@@ -2763,10 +2775,8 @@ var MarbleRunSimulatorCore;
                     let endPoint = this.findEndPoint(points[0]);
                     if (endPoint) {
                         let originTip = [];
-                        Mummu.RemoveFromStartForDistanceInPlace(points, 0.032, originTip);
-                        console.log("OriginTip length = " + originTip.length);
+                        Mummu.RemoveFromStartForDistanceInPlace(points, 0.022, originTip);
                         Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.004);
-                        console.log("OriginTip length = " + originTip.length);
                         let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
                         selectorMeshDisplayVertexDatas.push(dataOriginTip);
@@ -2784,7 +2794,7 @@ var MarbleRunSimulatorCore;
                     let endPoint = this.findEndPoint(points[points.length - 1]);
                     if (endPoint) {
                         let destinationTip = [];
-                        Mummu.RemoveFromEndForDistanceInPlace(points, 0.032, destinationTip);
+                        Mummu.RemoveFromEndForDistanceInPlace(points, 0.022, destinationTip);
                         Mummu.RemoveFromStartForDistanceInPlace(destinationTip, 0.004);
                         let dataDestinationTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataDestinationTip, BABYLON.Color3.FromHexString("#80FFFF"));
@@ -2834,9 +2844,19 @@ var MarbleRunSimulatorCore;
                     selectorEndpoint.endpoint.mode = EndpointEditionMode.OriginDestination;
                 });
             }
+            else if (this.xExtendable && !this.yExtendable && !this.zExtendable) {
+                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisX;
+                });
+            }
             else if (!this.xExtendable && this.yExtendable && !this.zExtendable) {
                 this.selectorEndpointsLogic.forEach(selectorEndpoint => {
                     selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisY;
+                });
+            }
+            else if (this instanceof MarbleRunSimulatorCore.Wall || !this.xExtendable && !this.yExtendable && this.zExtendable) {
+                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisZ;
                 });
             }
             this.refreshEncloseMeshAndAABB();
@@ -5055,6 +5075,9 @@ var MarbleRunSimulatorCore;
             template.w = w;
             template.h = h;
             template.d = d;
+            template.xExtendable = true;
+            template.yExtendable = true;
+            template.zExtendable = true;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
             let dir = new BABYLON.Vector3(1, 0, 0);
@@ -5128,6 +5151,11 @@ var MarbleRunSimulatorCore;
             return template;
         }
         recreateFromOriginDestination(origin, dest, machine) {
+            if (origin.i > dest.i) {
+                let tmp = origin;
+                origin = dest;
+                dest = tmp;
+            }
             let i = Math.min(origin.i, dest.i);
             let j = Math.min(origin.j, dest.j);
             let k = Math.min(origin.k, dest.k);
@@ -5145,6 +5173,9 @@ var MarbleRunSimulatorCore;
                 if (origin.k > dest.k) {
                     mirrorZ = true;
                 }
+            }
+            if (!this.getIsNaNOrValidWHD(w, h, d)) {
+                return undefined;
             }
             return new Ramp(machine, {
                 i: i,
@@ -5523,7 +5554,7 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
-    class Screw extends MarbleRunSimulatorCore.MachinePart {
+    class Screw extends MarbleRunSimulatorCore.MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
             this.x0 = 0;
@@ -5661,7 +5692,9 @@ var MarbleRunSimulatorCore;
             template.w = w;
             template.mirrorX = mirrorX;
             template.xExtendable = true;
+            template.minW = 1;
             template.yExtendable = true;
+            template.minH = 1;
             template.xMirrorable = true;
             let p0 = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h, 0);
             p0.x += 0.03;
@@ -5708,6 +5741,65 @@ var MarbleRunSimulatorCore;
                 child.freezeWorldMatrix();
             });
             this.screwWire.recomputeAbsolutePath();
+        }
+        recreateFromOriginDestination(origin, dest, machine) {
+            if (origin.i > dest.i) {
+                let tmp = origin;
+                origin = dest;
+                dest = tmp;
+            }
+            let i = Math.min(origin.i, dest.i);
+            let j = Math.min(origin.j, dest.j);
+            let w = Math.abs(dest.i - origin.i);
+            let h = Math.abs(dest.j - origin.j);
+            let mirrorX = false;
+            if (origin.j < dest.j) {
+                mirrorX = true;
+            }
+            if (!this.getIsNaNOrValidWHD(w, h)) {
+                return undefined;
+            }
+            return new Screw(machine, {
+                i: i,
+                j: j,
+                k: this.k,
+                w: w,
+                h: h,
+                c: this.colors,
+                mirrorX: mirrorX,
+            });
+        }
+        getOrigin() {
+            let i = this.i;
+            let j;
+            if (this.mirrorX) {
+                j = this.j;
+            }
+            else {
+                j = this.j + this.h;
+            }
+            let k = this.k;
+            return {
+                i: i,
+                j: j,
+                k: k,
+            };
+        }
+        getDestination() {
+            let i = this.i + this.w;
+            let j;
+            if (this.mirrorX) {
+                j = this.j + this.h;
+            }
+            else {
+                j = this.j;
+            }
+            let k = this.k;
+            return {
+                i: i,
+                j: j,
+                k: k,
+            };
         }
     }
     MarbleRunSimulatorCore.Screw = Screw;
@@ -7021,8 +7113,15 @@ var MarbleRunSimulatorCore;
             if (origin.j > dest.j) {
                 mirrorZ = true;
             }
+            let i = Math.min(origin.i, dest.i);
+            if (this.mirrorX) {
+                i -= this.template.getWidthForDepth(d);
+            }
+            if (!this.getIsNaNOrValidWHD(undefined, h, d)) {
+                return undefined;
+            }
             return new UTurn(machine, {
-                i: this.i,
+                i: i,
                 j: j,
                 k: k,
                 h: h,

@@ -80,8 +80,15 @@ namespace MarbleRunSimulatorCore {
             if (origin.j > dest.j) {
                 mirrorZ = true;
             }
+            let i = Math.min(origin.i, dest.i);
+            if (this.mirrorX) {
+                i -= this.template.getWidthForDepth(d);
+            }
+            if (!this.getIsNaNOrValidWHD(undefined, h, d)) {
+                return undefined;
+            }
             return new UTurn(machine, {
-                i: this.i,
+                i: i,
                 j: j,
                 k: k,
                 h: h,

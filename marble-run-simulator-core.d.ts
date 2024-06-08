@@ -350,7 +350,9 @@ declare namespace MarbleRunSimulatorCore {
     enum EndpointEditionMode {
         None = 0,
         OriginDestination = 1,
-        AxisY = 2
+        AxisX = 2,
+        AxisY = 3,
+        AxisZ = 4
     }
     class EndpointSelectorMesh extends BABYLON.Mesh {
         endpoint: MachinePartEndpoint;
@@ -442,6 +444,7 @@ declare namespace MarbleRunSimulatorCore {
         get xMirrorable(): boolean;
         get zMirrorable(): boolean;
         get hasOriginDestinationHandles(): boolean;
+        getIsNaNOrValidWHD(w?: number, h?: number, d?: number): boolean;
         private _template;
         get template(): MachinePartTemplate;
         setTemplate(template: MachinePartTemplate): void;
@@ -753,7 +756,7 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class Screw extends MachinePart {
+    class Screw extends MachinePartWithOriginDestination {
         rotor: BABYLON.Mesh;
         screwWire: Wire;
         x0: number;
@@ -777,6 +780,9 @@ declare namespace MarbleRunSimulatorCore {
         speed: number;
         a: number;
         update(dt: number): void;
+        recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Screw;
+        getOrigin(): Nabu.IJK;
+        getDestination(): Nabu.IJK;
     }
 }
 declare namespace MarbleRunSimulatorCore {
