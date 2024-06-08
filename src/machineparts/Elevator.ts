@@ -131,6 +131,7 @@ namespace MarbleRunSimulatorCore {
             template.h = h;
             template.mirrorX = mirrorX;
 
+            template.minH = 3;
             template.yExtendable = true;
             template.xMirrorable = true;
 
