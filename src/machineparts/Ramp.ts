@@ -1,11 +1,6 @@
 namespace MarbleRunSimulatorCore {
     export abstract class MachinePartWithOriginDestination extends MachinePart {
         
-        public selectorOriginMeshDisplay: BABYLON.Mesh;
-        public selectorDestinationMeshDisplay: BABYLON.Mesh;
-        public selectorOriginMeshLogic: EndpointSelectorMesh;
-        public selectorDestinationMeshLogic: EndpointSelectorMesh;
-
         public abstract recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): MachinePartWithOriginDestination;
 
         public getOrigin(): Nabu.IJK {

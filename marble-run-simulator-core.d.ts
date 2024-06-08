@@ -347,8 +347,14 @@ declare namespace MarbleRunSimulatorCore {
         part: MachinePart;
         constructor(part: MachinePart);
     }
+    enum EndpointSelectorMeshEditionMode {
+        None = 0,
+        OriginDestination = 1,
+        AxisY = 2
+    }
     class EndpointSelectorMesh extends BABYLON.Mesh {
         endpoint: MachinePartEndpoint;
+        mode: EndpointSelectorMeshEditionMode;
         constructor(endpoint: MachinePartEndpoint);
     }
     class MachinePartEndpoint {
@@ -388,7 +394,8 @@ declare namespace MarbleRunSimulatorCore {
         getColor(index: number): number;
         sleepersMeshes: Map<number, BABYLON.Mesh>;
         selectorMeshDisplay: BABYLON.Mesh;
-        selectorMeshLogic: MachinePartSelectorMesh;
+        selectorMainLogic: MachinePartSelectorMesh;
+        selectorEndpointsLogic: EndpointSelectorMesh[];
         encloseMesh: BABYLON.Mesh;
         isSelectable: boolean;
         onBeforeDelete: () => void;
@@ -700,10 +707,6 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     abstract class MachinePartWithOriginDestination extends MachinePart {
-        selectorOriginMeshDisplay: BABYLON.Mesh;
-        selectorDestinationMeshDisplay: BABYLON.Mesh;
-        selectorOriginMeshLogic: EndpointSelectorMesh;
-        selectorDestinationMeshLogic: EndpointSelectorMesh;
         abstract recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): MachinePartWithOriginDestination;
         getOrigin(): Nabu.IJK;
         getDestination(): Nabu.IJK;
