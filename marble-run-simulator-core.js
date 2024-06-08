@@ -2327,6 +2327,9 @@ var MarbleRunSimulatorCore;
         get farSide() {
             return this.localPosition.z > this.machinePart.encloseMid.z;
         }
+        isIJK(worldIJK) {
+            return (this.i + this.machinePart.i) === worldIJK.i && (this.j + this.machinePart.j) === worldIJK.j && (this.k + this.machinePart.k) === worldIJK.k;
+        }
         get absolutePosition() {
             this._absolutePosition.copyFrom(this.localPosition);
             this._absolutePosition.addInPlace(this.machinePart.position);
@@ -2761,7 +2764,9 @@ var MarbleRunSimulatorCore;
                     if (endPoint) {
                         let originTip = [];
                         Mummu.RemoveFromStartForDistanceInPlace(points, 0.032, originTip);
+                        console.log("OriginTip length = " + originTip.length);
                         Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.004);
+                        console.log("OriginTip length = " + originTip.length);
                         let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
                         selectorMeshDisplayVertexDatas.push(dataOriginTip);
@@ -6947,7 +6952,7 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
-    class UTurn extends MarbleRunSimulatorCore.MachinePart {
+    class UTurn extends MarbleRunSimulatorCore.MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
             let partName = "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
@@ -7003,6 +7008,73 @@ var MarbleRunSimulatorCore;
             }
             template.initialize();
             return template;
+        }
+        recreateFromOriginDestination(origin, dest, machine) {
+            let j = Math.min(origin.j, dest.j);
+            let k = Math.min(origin.k, dest.k);
+            let h = Math.abs(dest.j - origin.j);
+            h = Nabu.MinMax(h, this.minH, this.maxH);
+            let d = Math.abs(dest.k - origin.k) + 1;
+            d = Nabu.MinMax(d, this.minD, this.maxD);
+            let mirrorX = this.mirrorX;
+            let mirrorZ = false;
+            if (origin.j > dest.j) {
+                mirrorZ = true;
+            }
+            return new UTurn(machine, {
+                i: this.i,
+                j: j,
+                k: k,
+                h: h,
+                d: d,
+                c: this.colors,
+                mirrorX: mirrorX,
+                mirrorZ: mirrorZ,
+            });
+        }
+        getOrigin() {
+            let i;
+            if (this.mirrorX) {
+                i = this.i + this.w;
+            }
+            else {
+                i = this.i;
+            }
+            let j;
+            if (this.mirrorZ) {
+                j = this.j + this.h;
+            }
+            else {
+                j = this.j;
+            }
+            let k = this.k;
+            return {
+                i: i,
+                j: j,
+                k: k,
+            };
+        }
+        getDestination() {
+            let i;
+            if (this.mirrorX) {
+                i = this.i + this.w;
+            }
+            else {
+                i = this.i;
+            }
+            let j;
+            if (this.mirrorZ) {
+                j = this.j;
+            }
+            else {
+                j = this.j + this.h;
+            }
+            let k = this.k + this.d - 1;
+            return {
+                i: i,
+                j: j,
+                k: k,
+            };
         }
     }
     MarbleRunSimulatorCore.UTurn = UTurn;

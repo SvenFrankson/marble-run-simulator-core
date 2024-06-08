@@ -371,6 +371,7 @@ declare namespace MarbleRunSimulatorCore {
         get leftSide(): boolean;
         get upperSide(): boolean;
         get farSide(): boolean;
+        isIJK(worldIJK: Nabu.IJK): boolean;
         private _absolutePosition;
         get absolutePosition(): BABYLON.Vector3;
         connectTo(endPoint: MachinePartEndpoint): void;
@@ -895,9 +896,12 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class UTurn extends MachinePart {
+    class UTurn extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(h: number, d: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
+        getOrigin(): Nabu.IJK;
+        getDestination(): Nabu.IJK;
     }
 }
 declare namespace MarbleRunSimulatorCore {

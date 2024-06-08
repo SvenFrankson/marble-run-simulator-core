@@ -1,5 +1,5 @@
 namespace MarbleRunSimulatorCore {
-    export class UTurn extends MachinePart {
+    export class UTurn extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
@@ -66,6 +66,76 @@ namespace MarbleRunSimulatorCore {
             template.initialize();
 
             return template;
+        }
+
+        public recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp {
+            let j = Math.min(origin.j, dest.j);
+            let k = Math.min(origin.k, dest.k);
+            let h = Math.abs(dest.j - origin.j);
+            h = Nabu.MinMax(h, this.minH, this.maxH);
+            let d = Math.abs(dest.k - origin.k) + 1;
+            d = Nabu.MinMax(d, this.minD, this.maxD);
+            let mirrorX = this.mirrorX;
+            let mirrorZ = false;
+            if (origin.j > dest.j) {
+                mirrorZ = true;
+            }
+            return new UTurn(machine, {
+                i: this.i,
+                j: j,
+                k: k,
+                h: h,
+                d: d,
+                c: this.colors,
+                mirrorX: mirrorX,
+                mirrorZ: mirrorZ,
+            });
+        }
+
+        public getOrigin(): Nabu.IJK {
+            let i: number;
+            if (this.mirrorX) {
+                i = this.i + this.w;
+            } else {
+                i = this.i;
+            }
+
+            let j: number;
+            if (this.mirrorZ) {
+                j = this.j + this.h;
+            } else {
+                j = this.j;
+            }
+
+            let k = this.k;
+            return {
+                i: i,
+                j: j,
+                k: k,
+            };
+        }
+
+        public getDestination(): Nabu.IJK {
+            let i: number;
+            if (this.mirrorX) {
+                i = this.i + this.w;
+            } else {
+                i = this.i;
+            }
+
+            let j: number;
+            if (this.mirrorZ) {
+                j = this.j;
+            } else {
+                j = this.j + this.h;
+            }
+
+            let k = this.k + this.d - 1;
+            return {
+                i: i,
+                j: j,
+                k: k,
+            };
         }
     }
 }

@@ -101,6 +101,10 @@ namespace MarbleRunSimulatorCore {
             return this.localPosition.z > this.machinePart.encloseMid.z;
         }
 
+        public isIJK(worldIJK: Nabu.IJK): boolean {
+            return (this.i + this.machinePart.i) === worldIJK.i && (this.j + this.machinePart.j) === worldIJK.j && (this.k + this.machinePart.k) === worldIJK.k;
+        }
+
         private _absolutePosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public get absolutePosition(): BABYLON.Vector3 {
             this._absolutePosition.copyFrom(this.localPosition);
@@ -581,7 +585,9 @@ namespace MarbleRunSimulatorCore {
                     if (endPoint) {
                         let originTip: BABYLON.Vector3[] = [];
                         Mummu.RemoveFromStartForDistanceInPlace(points, 0.032, originTip);
+                        console.log("OriginTip length = " + originTip.length);
                         Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.004);
+                        console.log("OriginTip length = " + originTip.length);
                         
                         let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
