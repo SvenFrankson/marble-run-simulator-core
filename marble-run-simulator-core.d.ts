@@ -154,6 +154,7 @@ declare namespace MarbleRunSimulatorCore {
         instantiate(color?: number): Promise<void>;
     }
 }
+declare var THE_ORIGIN_OF_TIME_ms: any;
 declare namespace MarbleRunSimulatorCore {
     enum GraphicQuality {
         VeryLow = 0,

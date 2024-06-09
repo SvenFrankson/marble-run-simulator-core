@@ -1173,6 +1173,7 @@ var MarbleRunSimulatorCore;
 /// <reference path="../../../babylon.d.ts"/>
 /// <reference path="../../../nabu/nabu.d.ts"/>
 /// <reference path="../../../mummu/mummu.d.ts"/>
+var THE_ORIGIN_OF_TIME_ms;
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     function NToHex(n, l = 2) {
@@ -1280,18 +1281,20 @@ var MarbleRunSimulatorCore;
             this.exitHoleOut.material = this.game.materials.plasticBlack;
             data.applyToMesh(this.exitHoleOut);
             this.exitHoleOut.rotation.x = -Math.PI * 0.5;
-            this.fpsTexture = new BABYLON.DynamicTexture("fps-texture", { width: 397, height: 106 });
+            this.fpsTexture = new BABYLON.DynamicTexture("fps-texture", { width: 794, height: 212 });
             let context = this.fpsTexture.getContext();
-            context.clearRect(0, 0, 397, 106);
+            context.clearRect(0, 0, 794, 212);
             context.fillStyle = "white";
             context.font = "bold 100px monospace";
             context.fillText("--- FPS", 8, 90);
             this.fpsTexture.update();
             setInterval(() => {
-                context.clearRect(0, 0, 397, 106);
+                context.clearRect(0, 0, 794, 212);
                 context.fillStyle = "white";
-                context.font = "bold 100px monospace";
-                context.fillText(this.game.averagedFPS.toFixed(0).padStart(3, " ") + " FPS", 8, 90);
+                context.font = "bold 80px monospace";
+                let timeElapsed = (performance.now() - THE_ORIGIN_OF_TIME_ms) / 1000;
+                context.fillText(timeElapsed.toFixed(0).padStart(4, "0") + " s", 400, 80);
+                context.fillText(this.game.averagedFPS.toFixed(0).padStart(3, " ") + " FPS (" + this.game.timeFactor.toFixed(2).padStart(3, " ") + ")", 8, 180);
                 this.fpsTexture.update();
             }, 1000);
             this.fpsMaterial = new BABYLON.StandardMaterial("fps-material");
@@ -1346,7 +1349,6 @@ var MarbleRunSimulatorCore;
             });
         }
         reset() {
-            this.dispose();
             this.isChallengeMachine = false;
             this.name = MachineName.GetRandom();
             this.author = "Me";
@@ -1354,6 +1356,7 @@ var MarbleRunSimulatorCore;
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
         }
         dispose() {
+            this.reset();
             while (this.balls.length > 0) {
                 this.balls[0].dispose();
             }
