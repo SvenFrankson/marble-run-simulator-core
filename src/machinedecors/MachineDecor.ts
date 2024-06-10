@@ -21,6 +21,21 @@ namespace MarbleRunSimulatorCore {
         }
         public onNSet(n: number): void {}
 
+        protected _flip: boolean = false;
+        public get flip(): boolean {
+            return this._flip;
+        }
+        public setFlip(v: boolean): void {
+            if (this._flip != v) {
+                this._flip = v;
+                if (this.rotationQuaternion) {
+                    let forward = this.forward.scale(-1);
+                    let up = this.up;
+                    this.setDirAndUp(forward, up);
+                }
+            }
+        }
+
         public selectorMesh: MachineDecorSelector;
 
         public setPosition(p: BABYLON.Vector3): void {
@@ -110,6 +125,9 @@ namespace MarbleRunSimulatorCore {
                 let up = BABYLON.Vector3.Up();
                 let dir = BABYLON.Vector3.Right();
                 this.machinePart.getProjection(this.position, BABYLON.Vector3.Zero(), dir, up);
+                if (this.flip) {
+                    dir.scaleInPlace(-1);
+                }
                 this.setDirAndUp(dir, up);
             }
             this.freezeWorldMatrix();

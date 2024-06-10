@@ -731,7 +731,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
-            return this.serializeV7();
+            return this.serializeV8();
         }
 
         public serializeV1(): IMachineData {
@@ -909,11 +909,11 @@ namespace MarbleRunSimulatorCore {
             return data;
         }
 
-        public serializeV7(): IMachineData {
+        public serializeV8(): IMachineData {
             let data: IMachineData = {
                 n: this.name,
                 a: this.author,
-                v: 7
+                v: 8
             };
 
             let dataString = "";
@@ -985,6 +985,7 @@ namespace MarbleRunSimulatorCore {
                 dataString += NToHex(y, 3);
                 dataString += NToHex(z, 3);
                 dataString += NToHex(decor.n, 2);
+                dataString += NToHex(decor.flip ? 1 : 0, 1);
             }
 
             data.d = dataString;
@@ -1010,8 +1011,8 @@ namespace MarbleRunSimulatorCore {
                 else if (version === 3 || version === 4 || version === 5 || version === 6) {
                     return this.deserializeV3456(data);
                 }
-                else if (version === 7) {
-                    return this.deserializeV7(data);
+                else if (version === 7 || version === 8) {
+                    return this.deserializeV78(data);
                 }
             }
         }
@@ -1291,7 +1292,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public deserializeV7(data: IMachineData): void {
+        public deserializeV78(data: IMachineData): void {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -1420,6 +1421,11 @@ namespace MarbleRunSimulatorCore {
 
                     let n = parseInt(dataString.substring(pt, pt += 2), 36);
                     decor.setN(n);
+
+                    if (data.v === 8) {
+                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+                        decor.setFlip(f);
+                    }
                 }
             }
         }

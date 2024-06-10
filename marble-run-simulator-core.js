@@ -1765,7 +1765,7 @@ var MarbleRunSimulatorCore;
             }
         }
         serialize() {
-            return this.serializeV7();
+            return this.serializeV8();
         }
         serializeV1() {
             let data = {
@@ -1920,11 +1920,11 @@ var MarbleRunSimulatorCore;
             data.d = dataString;
             return data;
         }
-        serializeV7() {
+        serializeV8() {
             let data = {
                 n: this.name,
                 a: this.author,
-                v: 7
+                v: 8
             };
             let dataString = "";
             // Add ball count
@@ -1989,6 +1989,7 @@ var MarbleRunSimulatorCore;
                 dataString += NToHex(y, 3);
                 dataString += NToHex(z, 3);
                 dataString += NToHex(decor.n, 2);
+                dataString += NToHex(decor.flip ? 1 : 0, 1);
             }
             data.d = dataString;
             return data;
@@ -2010,8 +2011,8 @@ var MarbleRunSimulatorCore;
                 else if (version === 3 || version === 4 || version === 5 || version === 6) {
                     return this.deserializeV3456(data);
                 }
-                else if (version === 7) {
-                    return this.deserializeV7(data);
+                else if (version === 7 || version === 8) {
+                    return this.deserializeV78(data);
                 }
             }
         }
@@ -2259,7 +2260,7 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
-        deserializeV7(data) {
+        deserializeV78(data) {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -2372,6 +2373,10 @@ var MarbleRunSimulatorCore;
                     this.decors.push(decor);
                     let n = parseInt(dataString.substring(pt, pt += 2), 36);
                     decor.setN(n);
+                    if (data.v === 8) {
+                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+                        decor.setFlip(f);
+                    }
                 }
             }
         }
@@ -4464,6 +4469,7 @@ var MarbleRunSimulatorCore;
             this.decorName = decorName;
             this.isPlaced = true;
             this._n = 0;
+            this._flip = false;
             this.instantiated = false;
         }
         get n() {
@@ -4474,6 +4480,19 @@ var MarbleRunSimulatorCore;
             this.onNSet(this._n);
         }
         onNSet(n) { }
+        get flip() {
+            return this._flip;
+        }
+        setFlip(v) {
+            if (this._flip != v) {
+                this._flip = v;
+                if (this.rotationQuaternion) {
+                    let forward = this.forward.scale(-1);
+                    let up = this.up;
+                    this.setDirAndUp(forward, up);
+                }
+            }
+        }
         setPosition(p) {
             this.position.x = Math.round(p.x * 1000) / 1000;
             this.position.y = Math.round(p.y * 1000) / 1000;
@@ -4544,6 +4563,9 @@ var MarbleRunSimulatorCore;
                 let up = BABYLON.Vector3.Up();
                 let dir = BABYLON.Vector3.Right();
                 this.machinePart.getProjection(this.position, BABYLON.Vector3.Zero(), dir, up);
+                if (this.flip) {
+                    dir.scaleInPlace(-1);
+                }
                 this.setDirAndUp(dir, up);
             }
             this.freezeWorldMatrix();

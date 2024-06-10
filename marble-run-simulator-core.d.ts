@@ -296,12 +296,12 @@ declare namespace MarbleRunSimulatorCore {
         serializeV1(): IMachineData;
         serializeV2(): IMachineData;
         serializeV3456(version: number): IMachineData;
-        serializeV7(): IMachineData;
+        serializeV8(): IMachineData;
         deserialize(data: IMachineData): void;
         deserializeV1(data: IMachineData): void;
         deserializeV2(data: IMachineData): void;
         deserializeV3456(data: IMachineData): void;
-        deserializeV7(data: IMachineData): void;
+        deserializeV78(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;
@@ -651,6 +651,9 @@ declare namespace MarbleRunSimulatorCore {
         get n(): number;
         setN(v: number): void;
         onNSet(n: number): void;
+        protected _flip: boolean;
+        get flip(): boolean;
+        setFlip(v: boolean): void;
         selectorMesh: MachineDecorSelector;
         setPosition(p: BABYLON.Vector3): void;
         setDirAndUp(dir: BABYLON.Vector3, up: BABYLON.Vector3): void;
