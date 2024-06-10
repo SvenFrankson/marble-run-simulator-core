@@ -59,6 +59,7 @@ namespace MarbleRunSimulatorCore {
         public get plasticBlack() {
             return this.getMaterial(6);
         }
+        public plasticWhite: BABYLON.StandardMaterial;
 
         constructor(public game: IGame) {
             let envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
@@ -133,6 +134,11 @@ namespace MarbleRunSimulatorCore {
             plasticGreen.metallic = 0;
             plasticGreen.roughness = 0.9;
             plasticGreen.environmentTexture = envTexture;
+
+            this.plasticWhite = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
+            this.plasticWhite.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+            this.plasticWhite.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.plasticWhite.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
 
             this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);

@@ -115,6 +115,7 @@ declare namespace MarbleRunSimulatorCore {
         steelFullLitMaterial: BABYLON.StandardMaterial;
         copperFullLitMaterial: BABYLON.StandardMaterial;
         get plasticBlack(): BABYLON.Material;
+        plasticWhite: BABYLON.StandardMaterial;
         constructor(game: IGame);
         private _makePlasticPBR;
         private _makePlasticSTD;

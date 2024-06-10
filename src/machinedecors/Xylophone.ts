@@ -62,7 +62,7 @@ namespace MarbleRunSimulatorCore {
             this._n = 12;
 
             this.trigger = new BABYLON.Mesh("trigger");
-            this.trigger.position.y = 0.02;
+            this.trigger.position.y = 0.025;
             this.trigger.parent = this;
 
             this.blade = new BABYLON.Mesh("blade");
@@ -99,7 +99,7 @@ namespace MarbleRunSimulatorCore {
             data[0].applyToMesh(this);
             this.material = this.machine.game.materials.getMaterial(0);
             data[1].applyToMesh(this.trigger);
-            this.trigger.material = this.machine.game.materials.plasticBlack;
+            this.trigger.material = this.machine.game.materials.getMaterial(7);
             data[2].applyToMesh(this.blade);
             this.blade.material = this.machine.game.materials.getMaterial(1);
 
@@ -118,15 +118,24 @@ namespace MarbleRunSimulatorCore {
             if (this.sounding) {
                 return;
             }
-            if (BABYLON.Vector3.DistanceSquared(ball.position, this.position) < 0.01 * 0.01) {
-                this.sounding = true;
-                await this._animateTrigger(-75 / 180 * Math.PI, 0.05);
-                this.sound.play();
-                if (this.onSoundPlay) {
-                    this.onSoundPlay();
+            let dp = ball.position.subtract(this.position);
+            let x = BABYLON.Vector3.Dot(dp, this.right);
+            if (x > - 0.012 && x < 0.016) {
+                let y = BABYLON.Vector3.Dot(dp, this.up);
+                if (Math.abs(y) < 0.02) {
+                    let z = BABYLON.Vector3.Dot(dp, this.forward);
+                    if (Math.abs(z) < 0.005) {
+                        this.sounding = true;
+                        await this._animateTrigger(-75 / 180 * Math.PI, 0.02 / this.machine.game.currentTimeFactor);
+                        this.sound.setPlaybackRate(this.machine.game.currentTimeFactor);
+                        this.sound.play();
+                        if (this.onSoundPlay) {
+                            this.onSoundPlay();
+                        }
+                        await this._animateTrigger(0, 0.2 / this.machine.game.currentTimeFactor);
+                        this.sounding = false;
+                    }
                 }
-                await this._animateTrigger(0, 0.2);
-                this.sounding = false;
             }
         }
 
