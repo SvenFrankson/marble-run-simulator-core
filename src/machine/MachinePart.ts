@@ -302,6 +302,22 @@ namespace MarbleRunSimulatorCore {
             return false;
         }
 
+        public decors: MachineDecor[] = [];
+        public attachDecor(decor: MachineDecor): void {
+            if (this.decors.indexOf(decor) === - 1) {
+                this.decors.push(decor);
+                decor.detachMachinePart();
+                decor.machinePart = this;
+            }
+        }
+        public detachDecor(decor: MachineDecor): void {
+            let index = this.decors.indexOf(decor);
+            if (index > -1) {
+                let decor = this.decors.splice(index, 1)[0];
+                decor.machinePart = undefined;
+            }
+        }
+
         public get w(): number {
             return this.template.w;
         }
@@ -537,6 +553,55 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        public getDirAndUpAtWorldPos(worldPosition: BABYLON.Vector3): { dir: BABYLON.Vector3, up: BABYLON.Vector3 } {
+            let dir = BABYLON.Vector3.Right();
+            let up = BABYLON.Vector3.Up();
+
+
+
+            return { dir: dir, up: up };
+        }
+        public getProjection(worldPosition: BABYLON.Vector3, outProj: BABYLON.Vector3, outDir: BABYLON.Vector3, outUp: BABYLON.Vector3): void {
+            let localPosition = worldPosition.subtract(this.position);
+            let bestSqrDist = Infinity;
+            let bestTrack: Track;
+            let bestPointIndex = -1;
+            for (let i = 0; i < this.tracks.length; i++) {
+                let track = this.tracks[i];
+                for (let j = 0; j < track.templateInterpolatedPoints.length; j++) {
+                    let point = track.templateInterpolatedPoints[j];
+                    let sqrDist = BABYLON.Vector3.DistanceSquared(localPosition, point);
+                    if (sqrDist < bestSqrDist) {
+                        bestSqrDist = sqrDist;
+                        bestTrack = track;
+                        bestPointIndex = j;
+                    }
+                }
+            }
+
+            if (bestTrack) {
+                let point = bestTrack.templateInterpolatedPoints[bestPointIndex];
+                let normal = bestTrack.trackInterpolatedNormals[bestPointIndex];
+                let prev = bestTrack.templateInterpolatedPoints[bestPointIndex - 1];
+                let next = bestTrack.templateInterpolatedPoints[bestPointIndex + 1];
+                let dir: BABYLON.Vector3;
+                if (prev && next) {
+                    dir = next.subtract(prev).normalize();
+                }
+                else if (prev) {
+                    dir = point.subtract(prev).normalize();
+                }
+                else if (next) {
+                    dir = next.subtract(point).normalize();
+                }
+
+                if (point && normal && dir) {
+                    outProj.copyFrom(point).addInPlace(this.position);
+                    outUp.copyFrom(normal);
+                    outDir.copyFrom(dir);
+                }
+            }
+        }
         public getSlopeAt(index: number, trackIndex: number = 0): number {
             if (this.tracks[trackIndex]) {
                 return this.tracks[trackIndex].getSlopeAt(index);

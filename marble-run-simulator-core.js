@@ -307,6 +307,9 @@ var MarbleRunSimulatorCore;
                                     }
                                 }
                             });
+                            part.decors.forEach(decor => {
+                                decor.onBallCollideAABB(this);
+                            });
                             if (part instanceof MarbleRunSimulatorCore.GravityWell) {
                                 let col = Mummu.SphereLatheIntersection(this.position, this.radius, part.wellMesh.absolutePosition, part.wellPath);
                                 if (col.hit) {
@@ -1214,6 +1217,7 @@ var MarbleRunSimulatorCore;
             this.author = "Unknown Author";
             this.isChallengeMachine = false;
             this.parts = [];
+            this.decors = [];
             this.balls = [];
             this.ready = false;
             this.instantiated = false;
@@ -1221,6 +1225,7 @@ var MarbleRunSimulatorCore;
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
             this.playing = false;
             this.roomIndex = 0;
+            this.onPlayCallbacks = new Nabu.UniqueList();
             this.onStopCallbacks = new Nabu.UniqueList();
             this.margin = 0.05;
             this.baseMeshMinX = -this.margin;
@@ -1336,6 +1341,9 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < this.balls.length; i++) {
                 await this.balls[i].instantiate(hotReload);
             }
+            for (let i = 0; i < this.decors.length; i++) {
+                await this.decors[i].instantiate(hotReload);
+            }
             return new Promise((resolve) => {
                 requestAnimationFrame(() => {
                     for (let i = 0; i < this.parts.length; i++) {
@@ -1351,7 +1359,7 @@ var MarbleRunSimulatorCore;
         reset() {
             this.isChallengeMachine = false;
             this.name = MachineName.GetRandom();
-            this.author = "Me";
+            this.author = "";
             this.roomIndex = 0;
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
         }
@@ -1362,6 +1370,9 @@ var MarbleRunSimulatorCore;
             }
             while (this.parts.length > 0) {
                 this.parts[0].dispose();
+            }
+            while (this.decors.length > 0) {
+                this.decors[0].dispose();
             }
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
@@ -1444,6 +1455,12 @@ var MarbleRunSimulatorCore;
         }
         play() {
             this.playing = true;
+            this.decors.forEach(decor => {
+                decor.findMachinePart();
+            });
+            this.onPlayCallbacks.forEach((callback) => {
+                callback();
+            });
         }
         stop() {
             for (let i = 0; i < this.balls.length; i++) {
@@ -1748,7 +1765,7 @@ var MarbleRunSimulatorCore;
             }
         }
         serialize() {
-            return this.serializeV3456(6);
+            return this.serializeV7();
         }
         serializeV1() {
             let data = {
@@ -1903,6 +1920,79 @@ var MarbleRunSimulatorCore;
             data.d = dataString;
             return data;
         }
+        serializeV7() {
+            let data = {
+                n: this.name,
+                a: this.author,
+                v: 7
+            };
+            let dataString = "";
+            // Add ball count
+            dataString += NToHex(this.balls.length, 2);
+            for (let i = 0; i < this.balls.length; i++) {
+                let ball = this.balls[i];
+                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
+                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
+                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
+                dataString += NToHex(x, 3);
+                dataString += NToHex(y, 3);
+                dataString += NToHex(z, 3);
+                dataString += NToHex(ball.materialIndex, 2);
+            }
+            // Add parts count
+            dataString += NToHex(this.parts.length, 2);
+            for (let i = 0; i < this.parts.length; i++) {
+                let partDataString = "";
+                let part = this.parts[i];
+                let baseName = part.partName.split("-")[0];
+                let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
+                    return name.startsWith(baseName);
+                });
+                if (index === -1) {
+                    console.error("Error, can't find part index.");
+                    debugger;
+                }
+                partDataString += NToHex(index, 2);
+                let pI = part.i + partOffset;
+                let pJ = part.j + partOffset;
+                let pK = part.k + partOffset;
+                partDataString += NToHex(pI, 2);
+                partDataString += NToHex(pJ, 2);
+                partDataString += NToHex(pK, 2);
+                partDataString += NToHex(part.w, 1);
+                partDataString += NToHex(part.h, 1);
+                partDataString += NToHex(part.d, 1);
+                partDataString += NToHex(part.n, 1);
+                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                partDataString += NToHex(m, 1);
+                let colourCount = part.colors.length;
+                partDataString += NToHex(colourCount, 1);
+                for (let j = 0; j < part.colors.length; j++) {
+                    let c = part.colors[j];
+                    partDataString += NToHex(c, 1);
+                }
+                //console.log("---------------------------");
+                //console.log("serialize");
+                //console.log(part);
+                //console.log("into");
+                //console.log(partDataString);
+                //console.log("---------------------------");
+                dataString += partDataString;
+            }
+            dataString += NToHex(this.decors.length, 2);
+            for (let i = 0; i < this.decors.length; i++) {
+                let decor = this.decors[i];
+                let x = Math.round(decor.position.x * 1000) + ballOffset;
+                let y = Math.round(decor.position.y * 1000) + ballOffset;
+                let z = Math.round(decor.position.z * 1000) + ballOffset;
+                dataString += NToHex(x, 3);
+                dataString += NToHex(y, 3);
+                dataString += NToHex(z, 3);
+                dataString += NToHex(decor.n, 2);
+            }
+            data.d = dataString;
+            return data;
+        }
         deserialize(data) {
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
             this.isChallengeMachine = false;
@@ -1919,6 +2009,9 @@ var MarbleRunSimulatorCore;
                 }
                 else if (version === 3 || version === 4 || version === 5 || version === 6) {
                     return this.deserializeV3456(data);
+                }
+                else if (version === 7) {
+                    return this.deserializeV7(data);
                 }
             }
         }
@@ -2163,6 +2256,122 @@ var MarbleRunSimulatorCore;
                         console.log(baseName);
                         console.log(prop);
                     }
+                }
+            }
+        }
+        deserializeV7(data) {
+            let dataString = data.d;
+            if (dataString) {
+                if (data.n) {
+                    this.name = data.n;
+                    // Lol
+                    if (this.name === "Cable Management Final") {
+                        this.minimalAutoQualityFailed = GraphicQuality.High;
+                    }
+                }
+                if (data.a) {
+                    this.author = data.a;
+                }
+                if (data.r) {
+                    this.roomIndex = data.r;
+                }
+                else {
+                    this.roomIndex = 0;
+                }
+                this.balls = [];
+                this.parts = [];
+                let pt = 0;
+                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                //console.log("ballCount = " + ballCount);
+                for (let i = 0; i < ballCount; i++) {
+                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
+                    this.balls.push(ball);
+                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                    ball.materialIndex = materialIndex;
+                }
+                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                //console.log("partCount = " + partCount);
+                for (let i = 0; i < partCount; i++) {
+                    /*
+                    partDataString += NToHex(index, 2);
+                    
+                    let pI = part.i + partOffset;
+                    let pJ = part.j + partOffset;
+                    let pK = part.k + partOffset;
+                    partDataString += NToHex(pI, 2);
+                    partDataString += NToHex(pJ, 2);
+                    partDataString += NToHex(pK, 2);
+
+                    partDataString += NToHex(part.w, 1);
+                    partDataString += NToHex(part.h, 1);
+                    partDataString += NToHex(part.d, 1);
+                    partDataString += NToHex(part.n, 1);
+                    let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                    partDataString += NToHex(m, 1);
+
+                    let colourCount = part.colors.length;
+                    partDataString += NToHex(colourCount, 1);
+                    for (let j = 0; j < part.colors.length; j++) {
+                        let c = part.colors[j];
+                        partDataString += NToHex(c, 1);
+                    }
+                    */
+                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
+                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
+                    let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log(colorCount);
+                    let colors = [];
+                    for (let ii = 0; ii < colorCount; ii++) {
+                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                    }
+                    let prop = {
+                        i: pI,
+                        j: pJ,
+                        k: pK,
+                        w: w,
+                        h: h,
+                        d: d,
+                        n: n,
+                        mirrorX: (mirror % 2) === 1,
+                        mirrorZ: mirror >= 2,
+                        c: colors
+                    };
+                    let track = this.trackFactory.createTrackBaseName(baseName, prop);
+                    if (track) {
+                        this.parts.push(track);
+                    }
+                    else {
+                        console.warn("failed to createTrackBaseName");
+                        console.log(baseName);
+                        console.log(prop);
+                    }
+                }
+                let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                console.log("decorCount = " + decorCount);
+                for (let i = 0; i < decorCount; i++) {
+                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    let decor = new MarbleRunSimulatorCore.Xylophone(this);
+                    decor.setPosition(new BABYLON.Vector3(x, y, z));
+                    this.decors.push(decor);
+                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                    decor.setN(n);
                 }
             }
         }
@@ -2430,6 +2639,7 @@ var MarbleRunSimulatorCore;
             this.localCenter = BABYLON.Vector3.Zero();
             this.endPoints = [];
             this.neighbours = new Nabu.UniqueList();
+            this.decors = [];
             this.offsetPosition = BABYLON.Vector3.Zero();
             this._i = 0;
             this._j = 0;
@@ -2533,6 +2743,20 @@ var MarbleRunSimulatorCore;
                 }
             }
             return false;
+        }
+        attachDecor(decor) {
+            if (this.decors.indexOf(decor) === -1) {
+                this.decors.push(decor);
+                decor.detachMachinePart();
+                decor.machinePart = this;
+            }
+        }
+        detachDecor(decor) {
+            let index = this.decors.indexOf(decor);
+            if (index > -1) {
+                let decor = this.decors.splice(index, 1)[0];
+                decor.machinePart = undefined;
+            }
         }
         get w() {
             return this.template.w;
@@ -2723,6 +2947,50 @@ var MarbleRunSimulatorCore;
             }
             if (this.encloseMesh) {
                 this.encloseMesh.visibility = 0;
+            }
+        }
+        getDirAndUpAtWorldPos(worldPosition) {
+            let dir = BABYLON.Vector3.Right();
+            let up = BABYLON.Vector3.Up();
+            return { dir: dir, up: up };
+        }
+        getProjection(worldPosition, outProj, outDir, outUp) {
+            let localPosition = worldPosition.subtract(this.position);
+            let bestSqrDist = Infinity;
+            let bestTrack;
+            let bestPointIndex = -1;
+            for (let i = 0; i < this.tracks.length; i++) {
+                let track = this.tracks[i];
+                for (let j = 0; j < track.templateInterpolatedPoints.length; j++) {
+                    let point = track.templateInterpolatedPoints[j];
+                    let sqrDist = BABYLON.Vector3.DistanceSquared(localPosition, point);
+                    if (sqrDist < bestSqrDist) {
+                        bestSqrDist = sqrDist;
+                        bestTrack = track;
+                        bestPointIndex = j;
+                    }
+                }
+            }
+            if (bestTrack) {
+                let point = bestTrack.templateInterpolatedPoints[bestPointIndex];
+                let normal = bestTrack.trackInterpolatedNormals[bestPointIndex];
+                let prev = bestTrack.templateInterpolatedPoints[bestPointIndex - 1];
+                let next = bestTrack.templateInterpolatedPoints[bestPointIndex + 1];
+                let dir;
+                if (prev && next) {
+                    dir = next.subtract(prev).normalize();
+                }
+                else if (prev) {
+                    dir = point.subtract(prev).normalize();
+                }
+                else if (next) {
+                    dir = next.subtract(point).normalize();
+                }
+                if (point && normal && dir) {
+                    outProj.copyFrom(point).addInPlace(this.position);
+                    outUp.copyFrom(normal);
+                    outDir.copyFrom(dir);
+                }
             }
         }
         getSlopeAt(index, trackIndex = 0) {
@@ -4179,6 +4447,255 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.TrackPoint = TrackPoint;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    class MachineDecorSelector extends BABYLON.Mesh {
+        constructor(machineDecor, name) {
+            super(name);
+            this.machineDecor = machineDecor;
+        }
+    }
+    MarbleRunSimulatorCore.MachineDecorSelector = MachineDecorSelector;
+    class MachineDecor extends BABYLON.Mesh {
+        constructor(machine, decorName) {
+            super("decor");
+            this.machine = machine;
+            this.decorName = decorName;
+            this.isPlaced = true;
+            this._n = 0;
+            this.instantiated = false;
+        }
+        get n() {
+            return this._n;
+        }
+        setN(v) {
+            this._n = v;
+            this.onNSet(this._n);
+        }
+        onNSet(n) { }
+        setPosition(p) {
+            this.position.x = Math.round(p.x * 1000) / 1000;
+            this.position.y = Math.round(p.y * 1000) / 1000;
+            this.position.z = Math.round(p.z * 1000) / 1000;
+            this.freezeWorldMatrix();
+            this.getChildMeshes().forEach((m) => {
+                m.freezeWorldMatrix();
+            });
+            this.findMachinePart();
+        }
+        setDirAndUp(dir, up) {
+            if (!this.rotationQuaternion) {
+                this.rotationQuaternion = BABYLON.Quaternion.Identity();
+            }
+            Mummu.QuaternionFromYZAxisToRef(up, dir, this.rotationQuaternion);
+            this.freezeWorldMatrix();
+            this.getChildMeshes().forEach((m) => {
+                m.freezeWorldMatrix();
+            });
+        }
+        attachMachinePart(machinePart) {
+            if (machinePart != this.machinePart) {
+                if (this.machinePart) {
+                    this.detachMachinePart();
+                }
+                this.machinePart = machinePart;
+                if (machinePart) {
+                    if (machinePart.decors.indexOf(this) === -1) {
+                        machinePart.decors.push(this);
+                    }
+                }
+            }
+        }
+        detachMachinePart() {
+            if (this.machinePart) {
+                let machinePart = this.machinePart;
+                this.machinePart = undefined;
+                let index = machinePart.decors.indexOf(this);
+                if (index != -1) {
+                    machinePart.decors.splice(index, 1);
+                }
+            }
+        }
+        findMachinePart() {
+            for (let i = 0; i < this.machine.parts.length; i++) {
+                let part = this.machine.parts[i];
+                if (Mummu.PointAABBCheck(this.position, part.AABBMin, part.AABBMax)) {
+                    this.attachMachinePart(part);
+                    return;
+                }
+            }
+            this.attachMachinePart(undefined);
+        }
+        async instantiate(hotReload) {
+            this.instantiated = false;
+            if (this.selectorMesh) {
+                this.selectorMesh.dispose();
+            }
+            this.instantiateSelectorMesh();
+            if (this.selectorMesh) {
+                this.selectorMesh.visibility = 0;
+                this.selectorMesh.parent = this;
+                this.selectorMesh.freezeWorldMatrix();
+            }
+            await this.instantiateMachineDecorSpecific();
+            this.findMachinePart();
+            if (this.machinePart) {
+                let up = BABYLON.Vector3.Up();
+                let dir = BABYLON.Vector3.Right();
+                this.machinePart.getProjection(this.position, BABYLON.Vector3.Zero(), dir, up);
+                this.setDirAndUp(dir, up);
+            }
+            this.freezeWorldMatrix();
+            this.instantiated = true;
+        }
+        dispose() {
+            this.detachMachinePart();
+            let index = this.machine.decors.indexOf(this);
+            if (index > -1) {
+                this.machine.decors.splice(index, 1);
+            }
+            super.dispose();
+        }
+        select() {
+            if (this.selectorMesh) {
+                this.selectorMesh.visibility = 0.2;
+            }
+        }
+        unselect() {
+            if (this.selectorMesh) {
+                this.selectorMesh.visibility = 0;
+            }
+        }
+        async instantiateMachineDecorSpecific() { }
+        onBallCollideAABB(ball) { }
+    }
+    MarbleRunSimulatorCore.MachineDecor = MachineDecor;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    class MachineDecorFactory {
+        constructor(machine) {
+            this.machine = machine;
+        }
+        createDecor(name) {
+            if (name === "xylophone") {
+                return new MarbleRunSimulatorCore.Xylophone(this.machine);
+            }
+        }
+    }
+    MarbleRunSimulatorCore.MachineDecorFactory = MachineDecorFactory;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+/// <reference path="MachineDecor.ts"/>
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    class Xylophone extends MarbleRunSimulatorCore.MachineDecor {
+        constructor(machine) {
+            super(machine, "xylophone");
+            this._animateTrigger = Mummu.AnimationFactory.EmptyNumberCallback;
+            this.sounding = false;
+            this._n = 12;
+            this.trigger = new BABYLON.Mesh("trigger");
+            this.trigger.position.y = 0.02;
+            this.trigger.parent = this;
+            this.blade = new BABYLON.Mesh("blade");
+            this.blade.parent = this;
+            this._animateTrigger = Mummu.AnimationFactory.CreateNumber(this, this.trigger.rotation, "x", () => {
+                if (!this.machine.playing) {
+                    this.trigger.rotation.x = 0;
+                }
+                this.trigger.freezeWorldMatrix();
+                this.trigger.getChildMeshes().forEach((child) => {
+                    child.freezeWorldMatrix();
+                });
+            }, false, Nabu.Easing.easeInSquare);
+        }
+        instantiateSelectorMesh() {
+            this.selectorMesh = new MarbleRunSimulatorCore.MachineDecorSelector(this, "xylophone-selector");
+            let dataDisplay = BABYLON.CreateBoxVertexData({ size: 0.022 });
+            Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#00FFFF"));
+            dataDisplay.applyToMesh(this.selectorMesh);
+            this.selectorMesh.material = this.machine.game.materials.whiteFullLitMaterial;
+        }
+        async instantiateMachineDecorSpecific() {
+            let data = await this.machine.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/xylophone.babylon");
+            data[0].applyToMesh(this);
+            this.material = this.machine.game.materials.getMaterial(0);
+            data[1].applyToMesh(this.trigger);
+            this.trigger.material = this.machine.game.materials.plasticBlack;
+            data[2].applyToMesh(this.blade);
+            this.blade.material = this.machine.game.materials.getMaterial(1);
+            this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./work/xylophone/A (" + (this.n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.sound.setVolume(1);
+        }
+        onNSet(n) {
+            if (n > 0) {
+                this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./work/xylophone/A (" + (n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            }
+        }
+        async onBallCollideAABB(ball) {
+            if (this.sounding) {
+                return;
+            }
+            if (BABYLON.Vector3.DistanceSquared(ball.position, this.position) < 0.01 * 0.01) {
+                this.sounding = true;
+                await this._animateTrigger(-75 / 180 * Math.PI, 0.05);
+                this.sound.play();
+                if (this.onSoundPlay) {
+                    this.onSoundPlay();
+                }
+                await this._animateTrigger(0, 0.2);
+                this.sounding = false;
+            }
+        }
+    }
+    Xylophone.NotesName = [
+        "F4",
+        "F4#",
+        "G4",
+        "G4#",
+        "A5",
+        "A5#",
+        "B5",
+        "C5",
+        "C5#",
+        "D5",
+        "D5#",
+        "E5",
+        "F5",
+        "F5#",
+        "G5",
+        "G5#",
+        "A6",
+        "A6#",
+        "B6",
+        "C6",
+        "C6#",
+        "D6",
+        "D6#",
+        "E6",
+        "F6",
+        "F6#",
+        "G6",
+        "G6#",
+        "A7",
+        "A7#",
+        "B7",
+        "C7",
+        "C7#",
+        "D7",
+        "D7#",
+        "E7",
+        "F7",
+        "F7#",
+        "G7",
+        "G7#",
+        "A8",
+        "A8#",
+        "B8",
+        "C8"
+    ];
+    MarbleRunSimulatorCore.Xylophone = Xylophone;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
@@ -7383,6 +7900,11 @@ var MarbleRunSimulatorCore;
             return template;
         }
         recreateFromOriginDestination(origin, dest, machine) {
+            if (origin.i > dest.i) {
+                let tmp = origin;
+                origin = dest;
+                dest = tmp;
+            }
             let i = Math.min(origin.i, dest.i);
             let j = Math.min(origin.j, dest.j);
             let k = Math.min(origin.k, dest.k);
@@ -7400,6 +7922,9 @@ var MarbleRunSimulatorCore;
                 if (origin.k > dest.k) {
                     mirrorZ = true;
                 }
+            }
+            if (!this.getIsNaNOrValidWHD(w, h, d)) {
+                return undefined;
             }
             return new Wave(machine, {
                 i: i,

@@ -107,6 +107,7 @@ namespace MarbleRunSimulatorCore {
         public fpsTexture: BABYLON.DynamicTexture;
         public baseAxis: BABYLON.Mesh;
         public parts: MachinePart[] = [];
+        public decors: MachineDecor[] = [];
         public balls: Ball[] = [];
         public debugAxis: BABYLON.LinesMesh;
 
@@ -250,6 +251,10 @@ namespace MarbleRunSimulatorCore {
                 await this.balls[i].instantiate(hotReload);
             }
 
+            for (let i = 0; i < this.decors.length; i++) {
+                await this.decors[i].instantiate(hotReload);
+            }
+
             return new Promise<void>((resolve) => {
                 requestAnimationFrame(() => {
                     for (let i = 0; i < this.parts.length; i++) {
@@ -278,6 +283,9 @@ namespace MarbleRunSimulatorCore {
             }
             while (this.parts.length > 0) {
                 this.parts[0].dispose();
+            }
+            while (this.decors.length > 0) {
+                this.decors[0].dispose();
             }
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
@@ -361,8 +369,15 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        public onPlayCallbacks: Nabu.UniqueList<() => void> = new Nabu.UniqueList<() => void>();
         public play(): void {
             this.playing = true;
+            this.decors.forEach(decor => {
+                decor.findMachinePart();
+            });
+            this.onPlayCallbacks.forEach((callback) => {
+                callback();
+            });
         }
 
         public onStopCallbacks: Nabu.UniqueList<() => void> = new Nabu.UniqueList<() => void>();
@@ -716,7 +731,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
-            return this.serializeV3456(6);
+            return this.serializeV7();
         }
 
         public serializeV1(): IMachineData {
@@ -894,6 +909,89 @@ namespace MarbleRunSimulatorCore {
             return data;
         }
 
+        public serializeV7(): IMachineData {
+            let data: IMachineData = {
+                n: this.name,
+                a: this.author,
+                v: 7
+            };
+
+            let dataString = "";
+
+            // Add ball count
+            dataString += NToHex(this.balls.length, 2);
+            for (let i = 0; i < this.balls.length; i++) {
+                let ball = this.balls[i];
+                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
+                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
+                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
+                dataString += NToHex(x, 3);
+                dataString += NToHex(y, 3);
+                dataString += NToHex(z, 3);
+                dataString += NToHex(ball.materialIndex, 2);
+            }
+
+            // Add parts count
+            dataString += NToHex(this.parts.length, 2);
+            for (let i = 0; i < this.parts.length; i++) {
+                let partDataString = "";
+                let part = this.parts[i];
+                let baseName = part.partName.split("-")[0];
+                let index = TrackNames.findIndex((name) => {
+                    return name.startsWith(baseName);
+                });
+                if (index === - 1) {
+                    console.error("Error, can't find part index.");
+                    debugger;
+                }
+                partDataString += NToHex(index, 2);
+                
+                let pI = part.i + partOffset;
+                let pJ = part.j + partOffset;
+                let pK = part.k + partOffset;
+                partDataString += NToHex(pI, 2);
+                partDataString += NToHex(pJ, 2);
+                partDataString += NToHex(pK, 2);
+
+                partDataString += NToHex(part.w, 1);
+                partDataString += NToHex(part.h, 1);
+                partDataString += NToHex(part.d, 1);
+                partDataString += NToHex(part.n, 1);
+                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                partDataString += NToHex(m, 1);
+
+                let colourCount = part.colors.length;
+                partDataString += NToHex(colourCount, 1);
+                for (let j = 0; j < part.colors.length; j++) {
+                    let c = part.colors[j];
+                    partDataString += NToHex(c, 1);
+                }
+                //console.log("---------------------------");
+                //console.log("serialize");
+                //console.log(part);
+                //console.log("into");
+                //console.log(partDataString);
+                //console.log("---------------------------");
+                dataString += partDataString;
+            }
+
+            dataString += NToHex(this.decors.length, 2);
+            for (let i = 0; i < this.decors.length; i++) {
+                let decor = this.decors[i];
+                let x = Math.round(decor.position.x * 1000) + ballOffset;
+                let y = Math.round(decor.position.y * 1000) + ballOffset;
+                let z = Math.round(decor.position.z * 1000) + ballOffset;
+                dataString += NToHex(x, 3);
+                dataString += NToHex(y, 3);
+                dataString += NToHex(z, 3);
+                dataString += NToHex(decor.n, 2);
+            }
+
+            data.d = dataString;
+
+            return data;
+        }
+
         public deserialize(data: IMachineData): void {
             this.minimalAutoQualityFailed = GraphicQuality.High + 1;
             this.isChallengeMachine = false;
@@ -911,6 +1009,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (version === 3 || version === 4 || version === 5 || version === 6) {
                     return this.deserializeV3456(data);
+                }
+                else if (version === 7) {
+                    return this.deserializeV7(data);
                 }
             }
         }
@@ -1186,6 +1287,139 @@ namespace MarbleRunSimulatorCore {
                         console.log(baseName);
                         console.log(prop);
                     }
+                }
+            }
+        }
+
+        public deserializeV7(data: IMachineData): void {
+            let dataString = data.d;
+            if (dataString) {
+                if (data.n) {
+                    this.name = data.n;
+                    // Lol
+                    if (this.name === "Cable Management Final") {
+                        this.minimalAutoQualityFailed = GraphicQuality.High;
+                    }
+                }
+                if (data.a) {
+                    this.author = data.a;
+                }
+                if (data.r) {
+                    this.roomIndex = data.r;
+                }
+                else {
+                    this.roomIndex = 0;
+                }
+            
+                this.balls = [];
+                this.parts = [];
+
+                let pt = 0;
+                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                //console.log("ballCount = " + ballCount);
+
+                for (let i = 0; i < ballCount; i++) {
+                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+
+                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
+                    this.balls.push(ball);
+
+                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                    ball.materialIndex = materialIndex;
+                }
+                
+                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                //console.log("partCount = " + partCount);
+
+                for (let i = 0; i < partCount; i++) {
+                    /*
+                    partDataString += NToHex(index, 2);
+                    
+                    let pI = part.i + partOffset;
+                    let pJ = part.j + partOffset;
+                    let pK = part.k + partOffset;
+                    partDataString += NToHex(pI, 2);
+                    partDataString += NToHex(pJ, 2);
+                    partDataString += NToHex(pK, 2);
+
+                    partDataString += NToHex(part.w, 1);
+                    partDataString += NToHex(part.h, 1);
+                    partDataString += NToHex(part.d, 1);
+                    partDataString += NToHex(part.n, 1);
+                    let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                    partDataString += NToHex(m, 1);
+
+                    let colourCount = part.colors.length;
+                    partDataString += NToHex(colourCount, 1);
+                    for (let j = 0; j < part.colors.length; j++) {
+                        let c = part.colors[j];
+                        partDataString += NToHex(c, 1);
+                    }
+                    */
+                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                    let baseName = TrackNames[index].split("-")[0];
+
+                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+
+                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
+
+                    let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+
+                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
+
+                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log(colorCount);
+                    let colors: number[] = [];
+                    for (let ii = 0; ii < colorCount; ii++) {
+                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                    }
+
+                    let prop: IMachinePartProp = {
+                        i: pI,
+                        j: pJ,
+                        k: pK,
+                        w: w,
+                        h: h,
+                        d: d,
+                        n: n,
+                        mirrorX: (mirror % 2) === 1,
+                        mirrorZ: mirror >= 2,
+                        c: colors
+                    }
+                    let track = this.trackFactory.createTrackBaseName(baseName, prop);
+                    if (track) {
+                        this.parts.push(track);
+                    }
+                    else {
+                        console.warn("failed to createTrackBaseName");
+                        console.log(baseName);
+                        console.log(prop);
+                    }
+                }
+
+                let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                console.log("decorCount = " + decorCount);
+                for (let i = 0; i < decorCount; i++) {
+                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+
+                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    let decor = new Xylophone(this);
+                    decor.setPosition(new BABYLON.Vector3(x, y, z));
+                    this.decors.push(decor);
+
+                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                    decor.setN(n);
                 }
             }
         }

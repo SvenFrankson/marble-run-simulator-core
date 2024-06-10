@@ -55,6 +55,11 @@ namespace MarbleRunSimulatorCore {
         }
 
         public recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Wave {
+            if (origin.i > dest.i) {
+                let tmp = origin;
+                origin = dest;
+                dest = tmp;
+            }
             let i = Math.min(origin.i, dest.i);
             let j = Math.min(origin.j, dest.j);
             let k = Math.min(origin.k, dest.k);
@@ -71,6 +76,9 @@ namespace MarbleRunSimulatorCore {
                 if (origin.k > dest.k) {
                     mirrorZ = true;
                 }
+            }
+            if (!this.getIsNaNOrValidWHD(w, h, d)) {
+                return undefined;
             }
             return new Wave(machine, {
                 i: i,

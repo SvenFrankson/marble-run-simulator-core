@@ -242,6 +242,7 @@ declare namespace MarbleRunSimulatorCore {
         fpsTexture: BABYLON.DynamicTexture;
         baseAxis: BABYLON.Mesh;
         parts: MachinePart[];
+        decors: MachineDecor[];
         balls: Ball[];
         debugAxis: BABYLON.LinesMesh;
         trackFactory: MachinePartFactory;
@@ -266,6 +267,7 @@ declare namespace MarbleRunSimulatorCore {
         getBallPos(): any;
         applyBallPos(save: any): void;
         update(): void;
+        onPlayCallbacks: Nabu.UniqueList<() => void>;
         play(): void;
         onStopCallbacks: Nabu.UniqueList<() => void>;
         stop(): void;
@@ -294,10 +296,12 @@ declare namespace MarbleRunSimulatorCore {
         serializeV1(): IMachineData;
         serializeV2(): IMachineData;
         serializeV3456(version: number): IMachineData;
+        serializeV7(): IMachineData;
         deserialize(data: IMachineData): void;
         deserializeV1(data: IMachineData): void;
         deserializeV2(data: IMachineData): void;
         deserializeV3456(data: IMachineData): void;
+        deserializeV7(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;
@@ -424,6 +428,9 @@ declare namespace MarbleRunSimulatorCore {
         get isUpConnected(): boolean;
         get isDownConnected(): boolean;
         get isBackConnected(): boolean;
+        decors: MachineDecor[];
+        attachDecor(decor: MachineDecor): void;
+        detachDecor(decor: MachineDecor): void;
         get w(): number;
         get h(): number;
         get d(): number;
@@ -467,6 +474,11 @@ declare namespace MarbleRunSimulatorCore {
         set partVisibilityMode(v: PartVisibilityMode);
         select(): void;
         unselect(): void;
+        getDirAndUpAtWorldPos(worldPosition: BABYLON.Vector3): {
+            dir: BABYLON.Vector3;
+            up: BABYLON.Vector3;
+        };
+        getProjection(worldPosition: BABYLON.Vector3, outProj: BABYLON.Vector3, outDir: BABYLON.Vector3, outUp: BABYLON.Vector3): void;
         getSlopeAt(index: number, trackIndex?: number): number;
         getBankAt(index: number, trackIndex?: number): number;
         getBarycenter(): BABYLON.Vector3;
@@ -624,6 +636,60 @@ declare namespace MarbleRunSimulatorCore {
         summedLength: number;
         constructor(template: TrackTemplate, position: BABYLON.Vector3, dir?: BABYLON.Vector3, normal?: BABYLON.Vector3, tangentIn?: number, tangentOut?: number);
         isFirstOrLast(): boolean;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class MachineDecorSelector extends BABYLON.Mesh {
+        machineDecor: MachineDecor;
+        constructor(machineDecor: MachineDecor, name: string);
+    }
+    abstract class MachineDecor extends BABYLON.Mesh {
+        machine: Machine;
+        decorName: string;
+        isPlaced: boolean;
+        protected _n: number;
+        get n(): number;
+        setN(v: number): void;
+        onNSet(n: number): void;
+        selectorMesh: MachineDecorSelector;
+        setPosition(p: BABYLON.Vector3): void;
+        setDirAndUp(dir: BABYLON.Vector3, up: BABYLON.Vector3): void;
+        machinePart: MachinePart;
+        attachMachinePart(machinePart: MachinePart): void;
+        detachMachinePart(): void;
+        findMachinePart(): void;
+        constructor(machine: Machine, decorName: string);
+        instantiated: boolean;
+        instantiate(hotReload?: boolean): Promise<void>;
+        dispose(): void;
+        select(): void;
+        unselect(): void;
+        abstract instantiateSelectorMesh(): void;
+        protected instantiateMachineDecorSpecific(): Promise<void>;
+        onBallCollideAABB(ball: Ball): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    abstract class MachineDecorFactory {
+        machine: Machine;
+        constructor(machine: Machine);
+        createDecor(name: string): MachineDecor;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class Xylophone extends MachineDecor {
+        static NotesName: string[];
+        sound: BABYLON.Sound;
+        trigger: BABYLON.Mesh;
+        blade: BABYLON.Mesh;
+        private _animateTrigger;
+        constructor(machine: Machine);
+        instantiateSelectorMesh(): void;
+        protected instantiateMachineDecorSpecific(): Promise<void>;
+        onNSet(n: number): void;
+        sounding: boolean;
+        onBallCollideAABB(ball: Ball): Promise<void>;
+        onSoundPlay: () => void;
     }
 }
 declare namespace MarbleRunSimulatorCore {

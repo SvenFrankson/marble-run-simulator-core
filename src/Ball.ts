@@ -347,6 +347,9 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
                             });
+                            part.decors.forEach(decor => {
+                                decor.onBallCollideAABB(this);
+                            })
                             if (part instanceof GravityWell) {
                                 let col = Mummu.SphereLatheIntersection(this.position, this.radius, part.wellMesh.absolutePosition, part.wellPath);
                                 if (col.hit) {
