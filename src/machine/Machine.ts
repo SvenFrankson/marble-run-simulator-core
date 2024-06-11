@@ -708,6 +708,9 @@ namespace MarbleRunSimulatorCore {
             if (this.baseLogo) {
                 this.baseLogo.isVisible = v;
             }
+            if (this.baseFPS) {
+                this.baseFPS.isVisible = v;
+            }
             if (this.baseAxis) {
                 this.baseAxis.isVisible = v;
             }

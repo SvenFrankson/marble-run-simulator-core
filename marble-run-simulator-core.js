@@ -1748,6 +1748,9 @@ var MarbleRunSimulatorCore;
             if (this.baseLogo) {
                 this.baseLogo.isVisible = v;
             }
+            if (this.baseFPS) {
+                this.baseFPS.isVisible = v;
+            }
             if (this.baseAxis) {
                 this.baseAxis.isVisible = v;
             }
@@ -4671,12 +4674,12 @@ var MarbleRunSimulatorCore;
             this.trigger.material = this.machine.game.materials.plasticWhite;
             data[2].applyToMesh(this.blade);
             this.blade.material = this.machine.game.materials.getMaterial(1);
-            this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./work/xylophone/A (" + (this.n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (this.n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.sound.setVolume(1);
         }
         onNSet(n) {
             if (n > 0) {
-                this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./work/xylophone/A (" + (n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
+                this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
             }
         }
         async onBallCollideAABB(ball) {
