@@ -138,7 +138,7 @@ namespace MarbleRunSimulatorCore {
             this.plasticWhite = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
             this.plasticWhite.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
             this.plasticWhite.specularColor.copyFromFloats(0.1, 0.1, 0.1);
-            this.plasticWhite.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.plasticWhite.emissiveColor.copyFromFloats(0.3, 0.3, 0.3);
 
             this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);

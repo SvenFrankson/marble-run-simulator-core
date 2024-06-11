@@ -89,14 +89,19 @@ namespace MarbleRunSimulatorCore {
         }
 
         public findMachinePart(): void {
+            let closest = Infinity;
+            let closestMachinePart: MachinePart = undefined;
             for (let i = 0; i < this.machine.parts.length; i++) {
                 let part = this.machine.parts[i];
-                if (Mummu.PointAABBCheck(this.position, part.AABBMin, part.AABBMax)) {
-                    this.attachMachinePart(part);
-                    return;
+                let p = BABYLON.Vector3.Zero();
+                part.getProjection(this.position, p, BABYLON.Vector3.Zero(), BABYLON.Vector3.Zero());
+                let sqrDist = BABYLON.Vector3.DistanceSquared(this.position, p);
+                if (sqrDist < closest) {
+                    closest = sqrDist;
+                    closestMachinePart = part;
                 }
             }
-            this.attachMachinePart(undefined);
+            this.attachMachinePart(closestMachinePart);
         }
 
         constructor(public machine: Machine, public decorName: string) {

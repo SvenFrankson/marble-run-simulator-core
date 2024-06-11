@@ -723,7 +723,7 @@ var MarbleRunSimulatorCore;
             this.plasticWhite = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
             this.plasticWhite.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
             this.plasticWhite.specularColor.copyFromFloats(0.1, 0.1, 0.1);
-            this.plasticWhite.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.plasticWhite.emissiveColor.copyFromFloats(0.3, 0.3, 0.3);
             this.velvetMaterial = new BABYLON.StandardMaterial("velvet-material");
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);
             this.velvetMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/velvet.jpg");
@@ -4541,14 +4541,19 @@ var MarbleRunSimulatorCore;
             }
         }
         findMachinePart() {
+            let closest = Infinity;
+            let closestMachinePart = undefined;
             for (let i = 0; i < this.machine.parts.length; i++) {
                 let part = this.machine.parts[i];
-                if (Mummu.PointAABBCheck(this.position, part.AABBMin, part.AABBMax)) {
-                    this.attachMachinePart(part);
-                    return;
+                let p = BABYLON.Vector3.Zero();
+                part.getProjection(this.position, p, BABYLON.Vector3.Zero(), BABYLON.Vector3.Zero());
+                let sqrDist = BABYLON.Vector3.DistanceSquared(this.position, p);
+                if (sqrDist < closest) {
+                    closest = sqrDist;
+                    closestMachinePart = part;
                 }
             }
-            this.attachMachinePart(undefined);
+            this.attachMachinePart(closestMachinePart);
         }
         async instantiate(hotReload) {
             this.instantiated = false;
@@ -4619,6 +4624,7 @@ var MarbleRunSimulatorCore;
         constructor(machine) {
             super(machine, "xylophone");
             this._animateTrigger = Mummu.AnimationFactory.EmptyNumberCallback;
+            this._animateTriggerBack = Mummu.AnimationFactory.EmptyNumberCallback;
             this.sounding = false;
             this._n = 12;
             this.trigger = new BABYLON.Mesh("trigger");
@@ -4634,7 +4640,21 @@ var MarbleRunSimulatorCore;
                 this.trigger.getChildMeshes().forEach((child) => {
                     child.freezeWorldMatrix();
                 });
-            }, false, Nabu.Easing.easeInSquare);
+            }, false);
+            this._animateTriggerBack = Mummu.AnimationFactory.CreateNumber(this, this.trigger.rotation, "x", () => {
+                if (!this.machine.playing) {
+                    this.trigger.rotation.x = 0;
+                }
+                this.trigger.freezeWorldMatrix();
+                this.trigger.getChildMeshes().forEach((child) => {
+                    child.freezeWorldMatrix();
+                });
+            }, false, Nabu.Easing.easeInSine);
+        }
+        get noteLetterIndex() {
+            let note = Xylophone.NotesName[this.n];
+            let letter = note[0];
+            return "ABCDEFG".indexOf(letter);
         }
         instantiateSelectorMesh() {
             this.selectorMesh = new MarbleRunSimulatorCore.MachineDecorSelector(this, "xylophone-selector");
@@ -4648,7 +4668,7 @@ var MarbleRunSimulatorCore;
             data[0].applyToMesh(this);
             this.material = this.machine.game.materials.getMaterial(0);
             data[1].applyToMesh(this.trigger);
-            this.trigger.material = this.machine.game.materials.getMaterial(7);
+            this.trigger.material = this.machine.game.materials.plasticWhite;
             data[2].applyToMesh(this.blade);
             this.blade.material = this.machine.game.materials.getMaterial(1);
             this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./work/xylophone/A (" + (this.n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -4665,19 +4685,19 @@ var MarbleRunSimulatorCore;
             }
             let dp = ball.position.subtract(this.position);
             let x = BABYLON.Vector3.Dot(dp, this.right);
-            if (x > -0.012 && x < 0.016) {
+            if (Math.abs(x) < 0.005) {
                 let y = BABYLON.Vector3.Dot(dp, this.up);
                 if (Math.abs(y) < 0.02) {
                     let z = BABYLON.Vector3.Dot(dp, this.forward);
-                    if (Math.abs(z) < 0.005) {
+                    if (z > -0.006 && z < 0.016) {
                         this.sounding = true;
-                        await this._animateTrigger(-75 / 180 * Math.PI, 0.02 / this.machine.game.currentTimeFactor);
+                        await this._animateTrigger(-75 / 180 * Math.PI, 0.15 / this.machine.game.currentTimeFactor);
                         this.sound.setPlaybackRate(this.machine.game.currentTimeFactor);
                         this.sound.play();
                         if (this.onSoundPlay) {
                             this.onSoundPlay();
                         }
-                        await this._animateTrigger(0, 0.2 / this.machine.game.currentTimeFactor);
+                        await this._animateTrigger(0, 0.5 / this.machine.game.currentTimeFactor);
                         this.sounding = false;
                     }
                 }

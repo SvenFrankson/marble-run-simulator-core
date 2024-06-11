@@ -687,6 +687,8 @@ declare namespace MarbleRunSimulatorCore {
         trigger: BABYLON.Mesh;
         blade: BABYLON.Mesh;
         private _animateTrigger;
+        private _animateTriggerBack;
+        get noteLetterIndex(): number;
         constructor(machine: Machine);
         instantiateSelectorMesh(): void;
         protected instantiateMachineDecorSpecific(): Promise<void>;
