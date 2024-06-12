@@ -37,7 +37,7 @@ declare namespace MarbleRunSimulatorCore {
         get showPositionZeroGhost(): boolean;
         setShowPositionZeroGhost(v: boolean): void;
         positionZeroGhost: BABYLON.Mesh;
-        selectedMesh: BABYLON.Mesh;
+        selectorMesh: BABYLON.Mesh;
         get materialIndex(): number;
         set materialIndex(v: number);
         setPositionZero(p: BABYLON.Vector3): void;
@@ -56,8 +56,13 @@ declare namespace MarbleRunSimulatorCore {
         flyBackDuration: number;
         animatePosition: (target: BABYLON.Vector3, duration: number) => Promise<void>;
         constructor(positionZero: BABYLON.Vector3, machine: Machine, _materialIndex?: number);
+        private _selected;
         select(): void;
         unselect(): void;
+        private _hovered;
+        hover(): void;
+        anhover(): void;
+        updateSelectorMeshVisibility(): void;
         setIsVisible(isVisible: boolean): void;
         instantiate(hotReload?: boolean): Promise<void>;
         dispose(doNotRecurse?: boolean, disposeMaterialAndTextures?: boolean): void;
@@ -386,6 +391,10 @@ declare namespace MarbleRunSimulatorCore {
         get absolutePosition(): BABYLON.Vector3;
         connectTo(endPoint: MachinePartEndpoint): void;
         disconnect(): void;
+        private _hovered;
+        hover(): void;
+        anhover(): void;
+        updateSelectorMeshVisibility(): void;
         showHelperMesh(): void;
         hideHelperMesh(): void;
         updateHelperMesh(mode: number, timer: number): void;
@@ -404,8 +413,9 @@ declare namespace MarbleRunSimulatorCore {
         colors: number[];
         getColor(index: number): number;
         sleepersMeshes: Map<number, BABYLON.Mesh>;
-        selectorMeshDisplay: BABYLON.Mesh;
-        selectorMainLogic: MachinePartSelectorMesh;
+        selectorBodyDisplay: BABYLON.Mesh;
+        selectorBodyLogic: MachinePartSelectorMesh;
+        selectorEndpointsDisplay: BABYLON.Mesh[];
         selectorEndpointsLogic: EndpointSelectorMesh[];
         encloseMesh: BABYLON.Mesh;
         isSelectable: boolean;
@@ -475,8 +485,13 @@ declare namespace MarbleRunSimulatorCore {
         private _partVisibilityMode;
         get partVisilibityMode(): PartVisibilityMode;
         set partVisibilityMode(v: PartVisibilityMode);
+        private _selected;
         select(): void;
         unselect(): void;
+        private _hovered;
+        hover(): void;
+        anhover(): void;
+        updateSelectorMeshVisibility(): void;
         getDirAndUpAtWorldPos(worldPosition: BABYLON.Vector3): {
             dir: BABYLON.Vector3;
             up: BABYLON.Vector3;

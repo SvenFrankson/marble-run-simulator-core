@@ -126,6 +126,29 @@ namespace MarbleRunSimulatorCore {
             this.connectedEndPoint = undefined;
         }
 
+        private _hovered: boolean = false;
+        public hover(): void {
+            this._hovered = true;
+            this.updateSelectorMeshVisibility();
+        }
+
+        public anhover(): void {
+            this._hovered = false;
+            this.updateSelectorMeshVisibility();
+        }
+
+        public updateSelectorMeshVisibility(): void {
+            let selectorMesh = this.machinePart.selectorEndpointsDisplay[this.index];
+            if (selectorMesh) {
+                if (this._hovered) {
+                    selectorMesh.visibility = 0.2;
+                }
+                else {
+                    selectorMesh.visibility = 0;
+                }
+            }
+        }
+
         public showHelperMesh(): void {
             if (!this.helperMesh) {
                 let data = BABYLON.CreateCylinderVertexData({ height: 0.01, tessellation: 10, diameter: 0.02 });
@@ -206,8 +229,9 @@ namespace MarbleRunSimulatorCore {
             return this.colors[index];
         }
         public sleepersMeshes: Map<number, BABYLON.Mesh> = new Map<number, BABYLON.Mesh>();
-        public selectorMeshDisplay: BABYLON.Mesh;
-        public selectorMainLogic: MachinePartSelectorMesh;
+        public selectorBodyDisplay: BABYLON.Mesh;
+        public selectorBodyLogic: MachinePartSelectorMesh;
+        public selectorEndpointsDisplay: BABYLON.Mesh[] = [];
         public selectorEndpointsLogic: EndpointSelectorMesh[] = [];
         public encloseMesh: BABYLON.Mesh;
         public isSelectable: boolean = true;
@@ -535,21 +559,47 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        private _selected: boolean = false;
         public select(): void {
-            if (this.selectorMeshDisplay) {
-                this.selectorMeshDisplay.visibility = 0.2;
-            }
-            if (this.encloseMesh) {
-                this.encloseMesh.visibility = 1;
-            }
+            this._selected = true;
+            this.updateSelectorMeshVisibility();
         }
 
         public unselect(): void {
-            if (this.selectorMeshDisplay) {
-                this.selectorMeshDisplay.visibility = 0;
+            this._selected = false;
+            this.updateSelectorMeshVisibility();
+        }
+
+        private _hovered: boolean = false;
+        public hover(): void {
+            this._hovered = true;
+            this.updateSelectorMeshVisibility();
+        }
+
+        public anhover(): void {
+            this._hovered = false;
+            this.updateSelectorMeshVisibility();
+        }
+
+        public updateSelectorMeshVisibility(): void {
+            if (this.selectorBodyDisplay) {
+                if (this._selected) {
+                    this.selectorBodyDisplay.visibility = 0.2;
+                }
+                else if (this._hovered) {
+                    this.selectorBodyDisplay.visibility = 0.1;
+                }
+                else {
+                    this.selectorBodyDisplay.visibility = 0;
+                }
             }
             if (this.encloseMesh) {
-                this.encloseMesh.visibility = 0;
+                if (this._selected) {
+                    this.encloseMesh.visibility = 1;
+                }
+                else {
+                    this.encloseMesh.visibility = 0;
+                }
             }
         }
 
@@ -647,10 +697,16 @@ namespace MarbleRunSimulatorCore {
             let DEBUG_logicColliderVisibility: number = 0;
             let selectorMeshDisplayVertexDatas: BABYLON.VertexData[] = [];
             let selectorMeshLogicVertexDatas: BABYLON.VertexData[] = [];
+
+            this.selectorEndpointsDisplay.forEach(selectorEndpoint => {
+                selectorEndpoint.dispose();
+            });
+            this.selectorEndpointsDisplay = [];
             this.selectorEndpointsLogic.forEach(selectorEndpoint => {
                 selectorEndpoint.dispose();
             });
             this.selectorEndpointsLogic = [];
+
             for (let n = 0; n < this.tracks.length; n++) {
                 let points = [...this.tracks[n].templateInterpolatedPoints].map((p) => {
                     return p.clone();
@@ -661,12 +717,19 @@ namespace MarbleRunSimulatorCore {
                     let endPoint = this.findEndPoint(points[0]);
                     if (endPoint) {
                         let originTip: BABYLON.Vector3[] = [];
-                        Mummu.RemoveFromStartForDistanceInPlace(points, 0.022, originTip);
-                        Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.004);
+                        Mummu.RemoveFromStartForDistanceInPlace(points, 0.017, originTip);
+                        Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.002);
                         
                         let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
                         selectorMeshDisplayVertexDatas.push(dataOriginTip);
+
+                        let selectorEndpoint = new BABYLON.Mesh("selector-endpoint-start");
+                        selectorEndpoint.material = this.game.materials.whiteFullLitMaterial;
+                        selectorEndpoint.parent = this;
+                        dataOriginTip.applyToMesh(selectorEndpoint);
+                        selectorEndpoint.visibility = 0;
+                        this.selectorEndpointsDisplay.push(selectorEndpoint);
                         
                         let selectorOriginMeshLogic = new EndpointSelectorMesh(endPoint);
                         selectorOriginMeshLogic.material = this.game.materials.whiteFullLitMaterial;
@@ -683,12 +746,19 @@ namespace MarbleRunSimulatorCore {
                     let endPoint = this.findEndPoint(points[points.length - 1]);
                     if (endPoint) {
                         let destinationTip: BABYLON.Vector3[] = [];
-                        Mummu.RemoveFromEndForDistanceInPlace(points, 0.022, destinationTip);
-                        Mummu.RemoveFromStartForDistanceInPlace(destinationTip, 0.004);
+                        Mummu.RemoveFromEndForDistanceInPlace(points, 0.017, destinationTip);
+                        Mummu.RemoveFromStartForDistanceInPlace(destinationTip, 0.002);
                         
                         let dataDestinationTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataDestinationTip, BABYLON.Color3.FromHexString("#80FFFF"));
                         selectorMeshDisplayVertexDatas.push(dataDestinationTip);
+
+                        let selectorEndpoint = new BABYLON.Mesh("selector-endpoint-end");
+                        selectorEndpoint.material = this.game.materials.whiteFullLitMaterial;
+                        selectorEndpoint.parent = this;
+                        dataDestinationTip.applyToMesh(selectorEndpoint);
+                        selectorEndpoint.visibility = 0;
+                        this.selectorEndpointsDisplay.push(selectorEndpoint);
                         
                         let selectorDestinationMeshLogic = new EndpointSelectorMesh(endPoint);
                         selectorDestinationMeshLogic.material = this.game.materials.whiteFullLitMaterial;
@@ -712,27 +782,27 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (this.selectorMeshDisplay) {
-                this.selectorMeshDisplay.dispose();
+            if (this.selectorBodyDisplay) {
+                this.selectorBodyDisplay.dispose();
             }
-            this.selectorMeshDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
-            this.selectorMeshDisplay.material = this.game.materials.whiteFullLitMaterial;
-            this.selectorMeshDisplay.parent = this;
+            this.selectorBodyDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
+            this.selectorBodyDisplay.material = this.game.materials.whiteFullLitMaterial;
+            this.selectorBodyDisplay.parent = this;
             if (selectorMeshDisplayVertexDatas.length) {
-                Mummu.MergeVertexDatas(...selectorMeshDisplayVertexDatas).applyToMesh(this.selectorMeshDisplay);
+                Mummu.MergeVertexDatas(...selectorMeshDisplayVertexDatas).applyToMesh(this.selectorBodyDisplay);
             }
-            this.selectorMeshDisplay.visibility = 0;
+            this.selectorBodyDisplay.visibility = 0;
 
-            if (this.selectorMainLogic) {
-                this.selectorMainLogic.dispose();
+            if (this.selectorBodyLogic) {
+                this.selectorBodyLogic.dispose();
             }
-            this.selectorMainLogic = new MachinePartSelectorMesh(this);
-            this.selectorMainLogic.material = this.game.materials.whiteFullLitMaterial;
-            this.selectorMainLogic.parent = this;
-            if (selectorMeshLogicVertexDatas.length) {
-                Mummu.MergeVertexDatas(...selectorMeshLogicVertexDatas).applyToMesh(this.selectorMainLogic);
+            this.selectorBodyLogic = new MachinePartSelectorMesh(this);
+            this.selectorBodyLogic.material = this.game.materials.whiteFullLitMaterial;
+            this.selectorBodyLogic.parent = this;
+            if (selectorMeshLogicVertexDatas.length > 0) {
+                Mummu.MergeVertexDatas(...selectorMeshLogicVertexDatas).applyToMesh(this.selectorBodyLogic);
             }
-            this.selectorMainLogic.visibility = DEBUG_logicColliderVisibility;
+            this.selectorBodyLogic.visibility = DEBUG_logicColliderVisibility;
 
             // Assign EndpointManipulators logic
             if (this instanceof MachinePartWithOriginDestination) {

@@ -55,7 +55,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
         public positionZeroGhost: BABYLON.Mesh;
-        public selectedMesh: BABYLON.Mesh;
+        public selectorMesh: BABYLON.Mesh;
 
         public get materialIndex(): number {
             return this._materialIndex;
@@ -111,12 +111,44 @@ namespace MarbleRunSimulatorCore {
             this.animatePosition = Mummu.AnimationFactory.CreateVector3(this, this, "position");
         }
 
+        private _selected: boolean = false;
         public select(): void {
-            this.selectedMesh.isVisible = true;
+            this._selected = true;
+            this.updateSelectorMeshVisibility();
         }
 
         public unselect(): void {
-            this.selectedMesh.isVisible = false;
+            this._selected = false;
+            this.updateSelectorMeshVisibility();
+        }
+
+        private _hovered: boolean = false;
+        public hover(): void {
+            this._hovered = true;
+            this.updateSelectorMeshVisibility();
+        }
+
+        public anhover(): void {
+            this._hovered = false;
+            this.updateSelectorMeshVisibility();
+        }
+
+        public updateSelectorMeshVisibility(): void {
+            console.log(this);
+            if (this.selectorMesh) {
+                if (this._selected) {
+                    console.log("selected");
+                    this.selectorMesh.isVisible = true;
+                }
+                else if (this._hovered) {
+                    console.log("hovered");
+                    this.selectorMesh.isVisible = true;
+                }
+                else {
+                    console.log("nope");
+                    this.selectorMesh.isVisible = false;
+                }
+            }
         }
 
         public setIsVisible(isVisible: boolean): void {
@@ -154,8 +186,8 @@ namespace MarbleRunSimulatorCore {
             this.positionZeroGhost.position.copyFrom(this.positionZero);
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
 
-            if (this.selectedMesh) {
-                this.selectedMesh.dispose();
+            if (this.selectorMesh) {
+                this.selectorMesh.dispose();
             }
             let points: BABYLON.Vector3[] = [];
             for (let i = 0; i <= 32; i++) {
@@ -164,11 +196,11 @@ namespace MarbleRunSimulatorCore {
                 let sina = Math.sin(a);
                 points.push(new BABYLON.Vector3(cosa * (this.radius + 0.005), sina * (this.radius + 0.005), 0));
             }
-            this.selectedMesh = BABYLON.MeshBuilder.CreateLines("select-mesh", {
+            this.selectorMesh = BABYLON.MeshBuilder.CreateLines("select-mesh", {
                 points: points,
             });
-            this.selectedMesh.parent = this.positionZeroGhost;
-            this.selectedMesh.isVisible = false;
+            this.selectorMesh.parent = this.positionZeroGhost;
+            this.selectorMesh.isVisible = false;
 
             if (!hotReload) {
                 this.reset();
