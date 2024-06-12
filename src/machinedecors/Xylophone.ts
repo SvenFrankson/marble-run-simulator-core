@@ -126,13 +126,13 @@ namespace MarbleRunSimulatorCore {
             data[2].applyToMesh(this.blade);
             this.blade.material = this.machine.game.materials.getMaterial(1);
 
-            this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (this.n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (this.n + 1).toFixed(0) + ").mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.sound.setVolume(1);
         }
 
         public onNSet(n: number): void {
             if (n > 0) {
-                this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
+                this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (n + 1).toFixed(0) + ").mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             }
         }
 

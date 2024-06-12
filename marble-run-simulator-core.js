@@ -1220,6 +1220,7 @@ var MarbleRunSimulatorCore;
             this.name = "Unnamed Machine";
             this.author = "Unknown Author";
             this.isChallengeMachine = false;
+            this.TEST_USE_BASE_FPS = false; // only for Poki playtest
             this.parts = [];
             this.decors = [];
             this.balls = [];
@@ -1290,29 +1291,31 @@ var MarbleRunSimulatorCore;
             this.exitHoleOut.material = this.game.materials.plasticBlack;
             data.applyToMesh(this.exitHoleOut);
             this.exitHoleOut.rotation.x = -Math.PI * 0.5;
-            this.fpsTexture = new BABYLON.DynamicTexture("fps-texture", { width: 794, height: 212 });
-            let context = this.fpsTexture.getContext();
-            context.clearRect(0, 0, 794, 212);
-            context.fillStyle = "white";
-            context.font = "bold 100px monospace";
-            context.fillText("--- FPS", 8, 90);
-            this.fpsTexture.update();
-            setInterval(() => {
+            if (this.TEST_USE_BASE_FPS) {
+                this.fpsTexture = new BABYLON.DynamicTexture("fps-texture", { width: 794, height: 212 });
+                let context = this.fpsTexture.getContext();
                 context.clearRect(0, 0, 794, 212);
                 context.fillStyle = "white";
-                context.font = "bold 80px monospace";
-                let timeElapsed = (performance.now() - THE_ORIGIN_OF_TIME_ms) / 1000;
-                context.fillText(timeElapsed.toFixed(0).padStart(4, "0") + " s", 400, 80);
-                context.fillText(this.game.averagedFPS.toFixed(0).padStart(3, " ") + " FPS (" + this.game.timeFactor.toFixed(2).padStart(3, " ") + ")", 8, 180);
+                context.font = "bold 100px monospace";
+                context.fillText("--- FPS", 8, 90);
                 this.fpsTexture.update();
-            }, 1000);
-            this.fpsMaterial = new BABYLON.StandardMaterial("fps-material");
-            this.fpsMaterial.diffuseColor.copyFromFloats(1, 1, 1);
-            this.fpsMaterial.diffuseTexture = this.fpsTexture;
-            this.fpsMaterial.diffuseTexture.hasAlpha = true;
-            this.fpsMaterial.useAlphaFromDiffuseTexture = true;
-            this.fpsMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
-            this.fpsMaterial.alpha = 0.6;
+                setInterval(() => {
+                    context.clearRect(0, 0, 794, 212);
+                    context.fillStyle = "white";
+                    context.font = "bold 80px monospace";
+                    let timeElapsed = (performance.now() - THE_ORIGIN_OF_TIME_ms) / 1000;
+                    context.fillText(timeElapsed.toFixed(0).padStart(4, "0") + " s", 400, 80);
+                    context.fillText(this.game.averagedFPS.toFixed(0).padStart(3, " ") + " FPS (" + this.game.timeFactor.toFixed(2).padStart(3, " ") + ")", 8, 180);
+                    this.fpsTexture.update();
+                }, 1000);
+                this.fpsMaterial = new BABYLON.StandardMaterial("fps-material");
+                this.fpsMaterial.diffuseColor.copyFromFloats(1, 1, 1);
+                this.fpsMaterial.diffuseTexture = this.fpsTexture;
+                this.fpsMaterial.diffuseTexture.hasAlpha = true;
+                this.fpsMaterial.useAlphaFromDiffuseTexture = true;
+                this.fpsMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+                this.fpsMaterial.alpha = 0.6;
+            }
         }
         setAllIsSelectable(isSelectable) {
             for (let i = 0; i < this.parts.length; i++) {
@@ -1662,19 +1665,21 @@ var MarbleRunSimulatorCore;
                 Mummu.TranslateVertexDataInPlace(corner2Data, new BABYLON.Vector3(-this.margin + 0.02, 0, this.margin - 0.02));
                 Mummu.MergeVertexDatas(corner1Data, corner2Data).applyToMesh(this.baseLogo);
                 this.baseLogo.material = this.game.materials.logoMaterial;
-                if (this.baseFPS) {
-                    this.baseFPS.dispose();
+                if (this.TEST_USE_BASE_FPS) {
+                    if (this.baseFPS) {
+                        this.baseFPS.dispose();
+                    }
+                    this.baseFPS = new BABYLON.Mesh("base-logo");
+                    this.baseFPS.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
+                    this.baseFPS.position.y = this.baseMeshMinY + 0.0001;
+                    this.baseFPS.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
+                    let corner1DataFPS = Mummu.CloneVertexData(corner1Data);
+                    Mummu.TranslateVertexDataInPlace(corner1DataFPS, new BABYLON.Vector3(0, 0, logoH));
+                    let corner2DataFPS = Mummu.CloneVertexData(corner2Data);
+                    Mummu.TranslateVertexDataInPlace(corner2DataFPS, new BABYLON.Vector3(0, 0, -logoH));
+                    Mummu.MergeVertexDatas(corner1DataFPS, corner2DataFPS).applyToMesh(this.baseFPS);
+                    this.baseFPS.material = this.fpsMaterial;
                 }
-                this.baseFPS = new BABYLON.Mesh("base-logo");
-                this.baseFPS.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
-                this.baseFPS.position.y = this.baseMeshMinY + 0.0001;
-                this.baseFPS.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
-                let corner1DataFPS = Mummu.CloneVertexData(corner1Data);
-                Mummu.TranslateVertexDataInPlace(corner1DataFPS, new BABYLON.Vector3(0, 0, logoH));
-                let corner2DataFPS = Mummu.CloneVertexData(corner2Data);
-                Mummu.TranslateVertexDataInPlace(corner2DataFPS, new BABYLON.Vector3(0, 0, -logoH));
-                Mummu.MergeVertexDatas(corner1DataFPS, corner2DataFPS).applyToMesh(this.baseFPS);
-                this.baseFPS.material = this.fpsMaterial;
                 this.regenerateBaseAxis();
             }
             if (previousBaseMinY != this.baseMeshMinY) {
@@ -4674,12 +4679,12 @@ var MarbleRunSimulatorCore;
             this.trigger.material = this.machine.game.materials.plasticWhite;
             data[2].applyToMesh(this.blade);
             this.blade.material = this.machine.game.materials.getMaterial(1);
-            this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (this.n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (this.n + 1).toFixed(0) + ").mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.sound.setVolume(1);
         }
         onNSet(n) {
             if (n > 0) {
-                this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (n + 1).toFixed(0) + ").wav", this.getScene(), undefined, { loop: false, autoplay: false });
+                this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (n + 1).toFixed(0) + ").mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             }
         }
         async onBallCollideAABB(ball) {

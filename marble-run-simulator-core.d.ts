@@ -238,6 +238,7 @@ declare namespace MarbleRunSimulatorCore {
         pedestalTop: BABYLON.Mesh;
         baseFrame: BABYLON.Mesh;
         baseLogo: BABYLON.Mesh;
+        TEST_USE_BASE_FPS: boolean;
         baseFPS: BABYLON.Mesh;
         fpsMaterial: BABYLON.StandardMaterial;
         fpsTexture: BABYLON.DynamicTexture;
