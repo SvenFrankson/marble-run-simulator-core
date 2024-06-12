@@ -161,7 +161,8 @@ declare namespace MarbleRunSimulatorCore {
         VeryLow = 0,
         Low = 1,
         Medium = 2,
-        High = 3
+        High = 3,
+        VeryHigh = 4
     }
     enum GeometryQuality {
         Low = 0,

@@ -17,7 +17,8 @@ namespace MarbleRunSimulatorCore {
         VeryLow,
         Low,
         Medium,
-        High
+        High,
+        VeryHigh
     }
 
     export enum GeometryQuality {
@@ -120,7 +121,7 @@ namespace MarbleRunSimulatorCore {
         public ready: boolean = false;
         public instantiated: boolean = false;
         public hasBeenOpenedInEditor: boolean = false;
-        public minimalAutoQualityFailed: number = GraphicQuality.High + 1;
+        public minimalAutoQualityFailed: number = GraphicQuality.VeryHigh + 1;
 
         public playing: boolean = false;
 
@@ -276,7 +277,7 @@ namespace MarbleRunSimulatorCore {
             this.name = MachineName.GetRandom();
             this.author = "";
             this.roomIndex = 0;
-            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
+            this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
         }
         
         public dispose(): void {
@@ -1001,7 +1002,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public deserialize(data: IMachineData): void {
-            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
+            this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.isChallengeMachine = false;
             if (data) {
                 let version: number;

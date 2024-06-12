@@ -1194,6 +1194,7 @@ var MarbleRunSimulatorCore;
         GraphicQuality[GraphicQuality["Low"] = 1] = "Low";
         GraphicQuality[GraphicQuality["Medium"] = 2] = "Medium";
         GraphicQuality[GraphicQuality["High"] = 3] = "High";
+        GraphicQuality[GraphicQuality["VeryHigh"] = 4] = "VeryHigh";
     })(GraphicQuality = MarbleRunSimulatorCore.GraphicQuality || (MarbleRunSimulatorCore.GraphicQuality = {}));
     let GeometryQuality;
     (function (GeometryQuality) {
@@ -1227,7 +1228,7 @@ var MarbleRunSimulatorCore;
             this.ready = false;
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
-            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
+            this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.playing = false;
             this.roomIndex = 0;
             this.onPlayCallbacks = new Nabu.UniqueList();
@@ -1368,7 +1369,7 @@ var MarbleRunSimulatorCore;
             this.name = MachineName.GetRandom();
             this.author = "";
             this.roomIndex = 0;
-            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
+            this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
         }
         dispose() {
             this.reset();
@@ -2007,7 +2008,7 @@ var MarbleRunSimulatorCore;
             return data;
         }
         deserialize(data) {
-            this.minimalAutoQualityFailed = GraphicQuality.High + 1;
+            this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.isChallengeMachine = false;
             if (data) {
                 let version;
