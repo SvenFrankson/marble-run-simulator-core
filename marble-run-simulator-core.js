@@ -1210,6 +1210,7 @@ var MarbleRunSimulatorCore;
 /// <reference path="../../../nabu/nabu.d.ts"/>
 /// <reference path="../../../mummu/mummu.d.ts"/>
 var THE_ORIGIN_OF_TIME_ms;
+var IsTouchScreen;
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     function NToHex(n, l = 2) {
@@ -2536,13 +2537,6 @@ var MarbleRunSimulatorCore;
         let sina = Math.sin(a);
         selectorHullShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0);
     }
-    var selectorHullShapeLogic = [];
-    for (let i = 0; i < 6; i++) {
-        let a = (i / 6) * 2 * Math.PI;
-        let cosa = Math.cos(a);
-        let sina = Math.sin(a);
-        selectorHullShapeLogic[i] = new BABYLON.Vector3(cosa * 0.009 * 1.5, sina * 0.009 * 1.5, 0);
-    }
     class MachinePartSelectorMesh extends BABYLON.Mesh {
         constructor(part) {
             super("machine-part-selector");
@@ -3121,6 +3115,13 @@ var MarbleRunSimulatorCore;
         }
         async instantiate(rebuildNeighboursWireMeshes) {
             this.instantiated = false;
+            let selectorHullShapeLogic = [];
+            for (let i = 0; i < 6; i++) {
+                let a = (i / 6) * 2 * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
+            }
             let DEBUG_logicColliderVisibility = 0;
             let selectorMeshDisplayVertexDatas = [];
             let selectorMeshLogicVertexDatas = [];

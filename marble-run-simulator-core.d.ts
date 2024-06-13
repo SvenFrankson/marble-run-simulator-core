@@ -161,6 +161,7 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare var THE_ORIGIN_OF_TIME_ms: any;
+declare var IsTouchScreen: number;
 declare namespace MarbleRunSimulatorCore {
     enum GraphicQuality {
         VeryLow = 0,

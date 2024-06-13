@@ -39,14 +39,6 @@ namespace MarbleRunSimulatorCore {
         selectorHullShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0);
     }
     
-    var selectorHullShapeLogic: BABYLON.Vector3[] = [];
-    for (let i = 0; i < 6; i++) {
-        let a = (i / 6) * 2 * Math.PI;
-        let cosa = Math.cos(a);
-        let sina = Math.sin(a);
-        selectorHullShapeLogic[i] = new BABYLON.Vector3(cosa * 0.009 * 1.5, sina * 0.009 * 1.5, 0);
-    }
-
     export class MachinePartSelectorMesh extends BABYLON.Mesh {
         constructor(public part: MachinePart) {
             super("machine-part-selector");
@@ -694,6 +686,15 @@ namespace MarbleRunSimulatorCore {
         public instantiated = false;
         public async instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void> {
             this.instantiated = false;
+
+            let selectorHullShapeLogic: BABYLON.Vector3[] = [];
+            for (let i = 0; i < 6; i++) {
+                let a = (i / 6) * 2 * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
+            }
+
             let DEBUG_logicColliderVisibility: number = 0;
             let selectorMeshDisplayVertexDatas: BABYLON.VertexData[] = [];
             let selectorMeshLogicVertexDatas: BABYLON.VertexData[] = [];

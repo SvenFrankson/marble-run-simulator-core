@@ -3,6 +3,7 @@
 /// <reference path="../../../mummu/mummu.d.ts"/>
 
 var THE_ORIGIN_OF_TIME_ms;
+var IsTouchScreen: number;
 
 namespace MarbleRunSimulatorCore {
 
