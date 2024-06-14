@@ -66,10 +66,8 @@ namespace MarbleRunSimulatorCore {
             }
 
             let n = 4;
-            if (q === 1) {
+            if (q === 2) {
                 n = 6;
-            } else if (q === 2) {
-                n = 8;
             }
             let shape: BABYLON.Vector3[] = [];
             for (let i = 0; i < n; i++) {

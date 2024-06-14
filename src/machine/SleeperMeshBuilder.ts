@@ -41,33 +41,13 @@ namespace MarbleRunSimulatorCore {
                 if (colorIndex >= plasticIndex) {
                     radiusShape *= 2;
                 }
-                let nShape = 3;
-                if (q === 1) {
-                    nShape = 4;
-                } else if (q === 2) {
-                    nShape = 6;
-                }
+                let nShape = 4;
                 let shape: BABYLON.Vector3[] = [];
                 for (let i = 0; i < nShape; i++) {
                     let a = (i / nShape) * 2 * Math.PI;
                     let cosa = Math.cos(a);
                     let sina = Math.sin(a);
                     shape[i] = new BABYLON.Vector3(cosa * radiusShape, sina * radiusShape, 0);
-                }
-
-                let radiusPath = part.wireGauge * 0.5;
-                let nPath = 4;
-                if (q === 1) {
-                    nPath = 8;
-                } else if (q === 2) {
-                    nPath = 12;
-                }
-                let basePath: BABYLON.Vector3[] = [];
-                for (let i = 0; i <= nPath; i++) {
-                    let a = (i / nPath) * Math.PI;
-                    let cosa = Math.cos(a);
-                    let sina = Math.sin(a);
-                    basePath[i] = new BABYLON.Vector3(cosa * radiusPath, -sina * radiusPath, 0);
                 }
 
                 let sleeperPieceVertexDataTypeIndex = colorIndex >= plasticIndex ? 3 : 0;
@@ -105,7 +85,7 @@ namespace MarbleRunSimulatorCore {
 
                     let anchor: BABYLON.Vector3 = BABYLON.Vector3.Zero();
                     if (addSleeper && sleeperPieceVertexData) {
-                        anchor = new BABYLON.Vector3(0, - radiusPath, 0);
+                        anchor = new BABYLON.Vector3(0, - part.wireGauge * 0.5, 0);
 
                         let dir = interpolatedPoints[i + 1].subtract(interpolatedPoints[i - 1]).normalize();
                         let t = interpolatedPoints[i];
@@ -193,7 +173,7 @@ namespace MarbleRunSimulatorCore {
                                     if (!pick.hit) {
                                         let fixationPath: BABYLON.Vector3[] = [anchor, anchorBase];
 
-                                        let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                                        let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: false, cap: BABYLON.Mesh.CAP_ALL });
                                         let colorIndex = track.part.getColor(track.template.colorIndex);
                                         if (!partialsDatas[colorIndex]) {
                                             partialsDatas[colorIndex] = [];

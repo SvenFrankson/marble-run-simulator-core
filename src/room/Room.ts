@@ -85,9 +85,9 @@ namespace MarbleRunSimulatorCore {
             this.light2.intensity = 0.2;
             this.light2.includeOnlyWithLayerMask = 0x10000000;
 
-            this.skybox = BABYLON.MeshBuilder.CreateSphere("skyBox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE, arc: 12 }, this.game.scene);
+            this.skybox = BABYLON.MeshBuilder.CreateSphere("room-skybox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE, segments: 4 }, this.game.scene);
             this.skybox.layerMask = 0x10000000;
-            this.skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.game.scene);
+            this.skyboxMaterial = new BABYLON.StandardMaterial("room-skybox-material", this.game.scene);
             this.skyboxMaterial.backFaceCulling = false;
             this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.skyboxMaterial.emissiveColor.copyFromFloats(0, 0, 0);

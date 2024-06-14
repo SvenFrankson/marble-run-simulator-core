@@ -150,15 +150,18 @@ namespace MarbleRunSimulatorCore {
             this.exitTrack.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
             
             this.exitHolePath = [new BABYLON.Vector3(0.011, -0.002, 0), new BABYLON.Vector3(0.01835, 0, 0)];
+
+            // Do the drawing before exitHole have been subdivided, spare a few triangles.
+            let tmpMesh = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: [new BABYLON.Vector3(0.011, -0.1, 0), ...this.exitHolePath], tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            let data = BABYLON.VertexData.ExtractFromMesh(tmpMesh);
+            tmpMesh.dispose();
+            
             Mummu.CatmullRomPathInPlace(this.exitHolePath, Tools.V3Dir(0), Tools.V3Dir(90));
             Mummu.CatmullRomPathInPlace(this.exitHolePath, Tools.V3Dir(0), Tools.V3Dir(90));
             Mummu.CatmullRomPathInPlace(this.exitHolePath, Tools.V3Dir(0), Tools.V3Dir(90));
             
             this.exitHolePath = [new BABYLON.Vector3(0.011, -0.1, 0), ...this.exitHolePath];
 
-            let tmpMesh = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: this.exitHolePath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
-            let data = BABYLON.VertexData.ExtractFromMesh(tmpMesh);
-            tmpMesh.dispose();
             let colors = []
             for (let i = 0; i < data.positions.length / 3; i++) {
                 if (data.positions[3 * i + 1] < - 0.05) {

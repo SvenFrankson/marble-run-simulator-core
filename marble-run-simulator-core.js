@@ -1135,11 +1135,8 @@ var MarbleRunSimulatorCore;
                 this.getChildren()[0].dispose();
             }
             let n = 4;
-            if (q === 1) {
+            if (q === 2) {
                 n = 6;
-            }
-            else if (q === 2) {
-                n = 8;
             }
             let shape = [];
             for (let i = 0; i < n; i++) {
@@ -1289,13 +1286,14 @@ var MarbleRunSimulatorCore;
             this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitTrack.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
             this.exitHolePath = [new BABYLON.Vector3(0.011, -0.002, 0), new BABYLON.Vector3(0.01835, 0, 0)];
+            // Do the drawing before exitHole have been subdivided, spare a few triangles.
+            let tmpMesh = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: [new BABYLON.Vector3(0.011, -0.1, 0), ...this.exitHolePath], tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
+            let data = BABYLON.VertexData.ExtractFromMesh(tmpMesh);
+            tmpMesh.dispose();
             Mummu.CatmullRomPathInPlace(this.exitHolePath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
             Mummu.CatmullRomPathInPlace(this.exitHolePath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
             Mummu.CatmullRomPathInPlace(this.exitHolePath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(90));
             this.exitHolePath = [new BABYLON.Vector3(0.011, -0.1, 0), ...this.exitHolePath];
-            let tmpMesh = BABYLON.MeshBuilder.CreateLathe("exit-hole-in", { shape: this.exitHolePath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
-            let data = BABYLON.VertexData.ExtractFromMesh(tmpMesh);
-            tmpMesh.dispose();
             let colors = [];
             for (let i = 0; i < data.positions.length / 3; i++) {
                 if (data.positions[3 * i + 1] < -0.05) {
@@ -3712,34 +3710,13 @@ var MarbleRunSimulatorCore;
                 if (colorIndex >= plasticIndex) {
                     radiusShape *= 2;
                 }
-                let nShape = 3;
-                if (q === 1) {
-                    nShape = 4;
-                }
-                else if (q === 2) {
-                    nShape = 6;
-                }
+                let nShape = 4;
                 let shape = [];
                 for (let i = 0; i < nShape; i++) {
                     let a = (i / nShape) * 2 * Math.PI;
                     let cosa = Math.cos(a);
                     let sina = Math.sin(a);
                     shape[i] = new BABYLON.Vector3(cosa * radiusShape, sina * radiusShape, 0);
-                }
-                let radiusPath = part.wireGauge * 0.5;
-                let nPath = 4;
-                if (q === 1) {
-                    nPath = 8;
-                }
-                else if (q === 2) {
-                    nPath = 12;
-                }
-                let basePath = [];
-                for (let i = 0; i <= nPath; i++) {
-                    let a = (i / nPath) * Math.PI;
-                    let cosa = Math.cos(a);
-                    let sina = Math.sin(a);
-                    basePath[i] = new BABYLON.Vector3(cosa * radiusPath, -sina * radiusPath, 0);
                 }
                 let sleeperPieceVertexDataTypeIndex = colorIndex >= plasticIndex ? 3 : 0;
                 if (q === 1) {
@@ -3774,7 +3751,7 @@ var MarbleRunSimulatorCore;
                     }
                     let anchor = BABYLON.Vector3.Zero();
                     if (addSleeper && sleeperPieceVertexData) {
-                        anchor = new BABYLON.Vector3(0, -radiusPath, 0);
+                        anchor = new BABYLON.Vector3(0, -part.wireGauge * 0.5, 0);
                         let dir = interpolatedPoints[i + 1].subtract(interpolatedPoints[i - 1]).normalize();
                         let t = interpolatedPoints[i];
                         let up = track.trackInterpolatedNormals[i];
@@ -3852,7 +3829,7 @@ var MarbleRunSimulatorCore;
                                     });
                                     if (!pick.hit) {
                                         let fixationPath = [anchor, anchorBase];
-                                        let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                                        let tmp = BABYLON.ExtrudeShape("tmp", { shape: shape, path: fixationPath, closeShape: false, cap: BABYLON.Mesh.CAP_ALL });
                                         let colorIndex = track.part.getColor(track.template.colorIndex);
                                         if (!partialsDatas[colorIndex]) {
                                             partialsDatas[colorIndex] = [];
@@ -8360,9 +8337,9 @@ var MarbleRunSimulatorCore;
             this.light2.groundColor.copyFromFloats(0.3, 0.3, 0.3);
             this.light2.intensity = 0.2;
             this.light2.includeOnlyWithLayerMask = 0x10000000;
-            this.skybox = BABYLON.MeshBuilder.CreateSphere("skyBox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE, arc: 12 }, this.game.scene);
+            this.skybox = BABYLON.MeshBuilder.CreateSphere("room-skybox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE, segments: 4 }, this.game.scene);
             this.skybox.layerMask = 0x10000000;
-            this.skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.game.scene);
+            this.skyboxMaterial = new BABYLON.StandardMaterial("room-skybox-material", this.game.scene);
             this.skyboxMaterial.backFaceCulling = false;
             this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.skyboxMaterial.emissiveColor.copyFromFloats(0, 0, 0);
