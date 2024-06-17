@@ -1248,7 +1248,7 @@ var MarbleRunSimulatorCore;
             this.name = "Unnamed Machine";
             this.author = "Unknown Author";
             this.isChallengeMachine = false;
-            this.TEST_USE_BASE_FPS = true; // only for Poki playtest
+            this.TEST_USE_BASE_FPS = false; // only for Poki playtest
             this.parts = [];
             this.decors = [];
             this.balls = [];
@@ -7739,8 +7739,18 @@ var MarbleRunSimulatorCore;
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, -2 * r)),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
             ];
+            let hermite = (x) => {
+                return (3 * Math.pow(2 * x, 2) - Math.pow(2 * x, 3)) / 4;
+            };
+            let summedLength = [0];
+            let trackpoints = template.trackTemplates[0].trackpoints;
+            for (let n = 1; n < trackpoints.length; n++) {
+                summedLength[n] = summedLength[n - 1] + BABYLON.Vector3.Distance(trackpoints[n].position, trackpoints[n - 1].position);
+            }
+            let totalLength = summedLength[summedLength.length - 1];
             for (let n = 0; n < template.trackTemplates[0].trackpoints.length; n++) {
-                let f = n / (template.trackTemplates[0].trackpoints.length - 1);
+                let f = summedLength[n] / totalLength;
+                f = hermite(f);
                 template.trackTemplates[0].trackpoints[n].position.y = -f * template.h * MarbleRunSimulatorCore.tileHeight;
             }
             if (mirrorX) {

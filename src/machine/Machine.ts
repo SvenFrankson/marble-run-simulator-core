@@ -104,7 +104,7 @@ namespace MarbleRunSimulatorCore {
         public pedestalTop: BABYLON.Mesh;
         public baseFrame: BABYLON.Mesh;
         public baseLogo: BABYLON.Mesh;
-        public TEST_USE_BASE_FPS: boolean = true; // only for Poki playtest
+        public TEST_USE_BASE_FPS: boolean = false; // only for Poki playtest
         public baseFPS: BABYLON.Mesh;
         public fpsMaterial: BABYLON.StandardMaterial;
         public fpsTexture: BABYLON.DynamicTexture;

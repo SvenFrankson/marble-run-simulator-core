@@ -51,9 +51,20 @@ namespace MarbleRunSimulatorCore {
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
             ];
 
+            let hermite = (x: number) => {
+                return (3 * Math.pow(2 * x, 2) - Math.pow(2 * x, 3)) / 4;
+            }
+            let summedLength = [0];
+            let trackpoints = template.trackTemplates[0].trackpoints;
+            for (let n = 1; n < trackpoints.length; n++) {
+                summedLength[n] = summedLength[n - 1] + BABYLON.Vector3.Distance(trackpoints[n].position, trackpoints[n - 1].position);
+            }
+            let totalLength = summedLength[summedLength.length - 1];
+
             for (let n = 0; n < template.trackTemplates[0].trackpoints.length; n++) {
-                let f = n / (template.trackTemplates[0].trackpoints.length - 1);
-                template.trackTemplates[0].trackpoints[n].position.y = -f * template.h * tileHeight;
+                let f = summedLength[n] / totalLength;
+                f = hermite(f);
+                template.trackTemplates[0].trackpoints[n].position.y = - f * template.h * tileHeight;
             }
 
             if (mirrorX) {
