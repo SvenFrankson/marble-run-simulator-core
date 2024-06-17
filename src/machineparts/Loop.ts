@@ -43,9 +43,9 @@ namespace MarbleRunSimulatorCore {
             };
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -template.h * tileHeight, 0), Tools.V3Dir(90))];
 
-            let nLoops = n;
-            let xCenterStart = 0 + tileWidth * 0.5;
-            let xCenterEnd = tileWidth * (template.w - 2) + tileWidth * 0.5;
+            let loopsCount = n;
+            let xStart = tileWidth * 0.5;
+            let xEnd = tileWidth * 0.5 + tileWidth * (template.w - 2);
             let r = tileWidth * 0.7;
             let depthStart = 0.013;
             let depthEnd = -0.013;
@@ -53,13 +53,23 @@ namespace MarbleRunSimulatorCore {
                 depthStart = 0;
                 depthEnd = -tileDepth * (template.d - 1);
             }
-            for (let n = 0; n <= 8 * nLoops; n++) {
-                let f = (n + 0) / (8 * nLoops);
-                let a = (2 * Math.PI * n) / 8;
-                let cosa = Math.cos(a);
-                let sina = Math.sin(a);
 
-                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + f * (xCenterEnd - xCenterStart) + xCenterStart, r * 1 - cosa * r - template.h * tileHeight, f * (depthEnd - depthStart) + depthStart)));
+            for (let nLoop = 0; nLoop < loopsCount; nLoop++) {
+                for (let n = 0; n <= 8; n++) {
+                    if (n < 8 || xStart != xEnd || nLoop === loopsCount - 1) {
+                        let f = (n + 8 * nLoop) / (8 * loopsCount);
+                        let a = (2 * Math.PI * n) / 8;
+                        let cosa = Math.cos(a);
+                        let sina = Math.sin(a);
+        
+                        let fx = 0.5;
+                        if (loopsCount > 1) {
+                            fx = nLoop / (loopsCount - 1);
+                        }
+                        let x = (1 - fx) * xStart + fx * xEnd;
+                        template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + x, r * 1 - cosa * r - template.h * tileHeight, f * (depthEnd - depthStart) + depthStart)));
+                    }
+                }
             }
 
             template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), -template.h * tileHeight, -tileDepth * (template.d - 1)), Tools.V3Dir(90)));

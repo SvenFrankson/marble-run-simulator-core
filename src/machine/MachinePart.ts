@@ -783,10 +783,9 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (this.selectorBodyDisplay) {
-                this.selectorBodyDisplay.dispose();
+            if (!this.selectorBodyDisplay) {
+                this.selectorBodyDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
             }
-            this.selectorBodyDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
             this.selectorBodyDisplay.material = this.game.materials.whiteFullLitMaterial;
             this.selectorBodyDisplay.parent = this;
             if (selectorMeshDisplayVertexDatas.length) {

@@ -3195,10 +3195,9 @@ var MarbleRunSimulatorCore;
                     selectorMeshLogicVertexDatas.push(dataLogic);
                 }
             }
-            if (this.selectorBodyDisplay) {
-                this.selectorBodyDisplay.dispose();
+            if (!this.selectorBodyDisplay) {
+                this.selectorBodyDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
             }
-            this.selectorBodyDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
             this.selectorBodyDisplay.material = this.game.materials.whiteFullLitMaterial;
             this.selectorBodyDisplay.parent = this;
             if (selectorMeshDisplayVertexDatas.length) {
@@ -5594,9 +5593,9 @@ var MarbleRunSimulatorCore;
                 n.normalize();
             };
             template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -template.h * MarbleRunSimulatorCore.tileHeight, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))];
-            let nLoops = n;
-            let xCenterStart = 0 + MarbleRunSimulatorCore.tileWidth * 0.5;
-            let xCenterEnd = MarbleRunSimulatorCore.tileWidth * (template.w - 2) + MarbleRunSimulatorCore.tileWidth * 0.5;
+            let loopsCount = n;
+            let xStart = MarbleRunSimulatorCore.tileWidth * 0.5;
+            let xEnd = MarbleRunSimulatorCore.tileWidth * 0.5 + MarbleRunSimulatorCore.tileWidth * (template.w - 2);
             let r = MarbleRunSimulatorCore.tileWidth * 0.7;
             let depthStart = 0.013;
             let depthEnd = -0.013;
@@ -5604,12 +5603,21 @@ var MarbleRunSimulatorCore;
                 depthStart = 0;
                 depthEnd = -MarbleRunSimulatorCore.tileDepth * (template.d - 1);
             }
-            for (let n = 0; n <= 8 * nLoops; n++) {
-                let f = (n + 0) / (8 * nLoops);
-                let a = (2 * Math.PI * n) / 8;
-                let cosa = Math.cos(a);
-                let sina = Math.sin(a);
-                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + f * (xCenterEnd - xCenterStart) + xCenterStart, r * 1 - cosa * r - template.h * MarbleRunSimulatorCore.tileHeight, f * (depthEnd - depthStart) + depthStart)));
+            for (let nLoop = 0; nLoop < loopsCount; nLoop++) {
+                for (let n = 0; n <= 8; n++) {
+                    if (n < 8 || xStart != xEnd || nLoop === loopsCount - 1) {
+                        let f = (n + 8 * nLoop) / (8 * loopsCount);
+                        let a = (2 * Math.PI * n) / 8;
+                        let cosa = Math.cos(a);
+                        let sina = Math.sin(a);
+                        let fx = 0.5;
+                        if (loopsCount > 1) {
+                            fx = nLoop / (loopsCount - 1);
+                        }
+                        let x = (1 - fx) * xStart + fx * xEnd;
+                        template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + x, r * 1 - cosa * r - template.h * MarbleRunSimulatorCore.tileHeight, f * (depthEnd - depthStart) + depthStart)));
+                    }
+                }
             }
             template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * (template.w - 0.5), -template.h * MarbleRunSimulatorCore.tileHeight, -MarbleRunSimulatorCore.tileDepth * (template.d - 1)), MarbleRunSimulatorCore.Tools.V3Dir(90)));
             let points = template.trackTemplates[0].trackpoints.map((tp) => {
@@ -7091,8 +7099,8 @@ var MarbleRunSimulatorCore;
             let r = widthInM * 0.5 - 0.01;
             let heightStart = 0 - 0.003;
             let heightEnd = -MarbleRunSimulatorCore.tileHeight * template.h + 0.003;
+            let x = -MarbleRunSimulatorCore.tileWidth * 0.5 + template.w * MarbleRunSimulatorCore.tileWidth * 0.5;
             for (let nS = 0; nS < nSpirals; nS++) {
-                let x = -MarbleRunSimulatorCore.tileWidth * 0.5 + template.w * MarbleRunSimulatorCore.tileWidth * 0.5;
                 let nV0 = 0;
                 if (nS >= 1) {
                     nV0 = 1;
