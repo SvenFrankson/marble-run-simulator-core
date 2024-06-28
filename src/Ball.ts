@@ -137,15 +137,12 @@ namespace MarbleRunSimulatorCore {
             console.log(this);
             if (this.selectorMesh) {
                 if (this._selected) {
-                    console.log("selected");
                     this.selectorMesh.isVisible = true;
                 }
                 else if (this._hovered) {
-                    console.log("hovered");
                     this.selectorMesh.isVisible = true;
                 }
                 else {
-                    console.log("nope");
                     this.selectorMesh.isVisible = false;
                 }
             }

@@ -42,6 +42,21 @@ namespace MarbleRunSimulatorCore {
             this.normal.normalize();
         }
 
+        public setDir(dir: BABYLON.Vector3): void {
+            if (dir) {
+                this.fixedDir = true;
+                this.dir = dir;
+            } else {
+                this.fixedDir = false;
+                this.dir = BABYLON.Vector3.Right();
+            }
+            this.dir = this.dir.clone();
+
+            let right = BABYLON.Vector3.Cross(this.normal, this.dir).normalize();
+            BABYLON.Vector3.CrossToRef(this.dir, right, this.normal);
+            this.normal.normalize();
+        }
+
         public isFirstOrLast(): boolean {
             let index = this.template.trackpoints.indexOf(this);
             if (index === 0 || index === this.template.trackpoints.length - 1) {

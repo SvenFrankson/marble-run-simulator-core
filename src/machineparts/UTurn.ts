@@ -67,6 +67,22 @@ namespace MarbleRunSimulatorCore {
                 template.trackTemplates[0].trackpoints[n].position.y = - f * template.h * tileHeight;
             }
 
+            let tp1 = trackpoints[1];
+            let dir1 = trackpoints[2].position.subtract(trackpoints[1].position);
+            dir1.normalize();
+            let a = Mummu.AngleFromToAround(dir1, BABYLON.Axis.X, BABYLON.Axis.Y);
+            Mummu.RotateInPlace(dir1, BABYLON.Axis.Y, a);
+            tp1.setDir(dir1);
+
+            let tp2 = trackpoints[trackpoints.length - 2];
+            let dir2 = trackpoints[trackpoints.length - 2].position.subtract(trackpoints[trackpoints.length - 3].position);
+            dir2.normalize();
+            a = Mummu.AngleFromToAround(dir2, BABYLON.Axis.X.scale(-1), BABYLON.Axis.Y);
+            Mummu.RotateInPlace(dir2, BABYLON.Axis.Y, a);
+            tp2.setDir(dir2);
+
+            console.log(dir1 + " " + dir2);
+
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
             }

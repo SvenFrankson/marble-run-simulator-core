@@ -21,7 +21,8 @@ namespace MarbleRunSimulatorCore {
         "shooter-8",
         "controler",
         "screen",
-        "speeder"
+        "speeder",
+        "forwardSplit"
     ];
 
     export interface IMachinePartProp {
@@ -171,6 +172,9 @@ namespace MarbleRunSimulatorCore {
             if (partName === "split") {
                 return new Split(this.machine, prop);
             }
+            if (partName === "forwardSplit") {
+                return new ForwardSplit(this.machine, prop);
+            }
             if (partName === "controler") {
                 return new Controler(this.machine, prop);
             }
@@ -271,6 +275,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "split") {
                 return new Split(this.machine, prop);
+            }
+            if (baseName === "forwardSplit") {
+                return new ForwardSplit(this.machine, prop);
             }
             if (baseName === "controler") {
                 return new Controler(this.machine, prop);

@@ -654,6 +654,7 @@ declare namespace MarbleRunSimulatorCore {
         fixedTangentOut: boolean;
         summedLength: number;
         constructor(template: TrackTemplate, position: BABYLON.Vector3, dir?: BABYLON.Vector3, normal?: BABYLON.Vector3, tangentIn?: number, tangentOut?: number);
+        setDir(dir: BABYLON.Vector3): void;
         isFirstOrLast(): boolean;
     }
 }
@@ -770,6 +771,25 @@ declare namespace MarbleRunSimulatorCore {
     class FlatJoin extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class ForwardSplit extends MachinePart {
+        private _animatePivot;
+        anchor: BABYLON.Mesh;
+        pivot: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
+        clicSound: BABYLON.Sound;
+        static pivotL: number;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        private _exitLeft;
+        private _moving;
+        update(dt: number): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {

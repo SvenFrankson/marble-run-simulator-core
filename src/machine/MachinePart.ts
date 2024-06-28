@@ -444,7 +444,7 @@ namespace MarbleRunSimulatorCore {
             this.position.y = -this._j * tileHeight;
             this.position.z = -this._k * tileDepth;
 
-            this.sleepersMeshProp = { drawGroundAnchors: true, groundAnchorsRelativeMaxY: 0.6 };
+            this.sleepersMeshProp = { drawGroundAnchors: true, groundAnchorsRelativeMaxY: 0.35 };
 
             this.tracks = [new Track(this)];
         }

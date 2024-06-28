@@ -370,6 +370,9 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "split") {
                     data = Split.GenerateTemplate(mirrorX, mirrorZ);
                 }
+                else if (partName === "forwardSplit") {
+                    data = ForwardSplit.GenerateTemplate(mirrorX, mirrorZ);
+                }
                 else if (partName === "controler") {
                     data = Controler.GenerateTemplate(mirrorX);
                 }

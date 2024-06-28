@@ -1408,6 +1408,7 @@ namespace MarbleRunSimulatorCore {
                         mirrorZ: mirror >= 2,
                         c: colors
                     }
+                    
                     let track = this.trackFactory.createTrackBaseName(baseName, prop);
                     if (track) {
                         this.parts.push(track);
