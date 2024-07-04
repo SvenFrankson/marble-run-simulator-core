@@ -1,6 +1,8 @@
 namespace MarbleRunSimulatorCore {
     export class Track {
         public wires: Wire[];
+        public mesh: BABYLON.Mesh;
+
         public get templateInterpolatedPoints(): BABYLON.Vector3[] {
             return this.template.interpolatedPoints;
         }
@@ -162,30 +164,6 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
             }
-
-            /*
-        let dec = 1;
-        for (let i = 1; i <= 0.5 * (N - 1); i++) {
-            if (Math.abs(angles[i]) < Math.abs(startBank) * dec) {
-                angles[i] = startBank * dec;
-                dec *= 0.99;
-            }
-            else {
-                i = Infinity;
-            }
-        }
-        
-        dec = 1;
-        for (let i = N - 1 - 1; i >= 0.5 * (N - 1); i--) {
-            if (Math.abs(angles[i]) < Math.abs(endBank) * dec) {
-                angles[i] = endBank * dec;
-                dec *= 0.99;
-            }
-            else {
-                i = - Infinity;
-            }
-        }
-        */
 
             for (let i = 0; i < N; i++) {
                 let prevPoint = this.templateInterpolatedPoints[i - 1];

@@ -411,6 +411,7 @@ declare namespace MarbleRunSimulatorCore {
         allWires: Wire[];
         wireSize: number;
         wireGauge: number;
+        canPipeStyle: boolean;
         colors: number[];
         getColor(index: number): number;
         sleepersMeshes: Map<number, BABYLON.Mesh>;
@@ -538,6 +539,13 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    interface IPipeTrackMeshProps {
+    }
+    class PipeTrackMeshBuilder {
+        static BuildPipeTrackMesh(track: Track, props: IPipeTrackMeshProps): Promise<void>;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     interface ISleeperMeshProps {
         spacing?: number;
         drawWallAnchors?: boolean;
@@ -620,6 +628,7 @@ declare namespace MarbleRunSimulatorCore {
     class Track {
         part: MachinePart;
         wires: Wire[];
+        mesh: BABYLON.Mesh;
         get templateInterpolatedPoints(): BABYLON.Vector3[];
         trackInterpolatedNormals: BABYLON.Vector3[];
         get preferedStartBank(): number;
@@ -958,6 +967,12 @@ declare namespace MarbleRunSimulatorCore {
     class Spiral extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(w: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class SpiralUTurn extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static GenerateTemplate(h: number, d: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

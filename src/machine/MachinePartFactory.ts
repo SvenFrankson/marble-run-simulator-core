@@ -22,7 +22,8 @@ namespace MarbleRunSimulatorCore {
         "controler",
         "screen",
         "speeder",
-        "forwardSplit"
+        "forwardSplit",
+        "spiralUTurn-3.2",
     ];
 
     export interface IMachinePartProp {
@@ -163,6 +164,16 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Spiral(this.machine, prop);
             }
+            if (partName === "spiralUTurn" || partName.startsWith("spiralUTurn-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.d = d;
+                }
+                return new SpiralUTurn(this.machine, prop);
+            }
             if (partName === "join") {
                 return new Join(this.machine, prop);
             }
@@ -266,6 +277,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "spiral") {
                 return new Spiral(this.machine, prop);
+            }
+            if (baseName === "spiralUTurn") {
+                return new SpiralUTurn(this.machine, prop);
             }
             if (baseName === "join") {
                 return new Join(this.machine, prop);

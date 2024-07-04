@@ -393,6 +393,11 @@ namespace MarbleRunSimulatorCore {
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     data = Spiral.GenerateTemplate(w, h, mirrorX, mirrorZ);
                 }
+                else if (partName.startsWith("spiralUTurn-")) {
+                    let w = parseInt(partName.split("-")[1].split(".")[0]);
+                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                    data = SpiralUTurn.GenerateTemplate(w, h, mirrorX, mirrorZ);
+                }
                 else if (partName === "quarter") {
                     data = QuarterNote.GenerateTemplate(mirrorX);
                 }

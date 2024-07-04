@@ -215,6 +215,7 @@ namespace MarbleRunSimulatorCore {
         public wireSize: number = 0.0015;
         public wireGauge: number = 0.014;
 
+        public canPipeStyle: boolean = false;
         public colors: number[] = [0];
         public getColor(index: number): number {
             index = Nabu.MinMax(index, 0, this.colors.length - 1);
@@ -947,9 +948,14 @@ namespace MarbleRunSimulatorCore {
             this.tracks.forEach((track) => {
                 track.recomputeWiresPath();
                 track.recomputeAbsolutePath();
-                track.wires.forEach((wire) => {
-                    wire.instantiate(isFinite(wire.colorIndex) ? this.getColor(wire.colorIndex) : this.getColor(track.template.colorIndex));
-                });
+                if (this.canPipeStyle) {
+                    PipeTrackMeshBuilder.BuildPipeTrackMesh(track, {});
+                }
+                else {
+                    track.wires.forEach((wire) => {
+                        wire.instantiate(isFinite(wire.colorIndex) ? this.getColor(wire.colorIndex) : this.getColor(track.template.colorIndex));
+                    });
+                }
             });
             this.wires.forEach((wire) => {
                 wire.instantiate(isFinite(wire.colorIndex) ? this.getColor(wire.colorIndex) : this.getColor(0));
@@ -971,6 +977,9 @@ namespace MarbleRunSimulatorCore {
 
         public doSleepersMeshUpdate(): void {
             if (!this.instantiated || this.isDisposed()) {
+                return;
+            }
+            if (this.canPipeStyle) {
                 return;
             }
             let datas = SleeperMeshBuilder.GenerateSleepersVertexData(this, this.sleepersMeshProp);
