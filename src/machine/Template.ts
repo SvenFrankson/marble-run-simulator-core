@@ -13,6 +13,7 @@ namespace MarbleRunSimulatorCore {
         public cutOutSleeper: (n: number) => boolean;
 
         public colorIndex: number = 0;
+        public isPipe: boolean = false;
 
         public summedLength: number[] = [0];
         public totalLength: number = 0;
@@ -323,6 +324,11 @@ namespace MarbleRunSimulatorCore {
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
                     data = UTurn.GenerateTemplate(h, d, mirrorX, mirrorZ);
                 }
+                else if (partName.startsWith("pipeuturn-")) {
+                    let h = parseInt(partName.split("-")[1].split(".")[0]);
+                    let d = parseInt(partName.split("-")[1].split(".")[1]);
+                    data = UTurn.GenerateTemplate(h, d, mirrorX, mirrorZ, true);
+                }
                 else if (partName.startsWith("wall-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
@@ -338,6 +344,12 @@ namespace MarbleRunSimulatorCore {
                     let d = parseInt(partName.split("-")[1].split(".")[2]);
                     data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
                 }
+                else if (partName.startsWith("piperamp-")) {
+                    let w = parseInt(partName.split("-")[1].split(".")[0]);
+                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                    let d = parseInt(partName.split("-")[1].split(".")[2]);
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ, true);
+                }
                 else if (partName.startsWith("wave-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
@@ -351,6 +363,10 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("elevator-")) {
                     let h = parseInt(partName.split("-")[1]);
                     data = Elevator.GenerateTemplate(h, mirrorX);
+                }
+                else if (partName.startsWith("steamelevator-")) {
+                    let h = parseInt(partName.split("-")[1]);
+                    data = SteamElevator.GenerateTemplate(h, mirrorX);
                 }
                 else if (partName.startsWith("shooter-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);

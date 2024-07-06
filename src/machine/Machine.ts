@@ -725,17 +725,17 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public getBankAt(pos: BABYLON.Vector3, exclude: MachinePart): { isEnd: boolean; bank: number; part: MachinePart } {
+        public getBankAt(pos: BABYLON.Vector3, exclude: MachinePart): { isEnd: boolean; bank: number; part: MachinePart; pipeTrack: boolean } {
             for (let i = 0; i < this.parts.length; i++) {
                 let part = this.parts[i];
                 if (part != exclude) {
                     for (let j = 0; j < part.tracks.length; j++) {
                         let track = part.tracks[j];
                         if (BABYLON.Vector3.DistanceSquared(track.startWorldPosition, pos) < 0.000001) {
-                            return { isEnd: false, bank: track.preferedStartBank, part: part };
+                            return { isEnd: false, bank: track.preferedStartBank, part: part, pipeTrack: track instanceof PipeTrack };
                         }
                         if (BABYLON.Vector3.DistanceSquared(track.endWorldPosition, pos) < 0.000001) {
-                            return { isEnd: true, bank: track.preferedEndBank, part: part };
+                            return { isEnd: true, bank: track.preferedEndBank, part: part, pipeTrack: track instanceof PipeTrack };
                         }
                     }
                 }

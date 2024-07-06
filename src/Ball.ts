@@ -320,35 +320,6 @@ namespace MarbleRunSimulatorCore {
                             part.allWires.forEach((wire) => {
                                 let index = this.getLastIndex(wire);
                                 let col: Mummu.IIntersection;
-                                /*
-                            if (this.constructorIndex === 0) {
-                                if (index > - 1) {
-                                    this.optimCount++;
-                                    let t0 = performance.now();
-                                    col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, true, index);
-                                    this.setLastHit(wire, col.index);
-                                    let t1 = performance.now();
-                                    let t = t1 - t0;
-                                    this.averageWithOptim = this.averageWithOptim * 0.9999 + t * 0.0001;
-                                }
-                                else {
-                                    let t0 = performance.now();
-                                    col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, true, index);
-                                    this.setLastHit(wire, col.index);
-                                    let t1 = performance.now();
-                                    let t = t1 - t0;
-                                    this.averageNoOptim = this.averageNoOptim * 0.9999 + t * 0.0001;
-                                }
-                                this.totalCount++;
-                                if (Math.random() < 0.001) {
-                                    let optimRate = this.optimCount / this.totalCount * 100;
-                                    console.log("optim rate " + optimRate.toFixed(3) + " %");
-                                    console.log("averageWithOptim " + this.averageWithOptim.toFixed(6) + " ms");
-                                    console.log("averageNoOptim " + this.averageNoOptim.toFixed(6) + " ms");
-                                }
-                            }
-                            else {
-                                */
                                 let f = Nabu.MinMax(this.velocity.lengthSquared(), 0, 1);
                                 let range = Math.round(f * 32 + (1 - f) * 2);
                                 col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, !(part instanceof Spiral), index, range);
@@ -376,6 +347,34 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
                             });
+                            part.tracks.forEach(track => {
+                                if (track instanceof PipeTrack) {
+                                    let col: Mummu.IIntersection;
+                                    col = Mummu.SphereInTubeIntersection(this.position, this.radius, track.tubePath, 0.011);
+                                    if (col.hit) {
+                                        //this.setLastHit(wire, col.index);
+                                        let colDig = col.normal.scale(-1);
+                                        // Move away from collision
+                                        forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                        // Cancel depth component of speed
+                                        let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                        if (depthSpeed > 0) {
+                                            canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                        }
+                                        // Add ground reaction
+                                        let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                        reactions.addInPlace(reaction);
+                                        reactionsCount++;
+        
+                                        this.surface = Surface.Bowl;
+        
+                                        if (part instanceof Elevator) {
+                                            this.position.z = part.absolutePosition.z;
+                                            this.velocity.z = 0;
+                                        }
+                                    }
+                                }
+                            })
                             part.decors.forEach(decor => {
                                 decor.onBallCollideAABB(this);
                             })

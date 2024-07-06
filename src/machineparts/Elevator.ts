@@ -1,5 +1,6 @@
 namespace MarbleRunSimulatorCore {
     export class Elevator extends MachinePart {
+
         public boxesCount: number = 4;
         public rWheel: number = 0.015;
         public boxX: number[] = [];

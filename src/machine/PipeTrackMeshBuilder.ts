@@ -5,7 +5,7 @@ namespace MarbleRunSimulatorCore {
 
     export class PipeTrackMeshBuilder {
 
-        public static async BuildPipeTrackMesh(track: Track, props: IPipeTrackMeshProps): Promise<void> {
+        public static async BuildPipeTrackMesh(track: PipeTrack, props: IPipeTrackMeshProps): Promise<void> {
             let vertexDataLoader = track.part.game.vertexDataLoader;
 
             if (track.mesh) {
@@ -14,7 +14,7 @@ namespace MarbleRunSimulatorCore {
 
             track.mesh = new BABYLON.Mesh("track-mesh");
             track.mesh.parent = track.part;
-            track.mesh.material = track.part.game.materials.getMaterial(1);
+            track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0));
 
             let ringIn = await vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/steampunk-pipe.babylon", 0);
             ringIn = Mummu.CloneVertexData(ringIn);
@@ -24,13 +24,19 @@ namespace MarbleRunSimulatorCore {
             let p1 = track.templateInterpolatedPoints[1];
             let normIn = track.trackInterpolatedNormals[0];
             let dirIn = p1.subtract(p0).normalize();
-            Mummu.DrawDebugLine(p0, p0.add(dirIn), 300, BABYLON.Color3.Red()).parent = track.part;
+            dirIn.x = Math.round(dirIn.x);
+            dirIn.y = Math.round(dirIn.y);
+            dirIn.z = Math.round(dirIn.z);
+            //Mummu.DrawDebugLine(p0, p0.add(dirIn), 300, BABYLON.Color3.Red()).parent = track.part;
 
             let pN1 = track.templateInterpolatedPoints[track.templateInterpolatedPoints.length - 2];
             let pN = track.templateInterpolatedPoints[track.templateInterpolatedPoints.length - 1];
             let normOut = track.trackInterpolatedNormals[track.trackInterpolatedNormals.length - 1];
             let dirOut = pN.subtract(pN1).normalize();
-            Mummu.DrawDebugLine(pN, pN.add(dirOut), 300, BABYLON.Color3.Green()).parent = track.part;
+            dirOut.x = Math.round(dirOut.x);
+            dirOut.y = Math.round(dirOut.y);
+            dirOut.z = Math.round(dirOut.z);
+            //Mummu.DrawDebugLine(pN, pN.add(dirOut), 300, BABYLON.Color3.Green()).parent = track.part;
 
             Mummu.RotateVertexDataInPlace(ringIn, Mummu.QuaternionFromZYAxis(dirIn, normIn));
             Mummu.RotateVertexDataInPlace(ringOut, Mummu.QuaternionFromZYAxis(dirOut.scale(-1), normOut));
@@ -44,15 +50,27 @@ namespace MarbleRunSimulatorCore {
             let normals = [...track.trackInterpolatedNormals].map((p) => {
                 return p.clone();
             });
-            Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI, normals);
+            Mummu.RemoveFromStartForDistanceInPlace(points, 0.001);
+            Mummu.RemoveFromEndForDistanceInPlace(points, 0.001);
+            Mummu.DecimatePathInPlace(points, (2 / 180) * Math.PI, normals);
 
             points = points.map((pt, i) => {
                 return pt.add(normals[i].scale(0.008));
             });
             
-            let pipeData = Mummu.CreateWireVertexData({ path: points, pathUps: normals, tesselation: 12, radius: 0.01, color: new BABYLON.Color4(1, 1, 1, 1), closed: false, textureRatio: 4 });
+            let pipeData = Mummu.CreateWireVertexData({ path: points, pathUps: normals, tesselation: 12, radius: 0.011, color: new BABYLON.Color4(1, 1, 1, 1), closed: false, textureRatio: 4 });
+            let flip = Mummu.CloneVertexData(pipeData);
+            Mummu.TriFlipVertexDataInPlace(flip);
 
-            Mummu.MergeVertexDatas(ringIn, ringOut, pipeData).applyToMesh(track.mesh);
+            let allDatas = [ringIn, ringOut, pipeData, flip];
+
+            //for (let i = 0; i < points.length; i++) {
+            //    let cube = BABYLON.CreateBoxVertexData({ size: 0.001 });
+            //    Mummu.TranslateVertexDataInPlace(cube, points[i]);
+            //    allDatas.push(cube);
+            //}
+
+            Mummu.MergeVertexDatas(...allDatas).applyToMesh(track.mesh);
         }
     }
 }

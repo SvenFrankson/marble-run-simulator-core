@@ -65,18 +65,16 @@ namespace MarbleRunSimulatorCore {
     export class Ramp extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-
-            this.canPipeStyle = true;
             
-            let partName = "ramp-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + "ramp-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
 
-        public static GenerateTemplate(w: number = 1, h: number = 1, d: number = 1, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(w: number = 1, h: number = 1, d: number = 1, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "ramp-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + "ramp-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
 
             template.w = w;
             template.h = h;
@@ -101,6 +99,7 @@ namespace MarbleRunSimulatorCore {
             let r12 = radius - r2;
 
             template.trackTemplates[0] = new TrackTemplate(template);
+            template.trackTemplates[0].isPipe = pipeVersion;
             if (radius === 0 || widthInM > depthInM * 1.5) {
                 template.trackTemplates[0].trackpoints = [
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
@@ -201,6 +200,7 @@ namespace MarbleRunSimulatorCore {
                 c: this.colors,
                 mirrorX: mirrorX,
                 mirrorZ: mirrorZ,
+                pipeVersion: this.tracks[0].template.isPipe
             });
         }
     }

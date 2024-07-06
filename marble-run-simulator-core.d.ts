@@ -300,6 +300,7 @@ declare namespace MarbleRunSimulatorCore {
             isEnd: boolean;
             bank: number;
             part: MachinePart;
+            pipeTrack: boolean;
         };
         serialize(): IMachineData;
         serializeV1(): IMachineData;
@@ -411,7 +412,6 @@ declare namespace MarbleRunSimulatorCore {
         allWires: Wire[];
         wireSize: number;
         wireGauge: number;
-        canPipeStyle: boolean;
         colors: number[];
         getColor(index: number): number;
         sleepersMeshes: Map<number, BABYLON.Mesh>;
@@ -529,6 +529,7 @@ declare namespace MarbleRunSimulatorCore {
         c?: number[];
         mirrorX?: boolean;
         mirrorZ?: boolean;
+        pipeVersion?: boolean;
     }
     class MachinePartFactory {
         machine: Machine;
@@ -539,10 +540,51 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Track {
+        part: MachinePart;
+        wires: Wire[];
+        get templateInterpolatedPoints(): BABYLON.Vector3[];
+        trackInterpolatedNormals: BABYLON.Vector3[];
+        get preferedStartBank(): number;
+        private _startWorldPosition;
+        get startWorldPosition(): BABYLON.Vector3;
+        get preferedEndBank(): number;
+        private _endWorldPosition;
+        get endWorldPosition(): BABYLON.Vector3;
+        AABBMin: BABYLON.Vector3;
+        AABBMax: BABYLON.Vector3;
+        template: TrackTemplate;
+        constructor(part: MachinePart);
+        get trackIndex(): number;
+        getSlopeAt(index: number): number;
+        getBankAt(index: number): number;
+        initialize(template: TrackTemplate): void;
+        recomputeWiresPath(forceDisconnexion?: boolean): void;
+        recomputeAbsolutePath(): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class PipeTrack extends Track {
+        mesh: BABYLON.Mesh;
+        tubePath: BABYLON.Vector3[];
+        get preferedStartBank(): number;
+        get preferedEndBank(): number;
+        AABBMin: BABYLON.Vector3;
+        AABBMax: BABYLON.Vector3;
+        constructor(part: MachinePart);
+        get trackIndex(): number;
+        getSlopeAt(index: number): number;
+        getBankAt(index: number): number;
+        initialize(template: TrackTemplate): void;
+        recomputeWiresPath(forceDisconnexion?: boolean): void;
+        recomputeAbsolutePath(): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     interface IPipeTrackMeshProps {
     }
     class PipeTrackMeshBuilder {
-        static BuildPipeTrackMesh(track: Track, props: IPipeTrackMeshProps): Promise<void>;
+        static BuildPipeTrackMesh(track: PipeTrack, props: IPipeTrackMeshProps): Promise<void>;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -571,6 +613,7 @@ declare namespace MarbleRunSimulatorCore {
         preferedEndBank: number;
         cutOutSleeper: (n: number) => boolean;
         colorIndex: number;
+        isPipe: boolean;
         summedLength: number[];
         totalLength: number;
         globalSlope: number;
@@ -622,31 +665,6 @@ declare namespace MarbleRunSimulatorCore {
         private _dictionary;
         constructor(machine: Machine);
         getTemplate(partName: string, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
-    }
-}
-declare namespace MarbleRunSimulatorCore {
-    class Track {
-        part: MachinePart;
-        wires: Wire[];
-        mesh: BABYLON.Mesh;
-        get templateInterpolatedPoints(): BABYLON.Vector3[];
-        trackInterpolatedNormals: BABYLON.Vector3[];
-        get preferedStartBank(): number;
-        private _startWorldPosition;
-        get startWorldPosition(): BABYLON.Vector3;
-        get preferedEndBank(): number;
-        private _endWorldPosition;
-        get endWorldPosition(): BABYLON.Vector3;
-        AABBMin: BABYLON.Vector3;
-        AABBMax: BABYLON.Vector3;
-        template: TrackTemplate;
-        constructor(part: MachinePart);
-        get trackIndex(): number;
-        getSlopeAt(index: number): number;
-        getBankAt(index: number): number;
-        initialize(template: TrackTemplate): void;
-        recomputeWiresPath(forceDisconnexion?: boolean): void;
-        recomputeAbsolutePath(): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -838,7 +856,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class Ramp extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(w?: number, h?: number, d?: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        static GenerateTemplate(w?: number, h?: number, d?: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
     }
 }
@@ -1028,9 +1046,32 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class SteamElevator extends MachinePart {
+        gearBottom: BABYLON.Mesh;
+        gearTop: BABYLON.Mesh;
+        largeWheel: BABYLON.Mesh;
+        smallWheel: BABYLON.Mesh;
+        flyWheel: BABYLON.Mesh;
+        engineAxis: BABYLON.Mesh;
+        pistonBody: BABYLON.Mesh;
+        pistonMove: BABYLON.Mesh;
+        pistonBielle: BABYLON.Mesh;
+        speed: number;
+        x: number;
+        rGear: number;
+        chainLength: number;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class UTurn extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(h: number, d: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number, d: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
         getOrigin(): Nabu.IJK;
         getDestination(): Nabu.IJK;

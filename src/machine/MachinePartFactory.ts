@@ -24,6 +24,9 @@ namespace MarbleRunSimulatorCore {
         "speeder",
         "forwardSplit",
         "spiralUTurn-3.2",
+        "piperamp-1.1.1",
+        "pipeuturn-0.2",
+        "steamelevator-4"
     ];
 
     export interface IMachinePartProp {
@@ -38,6 +41,7 @@ namespace MarbleRunSimulatorCore {
         c?: number[];
         mirrorX?: boolean;
         mirrorZ?: boolean;
+        pipeVersion?: boolean;
     }
 
     export class MachinePartFactory {
@@ -77,6 +81,19 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Ramp(this.machine, prop);
             }
+            if (partName === "piperamp" || partName.startsWith("piperamp-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    let d = parseInt(argStr.split(".")[2]);
+                    prop.w = w;
+                    prop.h = h;
+                    prop.d = d;
+                }
+                prop.pipeVersion = true;
+                return new Ramp(this.machine, prop);
+            }
             if (partName === "wave" || partName.startsWith("wave-")) {
                 let argStr = partName.split("-")[1];
                 if (argStr) {
@@ -105,6 +122,17 @@ namespace MarbleRunSimulatorCore {
                     prop.h = h;
                     prop.d = d;
                 }
+                return new UTurn(this.machine, prop);
+            }
+            if (partName === "pipeuturn" || partName.startsWith("pipeuturn-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.d = d;
+                }
+                prop.pipeVersion = true;
                 return new UTurn(this.machine, prop);
             }
             if (partName === "wall" || partName.startsWith("wall-")) {
@@ -197,6 +225,14 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Elevator(this.machine, prop);
             }
+            if (partName === "steamelevator" || partName.startsWith("steamelevator-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr);
+                    prop.h = h;
+                }
+                return new SteamElevator(this.machine, prop);
+            }
             if (partName === "shooter" || partName.startsWith("shooter-")) {
                 let argStr = partName.split("-")[1];
                 if (argStr) {
@@ -245,6 +281,10 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "ramp") {
                 return new Ramp(this.machine, prop);
             }
+            if (baseName === "piperamp") {
+                prop.pipeVersion = true;
+                return new Ramp(this.machine, prop);
+            }
             if (baseName === "wave") {
                 return new Wave(this.machine, prop);
             }
@@ -252,6 +292,10 @@ namespace MarbleRunSimulatorCore {
                 return new Snake(this.machine, prop);
             }
             if (baseName === "uturn") {
+                return new UTurn(this.machine, prop);
+            }
+            if (baseName === "pipeuturn") {
+                prop.pipeVersion = true;
                 return new UTurn(this.machine, prop);
             }
             if (baseName === "wall") {
@@ -298,6 +342,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "elevator") {
                 return new Elevator(this.machine, prop);
+            }
+            if (baseName === "steamelevator") {
+                return new SteamElevator(this.machine, prop);
             }
             if (baseName === "shooter") {
                 return new Shooter(this.machine, prop);

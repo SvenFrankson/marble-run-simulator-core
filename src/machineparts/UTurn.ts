@@ -2,15 +2,13 @@ namespace MarbleRunSimulatorCore {
     export class UTurn extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-
-            this.canPipeStyle = true;
             
-            let partName = "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
 
-        public static GenerateTemplate(h: number, d: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(h: number, d: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
             template.getWidthForDepth = (argD) => {
                 if (argD >= 8) {
@@ -19,7 +17,7 @@ namespace MarbleRunSimulatorCore {
                 return argD - 1;
             }
 
-            template.partName = "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 50;
 
             template.w = template.getWidthForDepth(d);
@@ -43,6 +41,7 @@ namespace MarbleRunSimulatorCore {
             let x0 = -tileWidth * 0.5 + (2 * Math.PI * r) / 6;
             let r2 = r / Math.SQRT2;
             template.trackTemplates[0] = new TrackTemplate(template);
+            template.trackTemplates[0].isPipe = pipeVersion;
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 0)),
@@ -82,8 +81,6 @@ namespace MarbleRunSimulatorCore {
             a = Mummu.AngleFromToAround(dir2, BABYLON.Axis.X.scale(-1), BABYLON.Axis.Y);
             Mummu.RotateInPlace(dir2, BABYLON.Axis.Y, a);
             tp2.setDir(dir2);
-
-            console.log(dir1 + " " + dir2);
 
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
@@ -125,6 +122,7 @@ namespace MarbleRunSimulatorCore {
                 c: this.colors,
                 mirrorX: mirrorX,
                 mirrorZ: mirrorZ,
+                pipeVersion: this.tracks[0].template.isPipe
             });
         }
 

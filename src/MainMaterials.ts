@@ -311,23 +311,21 @@ namespace MarbleRunSimulatorCore {
             this._materialsPBR.push(steelMaterialPBR);
             this._materialsSTD.push(steelMaterialSTD);
 
-
-            let copperMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
-            copperMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#B87333");
-            copperMaterialPBR.metallic = 1.0;
-            copperMaterialPBR.roughness = 0.15;
-            copperMaterialPBR.environmentTexture = envTexture;
+            let brassMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("brass-pbr", this.game.scene);
+            brassMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#B87333");
+            brassMaterialPBR.metallic = 0.9;
+            brassMaterialPBR.roughness = 0.15;
+            brassMaterialPBR.environmentTexture = envTexture;
             
-            let copperMaterialSTD = new BABYLON.StandardMaterial("copper-std", this.game.scene);
-            copperMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#B87333");
-            copperMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
-            copperMaterialSTD.emissiveColor = copperMaterialSTD.diffuseColor.scale(0.5);
-            copperMaterialSTD.roughness = 0.15;
+            let brassMaterialSTD = new BABYLON.StandardMaterial("brass-std", this.game.scene);
+            brassMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#B87333");
+            brassMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
+            brassMaterialSTD.emissiveColor = brassMaterialSTD.diffuseColor.scale(0.5);
+            brassMaterialSTD.roughness = 0.15;
 
-            this._materialsPBR.push(copperMaterialPBR);
-            this._materialsSTD.push(copperMaterialSTD);
+            this._materialsPBR.push(brassMaterialPBR);
+            this._materialsSTD.push(brassMaterialSTD);
 
-            
             let blackSteelMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("steel-pbr", this.game.scene);
             blackSteelMaterialPBR.baseColor = new BABYLON.Color3(0.05, 0.04, 0.045);
             blackSteelMaterialPBR.metallic = 0.85;
@@ -424,6 +422,21 @@ namespace MarbleRunSimulatorCore {
             
             this._materialsPBR.push(this._makePlasticPBR("pink-plastic-pbr", BABYLON.Color3.FromHexString("#d23be7"), envTexture));
             this._materialsSTD.push(this._makePlasticSTD("pink-plastic-std", BABYLON.Color3.FromHexString("#d23be7")));
+
+            let copperMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("copper-pbr", this.game.scene);
+            copperMaterialPBR.baseColor = BABYLON.Color3.FromHexString("#9c3814");
+            copperMaterialPBR.metallic = 0.9;
+            copperMaterialPBR.roughness = 0.15;
+            copperMaterialPBR.environmentTexture = envTexture;
+            
+            let copperMaterialSTD = new BABYLON.StandardMaterial("copper-std", this.game.scene);
+            copperMaterialSTD.diffuseColor = BABYLON.Color3.FromHexString("#9c3814");
+            copperMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
+            copperMaterialSTD.emissiveColor = copperMaterialSTD.diffuseColor.scale(0.5);
+            copperMaterialSTD.roughness = 0.15;
+
+            this._materialsPBR.push(copperMaterialPBR);
+            this._materialsSTD.push(copperMaterialSTD);
         }
     }
 }

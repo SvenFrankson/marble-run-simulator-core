@@ -215,7 +215,6 @@ namespace MarbleRunSimulatorCore {
         public wireSize: number = 0.0015;
         public wireGauge: number = 0.014;
 
-        public canPipeStyle: boolean = false;
         public colors: number[] = [0];
         public getColor(index: number): number {
             index = Nabu.MinMax(index, 0, this.colors.length - 1);
@@ -447,7 +446,7 @@ namespace MarbleRunSimulatorCore {
 
             this.sleepersMeshProp = { drawGroundAnchors: true, groundAnchorsRelativeMaxY: 0.35 };
 
-            this.tracks = [new Track(this)];
+            this.tracks = [];
         }
 
         public offsetPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
@@ -917,7 +916,12 @@ namespace MarbleRunSimulatorCore {
                 for (let i = 0; i < this.template.trackTemplates.length; i++) {
                     let track = this.tracks[i];
                     if (!track) {
-                        track = new Track(this);
+                        if (this.template.trackTemplates[i].isPipe) {
+                            track = new PipeTrack(this);
+                        }
+                        else {
+                            track = new Track(this);
+                        }
                         this.tracks[i] = track;
                     }
                     track.initialize(this.template.trackTemplates[i]);
@@ -948,7 +952,7 @@ namespace MarbleRunSimulatorCore {
             this.tracks.forEach((track) => {
                 track.recomputeWiresPath();
                 track.recomputeAbsolutePath();
-                if (this.canPipeStyle) {
+                if (track instanceof PipeTrack) {
                     PipeTrackMeshBuilder.BuildPipeTrackMesh(track, {});
                 }
                 else {
@@ -977,9 +981,6 @@ namespace MarbleRunSimulatorCore {
 
         public doSleepersMeshUpdate(): void {
             if (!this.instantiated || this.isDisposed()) {
-                return;
-            }
-            if (this.canPipeStyle) {
                 return;
             }
             let datas = SleeperMeshBuilder.GenerateSleepersVertexData(this, this.sleepersMeshProp);

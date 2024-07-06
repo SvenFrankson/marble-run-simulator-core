@@ -1,36 +1,23 @@
-namespace MarbleRunSimulatorCore {
-    export class Track {
-        public wires: Wire[];
+/// <reference path="Track.ts"/>
 
-        public get templateInterpolatedPoints(): BABYLON.Vector3[] {
-            return this.template.interpolatedPoints;
-        }
-        public trackInterpolatedNormals: BABYLON.Vector3[];
+namespace MarbleRunSimulatorCore {
+    export class PipeTrack extends Track {
+        public mesh: BABYLON.Mesh;
+        public tubePath: BABYLON.Vector3[] = [];
 
         public get preferedStartBank(): number {
-            return this.template ? this.template.preferedStartBank : 0;
-        }
-        private _startWorldPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-        public get startWorldPosition(): BABYLON.Vector3 {
-            this._startWorldPosition.copyFrom(this.part.position).addInPlace(this.templateInterpolatedPoints[0]);
-            return this._startWorldPosition;
+            return 0;
         }
 
         public get preferedEndBank(): number {
-            return this.template ? this.template.preferedEndBank : 0;
-        }
-        private _endWorldPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-        public get endWorldPosition(): BABYLON.Vector3 {
-            this._endWorldPosition.copyFrom(this.part.position).addInPlace(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1]);
-            return this._endWorldPosition;
+            return 0;
         }
 
         public AABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public AABBMax: BABYLON.Vector3 = BABYLON.Vector3.Zero();
 
-        public template: TrackTemplate;
-
-        constructor(public part: MachinePart) {
+        constructor(part: MachinePart) {
+            super(part);
             this.wires = [new Wire(this.part), new Wire(this.part)];
         }
 
@@ -56,15 +43,6 @@ namespace MarbleRunSimulatorCore {
         }
 
         public getBankAt(index: number): number {
-            let trackpoint = this.template.trackpoints[index];
-            if (trackpoint) {
-                let n = trackpoint.normal;
-                if (n.y < 0) {
-                    n = n.scale(-1);
-                }
-                let angle = Mummu.AngleFromToAround(trackpoint.normal, BABYLON.Axis.Y, trackpoint.dir);
-                return (angle / Math.PI) * 180;
-            }
             return 0;
         }
 
@@ -98,77 +76,7 @@ namespace MarbleRunSimulatorCore {
             let N = this.templateInterpolatedPoints.length;
 
             let angles = [...this.template.angles];
-            this.trackInterpolatedNormals = this.template.interpolatedNormals.map((v) => {
-                return v.clone();
-            });
-
-            let startBank = this.preferedStartBank;
-            if (!forceDisconnexion) {
-                let otherS = this.part.machine.getBankAt(this.startWorldPosition, this.part);
-                if (otherS) {
-                    this.part.addNeighbour(otherS.part);
-    
-                    if (otherS.pipeTrack) {
-                        startBank = 0;
-                    }
-                    else {
-                        let otherBank = otherS.bank * (otherS.isEnd ? 1 : -1);
-                        if (this.preferedStartBank * otherBank >= 0) {
-                            startBank = Math.sign(this.preferedStartBank + otherBank) * Math.max(Math.abs(this.preferedStartBank), Math.abs(otherBank));
-                        } else {
-                            startBank = this.preferedStartBank * 0.5 + otherBank * 0.5;
-                        }
-                    }
-                }
-            }
-
-            let endBank = this.preferedEndBank;
-            if (!forceDisconnexion) {
-                let otherE = this.part.machine.getBankAt(this.endWorldPosition, this.part);
-                if (otherE) {
-                    this.part.addNeighbour(otherE.part);
-
-                    if (otherE.pipeTrack) {
-                        endBank = 0;
-                    }
-                    else {
-                        let otherBank = otherE.bank * (otherE.isEnd ? -1 : 1);
-                        if (this.preferedEndBank * otherBank >= 0) {
-                            endBank = Math.sign(this.preferedEndBank + otherBank) * Math.max(Math.abs(this.preferedEndBank), Math.abs(otherBank));
-                        } else {
-                            endBank = this.preferedEndBank * 0.5 + otherBank * 0.5;
-                        }
-                    }
-                }
-            }
-
-            angles[0] = startBank;
-            angles[angles.length - 1] = endBank;
-            let f = 1;
-            for (let n = 0; n < this.template.partTemplate.angleSmoothSteps; n++) {
-                for (let i = 1; i < N - 1; i++) {
-                    let aPrev = angles[i - 1];
-                    let a = angles[i];
-                    let point = this.templateInterpolatedPoints[i];
-                    let aNext = angles[i + 1];
-
-                    if (isFinite(aPrev) && isFinite(aNext)) {
-                        let prevPoint = this.templateInterpolatedPoints[i - 1];
-                        let distPrev = BABYLON.Vector3.Distance(prevPoint, point);
-
-                        let nextPoint = this.templateInterpolatedPoints[i + 1];
-                        let distNext = BABYLON.Vector3.Distance(nextPoint, point);
-
-                        let d = distPrev / (distPrev + distNext);
-
-                        angles[i] = (1 - f) * a + f * ((1 - d) * aPrev + d * aNext);
-                    } else if (isFinite(aPrev)) {
-                        angles[i] = (1 - f) * a + f * aPrev;
-                    } else if (isFinite(aNext)) {
-                        angles[i] = (1 - f) * a + f * aNext;
-                    }
-                }
-            }      
+            angles = angles.map(a => { return 0; });
 
             for (let i = 0; i < N; i++) {
                 let prevPoint = this.templateInterpolatedPoints[i - 1];
@@ -229,9 +137,20 @@ namespace MarbleRunSimulatorCore {
         }
 
         public recomputeAbsolutePath(): void {
-            this.wires.forEach((wire) => {
-                wire.recomputeAbsolutePath();
+            let points = [...this.templateInterpolatedPoints].map((p) => {
+                return p.clone();
             });
+            let normals = [...this.trackInterpolatedNormals].map((p) => {
+                return p.clone();
+            });
+
+            this.tubePath = points.map((pt, i) => {
+                return pt.add(normals[i].scale(0.008));
+            });
+
+            for (let i = 0; i < this.tubePath.length; i++) {
+                BABYLON.Vector3.TransformCoordinatesToRef(this.tubePath[i], this.part.getWorldMatrix(), this.tubePath[i]);
+            }
         }
     }
 }

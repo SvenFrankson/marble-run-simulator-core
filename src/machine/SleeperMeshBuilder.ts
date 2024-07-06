@@ -83,6 +83,10 @@ namespace MarbleRunSimulatorCore {
                         addSleeper = false;
                     }
 
+                    if (track instanceof PipeTrack) {
+                        addSleeper = false;
+                    }
+
                     let anchor: BABYLON.Vector3 = BABYLON.Vector3.Zero();
                     if (addSleeper && sleeperPieceVertexData) {
                         anchor = new BABYLON.Vector3(0, - part.wireGauge * 0.5, 0);
