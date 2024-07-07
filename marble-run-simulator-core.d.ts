@@ -101,6 +101,7 @@ declare namespace MarbleRunSimulatorCore {
         private _wallpapers;
         getWallpaperMaterial(index: number): BABYLON.Material;
         cableMaterial: BABYLON.Material;
+        chainMaterial: BABYLON.Material;
         velvetMaterial: BABYLON.StandardMaterial;
         logoMaterial: BABYLON.StandardMaterial;
         baseAxisMaterial: BABYLON.StandardMaterial;
@@ -1056,10 +1057,16 @@ declare namespace MarbleRunSimulatorCore {
         pistonBody: BABYLON.Mesh;
         pistonMove: BABYLON.Mesh;
         pistonBielle: BABYLON.Mesh;
+        chain: BABYLON.Mesh;
+        courroie: BABYLON.Mesh;
         speed: number;
         x: number;
+        rLargeWheel: number;
+        rSmallWheel: number;
         rGear: number;
+        pGear: number;
         chainLength: number;
+        baseChainUVs: number[];
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;

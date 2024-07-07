@@ -793,6 +793,14 @@ var MarbleRunSimulatorCore;
             cableMaterialPBR.lightmapTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
             cableMaterialPBR.environmentTexture = envTexture;
             this.cableMaterial = cableMaterial;
+            let chainMaterial = new BABYLON.StandardMaterial("cable-material");
+            chainMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/chain.png");
+            chainMaterial.diffuseColor.copyFromFloats(1, 1, 1);
+            chainMaterial.specularColor = new BABYLON.Color3(1, 1, 1).scale(0.5);
+            chainMaterial.emissiveColor = chainMaterial.diffuseColor.scale(0.5);
+            chainMaterial.roughness = 0.15;
+            chainMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.chainMaterial = chainMaterial;
             /*
             let makeMetalBallMaterial = (name: string, textureName: string) => {
                 let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
@@ -8338,10 +8346,14 @@ var MarbleRunSimulatorCore;
     class SteamElevator extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            this.speed = 0.04; // in m/s
+            this.speed = 0.05; // in m/s
             this.x = 0;
-            this.rGear = 0.02;
+            this.rLargeWheel = 0.06;
+            this.rSmallWheel = 0.02;
+            this.rGear = 0.022;
+            this.pGear = 1;
             this.chainLength = 1;
+            this.baseChainUVs = [];
             this.reset = () => {
                 this.update(0);
             };
@@ -8358,16 +8370,16 @@ var MarbleRunSimulatorCore;
             this.gearBottom.position.y = -MarbleRunSimulatorCore.tileHeight * this.h;
             this.gearBottom.parent = this;
             this.largeWheel = new BABYLON.Mesh("largeWheel");
-            this.largeWheel.position.z = -0.05;
+            this.largeWheel.position.z = -0.035;
             this.largeWheel.parent = this.gearBottom;
             this.engineAxis = new BABYLON.Mesh("engineAxis");
             this.engineAxis.position.y = -MarbleRunSimulatorCore.tileHeight * this.h - 0.1;
             this.engineAxis.parent = this;
             this.flyWheel = new BABYLON.Mesh("flyWheel");
-            this.flyWheel.position.z = 0.05;
+            this.flyWheel.position.z = 0.035;
             this.flyWheel.parent = this.engineAxis;
             this.smallWheel = new BABYLON.Mesh("smallWheel");
-            this.smallWheel.position.z = -0.05;
+            this.smallWheel.position.z = -0.035;
             this.smallWheel.parent = this.engineAxis;
             this.pistonBody = new BABYLON.Mesh("pistonBody");
             this.pistonBody.position.x = -0.05;
@@ -8377,7 +8389,15 @@ var MarbleRunSimulatorCore;
             this.pistonMove.parent = this.pistonBody;
             this.pistonBielle = new BABYLON.Mesh("pistonBielle");
             this.pistonBielle.parent = this.pistonMove;
-            this.chainLength = 2 * MarbleRunSimulatorCore.tileHeight * this.h + 2 * Math.PI * this.rGear;
+            this.pGear = 2 * Math.PI * this.rGear;
+            this.chainLength = 2 * MarbleRunSimulatorCore.tileHeight * this.h + this.pGear;
+            this.chain = new BABYLON.Mesh("chain");
+            this.chain.parent = this;
+            this.chain.material = this.game.materials.chainMaterial;
+            this.courroie = new BABYLON.Mesh("courroie");
+            this.courroie.position.z = -0.035;
+            this.courroie.scaling.z = 2.5;
+            this.courroie.parent = this;
             this.generateWires();
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
@@ -8403,6 +8423,52 @@ var MarbleRunSimulatorCore;
             this.pistonMove.material = this.game.materials.getMaterial(1);
             datas[7].applyToMesh(this.pistonBody);
             this.pistonBody.material = this.game.materials.getMaterial(1);
+            let nCable = 6;
+            let rChain = 0.003;
+            let x0 = this.gearBottom.position.x;
+            let y0 = this.gearBottom.position.y;
+            let pathCable = [];
+            for (let i = 0; i <= 12; i++) {
+                let a = (i / 12) * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                pathCable.push(new BABYLON.Vector3(x0 + cosa * this.rGear, y0 - sina * this.rGear));
+            }
+            x0 = this.gearTop.position.x;
+            y0 = this.gearTop.position.y;
+            for (let i = 0; i < 12; i++) {
+                let a = (i / 12) * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                pathCable.push(new BABYLON.Vector3(x0 - cosa * this.rGear, y0 + sina * this.rGear));
+            }
+            let chainData = Mummu.CreateWireVertexData({ path: pathCable, tesselation: 4, radius: rChain, color: new BABYLON.Color4(1, 1, 1, 1), closed: true, textureRatio: 1.2, bissectFirstRayon: true });
+            this.baseChainUVs = [...chainData.uvs];
+            for (let i = 0; i < this.baseChainUVs.length / 2; i++) {
+                this.baseChainUVs[2 * i + 1] += 0.25;
+            }
+            chainData.uvs = this.baseChainUVs;
+            chainData.applyToMesh(this.chain);
+            let rCourroie = 0.002;
+            x0 = this.engineAxis.position.x;
+            y0 = this.engineAxis.position.y;
+            pathCable = [];
+            for (let i = 0; i <= 16; i++) {
+                let a = Math.PI / 10 + (i / 16) * 8 * Math.PI / 10;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                pathCable.push(new BABYLON.Vector3(x0 + cosa * this.rSmallWheel, y0 - sina * this.rSmallWheel));
+            }
+            x0 = this.gearBottom.position.x;
+            y0 = this.gearBottom.position.y;
+            for (let i = 0; i <= 16; i++) {
+                let a = -Math.PI / 10 + (i / 16) * 12 * Math.PI / 10;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                pathCable.push(new BABYLON.Vector3(x0 - cosa * this.rLargeWheel, y0 + sina * this.rLargeWheel));
+            }
+            let courroieData = Mummu.CreateWireVertexData({ path: pathCable, tesselation: 4, radius: rCourroie, color: new BABYLON.Color4(1, 1, 1, 1), closed: true, textureRatio: 4, bissectFirstRayon: true });
+            courroieData.applyToMesh(this.courroie);
         }
         static GenerateTemplate(h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -8458,9 +8524,18 @@ var MarbleRunSimulatorCore;
             while (this.x > this.chainLength) {
                 this.x -= this.chainLength;
             }
-            this.gearBottom.rotation.z = this.x / this.rGear;
-            this.gearTop.rotation.z = this.x / this.rGear;
-            this.engineAxis.rotation.z = 2 * this.gearBottom.rotation.z;
+            let deltaAngle = (this.speed * dt / this.pGear) * 2 * Math.PI;
+            this.gearBottom.rotation.z += deltaAngle;
+            this.gearBottom.rotation.z = Nabu.In0_2PIRange(this.gearBottom.rotation.z);
+            let newCablesUvs = [...this.baseChainUVs];
+            for (let i = 0; i < newCablesUvs.length / 2; i++) {
+                newCablesUvs[2 * i + 1] += this.gearTop.rotation.z / (2 * Math.PI) * 12 * 0.5;
+            }
+            this.chain.setVerticesData(BABYLON.VertexBuffer.UVKind, newCablesUvs);
+            this.gearTop.rotation.z += deltaAngle;
+            this.gearTop.rotation.z = Nabu.In0_2PIRange(this.gearTop.rotation.z);
+            this.engineAxis.rotation.z += (this.rLargeWheel / this.rSmallWheel) * deltaAngle;
+            this.engineAxis.rotation.z = Nabu.In0_2PIRange(this.engineAxis.rotation.z);
             let xOff = 0.01 * Math.cos(this.engineAxis.rotation.z);
             let yOff = 0.01 * Math.sin(this.engineAxis.rotation.z);
             let pistonBielleLength = 0.04;
