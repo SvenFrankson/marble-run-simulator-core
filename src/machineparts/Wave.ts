@@ -18,6 +18,12 @@ namespace MarbleRunSimulatorCore {
             template.d = d;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
+            
+            template.xExtendable = true;
+            template.yExtendable = true;
+            template.zExtendable = true;
+            template.mirrorX = mirrorX;
+            template.mirrorZ = mirrorZ;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -90,6 +96,7 @@ namespace MarbleRunSimulatorCore {
                 c: this.colors,
                 mirrorX: mirrorX,
                 mirrorZ: mirrorZ,
+                pipeVersion: this.tracks[0].template.isPipe
             });
         }
     }
