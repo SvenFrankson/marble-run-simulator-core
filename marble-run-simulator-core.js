@@ -677,6 +677,11 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
+    let MaterialType;
+    (function (MaterialType) {
+        MaterialType[MaterialType["Plastic"] = 0] = "Plastic";
+        MaterialType[MaterialType["Metal"] = 1] = "Metal";
+    })(MaterialType = MarbleRunSimulatorCore.MaterialType || (MarbleRunSimulatorCore.MaterialType = {}));
     class MainMaterials {
         constructor(game) {
             this.game = game;
@@ -880,6 +885,12 @@ var MarbleRunSimulatorCore;
                 return this._materialsPBR[colorIndex % this._materialsPBR.length];
             }
             return this._materialsSTD[colorIndex % this._materialsSTD.length];
+        }
+        getMaterialType(colorIndex) {
+            if (colorIndex >= 6 && colorIndex <= 14) {
+                return MaterialType.Plastic;
+            }
+            return MaterialType.Metal;
         }
         get metalMaterialsCount() {
             return Math.min(this._materialsPBR.length, this._materialsSTD.length);
@@ -4190,7 +4201,6 @@ var MarbleRunSimulatorCore;
             for (let j = 0; j < part.tracks.length; j++) {
                 let track = part.tracks[j];
                 let colorIndex = track.part.getColor(track.template.colorIndex);
-                let plasticIndex = 6;
                 let interpolatedPoints = track.templateInterpolatedPoints;
                 let summedLength = [0];
                 for (let i = 1; i < interpolatedPoints.length; i++) {
@@ -4203,7 +4213,7 @@ var MarbleRunSimulatorCore;
                 count = Math.max(1, count);
                 let correctedSpacing = summedLength[summedLength.length - 1] / count;
                 let radiusShape = part.wireSize * 0.5 * 0.75;
-                if (colorIndex >= plasticIndex) {
+                if (part.game.materials.getMaterialType(colorIndex) === MarbleRunSimulatorCore.MaterialType.Plastic) {
                     radiusShape *= 2;
                 }
                 let nShape = 4;
@@ -4214,7 +4224,7 @@ var MarbleRunSimulatorCore;
                     let sina = Math.sin(a);
                     shape[i] = new BABYLON.Vector3(cosa * radiusShape, sina * radiusShape, 0);
                 }
-                let sleeperPieceVertexDataTypeIndex = colorIndex >= plasticIndex ? 3 : 0;
+                let sleeperPieceVertexDataTypeIndex = (part.game.materials.getMaterialType(colorIndex) === MarbleRunSimulatorCore.MaterialType.Plastic) ? 3 : 0;
                 if (q === 1) {
                     sleeperPieceVertexDataTypeIndex += 1;
                 }

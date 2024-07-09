@@ -88,11 +88,16 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    enum MaterialType {
+        Plastic = 0,
+        Metal = 1
+    }
     class MainMaterials {
         game: IGame;
         private _materialsPBR;
         private _materialsSTD;
         getMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
+        getMaterialType(colorIndex: number): MaterialType;
         get metalMaterialsCount(): number;
         private _ballMaterialsPBR;
         private _ballMaterialsSTD;

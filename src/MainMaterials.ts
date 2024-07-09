@@ -1,4 +1,9 @@
 namespace MarbleRunSimulatorCore {
+    export enum MaterialType {
+        Plastic,
+        Metal
+    }
+    
     export class MainMaterials {
         private _materialsPBR: BABYLON.Material[] = [];
         private _materialsSTD: BABYLON.Material[] = [];
@@ -11,6 +16,12 @@ namespace MarbleRunSimulatorCore {
                 return this._materialsPBR[colorIndex % this._materialsPBR.length];
             }
             return this._materialsSTD[colorIndex % this._materialsSTD.length];
+        }
+        public getMaterialType(colorIndex: number): MaterialType {
+            if (colorIndex >= 6 && colorIndex <= 14) {
+                return MaterialType.Plastic;
+            }
+            return MaterialType.Metal;
         }
         public get metalMaterialsCount(): number {
             return Math.min(this._materialsPBR.length, this._materialsSTD.length);
