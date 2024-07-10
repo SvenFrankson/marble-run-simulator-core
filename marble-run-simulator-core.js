@@ -892,6 +892,16 @@ var MarbleRunSimulatorCore;
             }
             return MaterialType.Metal;
         }
+        getMaterialHexBaseColor(colorIndex) {
+            let material = this.getMaterial(colorIndex);
+            if (material instanceof BABYLON.StandardMaterial) {
+                return material.diffuseColor.toHexString();
+            }
+            if (material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
+                return material.baseColor.toHexString();
+            }
+            return "#ffffff";
+        }
         get metalMaterialsCount() {
             return Math.min(this._materialsPBR.length, this._materialsSTD.length);
         }

@@ -23,6 +23,16 @@ namespace MarbleRunSimulatorCore {
             }
             return MaterialType.Metal;
         }
+        public getMaterialHexBaseColor(colorIndex: number): string {
+            let material = this.getMaterial(colorIndex);
+            if (material instanceof BABYLON.StandardMaterial) {
+                return material.diffuseColor.toHexString();
+            }
+            if (material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
+                return material.baseColor.toHexString();
+            }
+            return "#ffffff";
+        }
         public get metalMaterialsCount(): number {
             return Math.min(this._materialsPBR.length, this._materialsSTD.length);
         }

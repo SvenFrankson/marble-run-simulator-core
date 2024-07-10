@@ -98,6 +98,7 @@ declare namespace MarbleRunSimulatorCore {
         private _materialsSTD;
         getMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
         getMaterialType(colorIndex: number): MaterialType;
+        getMaterialHexBaseColor(colorIndex: number): string;
         get metalMaterialsCount(): number;
         private _ballMaterialsPBR;
         private _ballMaterialsSTD;
