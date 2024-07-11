@@ -14,6 +14,10 @@ namespace MarbleRunSimulatorCore {
             let partName = "elevator-" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
+            for (let i = this.colors.length; i < 4; i++) {
+                this.colors[i] = 0;
+            }
+
             let x = 1;
             if (prop.mirrorX) {
                 x = -1;
@@ -42,6 +46,7 @@ namespace MarbleRunSimulatorCore {
                 let nRamp = 12;
 
                 let rampWire0 = new Wire(this);
+                rampWire0.colorIndex = 2;
                 rampWire0.path = [new BABYLON.Vector3(-0.02 * x, 0.0015, rRamp)];
                 for (let i = 0; i <= nRamp * 0.5; i++) {
                     let a = (i / nRamp) * Math.PI;
@@ -52,6 +57,7 @@ namespace MarbleRunSimulatorCore {
                 rampWire0.parent = box;
 
                 let rampWire1 = new Wire(this);
+                rampWire1.colorIndex = 2;
                 rampWire1.path = [];
                 for (let i = nRamp * 0.5; i <= nRamp; i++) {
                     let a = (i / nRamp) * Math.PI;
@@ -120,8 +126,8 @@ namespace MarbleRunSimulatorCore {
             let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 0);
             wheelData.applyToMesh(this.wheels[0]);
             wheelData.applyToMesh(this.wheels[1]);
-            this.wheels[0].material = this.game.materials.getMaterial(0);
-            this.wheels[1].material = this.game.materials.getMaterial(0);
+            this.wheels[0].material = this.game.materials.getMaterial(this.getColor(3));
+            this.wheels[1].material = this.game.materials.getMaterial(this.getColor(3));
         }
 
         public static GenerateTemplate(h: number, mirrorX: boolean) {
@@ -156,6 +162,7 @@ namespace MarbleRunSimulatorCore {
             let vertX: number = tileWidth * 0.5 + 0.01 - cupR;
 
             template.trackTemplates[0] = new TrackTemplate(template);
+            template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * h, 0), dir),
 
@@ -169,6 +176,7 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].drawEndTip = true;
 
             template.trackTemplates[1] = new TrackTemplate(template);
+            template.trackTemplates[1].colorIndex = 1;
             template.trackTemplates[1].trackpoints = [
                 new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dirLeft),
                 new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-0.008 + tileWidth * 0.5, -tileHeight * 0.5, 0), dirRight)
