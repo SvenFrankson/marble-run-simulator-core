@@ -78,6 +78,24 @@ namespace MarbleRunSimulatorCore {
             let angles = [...this.template.angles];
             angles = angles.map(a => { return 0; });
 
+            let startBank = this.preferedStartBank;
+            if (!forceDisconnexion) {
+                let otherS = this.part.machine.getBankAt(this.startWorldPosition, this.part);
+                if (otherS) {
+                    this.part.addNeighbour(otherS.part);
+                    startBank = 0;
+                }
+            }
+
+            let endBank = this.preferedEndBank;
+            if (!forceDisconnexion) {
+                let otherE = this.part.machine.getBankAt(this.endWorldPosition, this.part);
+                if (otherE) {
+                    this.part.addNeighbour(otherE.part);
+                    endBank = 0;
+                }
+            }
+
             for (let i = 0; i < N; i++) {
                 let prevPoint = this.templateInterpolatedPoints[i - 1];
                 let point = this.templateInterpolatedPoints[i];

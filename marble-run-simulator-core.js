@@ -2563,12 +2563,26 @@ var MarbleRunSimulatorCore;
         let sina = Math.sin(a);
         selectorHullShapeDisplayTip[i] = new BABYLON.Vector3(cosa * 0.01, sina * 0.01, 0);
     }
+    var selectorHullPipeShapeDisplayTip = [];
+    for (let i = 0; i < 10; i++) {
+        let a = (i / 10) * 2 * Math.PI;
+        let cosa = Math.cos(a);
+        let sina = Math.sin(a);
+        selectorHullPipeShapeDisplayTip[i] = new BABYLON.Vector3(cosa * 0.014, sina * 0.014, 0);
+    }
     var selectorHullShapeDisplay = [];
     for (let i = 0; i < 10; i++) {
         let a = (i / 10) * 2 * Math.PI;
         let cosa = Math.cos(a);
         let sina = Math.sin(a);
         selectorHullShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0);
+    }
+    var selectorHullPipeShapeDisplay = [];
+    for (let i = 0; i < 10; i++) {
+        let a = (i / 10) * 2 * Math.PI;
+        let cosa = Math.cos(a);
+        let sina = Math.sin(a);
+        selectorHullPipeShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.012, sina * 0.012, 0);
     }
     class MachinePartSelectorMesh extends BABYLON.Mesh {
         constructor(part) {
@@ -3170,14 +3184,21 @@ var MarbleRunSimulatorCore;
                 let points = [...this.tracks[n].templateInterpolatedPoints].map((p) => {
                     return p.clone();
                 });
+                if (this.tracks[n].template.isPipe) {
+                    let normals = this.tracks[n].trackInterpolatedNormals;
+                    points = points.map((pt, i) => {
+                        return pt.add(normals[i].scale(0.008));
+                    });
+                }
                 Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI);
-                if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(points[0])) {
-                    let endPoint = this.findEndPoint(points[0]);
+                if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[0])) {
+                    let endPoint = this.findEndPoint(this.tracks[n].templateInterpolatedPoints[0]);
                     if (endPoint) {
                         let originTip = [];
                         Mummu.RemoveFromStartForDistanceInPlace(points, 0.017, originTip);
                         Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.002);
-                        let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                        let shapeTip = this.tracks[n].template.isPipe ? selectorHullPipeShapeDisplayTip : selectorHullShapeDisplayTip;
+                        let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: shapeTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
                         selectorMeshDisplayVertexDatas.push(dataOriginTip);
                         let selectorEndpoint = new BABYLON.Mesh("selector-endpoint-start");
@@ -3196,13 +3217,14 @@ var MarbleRunSimulatorCore;
                         this.selectorEndpointsLogic.push(selectorOriginMeshLogic);
                     }
                 }
-                if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(points[points.length - 1])) {
-                    let endPoint = this.findEndPoint(points[points.length - 1]);
+                if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[this.tracks[n].templateInterpolatedPoints.length - 1])) {
+                    let endPoint = this.findEndPoint(this.tracks[n].templateInterpolatedPoints[this.tracks[n].templateInterpolatedPoints.length - 1]);
                     if (endPoint) {
                         let destinationTip = [];
                         Mummu.RemoveFromEndForDistanceInPlace(points, 0.017, destinationTip);
                         Mummu.RemoveFromStartForDistanceInPlace(destinationTip, 0.002);
-                        let dataDestinationTip = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplayTip, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                        let shapeTip = this.tracks[n].template.isPipe ? selectorHullPipeShapeDisplayTip : selectorHullShapeDisplayTip;
+                        let dataDestinationTip = Mummu.CreateExtrudeShapeVertexData({ shape: shapeTip, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataDestinationTip, BABYLON.Color3.FromHexString("#80FFFF"));
                         selectorMeshDisplayVertexDatas.push(dataDestinationTip);
                         let selectorEndpoint = new BABYLON.Mesh("selector-endpoint-end");
@@ -3222,7 +3244,8 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 if (points.length >= 2) {
-                    let dataDisplay = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeDisplay, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    let shape = this.tracks[n].template.isPipe ? selectorHullPipeShapeDisplay : selectorHullShapeDisplay;
+                    let dataDisplay = Mummu.CreateExtrudeShapeVertexData({ shape: shape, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                     Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#00FFFF"));
                     selectorMeshDisplayVertexDatas.push(dataDisplay);
                     let dataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
@@ -4068,6 +4091,22 @@ var MarbleRunSimulatorCore;
             let N = this.templateInterpolatedPoints.length;
             let angles = [...this.template.angles];
             angles = angles.map(a => { return 0; });
+            let startBank = this.preferedStartBank;
+            if (!forceDisconnexion) {
+                let otherS = this.part.machine.getBankAt(this.startWorldPosition, this.part);
+                if (otherS) {
+                    this.part.addNeighbour(otherS.part);
+                    startBank = 0;
+                }
+            }
+            let endBank = this.preferedEndBank;
+            if (!forceDisconnexion) {
+                let otherE = this.part.machine.getBankAt(this.endWorldPosition, this.part);
+                if (otherE) {
+                    this.part.addNeighbour(otherE.part);
+                    endBank = 0;
+                }
+            }
             for (let i = 0; i < N; i++) {
                 let prevPoint = this.templateInterpolatedPoints[i - 1];
                 let point = this.templateInterpolatedPoints[i];
