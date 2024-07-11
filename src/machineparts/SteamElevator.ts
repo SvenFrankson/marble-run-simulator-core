@@ -15,8 +15,8 @@ namespace MarbleRunSimulatorCore {
 
         public speed: number = 0.05; // in m/s
         public x: number = 0;
-        public rLargeWheel: number = 0.06;
-        public rSmallWheel: number = 0.02;
+        public rLargeWheel: number = 0.045;
+        public rSmallWheel: number = 0.01;
         public rGear: number = 0.022;
         public pGear: number = 1;
         public chainLength: number = 1;
@@ -34,10 +34,12 @@ namespace MarbleRunSimulatorCore {
             }
             
             this.gearTop = new BABYLON.Mesh("gearTop");
+            this.gearTop.position.x = tileWidth;
             this.gearTop.position.y = 0;
             this.gearTop.parent = this;
 
             this.gearBottom = new BABYLON.Mesh("gearBottom");
+            this.gearBottom.position.x = tileWidth;
             this.gearBottom.position.y = - tileHeight * this.h;
             this.gearBottom.parent = this;
 
@@ -46,7 +48,8 @@ namespace MarbleRunSimulatorCore {
             this.largeWheel.parent = this.gearBottom;
 
             this.engineAxis = new BABYLON.Mesh("engineAxis");
-            this.engineAxis.position.y = - tileHeight * this.h - 0.1;
+            this.engineAxis.position.x = tileWidth;
+            this.engineAxis.position.y = - tileHeight * this.h - 0.07;
             this.engineAxis.parent = this;
 
             this.flyWheel = new BABYLON.Mesh("flyWheel");
@@ -58,8 +61,8 @@ namespace MarbleRunSimulatorCore {
             this.smallWheel.parent = this.engineAxis;
 
             this.pistonBody = new BABYLON.Mesh("pistonBody");
-            this.pistonBody.position.x = - 0.05;
-            this.pistonBody.position.y = - tileHeight * this.h - 0.1;
+            this.pistonBody.position.x = tileWidth - 0.04;
+            this.pistonBody.position.y = - tileHeight * this.h - 0.07;
             this.pistonBody.parent = this;
 
             this.pistonMove = new BABYLON.Mesh("pistonMove");
@@ -77,7 +80,7 @@ namespace MarbleRunSimulatorCore {
             
             this.courroie = new BABYLON.Mesh("courroie");
             this.courroie.position.z = - 0.035;
-            this.courroie.scaling.z = 2.5;
+            this.courroie.scaling.z = 1.25;
             this.courroie.parent = this;
 
             this.generateWires();
@@ -244,7 +247,7 @@ namespace MarbleRunSimulatorCore {
             }
 
 
-            let deltaAngle = (this.speed * dt / this.pGear) * 2 * Math.PI;
+            let deltaAngle = - (this.speed * dt / this.pGear) * 2 * Math.PI;
             this.gearBottom.rotation.z += deltaAngle;
             this.gearBottom.rotation.z = Nabu.In0_2PIRange(this.gearBottom.rotation.z);
 
@@ -266,7 +269,7 @@ namespace MarbleRunSimulatorCore {
             let pistonBielleLength = 0.04;
             let d = Math.sqrt(pistonBielleLength * pistonBielleLength - yOff * yOff);
 
-            this.pistonMove.position.x = 0.05 - (d - xOff);
+            this.pistonMove.position.x = 0.04 - (d - xOff);
             this.pistonBielle.rotation.z = Math.atan(yOff / d);
 
             this.getChildMeshes().forEach((child) => {
