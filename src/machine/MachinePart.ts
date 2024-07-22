@@ -816,7 +816,7 @@ namespace MarbleRunSimulatorCore {
             }
             this.selectorBodyDisplay.material = this.game.materials.whiteFullLitMaterial;
             this.selectorBodyDisplay.parent = this;
-            if (selectorMeshDisplayVertexDatas.length) {
+            if (selectorMeshDisplayVertexDatas.length > 0) {
                 Mummu.MergeVertexDatas(...selectorMeshDisplayVertexDatas).applyToMesh(this.selectorBodyDisplay);
             }
             this.selectorBodyDisplay.visibility = 0;

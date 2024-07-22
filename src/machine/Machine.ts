@@ -742,6 +742,21 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        public static MachineDataCompare(d1: IMachineData, d2: IMachineData): boolean {
+            if (d1 && d2) {
+                if (d1.v === d2.v) {
+                    if (d1.n === d2.n) {
+                        if (d1.a === d2.a) {
+                            if (d1.d && d1.d === d2.d) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         public serialize(): IMachineData {
             return this.serializeV8();
         }
@@ -1005,7 +1020,9 @@ namespace MarbleRunSimulatorCore {
             return data;
         }
 
+        public lastDeserializedData: IMachineData;
         public deserialize(data: IMachineData): void {
+            this.lastDeserializedData = data;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.isChallengeMachine = false;
             if (data) {

@@ -1840,6 +1840,20 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
+        static MachineDataCompare(d1, d2) {
+            if (d1 && d2) {
+                if (d1.v === d2.v) {
+                    if (d1.n === d2.n) {
+                        if (d1.a === d2.a) {
+                            if (d1.d && d1.d === d2.d) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
         serialize() {
             return this.serializeV8();
         }
@@ -2071,6 +2085,7 @@ var MarbleRunSimulatorCore;
             return data;
         }
         deserialize(data) {
+            this.lastDeserializedData = data;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.isChallengeMachine = false;
             if (data) {
@@ -3258,7 +3273,7 @@ var MarbleRunSimulatorCore;
             }
             this.selectorBodyDisplay.material = this.game.materials.whiteFullLitMaterial;
             this.selectorBodyDisplay.parent = this;
-            if (selectorMeshDisplayVertexDatas.length) {
+            if (selectorMeshDisplayVertexDatas.length > 0) {
                 Mummu.MergeVertexDatas(...selectorMeshDisplayVertexDatas).applyToMesh(this.selectorBodyDisplay);
             }
             this.selectorBodyDisplay.visibility = 0;

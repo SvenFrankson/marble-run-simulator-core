@@ -309,11 +309,13 @@ declare namespace MarbleRunSimulatorCore {
             part: MachinePart;
             pipeTrack: boolean;
         };
+        static MachineDataCompare(d1: IMachineData, d2: IMachineData): boolean;
         serialize(): IMachineData;
         serializeV1(): IMachineData;
         serializeV2(): IMachineData;
         serializeV3456(version: number): IMachineData;
         serializeV8(): IMachineData;
+        lastDeserializedData: IMachineData;
         deserialize(data: IMachineData): void;
         deserializeV1(data: IMachineData): void;
         deserializeV2(data: IMachineData): void;
