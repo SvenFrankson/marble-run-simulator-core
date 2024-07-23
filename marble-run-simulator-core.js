@@ -2237,10 +2237,6 @@ var MarbleRunSimulatorCore;
             if (dataString) {
                 if (data.n) {
                     this.name = data.n;
-                    // Lol
-                    if (this.name === "Cable Management Final") {
-                        this.minimalAutoQualityFailed = GraphicQuality.High;
-                    }
                 }
                 if (data.a) {
                     this.author = data.a;
