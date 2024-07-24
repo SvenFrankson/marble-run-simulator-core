@@ -38,6 +38,7 @@ namespace MarbleRunSimulatorCore {
         h?: number;
         d?: number;
         n?: number;
+        s?: number;
         c?: number[];
         mirrorX?: boolean;
         mirrorZ?: boolean;
@@ -110,7 +111,11 @@ namespace MarbleRunSimulatorCore {
                 let argStr = partName.split("-")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
+                    let s = parseInt(argStr.split(".")[1]);
                     prop.w = w;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
                 }
                 return new Snake(this.machine, prop);
             }
@@ -119,8 +124,12 @@ namespace MarbleRunSimulatorCore {
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
+                    let s = parseInt(argStr.split(".")[2]);
                     prop.h = h;
                     prop.d = d;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
                 }
                 return new UTurn(this.machine, prop);
             }
@@ -278,6 +287,10 @@ namespace MarbleRunSimulatorCore {
         }
 
         public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
+            if (isNaN(prop.s)) {
+                prop.s = TrackSpeed.Medium;
+            }
+            
             if (baseName === "ramp") {
                 return new Ramp(this.machine, prop);
             }

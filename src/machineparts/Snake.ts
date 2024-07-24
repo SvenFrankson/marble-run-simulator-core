@@ -5,25 +5,27 @@ namespace MarbleRunSimulatorCore {
 
             prop.w = Math.max(prop.w, 2);
 
-            let partName = "snake-" + prop.w.toFixed(0);
+            let partName = "snake-" + prop.w.toFixed(0) + "." + prop.s.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
 
-        public static GenerateTemplate(w: number = 1, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(w: number, s: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "snake-" + w.toFixed(0);
+            template.partName = "snake-" + w.toFixed(0) + "." + s.toFixed(0);
             template.angleSmoothSteps = 40;
             template.maxAngle = Math.PI / 8;
 
             template.w = w;
             template.h = 0;
             template.d = 3;
+            template.s = s;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
 
             template.xExtendable = true;
+            template.sExtendable = true;
             template.xMirrorable = true;
             template.zMirrorable = true;
 
@@ -98,6 +100,7 @@ namespace MarbleRunSimulatorCore {
                 }
             }
             template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], end, dir, undefined, 1));
+            template.maxAngle = Math.PI / 4 / 2 * template.s;
 
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();

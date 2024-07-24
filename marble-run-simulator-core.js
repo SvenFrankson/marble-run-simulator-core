@@ -29,6 +29,7 @@ var MarbleRunSimulatorCore;
             this.constructorIndex = 0;
             this.size = 0.016;
             this.velocity = BABYLON.Vector3.Zero();
+            this.boosting = true;
             this.rotationSpeed = 0;
             this.rotationAxis = BABYLON.Vector3.Right();
             this.surface = Surface.Rail;
@@ -606,14 +607,25 @@ var MarbleRunSimulatorCore;
                     if (this.surface === Surface.Velvet) {
                         friction = this.velocity.scale(-1).scaleInPlace(0.02);
                     }
-                    let acceleration = weight
-                        .add(reactions)
-                        .add(friction)
-                        .scaleInPlace(1 / m);
+                    let acceleration = weight;
+                    if (this.boosting) {
+                        /*
+                        let boost = BABYLON.Vector3.Right();
+                        if (this.velocity.lengthSquared() > 0) {
+                            boost.copyFrom(this.velocity).normalize().scaleInPlace(0.02);
+                        }
+                        acceleration.addInPlace(boost);
+                        */
+                        acceleration.scaleInPlace(2);
+                    }
+                    acceleration.addInPlace(reactions);
+                    acceleration.addInPlace(friction);
+                    acceleration.scaleInPlace(1 / m);
                     this.velocity.addInPlace(acceleration.scale(physicDT));
                     this.position.addInPlace(this.velocity.scale(physicDT));
                     if (reactions.length() > 0) {
-                        BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis);
+                        this.rotationAxis.scaleInPlace(0.2);
+                        this.rotationAxis.addInPlace(BABYLON.Vector3.Cross(reactions, this.visibleVelocity).normalize().scaleInPlace(0.8));
                         if (this.rotationAxis.lengthSquared() > 0) {
                             this.rotationAxis.normalize();
                         }
@@ -1855,7 +1867,7 @@ var MarbleRunSimulatorCore;
             return false;
         }
         serialize() {
-            return this.serializeV8();
+            return this.serializeV9();
         }
         serializeV1() {
             let data = {
@@ -2084,6 +2096,81 @@ var MarbleRunSimulatorCore;
             data.d = dataString;
             return data;
         }
+        serializeV9() {
+            let data = {
+                n: this.name,
+                a: this.author,
+                v: 9
+            };
+            let dataString = "";
+            // Add ball count
+            dataString += NToHex(this.balls.length, 2);
+            for (let i = 0; i < this.balls.length; i++) {
+                let ball = this.balls[i];
+                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
+                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
+                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
+                dataString += NToHex(x, 3);
+                dataString += NToHex(y, 3);
+                dataString += NToHex(z, 3);
+                dataString += NToHex(ball.materialIndex, 2);
+            }
+            // Add parts count
+            dataString += NToHex(this.parts.length, 2);
+            for (let i = 0; i < this.parts.length; i++) {
+                let partDataString = "";
+                let part = this.parts[i];
+                let baseName = part.partName.split("-")[0];
+                let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
+                    return name.startsWith(baseName);
+                });
+                if (index === -1) {
+                    console.error("Error, can't find part index.");
+                    debugger;
+                }
+                partDataString += NToHex(index, 2);
+                let pI = part.i + partOffset;
+                let pJ = part.j + partOffset;
+                let pK = part.k + partOffset;
+                partDataString += NToHex(pI, 2);
+                partDataString += NToHex(pJ, 2);
+                partDataString += NToHex(pK, 2);
+                partDataString += NToHex(part.w, 1);
+                partDataString += NToHex(part.h, 1);
+                partDataString += NToHex(part.d, 1);
+                partDataString += NToHex(part.n, 1);
+                partDataString += NToHex(part.s, 1);
+                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                partDataString += NToHex(m, 1);
+                let colourCount = part.colors.length;
+                partDataString += NToHex(colourCount, 1);
+                for (let j = 0; j < part.colors.length; j++) {
+                    let c = part.colors[j];
+                    partDataString += NToHex(c, 1);
+                }
+                //console.log("---------------------------");
+                //console.log("serialize");
+                //console.log(part);
+                //console.log("into");
+                //console.log(partDataString);
+                //console.log("---------------------------");
+                dataString += partDataString;
+            }
+            dataString += NToHex(this.decors.length, 2);
+            for (let i = 0; i < this.decors.length; i++) {
+                let decor = this.decors[i];
+                let x = Math.round(decor.position.x * 1000) + ballOffset;
+                let y = Math.round(decor.position.y * 1000) + ballOffset;
+                let z = Math.round(decor.position.z * 1000) + ballOffset;
+                dataString += NToHex(x, 3);
+                dataString += NToHex(y, 3);
+                dataString += NToHex(z, 3);
+                dataString += NToHex(decor.n, 2);
+                dataString += NToHex(decor.flip ? 1 : 0, 1);
+            }
+            data.d = dataString;
+            return data;
+        }
         deserialize(data) {
             this.lastDeserializedData = data;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
@@ -2104,6 +2191,9 @@ var MarbleRunSimulatorCore;
                 }
                 else if (version === 7 || version === 8) {
                     return this.deserializeV78(data);
+                }
+                else if (version === 9) {
+                    return this.deserializeV9(data);
                 }
             }
         }
@@ -2352,10 +2442,6 @@ var MarbleRunSimulatorCore;
             if (dataString) {
                 if (data.n) {
                     this.name = data.n;
-                    // Lol
-                    if (this.name === "Cable Management Final") {
-                        this.minimalAutoQualityFailed = GraphicQuality.High;
-                    }
                 }
                 if (data.a) {
                     this.author = data.a;
@@ -2449,7 +2535,99 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                console.log("decorCount = " + decorCount);
+                for (let i = 0; i < decorCount; i++) {
+                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    let decor = new MarbleRunSimulatorCore.Xylophone(this);
+                    decor.setPosition(new BABYLON.Vector3(x, y, z));
+                    this.decors.push(decor);
+                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                    decor.setN(n);
+                    if (data.v === 8) {
+                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+                        decor.setFlip(f);
+                    }
+                }
+            }
+        }
+        deserializeV9(data) {
+            let dataString = data.d;
+            if (dataString) {
+                if (data.n) {
+                    this.name = data.n;
+                }
+                if (data.a) {
+                    this.author = data.a;
+                }
+                if (data.r) {
+                    this.roomIndex = data.r;
+                }
+                else {
+                    this.roomIndex = 0;
+                }
+                this.balls = [];
+                this.parts = [];
+                let pt = 0;
+                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                //console.log("ballCount = " + ballCount);
+                for (let i = 0; i < ballCount; i++) {
+                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
+                    this.balls.push(ball);
+                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                    ball.materialIndex = materialIndex;
+                }
+                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+                //console.log("partCount = " + partCount);
+                for (let i = 0; i < partCount; i++) {
+                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
+                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
+                    let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let s = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log(colorCount);
+                    let colors = [];
+                    for (let ii = 0; ii < colorCount; ii++) {
+                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                    }
+                    let prop = {
+                        i: pI,
+                        j: pJ,
+                        k: pK,
+                        w: w,
+                        h: h,
+                        d: d,
+                        n: n,
+                        s: s,
+                        mirrorX: (mirror % 2) === 1,
+                        mirrorZ: mirror >= 2,
+                        c: colors
+                    };
+                    let track = this.trackFactory.createTrackBaseName(baseName, prop);
+                    if (track) {
+                        this.parts.push(track);
+                    }
+                    else {
+                        console.warn("failed to createTrackBaseName");
+                        console.log(baseName);
+                        console.log(prop);
+                    }
+                }
+                let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
                 for (let i = 0; i < decorCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
@@ -2892,6 +3070,9 @@ var MarbleRunSimulatorCore;
         get n() {
             return this.template.n;
         }
+        get s() {
+            return this.template.s;
+        }
         get mirrorX() {
             return this.template.mirrorX;
         }
@@ -2909,6 +3090,9 @@ var MarbleRunSimulatorCore;
         }
         get nExtendable() {
             return this.template.nExtendable;
+        }
+        get sExtendable() {
+            return this.template.sExtendable;
         }
         get minW() {
             return this.template.minW;
@@ -2933,6 +3117,12 @@ var MarbleRunSimulatorCore;
         }
         get maxN() {
             return this.template.maxN;
+        }
+        get minS() {
+            return this.template.minS;
+        }
+        get maxS() {
+            return this.template.maxS;
         }
         get xMirrorable() {
             return this.template.xMirrorable;
@@ -3564,7 +3754,11 @@ var MarbleRunSimulatorCore;
                 let argStr = partName.split("-")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
+                    let s = parseInt(argStr.split(".")[1]);
                     prop.w = w;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
                 }
                 return new MarbleRunSimulatorCore.Snake(this.machine, prop);
             }
@@ -3573,8 +3767,12 @@ var MarbleRunSimulatorCore;
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
+                    let s = parseInt(argStr.split(".")[2]);
                     prop.h = h;
                     prop.d = d;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
                 }
                 return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
             }
@@ -3731,6 +3929,9 @@ var MarbleRunSimulatorCore;
             }
         }
         createTrackBaseName(baseName, prop) {
+            if (isNaN(prop.s)) {
+                prop.s = MarbleRunSimulatorCore.TrackSpeed.Medium;
+            }
             if (baseName === "ramp") {
                 return new MarbleRunSimulatorCore.Ramp(this.machine, prop);
             }
@@ -4430,6 +4631,19 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
+    let TrackSpeed;
+    (function (TrackSpeed) {
+        TrackSpeed[TrackSpeed["Flat"] = 0] = "Flat";
+        TrackSpeed[TrackSpeed["Slow"] = 1] = "Slow";
+        TrackSpeed[TrackSpeed["Medium"] = 2] = "Medium";
+        TrackSpeed[TrackSpeed["Fast"] = 3] = "Fast";
+    })(TrackSpeed = MarbleRunSimulatorCore.TrackSpeed || (MarbleRunSimulatorCore.TrackSpeed = {}));
+    MarbleRunSimulatorCore.TrackSpeedNames = [
+        "Flat",
+        "Slow",
+        "Medium",
+        "Fast"
+    ];
     class TrackTemplate {
         constructor(partTemplate) {
             this.partTemplate = partTemplate;
@@ -4654,6 +4868,7 @@ var MarbleRunSimulatorCore;
             this.h = 1;
             this.d = 1;
             this.n = 1;
+            this.s = TrackSpeed.Medium;
             this.mirrorX = false;
             this.mirrorZ = false;
             this.angleSmoothSteps = 30;
@@ -4663,6 +4878,7 @@ var MarbleRunSimulatorCore;
             this.yExtendable = false;
             this.zExtendable = false;
             this.nExtendable = false;
+            this.sExtendable = false;
             this.minW = 1;
             this.maxW = 35;
             this.minH = 0;
@@ -4671,6 +4887,8 @@ var MarbleRunSimulatorCore;
             this.maxD = 35;
             this.minN = 1;
             this.maxN = 35;
+            this.minS = 0;
+            this.maxS = 3;
             this.xMirrorable = false;
             this.zMirrorable = false;
             this.hasOriginDestinationHandles = false;
@@ -4716,12 +4934,16 @@ var MarbleRunSimulatorCore;
                 if (partName.startsWith("uturn-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
-                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, mirrorX, mirrorZ);
+                    let s = parseInt(partName.split("-")[1].split(".")[2]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, s, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("pipeuturn-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
-                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, mirrorX, mirrorZ, true);
+                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, 2, mirrorX, mirrorZ, true);
                 }
                 else if (partName.startsWith("wall-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
@@ -4752,7 +4974,11 @@ var MarbleRunSimulatorCore;
                 }
                 else if (partName.startsWith("snake-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    data = MarbleRunSimulatorCore.Snake.GenerateTemplate(w, mirrorX, mirrorZ);
+                    let s = parseInt(partName.split("-")[1].split(".")[1]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = MarbleRunSimulatorCore.Snake.GenerateTemplate(w, s, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("elevator-")) {
                     let h = parseInt(partName.split("-")[1]);
@@ -7496,21 +7722,23 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             prop.w = Math.max(prop.w, 2);
-            let partName = "snake-" + prop.w.toFixed(0);
+            let partName = "snake-" + prop.w.toFixed(0) + "." + prop.s.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
-        static GenerateTemplate(w = 1, mirrorX, mirrorZ) {
+        static GenerateTemplate(w, s, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "snake-" + w.toFixed(0);
+            template.partName = "snake-" + w.toFixed(0) + "." + s.toFixed(0);
             template.angleSmoothSteps = 40;
             template.maxAngle = Math.PI / 8;
             template.w = w;
             template.h = 0;
             template.d = 3;
+            template.s = s;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
             template.xExtendable = true;
+            template.sExtendable = true;
             template.xMirrorable = true;
             template.zMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
@@ -7580,6 +7808,7 @@ var MarbleRunSimulatorCore;
                 }
             }
             template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], end, dir, undefined, 1));
+            template.maxAngle = Math.PI / 4 / 2 * template.s;
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
             }
@@ -8634,11 +8863,17 @@ var MarbleRunSimulatorCore;
     class UTurn extends MarbleRunSimulatorCore.MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
+            if (isNaN(prop.s)) {
+                prop.s = MarbleRunSimulatorCore.TrackSpeed.Medium;
+            }
             let partName = (prop.pipeVersion ? "pipe" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            if (prop.pipeVersion) {
+                partName += "." + prop.s.toFixed(0);
+            }
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
-        static GenerateTemplate(h, d, mirrorX, mirrorZ, pipeVersion) {
+        static GenerateTemplate(h, d, s, mirrorX, mirrorZ, pipeVersion) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.getWidthForDepth = (argD) => {
                 if (argD >= 8) {
@@ -8647,14 +8882,21 @@ var MarbleRunSimulatorCore;
                 return argD - 1;
             };
             template.partName = (pipeVersion ? "pipe" : "") + "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
+            if (!pipeVersion) {
+                template.partName += "." + s.toFixed(0);
+            }
             template.angleSmoothSteps = 50;
             template.w = template.getWidthForDepth(d);
             template.h = h;
             template.d = d;
+            template.s = s;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
             template.yExtendable = true;
             template.zExtendable = true;
+            if (!pipeVersion) {
+                template.sExtendable = true;
+            }
             template.minD = 2;
             template.xMirrorable = true;
             template.zMirrorable = true;
@@ -8676,6 +8918,7 @@ var MarbleRunSimulatorCore;
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, -2 * r)),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
             ];
+            template.maxAngle = Math.PI / 4 / 2 * template.s;
             let hermite = (x) => {
                 return (3 * Math.pow(2 * x, 2) - Math.pow(2 * x, 3)) / 4;
             };

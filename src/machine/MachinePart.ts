@@ -362,6 +362,9 @@ namespace MarbleRunSimulatorCore {
         public get n(): number {
             return this.template.n;
         }
+        public get s(): number {
+            return this.template.s;
+        }
         public get mirrorX(): boolean {
             return this.template.mirrorX;
         }
@@ -380,6 +383,9 @@ namespace MarbleRunSimulatorCore {
         }
         public get nExtendable(): boolean {
             return this.template.nExtendable;
+        }
+        public get sExtendable(): boolean {
+            return this.template.sExtendable;
         }
         public get minW(): number {
             return this.template.minW;
@@ -404,6 +410,12 @@ namespace MarbleRunSimulatorCore {
         }
         public get maxN(): number {
             return this.template.maxN;
+        }
+        public get minS(): number {
+            return this.template.minS;
+        }
+        public get maxS(): number {
+            return this.template.maxS;
         }
         public get xMirrorable(): boolean {
             return this.template.xMirrorable;

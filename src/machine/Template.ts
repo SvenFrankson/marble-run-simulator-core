@@ -1,4 +1,19 @@
 namespace MarbleRunSimulatorCore {
+
+    export enum TrackSpeed {
+        Flat = 0,
+        Slow = 1,
+        Medium = 2,
+        Fast = 3
+    }
+
+    export var TrackSpeedNames = [
+        "Flat",
+        "Slow",
+        "Medium",
+        "Fast"
+    ];
+
     export class TrackTemplate {
         public trackpoints: TrackPoint[] = ([] = []);
         public interpolatedPoints: BABYLON.Vector3[] = [];
@@ -252,6 +267,7 @@ namespace MarbleRunSimulatorCore {
         public h: number = 1;
         public d: number = 1;
         public n: number = 1;
+        public s: number = TrackSpeed.Medium;
         public mirrorX: boolean = false;
         public mirrorZ: boolean = false;
         public angleSmoothSteps: number = 30;
@@ -262,6 +278,7 @@ namespace MarbleRunSimulatorCore {
         public yExtendable: boolean = false;
         public zExtendable: boolean = false;
         public nExtendable: boolean = false;
+        public sExtendable: boolean = false;
         public minW: number = 1;
         public maxW: number = 35;
         public minH: number = 0;
@@ -270,6 +287,8 @@ namespace MarbleRunSimulatorCore {
         public maxD: number = 35;
         public minN: number = 1;
         public maxN: number = 35;
+        public minS: number = 0;
+        public maxS: number = 3;
         public xMirrorable: boolean = false;
         public zMirrorable: boolean = false;
         public hasOriginDestinationHandles: boolean = false;
@@ -322,12 +341,16 @@ namespace MarbleRunSimulatorCore {
                 if (partName.startsWith("uturn-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
-                    data = UTurn.GenerateTemplate(h, d, mirrorX, mirrorZ);
+                    let s = parseInt(partName.split("-")[1].split(".")[2]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = UTurn.GenerateTemplate(h, d, s, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("pipeuturn-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
-                    data = UTurn.GenerateTemplate(h, d, mirrorX, mirrorZ, true);
+                    data = UTurn.GenerateTemplate(h, d, 2, mirrorX, mirrorZ, true);
                 }
                 else if (partName.startsWith("wall-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
@@ -358,7 +381,11 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName.startsWith("snake-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    data = Snake.GenerateTemplate(w, mirrorX, mirrorZ);
+                    let s = parseInt(partName.split("-")[1].split(".")[1]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = Snake.GenerateTemplate(w, s, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("elevator-")) {
                     let h = parseInt(partName.split("-")[1]);

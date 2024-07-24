@@ -30,6 +30,7 @@ declare namespace MarbleRunSimulatorCore {
         get mass(): number;
         get sectionArea(): number;
         velocity: BABYLON.Vector3;
+        boosting: boolean;
         rotationSpeed: number;
         rotationAxis: BABYLON.Vector3;
         surface: Surface;
@@ -315,12 +316,14 @@ declare namespace MarbleRunSimulatorCore {
         serializeV2(): IMachineData;
         serializeV3456(version: number): IMachineData;
         serializeV8(): IMachineData;
+        serializeV9(): IMachineData;
         lastDeserializedData: IMachineData;
         deserialize(data: IMachineData): void;
         deserializeV1(data: IMachineData): void;
         deserializeV2(data: IMachineData): void;
         deserializeV3456(data: IMachineData): void;
         deserializeV78(data: IMachineData): void;
+        deserializeV9(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;
@@ -459,12 +462,14 @@ declare namespace MarbleRunSimulatorCore {
         get h(): number;
         get d(): number;
         get n(): number;
+        get s(): number;
         get mirrorX(): boolean;
         get mirrorZ(): boolean;
         get xExtendable(): boolean;
         get yExtendable(): boolean;
         get zExtendable(): boolean;
         get nExtendable(): boolean;
+        get sExtendable(): boolean;
         get minW(): number;
         get maxW(): number;
         get minH(): number;
@@ -473,6 +478,8 @@ declare namespace MarbleRunSimulatorCore {
         get maxD(): number;
         get minN(): number;
         get maxN(): number;
+        get minS(): number;
+        get maxS(): number;
         get xMirrorable(): boolean;
         get zMirrorable(): boolean;
         get hasOriginDestinationHandles(): boolean;
@@ -535,6 +542,7 @@ declare namespace MarbleRunSimulatorCore {
         h?: number;
         d?: number;
         n?: number;
+        s?: number;
         c?: number[];
         mirrorX?: boolean;
         mirrorZ?: boolean;
@@ -610,6 +618,13 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    enum TrackSpeed {
+        Flat = 0,
+        Slow = 1,
+        Medium = 2,
+        Fast = 3
+    }
+    var TrackSpeedNames: string[];
     class TrackTemplate {
         partTemplate: MachinePartTemplate;
         trackpoints: TrackPoint[];
@@ -640,6 +655,7 @@ declare namespace MarbleRunSimulatorCore {
         h: number;
         d: number;
         n: number;
+        s: number;
         mirrorX: boolean;
         mirrorZ: boolean;
         angleSmoothSteps: number;
@@ -649,6 +665,7 @@ declare namespace MarbleRunSimulatorCore {
         yExtendable: boolean;
         zExtendable: boolean;
         nExtendable: boolean;
+        sExtendable: boolean;
         minW: number;
         maxW: number;
         minH: number;
@@ -657,6 +674,8 @@ declare namespace MarbleRunSimulatorCore {
         maxD: number;
         minN: number;
         maxN: number;
+        minS: number;
+        maxS: number;
         xMirrorable: boolean;
         zMirrorable: boolean;
         hasOriginDestinationHandles: boolean;
@@ -972,7 +991,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Snake extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(w?: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        static GenerateTemplate(w: number, s: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Snake;
     }
 }
@@ -1086,7 +1105,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class UTurn extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(h: number, d: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
         getOrigin(): Nabu.IJK;
         getDestination(): Nabu.IJK;
