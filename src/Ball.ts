@@ -40,6 +40,7 @@ namespace MarbleRunSimulatorCore {
             return Math.PI * this.radius * this.radius;
         }
         public velocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public boosting: boolean = true;
         public rotationSpeed: number = 0;
         public rotationAxis: BABYLON.Vector3 = BABYLON.Vector3.Right();
         public surface: Surface = Surface.Rail;
@@ -668,15 +669,26 @@ namespace MarbleRunSimulatorCore {
                     }
     
                     let acceleration = weight
-                        .add(reactions)
-                        .add(friction)
-                        .scaleInPlace(1 / m);
+                    if (this.boosting) {
+                        /*
+                        let boost = BABYLON.Vector3.Right();
+                        if (this.velocity.lengthSquared() > 0) {
+                            boost.copyFrom(this.velocity).normalize().scaleInPlace(0.02);
+                        }
+                        acceleration.addInPlace(boost);
+                        */
+                       acceleration.scaleInPlace(2);
+                    }
+                    acceleration.addInPlace(reactions)
+                    acceleration.addInPlace(friction);
+                    acceleration.scaleInPlace(1 / m);
                     this.velocity.addInPlace(acceleration.scale(physicDT));
     
                     this.position.addInPlace(this.velocity.scale(physicDT));
 
                     if (reactions.length() > 0) {
-                        BABYLON.Vector3.CrossToRef(reactions, this.visibleVelocity, this.rotationAxis);
+                        this.rotationAxis.scaleInPlace(0.2);
+                        this.rotationAxis.addInPlace(BABYLON.Vector3.Cross(reactions, this.visibleVelocity).normalize().scaleInPlace(0.8));
                         if (this.rotationAxis.lengthSquared() > 0) {
                             this.rotationAxis.normalize();
                         }
