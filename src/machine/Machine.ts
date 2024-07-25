@@ -59,12 +59,14 @@ namespace MarbleRunSimulatorCore {
         averagedFPS: number;
     }
 
+    // Should be removed
     export enum GameMode {
         Home,
         Page,
         Create,
         Challenge,
-        Demo
+        Demo,
+        GravityControl
     }
 
     export interface IBallData {

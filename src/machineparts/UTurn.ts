@@ -8,7 +8,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             let partName = (prop.pipeVersion ? "pipe" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
-            if (prop.pipeVersion) {
+            if (!prop.pipeVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));

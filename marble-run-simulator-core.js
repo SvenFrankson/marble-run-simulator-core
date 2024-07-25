@@ -1281,6 +1281,7 @@ var MarbleRunSimulatorCore;
         MaterialQuality[MaterialQuality["Standard"] = 0] = "Standard";
         MaterialQuality[MaterialQuality["PBR"] = 1] = "PBR";
     })(MaterialQuality = MarbleRunSimulatorCore.MaterialQuality || (MarbleRunSimulatorCore.MaterialQuality = {}));
+    // Should be removed
     let GameMode;
     (function (GameMode) {
         GameMode[GameMode["Home"] = 0] = "Home";
@@ -1288,6 +1289,7 @@ var MarbleRunSimulatorCore;
         GameMode[GameMode["Create"] = 2] = "Create";
         GameMode[GameMode["Challenge"] = 3] = "Challenge";
         GameMode[GameMode["Demo"] = 4] = "Demo";
+        GameMode[GameMode["GravityControl"] = 5] = "GravityControl";
     })(GameMode = MarbleRunSimulatorCore.GameMode || (MarbleRunSimulatorCore.GameMode = {}));
     class Machine {
         constructor(game) {
@@ -8867,7 +8869,7 @@ var MarbleRunSimulatorCore;
                 prop.s = MarbleRunSimulatorCore.TrackSpeed.Medium;
             }
             let partName = (prop.pipeVersion ? "pipe" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
-            if (prop.pipeVersion) {
+            if (!prop.pipeVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));

@@ -217,7 +217,8 @@ declare namespace MarbleRunSimulatorCore {
         Page = 1,
         Create = 2,
         Challenge = 3,
-        Demo = 4
+        Demo = 4,
+        GravityControl = 5
     }
     interface IBallData {
         x: number;
