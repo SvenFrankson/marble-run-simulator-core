@@ -89,7 +89,7 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 let deltaPos = ball.position.subtract(this.position);
-                if (Math.abs(deltaPos.x) < 0.02) {
+                if (Math.abs(deltaPos.x) < 0.04) {
                     if (Math.abs(deltaPos.y) < tileHeight * 0.5) {
                         if (Math.abs(deltaPos.z) < 0.001) {
                             if (ball.velocity.length() < 1) {
