@@ -40,7 +40,21 @@ namespace MarbleRunSimulatorCore {
             return Math.PI * this.radius * this.radius;
         }
         public velocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-        public boosting: boolean = false;
+        private _boosting: boolean = false;
+        public get boosting(): boolean {
+            return this._boosting;
+        }
+        public set boosting(v: boolean) {
+            if (this._boosting != v) {
+                this._boosting = v;
+                if (this._boosting) {
+                    this.material = this.game.materials.groundMaterial;
+                }
+                else {
+                    this.material = this.game.materials.getBallMaterial(this.materialIndex);
+                }
+            }
+        }
         public rotationSpeed: number = 0;
         public rotationAxis: BABYLON.Vector3 = BABYLON.Vector3.Right();
         public surface: Surface = Surface.Rail;
@@ -64,19 +78,6 @@ namespace MarbleRunSimulatorCore {
         public set materialIndex(v: number) {
             this._materialIndex = v;
             this.material = this.game.materials.getBallMaterial(this.materialIndex);
-        }
-
-        private _boostMaterial: boolean;
-        public setBoostMaterial(v: boolean): void {
-            if (v != this._boostMaterial) {
-                this._boostMaterial = v;
-                if (this._boostMaterial) {
-                    this.material = this.game.materials.groundMaterial;
-                }
-                else {
-                    this.material = this.game.materials.getBallMaterial(this.materialIndex);
-                }
-            }
         }
 
         public setPositionZero(p: BABYLON.Vector3): void {
@@ -238,6 +239,7 @@ namespace MarbleRunSimulatorCore {
             if (this.rotationQuaternion) {
                 this.rotationQuaternion.copyFromFloats(0, 0, 0, 1);
             }
+            this.boosting = false;
             this.velocity.copyFromFloats(0, 0, 0);
             this._timer = 0;
             this.collisionState = CollisionState.Normal;
@@ -727,8 +729,6 @@ namespace MarbleRunSimulatorCore {
             let axis = this.rotationAxis;
             let angle = this.rotationSpeed * 2 * Math.PI * dt
             this.rotate(axis, angle, BABYLON.Space.WORLD);
-
-            this.setBoostMaterial(this.boosting);
 
             if (this.collisionState === CollisionState.Flyback) {
                 if (this.flybackDestination) {

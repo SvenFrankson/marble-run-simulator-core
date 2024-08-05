@@ -30,7 +30,9 @@ declare namespace MarbleRunSimulatorCore {
         get mass(): number;
         get sectionArea(): number;
         velocity: BABYLON.Vector3;
-        boosting: boolean;
+        private _boosting;
+        get boosting(): boolean;
+        set boosting(v: boolean);
         rotationSpeed: number;
         rotationAxis: BABYLON.Vector3;
         surface: Surface;
@@ -41,8 +43,6 @@ declare namespace MarbleRunSimulatorCore {
         selectorMesh: BABYLON.Mesh;
         get materialIndex(): number;
         set materialIndex(v: number);
-        private _boostMaterial;
-        setBoostMaterial(v: boolean): void;
         setPositionZero(p: BABYLON.Vector3): void;
         get k(): number;
         set k(v: number);
