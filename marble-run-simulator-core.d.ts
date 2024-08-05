@@ -30,6 +30,8 @@ declare namespace MarbleRunSimulatorCore {
         get mass(): number;
         get sectionArea(): number;
         velocity: BABYLON.Vector3;
+        private _hasBoostMaterial;
+        private _baseColor;
         private _boosting;
         get boosting(): boolean;
         set boosting(v: boolean);
@@ -289,7 +291,11 @@ declare namespace MarbleRunSimulatorCore {
         update(): void;
         onPlayCallbacks: Nabu.UniqueList<() => void>;
         play(): void;
+        private _paused;
+        get paused(): boolean;
+        pause(): void;
         onStopCallbacks: Nabu.UniqueList<() => void>;
+        get stopped(): boolean;
         stop(): void;
         margin: number;
         baseMeshMinX: number;

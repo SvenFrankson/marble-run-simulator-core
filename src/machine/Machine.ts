@@ -381,6 +381,7 @@ namespace MarbleRunSimulatorCore {
 
         public onPlayCallbacks: Nabu.UniqueList<() => void> = new Nabu.UniqueList<() => void>();
         public play(): void {
+            this._paused = false;
             this.playing = true;
             this.decors.forEach(decor => {
                 decor.findMachinePart();
@@ -390,7 +391,19 @@ namespace MarbleRunSimulatorCore {
             });
         }
 
+        private _paused: boolean = false;
+        public get paused(): boolean {
+            return this._paused;
+        }
+        public pause(): void {
+            this._paused = true;
+            this.playing = false;
+        }
+
         public onStopCallbacks: Nabu.UniqueList<() => void> = new Nabu.UniqueList<() => void>();
+        public get stopped(): boolean {
+            return !this.playing && !this.paused;
+        }
         public stop(): void {
             for (let i = 0; i < this.balls.length; i++) {
                 this.balls[i].reset();
@@ -398,6 +411,7 @@ namespace MarbleRunSimulatorCore {
             this.onStopCallbacks.forEach((callback) => {
                 callback();
             });
+            this._paused = false;
             this.playing = false;
         }
 
