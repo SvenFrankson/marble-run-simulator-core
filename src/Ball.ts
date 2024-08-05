@@ -40,6 +40,9 @@ namespace MarbleRunSimulatorCore {
             return Math.PI * this.radius * this.radius;
         }
         public velocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+
+        private _hasBoostMaterial: boolean = false;
+        private _baseColor: BABYLON.Color3;
         private _boosting: boolean = false;
         public get boosting(): boolean {
             return this._boosting;
@@ -47,11 +50,15 @@ namespace MarbleRunSimulatorCore {
         public set boosting(v: boolean) {
             if (this._boosting != v) {
                 this._boosting = v;
-                if (this._boosting) {
-                    this.material = this.game.materials.groundMaterial;
-                }
-                else {
-                    this.material = this.game.materials.getBallMaterial(this.materialIndex);
+                if (this._boosting && !this._hasBoostMaterial) {
+                    this._hasBoostMaterial = true;
+                    if (this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
+                        this._baseColor = this.material.baseColor.clone();
+                    }
+                    else if (this.material instanceof BABYLON.StandardMaterial) {
+                        this._baseColor = this.material.diffuseColor.clone();
+                    }
+                    this.material = this.material.clone(this.material.name + "-clone");
                 }
             }
         }
@@ -187,6 +194,7 @@ namespace MarbleRunSimulatorCore {
             }
             data.applyToMesh(this);
 
+            this._hasBoostMaterial = false;
             this.material = this.game.materials.getBallMaterial(this.materialIndex);
 
             if (this.positionZeroGhost) {
@@ -240,6 +248,9 @@ namespace MarbleRunSimulatorCore {
                 this.rotationQuaternion.copyFromFloats(0, 0, 0, 1);
             }
             this.boosting = false;
+            if (this._hasBoostMaterial && this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
+                this.material.baseColor.copyFrom(this._baseColor);
+            }
             this.velocity.copyFromFloats(0, 0, 0);
             this._timer = 0;
             this.collisionState = CollisionState.Normal;
@@ -307,6 +318,19 @@ namespace MarbleRunSimulatorCore {
 
             this._timer += dt;
             this._timer = Math.min(this._timer, 1);
+
+            if (this._hasBoostMaterial && this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
+                if (this.boosting) {
+                    this.material.baseColor.r = this.material.baseColor.r * 0.9 + this._baseColor.r * 0.8 * 0.1;
+                    this.material.baseColor.g = this.material.baseColor.g * 0.9 + this._baseColor.g * 0.5 * 0.1;
+                    this.material.baseColor.b = this.material.baseColor.b * 0.9 + this._baseColor.b * 0.5 * 0.1;
+                }
+                else {
+                    this.material.baseColor.r = this.material.baseColor.r * 0.9 + this._baseColor.r * 0.1;
+                    this.material.baseColor.g = this.material.baseColor.g * 0.9 + this._baseColor.g * 0.1;
+                    this.material.baseColor.b = this.material.baseColor.b * 0.9 + this._baseColor.b * 0.1;
+                }
+            }
 
             while (this._timer > 0) {
                 let m = this.mass;
