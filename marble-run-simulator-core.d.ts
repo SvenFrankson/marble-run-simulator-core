@@ -97,13 +97,19 @@ declare namespace MarbleRunSimulatorCore {
         Plastic = 0,
         Metal = 1
     }
+    enum BallMaterialType {
+        Metal = 0,
+        Logo = 1
+    }
     class MainMaterials {
         game: IGame;
         private _materialsPBR;
         private _materialsSTD;
         getMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
         getMaterialType(colorIndex: number): MaterialType;
+        getBallMaterialType(colorIndex: number): BallMaterialType;
         getMaterialHexBaseColor(colorIndex: number): string;
+        getBallMaterialHexBaseColor(colorIndex: number): string;
         get metalMaterialsCount(): number;
         private _ballMaterialsPBR;
         private _ballMaterialsSTD;
@@ -136,6 +142,8 @@ declare namespace MarbleRunSimulatorCore {
         constructor(game: IGame);
         private _makePlasticPBR;
         private _makePlasticSTD;
+        private _makeMetalPBR;
+        private _makeMetalSTD;
         private _generateMaterials;
     }
 }

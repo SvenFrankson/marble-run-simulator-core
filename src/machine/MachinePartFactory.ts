@@ -70,6 +70,8 @@ namespace MarbleRunSimulatorCore {
                 partName = partName.replace("_Z", "");
             }
 
+            console.log(prop.c);
+
             if (partName === "ramp" || partName.startsWith("ramp-")) {
                 let argStr = partName.split("-")[1];
                 if (argStr) {
