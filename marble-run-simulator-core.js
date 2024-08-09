@@ -30,6 +30,7 @@ var MarbleRunSimulatorCore;
             this.size = 0.016;
             this.velocity = BABYLON.Vector3.Zero();
             this._hasBoostMaterial = false;
+            this._boostColor = new BABYLON.Color3(0.9, 0.1, 0.3);
             this._boosting = false;
             this.rotationSpeed = 0;
             this.rotationAxis = BABYLON.Vector3.Right();
@@ -89,16 +90,25 @@ var MarbleRunSimulatorCore;
             if (this._boosting != v) {
                 this._boosting = v;
                 if (this._boosting && !this._hasBoostMaterial) {
-                    this._hasBoostMaterial = true;
-                    if (this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
-                        this._baseColor = this.material.baseColor.clone();
-                    }
-                    else if (this.material instanceof BABYLON.StandardMaterial) {
-                        this._baseColor = this.material.diffuseColor.clone();
-                    }
-                    this.material = this.material.clone(this.material.name + "-clone");
+                    this.useBoostingMaterial();
                 }
             }
+        }
+        useBoostingMaterial() {
+            if (!this._hasBoostMaterial) {
+                this._hasBoostMaterial = true;
+                this.material = this.game.materials.getParkourBallMaterial();
+                if (this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
+                    this._baseColor = this.material.baseColor.clone();
+                }
+                else if (this.material instanceof BABYLON.StandardMaterial) {
+                    this._baseColor = this.material.diffuseColor.clone();
+                }
+            }
+        }
+        unuseBoostingMaterial() {
+            this._hasBoostMaterial = false;
+            this.material = this.game.materials.getBallMaterial(this.materialIndex);
         }
         get showPositionZeroGhost() {
             return this._showPositionZeroGhost;
@@ -182,8 +192,10 @@ var MarbleRunSimulatorCore;
                 uvs[2 * i] *= -2;
             }
             data.applyToMesh(this);
-            this._hasBoostMaterial = false;
-            this.material = this.game.materials.getBallMaterial(this.materialIndex);
+            if (!hotReload) {
+                this._hasBoostMaterial = false;
+                this.material = this.game.materials.getBallMaterial(this.materialIndex);
+            }
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.dispose();
             }
@@ -259,6 +271,25 @@ var MarbleRunSimulatorCore;
             this._lastWires[this._pouet] = wire;
             this._lastWireIndexes[this._pouet] = index;
         }
+        updateMaterial(dt) {
+            if (this._hasBoostMaterial) {
+                let materialColor;
+                if (this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
+                    materialColor = this.material.baseColor;
+                }
+                else if (this.material instanceof BABYLON.StandardMaterial) {
+                    materialColor = this.material.diffuseColor;
+                }
+                if (materialColor) {
+                    let targetColor = this._baseColor;
+                    if (this.boosting) {
+                        targetColor = this._boostColor;
+                    }
+                    let f = Nabu.Easing.smoothNSec(1 / dt, 0.3);
+                    BABYLON.Color3.LerpToRef(materialColor, targetColor, 1 - f, materialColor);
+                }
+            }
+        }
         update(dt) {
             if (this.game.DEBUG_MODE && (this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01 && this.recordedPositions.length < 1000)) {
                 this.recordedPositions.push(this.position.clone());
@@ -279,18 +310,7 @@ var MarbleRunSimulatorCore;
             }
             this._timer += dt;
             this._timer = Math.min(this._timer, 1);
-            if (this._hasBoostMaterial && this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
-                if (this.boosting) {
-                    this.material.baseColor.r = this.material.baseColor.r * 0.9 + this._baseColor.r * 0.8 * 0.1;
-                    this.material.baseColor.g = this.material.baseColor.g * 0.9 + this._baseColor.g * 0.5 * 0.1;
-                    this.material.baseColor.b = this.material.baseColor.b * 0.9 + this._baseColor.b * 0.5 * 0.1;
-                }
-                else {
-                    this.material.baseColor.r = this.material.baseColor.r * 0.9 + this._baseColor.r * 0.1;
-                    this.material.baseColor.g = this.material.baseColor.g * 0.9 + this._baseColor.g * 0.1;
-                    this.material.baseColor.b = this.material.baseColor.b * 0.9 + this._baseColor.b * 0.1;
-                }
-            }
+            this.updateMaterial(dt);
             while (this._timer > 0) {
                 let m = this.mass;
                 let physicDT = this.game.physicDT;
@@ -923,6 +943,21 @@ var MarbleRunSimulatorCore;
                 this._materialsSTD[4],
                 this._materialsSTD[5]
             ];
+            let parkourBallColor = BABYLON.Color3.FromHexString("#0c0c18");
+            let parkourBallMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("parkour-ball-pbr", this.game.scene);
+            parkourBallMaterialPBR.baseColor = parkourBallColor;
+            parkourBallMaterialPBR.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/ball-parkour.png", undefined, undefined, false);
+            parkourBallMaterialPBR.metallic = 0.75;
+            parkourBallMaterialPBR.roughness = 0.25;
+            parkourBallMaterialPBR.environmentTexture = envTexture;
+            let parkourBallMaterialSTD = new BABYLON.StandardMaterial("parkour-ball-pbr", this.game.scene);
+            parkourBallMaterialSTD.diffuseColor = parkourBallColor;
+            parkourBallMaterialSTD.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/ball-parkour.png", undefined, undefined, false);
+            parkourBallMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            parkourBallMaterialSTD.emissiveColor = parkourBallMaterialSTD.diffuseColor.scale(0.5);
+            parkourBallMaterialSTD.roughness = 0.25;
+            this._parkourBallMaterialPBR = parkourBallMaterialPBR;
+            this._parkourBallMaterialSTD = parkourBallMaterialSTD;
             /*
             this._wallpapers = [];
 
@@ -996,6 +1031,15 @@ var MarbleRunSimulatorCore;
                 return this._ballMaterialsPBR[colorIndex % this._ballMaterialsPBR.length];
             }
             return this._ballMaterialsSTD[colorIndex % this._ballMaterialsSTD.length];
+        }
+        getParkourBallMaterial(materialQ = -1) {
+            if (materialQ === -1) {
+                materialQ = this.game.getMaterialQ();
+            }
+            if (materialQ === MarbleRunSimulatorCore.MaterialQuality.PBR) {
+                return this._parkourBallMaterialPBR;
+            }
+            return this._parkourBallMaterialSTD;
         }
         get ballMaterialsCount() {
             return Math.min(this._ballMaterialsPBR.length, this._ballMaterialsSTD.length);
@@ -1587,6 +1631,12 @@ var MarbleRunSimulatorCore;
                 for (let i = 0; i < this.balls.length; i++) {
                     this.balls[i].marbleLoopSound.setVolume(0, 0.1);
                     this.balls[i].marbleBowlLoopSound.setVolume(0, 0.1);
+                }
+                let dt = this.game.scene.deltaTime / 1000;
+                if (isFinite(dt)) {
+                    for (let i = 0; i < this.balls.length; i++) {
+                        this.balls[i].updateMaterial(dt * this.game.currentTimeFactor);
+                    }
                 }
             }
         }

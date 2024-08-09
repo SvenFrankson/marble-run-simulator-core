@@ -60,6 +60,8 @@ namespace MarbleRunSimulatorCore {
 
         private _ballMaterialsPBR: BABYLON.Material[] = [];
         private _ballMaterialsSTD: BABYLON.Material[] = [];
+        private _parkourBallMaterialPBR: BABYLON.Material;
+        private _parkourBallMaterialSTD: BABYLON.Material;
         public getBallMaterial(colorIndex: number, materialQ: number = - 1): BABYLON.Material {
             if (materialQ === -1) {
                 materialQ = this.game.getMaterialQ();
@@ -69,6 +71,16 @@ namespace MarbleRunSimulatorCore {
                 return this._ballMaterialsPBR[colorIndex % this._ballMaterialsPBR.length];
             }
             return this._ballMaterialsSTD[colorIndex % this._ballMaterialsSTD.length];
+        }
+        public getParkourBallMaterial(materialQ: number = - 1): BABYLON.Material {
+            if (materialQ === -1) {
+                materialQ = this.game.getMaterialQ();
+            }
+
+            if (materialQ === MaterialQuality.PBR) {
+                return this._parkourBallMaterialPBR;
+            }
+            return this._parkourBallMaterialSTD;
         }
         public get ballMaterialsCount(): number {
             return Math.min(this._ballMaterialsPBR.length, this._ballMaterialsSTD.length);
@@ -318,6 +330,25 @@ namespace MarbleRunSimulatorCore {
                 this._materialsSTD[4],
                 this._materialsSTD[5]
             ]
+
+            let parkourBallColor = BABYLON.Color3.FromHexString("#0c0c18");
+
+            let parkourBallMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("parkour-ball-pbr", this.game.scene);
+            parkourBallMaterialPBR.baseColor = parkourBallColor;
+            parkourBallMaterialPBR.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/ball-parkour.png", undefined, undefined, false);
+            parkourBallMaterialPBR.metallic = 0.75;
+            parkourBallMaterialPBR.roughness = 0.25;
+            parkourBallMaterialPBR.environmentTexture = envTexture;
+            
+            let parkourBallMaterialSTD = new BABYLON.StandardMaterial("parkour-ball-pbr", this.game.scene);
+            parkourBallMaterialSTD.diffuseColor = parkourBallColor;
+            parkourBallMaterialSTD.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/ball-parkour.png", undefined, undefined, false);
+            parkourBallMaterialSTD.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            parkourBallMaterialSTD.emissiveColor = parkourBallMaterialSTD.diffuseColor.scale(0.5);
+            parkourBallMaterialSTD.roughness = 0.25;
+
+            this._parkourBallMaterialPBR = parkourBallMaterialPBR;
+            this._parkourBallMaterialSTD = parkourBallMaterialSTD;
 
             /*
             this._wallpapers = [];

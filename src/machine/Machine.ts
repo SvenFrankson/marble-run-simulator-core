@@ -371,10 +371,17 @@ namespace MarbleRunSimulatorCore {
                 if (this.exitShooter) {
                     this.exitShooter.update(dt);
                 }
-            } else {
+            }
+            else {
                 for (let i = 0; i < this.balls.length; i++) {
                     this.balls[i].marbleLoopSound.setVolume(0, 0.1);
                     this.balls[i].marbleBowlLoopSound.setVolume(0, 0.1);
+                }
+                let dt = this.game.scene.deltaTime / 1000;
+                if (isFinite(dt)) {
+                    for (let i = 0; i < this.balls.length; i++) {
+                        this.balls[i].updateMaterial(dt * this.game.currentTimeFactor);
+                    }
                 }
             }
         }

@@ -32,9 +32,12 @@ declare namespace MarbleRunSimulatorCore {
         velocity: BABYLON.Vector3;
         private _hasBoostMaterial;
         private _baseColor;
+        private _boostColor;
         private _boosting;
         get boosting(): boolean;
         set boosting(v: boolean);
+        useBoostingMaterial(): void;
+        unuseBoostingMaterial(): void;
         rotationSpeed: number;
         rotationAxis: BABYLON.Vector3;
         surface: Surface;
@@ -89,6 +92,7 @@ declare namespace MarbleRunSimulatorCore {
         visibleVelocity: BABYLON.Vector3;
         collisionState: number;
         recordedPositions: BABYLON.Vector3[];
+        updateMaterial(dt: number): void;
         update(dt: number): void;
     }
 }
@@ -113,7 +117,10 @@ declare namespace MarbleRunSimulatorCore {
         get metalMaterialsCount(): number;
         private _ballMaterialsPBR;
         private _ballMaterialsSTD;
+        private _parkourBallMaterialPBR;
+        private _parkourBallMaterialSTD;
         getBallMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
+        getParkourBallMaterial(materialQ?: number): BABYLON.Material;
         get ballMaterialsCount(): number;
         private _wallpapers;
         getWallpaperMaterial(index: number): BABYLON.Material;
