@@ -107,6 +107,7 @@ namespace MarbleRunSimulatorCore {
         public redMaterial: BABYLON.StandardMaterial;
         public greenMaterial: BABYLON.StandardMaterial;
         public blueMaterial: BABYLON.StandardMaterial;
+        public ballAnimationMaterial: BABYLON.StandardMaterial;
         public whiteAutolitMaterial: BABYLON.StandardMaterial;
         public whiteFullLitMaterial: BABYLON.StandardMaterial;
         public steelFullLitMaterial: BABYLON.StandardMaterial;
@@ -133,6 +134,12 @@ namespace MarbleRunSimulatorCore {
             this.gridMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.gridMaterial.specularColor.copyFromFloats(0, 0, 0);
             //this.gridMaterial.alpha = this.game.config.getValue("gridOpacity");
+
+            this.ballAnimationMaterial = new BABYLON.StandardMaterial("ball-animation-material");
+            this.ballAnimationMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.ballAnimationMaterial.specularColor.copyFromFloats(0, 0, 0);
+            this.ballAnimationMaterial.emissiveColor = new BABYLON.Color3(0.9, 0.1, 0.3);
+            this.ballAnimationMaterial.alpha = 0.5;
 
             this.cyanMaterial = new BABYLON.StandardMaterial("cyan-material");
             this.cyanMaterial.diffuseColor = BABYLON.Color3.FromHexString("#00FFFF");

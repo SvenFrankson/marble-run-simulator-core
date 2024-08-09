@@ -30,6 +30,7 @@ declare namespace MarbleRunSimulatorCore {
         get mass(): number;
         get sectionArea(): number;
         velocity: BABYLON.Vector3;
+        private _boostAnimation;
         private _hasBoostMaterial;
         private _baseColor;
         private _boostColor;
@@ -92,8 +93,22 @@ declare namespace MarbleRunSimulatorCore {
         visibleVelocity: BABYLON.Vector3;
         collisionState: number;
         recordedPositions: BABYLON.Vector3[];
-        updateMaterial(dt: number): void;
+        updateMaterial(rawDT: number): void;
         update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class BallBoostAnimation extends BABYLON.Mesh {
+        ball: Ball;
+        private _duration;
+        private _timer;
+        shown: boolean;
+        get instantiated(): boolean;
+        rings: BABYLON.Mesh[];
+        constructor(ball: Ball);
+        instantiate(): void;
+        uninstantiate(): void;
+        update(rawDT: number): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -140,6 +155,7 @@ declare namespace MarbleRunSimulatorCore {
         redMaterial: BABYLON.StandardMaterial;
         greenMaterial: BABYLON.StandardMaterial;
         blueMaterial: BABYLON.StandardMaterial;
+        ballAnimationMaterial: BABYLON.StandardMaterial;
         whiteAutolitMaterial: BABYLON.StandardMaterial;
         whiteFullLitMaterial: BABYLON.StandardMaterial;
         steelFullLitMaterial: BABYLON.StandardMaterial;

@@ -105,9 +105,18 @@ var MarbleRunSimulatorCore;
                     this._baseColor = this.material.diffuseColor.clone();
                 }
             }
+            if (!this._boostAnimation) {
+                this._boostAnimation = new MarbleRunSimulatorCore.BallBoostAnimation(this);
+            }
+            if (!this._boostAnimation.instantiated) {
+                this._boostAnimation.instantiate();
+            }
         }
         unuseBoostingMaterial() {
             this._hasBoostMaterial = false;
+            if (this._boostAnimation.instantiated) {
+                this._boostAnimation.uninstantiate();
+            }
             this.material = this.game.materials.getBallMaterial(this.materialIndex);
         }
         get showPositionZeroGhost() {
@@ -225,6 +234,9 @@ var MarbleRunSimulatorCore;
         }
         dispose(doNotRecurse, disposeMaterialAndTextures) {
             super.dispose(doNotRecurse, disposeMaterialAndTextures);
+            if (this._boostAnimation) {
+                this._boostAnimation.dispose();
+            }
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleLoopSound.pause();
             this.marbleBowlLoopSound.setVolume(0, 0.1);
@@ -271,7 +283,7 @@ var MarbleRunSimulatorCore;
             this._lastWires[this._pouet] = wire;
             this._lastWireIndexes[this._pouet] = index;
         }
-        updateMaterial(dt) {
+        updateMaterial(rawDT) {
             if (this._hasBoostMaterial) {
                 let materialColor;
                 if (this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
@@ -285,9 +297,13 @@ var MarbleRunSimulatorCore;
                     if (this.boosting) {
                         targetColor = this._boostColor;
                     }
-                    let f = Nabu.Easing.smoothNSec(1 / dt, 0.3);
+                    let f = Nabu.Easing.smoothNSec(1 / rawDT, 0.3);
                     BABYLON.Color3.LerpToRef(materialColor, targetColor, 1 - f, materialColor);
                 }
+            }
+            if (this._boostAnimation) {
+                this._boostAnimation.shown = this.boosting;
+                this._boostAnimation.update(rawDT);
             }
         }
         update(dt) {
@@ -310,7 +326,10 @@ var MarbleRunSimulatorCore;
             }
             this._timer += dt;
             this._timer = Math.min(this._timer, 1);
-            this.updateMaterial(dt);
+            let rawDT = this.getScene().deltaTime / 1000;
+            if (isFinite(rawDT)) {
+                this.updateMaterial(rawDT);
+            }
             while (this._timer > 0) {
                 let m = this.mass;
                 let physicDT = this.game.physicDT;
@@ -745,6 +764,67 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
+    class BallBoostAnimation extends BABYLON.Mesh {
+        constructor(ball) {
+            super("ball-boost-animation");
+            this.ball = ball;
+            this._duration = 1.3;
+            this._timer = 0;
+            this.shown = false;
+            this.rings = [];
+        }
+        get instantiated() {
+            return this.rings && this.rings.length > 0;
+        }
+        instantiate() {
+            if (!this.instantiated) {
+                for (let i = 0; i < 4; i++) {
+                    //this.rings[i] = BABYLON.MeshBuilder.CreateCylinder("ring-" + i.toFixed(0), { height: 0.0015, diameter: 0.02, tessellation: 12 });
+                    this.rings[i] = BABYLON.MeshBuilder.CreateTorus("ring-" + i.toFixed(0), { diameter: 0.017, tessellation: 12, thickness: 0.002 });
+                    this.rings[i].material = this.ball.game.materials.ballAnimationMaterial;
+                    this.rings[i].visibility = 0;
+                    this.rings[i].parent = this;
+                }
+            }
+        }
+        uninstantiate() {
+            for (let i = 0; i < this.rings.length; i++) {
+                this.rings[i].dispose();
+            }
+            this.rings = [];
+        }
+        update(rawDT) {
+            this._timer += rawDT;
+            while (this._timer > this._duration) {
+                this._timer -= this._duration;
+            }
+            let targetAlpha = this.shown ? 1 : 0;
+            let f = Nabu.Easing.smoothNSec(1 / rawDT, 0.3);
+            for (let i = 0; i < this.rings.length; i++) {
+                this.rings[i].visibility = this.rings[i].visibility * f + targetAlpha * (1 - f);
+            }
+            this.position.copyFrom(this.ball.position);
+            for (let i = 0; i < this.rings.length; i++) {
+                let f = this._timer / this._duration + i / this.rings.length;
+                while (f > 1) {
+                    f -= 1;
+                }
+                this.rings[i].position.y = -this.ball.radius - 0.02 + 0.02 * f;
+                let size = 1;
+                if (f <= 0.9) {
+                    size = f / 0.9;
+                }
+                else {
+                    size = 1 - (f - 0.9) / 0.1;
+                }
+                this.rings[i].scaling.copyFromFloats(size, size, size);
+            }
+        }
+    }
+    MarbleRunSimulatorCore.BallBoostAnimation = BallBoostAnimation;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
     let MaterialType;
     (function (MaterialType) {
         MaterialType[MaterialType["Plastic"] = 0] = "Plastic";
@@ -776,6 +856,11 @@ var MarbleRunSimulatorCore;
             this.gridMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.gridMaterial.specularColor.copyFromFloats(0, 0, 0);
             //this.gridMaterial.alpha = this.game.config.getValue("gridOpacity");
+            this.ballAnimationMaterial = new BABYLON.StandardMaterial("ball-animation-material");
+            this.ballAnimationMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.ballAnimationMaterial.specularColor.copyFromFloats(0, 0, 0);
+            this.ballAnimationMaterial.emissiveColor = new BABYLON.Color3(0.9, 0.1, 0.3);
+            this.ballAnimationMaterial.alpha = 0.5;
             this.cyanMaterial = new BABYLON.StandardMaterial("cyan-material");
             this.cyanMaterial.diffuseColor = BABYLON.Color3.FromHexString("#00FFFF");
             this.cyanMaterial.specularColor.copyFromFloats(0, 0, 0);
