@@ -1507,6 +1507,7 @@ var MarbleRunSimulatorCore;
             this.name = MachineName.GetRandom();
             this.trackFactory = new MarbleRunSimulatorCore.MachinePartFactory(this);
             this.templateManager = new MarbleRunSimulatorCore.TemplateManager(this);
+            this.sleepersMeshProp = { grndAnchors: true, grndAnchorsMaxY: 0.35 };
             this.exitShooter = new MarbleRunSimulatorCore.Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 0, 6, 3] });
             this.exitShooter.isSelectable = false;
             this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
@@ -2068,7 +2069,7 @@ var MarbleRunSimulatorCore;
             return false;
         }
         serialize() {
-            return this.serializeV9();
+            return this.serializeV910(10);
         }
         serializeV1() {
             let data = {
@@ -2297,11 +2298,11 @@ var MarbleRunSimulatorCore;
             data.d = dataString;
             return data;
         }
-        serializeV9() {
+        serializeV910(version) {
             let data = {
                 n: this.name,
                 a: this.author,
-                v: 9
+                v: version
             };
             let dataString = "";
             // Add ball count
@@ -2370,6 +2371,9 @@ var MarbleRunSimulatorCore;
                 dataString += NToHex(decor.flip ? 1 : 0, 1);
             }
             data.d = dataString;
+            if (version === 10) {
+                data.sp = this.sleepersMeshProp;
+            }
             return data;
         }
         deserialize(data) {
@@ -2393,8 +2397,8 @@ var MarbleRunSimulatorCore;
                 else if (version === 7 || version === 8) {
                     return this.deserializeV78(data);
                 }
-                else if (version === 9) {
-                    return this.deserializeV9(data);
+                else if (version === 9 || version === 10) {
+                    return this.deserializeV910(data);
                 }
             }
         }
@@ -2753,7 +2757,7 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
-        deserializeV9(data) {
+        deserializeV910(data) {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -2767,6 +2771,11 @@ var MarbleRunSimulatorCore;
                 }
                 else {
                     this.roomIndex = 0;
+                }
+                if (data.v === 10) {
+                    if (data.sp) {
+                        this.sleepersMeshProp = data.sp;
+                    }
                 }
                 this.balls = [];
                 this.parts = [];
@@ -3162,7 +3171,7 @@ var MarbleRunSimulatorCore;
             this.position.x = this._i * MarbleRunSimulatorCore.tileWidth;
             this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight;
             this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth;
-            this.sleepersMeshProp = { drawGroundAnchors: true, groundAnchorsRelativeMaxY: 0.35 };
+            this.sleepersMeshProp = this.machine.sleepersMeshProp;
             this.tracks = [];
         }
         get partName() {
@@ -4666,8 +4675,8 @@ var MarbleRunSimulatorCore;
             if (!isFinite(props.spacing)) {
                 props.spacing = 0.03;
             }
-            if (!isFinite(props.groundAnchorsRelativeMaxY)) {
-                props.groundAnchorsRelativeMaxY = 1;
+            if (!isFinite(props.grndAnchorsMaxY)) {
+                props.grndAnchorsMaxY = 1;
             }
             let q = part.game.getGeometryQ();
             let partialsDatas = [];
@@ -4794,14 +4803,14 @@ var MarbleRunSimulatorCore;
                                 tmp.dispose();
                             }
                         }
-                        if (track.part.isPlaced && (props.drawGroundAnchors && q > 0)) {
+                        if (track.part.isPlaced && (props.grndAnchors && q > 0)) {
                             if (((n - 1.5) % 6 === 0 || count === 1) && up.y > 0.1) {
                                 let anchorYWorld = anchor.y + part.position.y;
                                 let anchorBase = anchor.clone();
                                 let minY = part.machine.baseMeshMinY;
                                 let maxY = part.machine.baseMeshMaxY;
                                 anchorBase.y = part.machine.baseMeshMinY - part.position.y;
-                                if (anchorYWorld < minY + props.groundAnchorsRelativeMaxY * (maxY - minY)) {
+                                if (anchorYWorld < minY + props.grndAnchorsMaxY * (maxY - minY)) {
                                     let rayOrigin = anchor.add(part.position);
                                     let rayDir = new BABYLON.Vector3(0, -1, 0);
                                     rayOrigin.addInPlace(rayDir.scale(0.01));

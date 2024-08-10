@@ -96,6 +96,7 @@ namespace MarbleRunSimulatorCore {
         parts?: IMachinePartData[]; // v1 - deprecated
         d?: string; // v2
         r?: number; // v6 - RoomIndex
+        sp?: ISleeperMeshProps; // v10
     }
 
     export class Machine {
@@ -115,6 +116,7 @@ namespace MarbleRunSimulatorCore {
         public decors: MachineDecor[] = [];
         public balls: Ball[] = [];
         public debugAxis: BABYLON.LinesMesh;
+        public sleepersMeshProp: ISleeperMeshProps;
 
         public trackFactory: MachinePartFactory;
         public templateManager: TemplateManager;
@@ -140,6 +142,8 @@ namespace MarbleRunSimulatorCore {
             this.name = MachineName.GetRandom();
             this.trackFactory = new MachinePartFactory(this);
             this.templateManager = new TemplateManager(this);
+
+            this.sleepersMeshProp = { grndAnchors: true, grndAnchorsMaxY: 0.35 };
 
             this.exitShooter = new Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 0, 6, 3] });
             this.exitShooter.isSelectable = false;
@@ -781,7 +785,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
-            return this.serializeV9();
+            return this.serializeV910(10);
         }
 
         public serializeV1(): IMachineData {
@@ -1043,11 +1047,11 @@ namespace MarbleRunSimulatorCore {
             return data;
         }
 
-        public serializeV9(): IMachineData {
+        public serializeV910(version: number): IMachineData {
             let data: IMachineData = {
                 n: this.name,
                 a: this.author,
-                v: 9
+                v: version
             };
 
             let dataString = "";
@@ -1125,6 +1129,10 @@ namespace MarbleRunSimulatorCore {
 
             data.d = dataString;
 
+            if (version === 10) {
+                data.sp = this.sleepersMeshProp;
+            }
+
             return data;
         }
 
@@ -1151,8 +1159,8 @@ namespace MarbleRunSimulatorCore {
                 else if (version === 7 || version === 8) {
                     return this.deserializeV78(data);
                 }
-                else if (version === 9) {
-                    return this.deserializeV9(data);
+                else if (version === 9 || version === 10) {
+                    return this.deserializeV910(data);
                 }
             }
         }
@@ -1562,7 +1570,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public deserializeV9(data: IMachineData): void {
+        public deserializeV910(data: IMachineData): void {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -1576,6 +1584,11 @@ namespace MarbleRunSimulatorCore {
                 }
                 else {
                     this.roomIndex = 0;
+                }
+                if (data.v === 10) {
+                    if (data.sp) {
+                        this.sleepersMeshProp = data.sp;
+                    }
                 }
             
                 this.balls = [];

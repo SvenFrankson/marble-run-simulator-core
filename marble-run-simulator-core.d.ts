@@ -280,6 +280,7 @@ declare namespace MarbleRunSimulatorCore {
         parts?: IMachinePartData[];
         d?: string;
         r?: number;
+        sp?: ISleeperMeshProps;
     }
     class Machine {
         game: IGame;
@@ -298,6 +299,7 @@ declare namespace MarbleRunSimulatorCore {
         decors: MachineDecor[];
         balls: Ball[];
         debugAxis: BABYLON.LinesMesh;
+        sleepersMeshProp: ISleeperMeshProps;
         trackFactory: MachinePartFactory;
         templateManager: TemplateManager;
         sleeperVertexData: BABYLON.VertexData[];
@@ -356,14 +358,14 @@ declare namespace MarbleRunSimulatorCore {
         serializeV2(): IMachineData;
         serializeV3456(version: number): IMachineData;
         serializeV8(): IMachineData;
-        serializeV9(): IMachineData;
+        serializeV910(version: number): IMachineData;
         lastDeserializedData: IMachineData;
         deserialize(data: IMachineData): void;
         deserializeV1(data: IMachineData): void;
         deserializeV2(data: IMachineData): void;
         deserializeV3456(data: IMachineData): void;
         deserializeV78(data: IMachineData): void;
-        deserializeV9(data: IMachineData): void;
+        deserializeV910(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;
@@ -648,8 +650,8 @@ declare namespace MarbleRunSimulatorCore {
     interface ISleeperMeshProps {
         spacing?: number;
         drawWallAnchors?: boolean;
-        drawGroundAnchors?: boolean;
-        groundAnchorsRelativeMaxY?: number;
+        grndAnchors?: boolean;
+        grndAnchorsMaxY?: number;
         forceDrawWallAnchors?: boolean;
         forcedWallAnchorsZ?: number;
     }

@@ -2,8 +2,8 @@ namespace MarbleRunSimulatorCore {
     export interface ISleeperMeshProps {
         spacing?: number;
         drawWallAnchors?: boolean;
-        drawGroundAnchors?: boolean;
-        groundAnchorsRelativeMaxY?: number;
+        grndAnchors?: boolean;
+        grndAnchorsMaxY?: number;
         forceDrawWallAnchors?: boolean;
         forcedWallAnchorsZ?: number;
     }
@@ -13,8 +13,8 @@ namespace MarbleRunSimulatorCore {
             if (!isFinite(props.spacing)) {
                 props.spacing = 0.03;
             }
-            if (!isFinite(props.groundAnchorsRelativeMaxY)) {
-                props.groundAnchorsRelativeMaxY = 1;
+            if (!isFinite(props.grndAnchorsMaxY)) {
+                props.grndAnchorsMaxY = 1;
             }
 
             let q = part.game.getGeometryQ();
@@ -157,7 +157,7 @@ namespace MarbleRunSimulatorCore {
                             }
                         }
 
-                        if (track.part.isPlaced && (props.drawGroundAnchors && q > 0)) {
+                        if (track.part.isPlaced && (props.grndAnchors && q > 0)) {
                             if (((n - 1.5) % 6 === 0 || count === 1) && up.y > 0.1) {
                                 let anchorYWorld = anchor.y + part.position.y;
                                 let anchorBase = anchor.clone();
@@ -165,7 +165,7 @@ namespace MarbleRunSimulatorCore {
                                 let maxY = part.machine.baseMeshMaxY;
                                 anchorBase.y = part.machine.baseMeshMinY - part.position.y;
 
-                                if (anchorYWorld < minY + props.groundAnchorsRelativeMaxY * (maxY - minY)) {
+                                if (anchorYWorld < minY + props.grndAnchorsMaxY * (maxY - minY)) {
                                     let rayOrigin = anchor.add(part.position);
                                     let rayDir = new BABYLON.Vector3(0, -1, 0);
                                     rayOrigin.addInPlace(rayDir.scale(0.01));
