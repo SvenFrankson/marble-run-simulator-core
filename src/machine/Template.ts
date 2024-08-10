@@ -365,13 +365,17 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     let d = parseInt(partName.split("-")[1].split(".")[2]);
-                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
+                    let s = parseInt(partName.split("-")[1].split(".")[3]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, s, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("piperamp-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     let d = parseInt(partName.split("-")[1].split(".")[2]);
-                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ, true);
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 2, mirrorX, mirrorZ, true);
                 }
                 else if (partName.startsWith("wave-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);

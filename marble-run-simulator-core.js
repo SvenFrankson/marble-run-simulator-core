@@ -3921,9 +3921,16 @@ var MarbleRunSimulatorCore;
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
                     let d = parseInt(argStr.split(".")[2]);
+                    let s = parseInt(argStr.split(".")[3]);
                     prop.w = w;
                     prop.h = h;
                     prop.d = d;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
+                }
+                if (isNaN(prop.s)) {
+                    prop.s = MarbleRunSimulatorCore.TrackSpeed.Medium;
                 }
                 return new MarbleRunSimulatorCore.Ramp(this.machine, prop);
             }
@@ -3975,6 +3982,9 @@ var MarbleRunSimulatorCore;
                     if (isFinite(s)) {
                         prop.s = s;
                     }
+                }
+                if (isNaN(prop.s)) {
+                    prop.s = MarbleRunSimulatorCore.TrackSpeed.Medium;
                 }
                 return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
             }
@@ -5160,13 +5170,17 @@ var MarbleRunSimulatorCore;
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     let d = parseInt(partName.split("-")[1].split(".")[2]);
-                    data = MarbleRunSimulatorCore.Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
+                    let s = parseInt(partName.split("-")[1].split(".")[3]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = MarbleRunSimulatorCore.Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, s, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("piperamp-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     let d = parseInt(partName.split("-")[1].split(".")[2]);
-                    data = MarbleRunSimulatorCore.Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ, true);
+                    data = MarbleRunSimulatorCore.Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 2, mirrorX, mirrorZ, true);
                 }
                 else if (partName.startsWith("wave-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
@@ -6794,18 +6808,28 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             let partName = (prop.pipeVersion ? "pipe" : "") + "ramp-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            if (!prop.pipeVersion) {
+                partName += "." + prop.s.toFixed(0);
+            }
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
-        static GenerateTemplate(w = 1, h = 1, d = 1, mirrorX, mirrorZ, pipeVersion) {
+        static GenerateTemplate(w, h, d, s, mirrorX, mirrorZ, pipeVersion) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = (pipeVersion ? "pipe" : "") + "ramp-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+            if (!pipeVersion) {
+                template.partName += "." + s.toFixed(0);
+            }
             template.w = w;
             template.h = h;
             template.d = d;
+            template.s = s;
             template.xExtendable = true;
             template.yExtendable = true;
             template.zExtendable = true;
+            if (!pipeVersion) {
+                template.sExtendable = true;
+            }
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
             let dir = new BABYLON.Vector3(1, 0, 0);
@@ -6870,6 +6894,7 @@ var MarbleRunSimulatorCore;
                     trackpoint.position.y = tmpPoint.y;
                 }
             }
+            template.maxAngle = Math.PI / 4 / 2 * template.s;
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
             }
@@ -6913,6 +6938,7 @@ var MarbleRunSimulatorCore;
                 w: w,
                 h: h,
                 d: d,
+                s: this.s,
                 c: this.colors,
                 mirrorX: mirrorX,
                 mirrorZ: mirrorZ,
@@ -9065,9 +9091,6 @@ var MarbleRunSimulatorCore;
     class UTurn extends MarbleRunSimulatorCore.MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
-            if (isNaN(prop.s)) {
-                prop.s = MarbleRunSimulatorCore.TrackSpeed.Medium;
-            }
             let partName = (prop.pipeVersion ? "pipe" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             if (!prop.pipeVersion) {
                 partName += "." + prop.s.toFixed(0);
@@ -9181,6 +9204,7 @@ var MarbleRunSimulatorCore;
                 k: k,
                 h: h,
                 d: d,
+                s: this.s,
                 c: this.colors,
                 mirrorX: mirrorX,
                 mirrorZ: mirrorZ,

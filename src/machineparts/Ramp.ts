@@ -67,21 +67,31 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
             
             let partName = (prop.pipeVersion ? "pipe" : "") + "ramp-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            if (!prop.pipeVersion) {
+                partName += "." + prop.s.toFixed(0);
+            }
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
 
-        public static GenerateTemplate(w: number = 1, h: number = 1, d: number = 1, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(w: number, h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
             template.partName = (pipeVersion ? "pipe" : "") + "ramp-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+            if (!pipeVersion) {
+                template.partName += "." + s.toFixed(0)
+            }
 
             template.w = w;
             template.h = h;
             template.d = d;
+            template.s = s;
             template.xExtendable = true;
             template.yExtendable = true;
             template.zExtendable = true;
+            if (!pipeVersion) {
+                template.sExtendable = true;
+            }
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
 
@@ -151,6 +161,7 @@ namespace MarbleRunSimulatorCore {
                     trackpoint.position.y = tmpPoint.y;
                 }
             }
+            template.maxAngle = Math.PI / 4 / 2 * template.s;
 
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
@@ -197,6 +208,7 @@ namespace MarbleRunSimulatorCore {
                 w: w,
                 h: h,
                 d: d,
+                s: this.s,
                 c: this.colors,
                 mirrorX: mirrorX,
                 mirrorZ: mirrorZ,

@@ -3,10 +3,6 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
             
-            if (isNaN(prop.s)) {
-                prop.s = TrackSpeed.Medium;
-            }
-
             let partName = (prop.pipeVersion ? "pipe" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             if (!prop.pipeVersion) {
                 partName += "." + prop.s.toFixed(0);
@@ -134,6 +130,7 @@ namespace MarbleRunSimulatorCore {
                 k: k,
                 h: h,
                 d: d,
+                s: this.s,
                 c: this.colors,
                 mirrorX: mirrorX,
                 mirrorZ: mirrorZ,

@@ -78,9 +78,16 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
                     let d = parseInt(argStr.split(".")[2]);
+                    let s = parseInt(argStr.split(".")[3]);
                     prop.w = w;
                     prop.h = h;
                     prop.d = d;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
+                }
+                if (isNaN(prop.s)) {
+                    prop.s = TrackSpeed.Medium;
                 }
                 return new Ramp(this.machine, prop);
             }
@@ -132,6 +139,9 @@ namespace MarbleRunSimulatorCore {
                     if (isFinite(s)) {
                         prop.s = s;
                     }
+                }
+                if (isNaN(prop.s)) {
+                    prop.s = TrackSpeed.Medium;
                 }
                 return new UTurn(this.machine, prop);
             }
