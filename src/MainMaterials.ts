@@ -142,7 +142,8 @@ namespace MarbleRunSimulatorCore {
             this.ballAnimationMaterial.alpha = 0.5;
 
             this.cyanMaterial = new BABYLON.StandardMaterial("cyan-material");
-            this.cyanMaterial.diffuseColor = BABYLON.Color3.FromHexString("#00FFFF");
+            this.cyanMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.cyanMaterial.emissiveColor.copyFromFloats(0, 1, 1);
             this.cyanMaterial.specularColor.copyFromFloats(0, 0, 0);
 
             this.whiteAutolitMaterial = new BABYLON.StandardMaterial("white-autolit-material");
