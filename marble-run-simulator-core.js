@@ -1324,7 +1324,6 @@ var MarbleRunSimulatorCore;
             this.absolutePath = [];
             this.parent = this.track;
             this.rotationQuaternion = BABYLON.Quaternion.Identity();
-            Wire.Instances.push(this);
         }
         get size() {
             if (isFinite(this.wireSize)) {
@@ -1428,7 +1427,6 @@ var MarbleRunSimulatorCore;
         }
     }
     Wire.DEBUG_DISPLAY = false;
-    Wire.Instances = new Nabu.UniqueList();
     MarbleRunSimulatorCore.Wire = Wire;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 /// <reference path="../../../babylon.d.ts"/>
@@ -6633,13 +6631,26 @@ var MarbleRunSimulatorCore;
             template.mirrorX = mirrorX;
             template.nExtendable = true;
             template.xMirrorable = true;
-            let d = 2.5 * MarbleRunSimulatorCore.tileHeight;
-            let aDeg = template.n * 10;
-            let aRad = (aDeg / 180) * Math.PI;
-            let xEnd = MarbleRunSimulatorCore.tileWidth * 0.5 + Math.cos(aRad) * d;
-            let yEnd = -MarbleRunSimulatorCore.tileHeight * template.h + Math.sin(aRad) * d;
-            template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xEnd, yEnd, 0), MarbleRunSimulatorCore.Tools.V3Dir(90 - aDeg))];
+            if (n < 9) {
+                let d = 2.5 * MarbleRunSimulatorCore.tileHeight;
+                let aDeg = template.n * 10;
+                let aRad = (aDeg / 180) * Math.PI;
+                let xEnd = MarbleRunSimulatorCore.tileWidth * 0.5 + Math.cos(aRad) * d;
+                let yEnd = -MarbleRunSimulatorCore.tileHeight * template.h + Math.sin(aRad) * d;
+                template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xEnd, yEnd, 0), MarbleRunSimulatorCore.Tools.V3Dir(90 - aDeg))];
+            }
+            else {
+                let d = 2.5 * MarbleRunSimulatorCore.tileHeight - 0.02;
+                template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[0].trackpoints = [
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + 0.02, -MarbleRunSimulatorCore.tileHeight * template.h, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + 0.02 + d * Math.SQRT2 / 2, MarbleRunSimulatorCore.tileHeight * 0.5 - 0.02 - d * Math.SQRT2 / 2, 0)),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.5, MarbleRunSimulatorCore.tileHeight * 0.5 - 0.01, 0), MarbleRunSimulatorCore.Tools.V3Dir(0)),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.5, MarbleRunSimulatorCore.tileHeight * 0.5, 0), MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(-90))
+                ];
+            }
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
             }

@@ -182,7 +182,6 @@ declare namespace MarbleRunSimulatorCore {
     class Wire extends BABYLON.Mesh {
         track: MachinePart;
         static DEBUG_DISPLAY: boolean;
-        static Instances: Nabu.UniqueList<Wire>;
         path: BABYLON.Vector3[];
         normals: BABYLON.Vector3[];
         absolutePath: BABYLON.Vector3[];

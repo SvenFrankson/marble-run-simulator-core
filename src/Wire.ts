@@ -2,8 +2,6 @@ namespace MarbleRunSimulatorCore {
     export class Wire extends BABYLON.Mesh {
         public static DEBUG_DISPLAY: boolean = false;
 
-        public static Instances: Nabu.UniqueList<Wire> = new Nabu.UniqueList<Wire>();
-
         public path: BABYLON.Vector3[] = [];
         public normals: BABYLON.Vector3[] = [];
         public absolutePath: BABYLON.Vector3[] = [];
@@ -30,7 +28,6 @@ namespace MarbleRunSimulatorCore {
             super("wire");
             this.parent = this.track;
             this.rotationQuaternion = BABYLON.Quaternion.Identity();
-            Wire.Instances.push(this);
         }
 
         public show(): void {
