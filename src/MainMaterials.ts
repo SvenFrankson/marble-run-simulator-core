@@ -100,6 +100,7 @@ namespace MarbleRunSimulatorCore {
         public paintingLight: BABYLON.StandardMaterial;
         public wallShadow: BABYLON.StandardMaterial;
         public groundMaterial: BABYLON.StandardMaterial;
+        public whiteGroundMaterial: BABYLON.StandardMaterial;
         public handleMaterial: BABYLON.StandardMaterial;
         public ghostMaterial: BABYLON.StandardMaterial;
         public gridMaterial: BABYLON.StandardMaterial;
@@ -241,6 +242,11 @@ namespace MarbleRunSimulatorCore {
             this.groundMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/concrete.png");
             this.groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#3f4c52");
             this.groundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+
+            this.whiteGroundMaterial = new BABYLON.StandardMaterial("ground-material");
+            this.whiteGroundMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/concrete.png");
+            this.whiteGroundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#ffffff");
+            this.whiteGroundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
 
             let cableMaterial = new BABYLON.StandardMaterial("cable-material");
             cableMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");

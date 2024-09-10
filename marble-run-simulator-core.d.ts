@@ -148,6 +148,7 @@ declare namespace MarbleRunSimulatorCore {
         paintingLight: BABYLON.StandardMaterial;
         wallShadow: BABYLON.StandardMaterial;
         groundMaterial: BABYLON.StandardMaterial;
+        whiteGroundMaterial: BABYLON.StandardMaterial;
         handleMaterial: BABYLON.StandardMaterial;
         ghostMaterial: BABYLON.StandardMaterial;
         gridMaterial: BABYLON.StandardMaterial;
@@ -1010,8 +1011,8 @@ declare namespace MarbleRunSimulatorCore {
         shieldLength: number;
         clicSound: BABYLON.Sound;
         base: BABYLON.Mesh;
-        animateKickerArm: (target: number, duration: number) => Promise<void>;
-        animateKickerKick: (target: number, duration: number) => Promise<void>;
+        animateKickerArm: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
+        animateKickerKick: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(h: number, n: number, mirrorX: boolean): MachinePartTemplate;
@@ -1198,6 +1199,7 @@ declare namespace MarbleRunSimulatorCore {
         private _lightedPlane;
         private _paintBody;
         private _paintPlane;
+        getAllMeshes(): BABYLON.Mesh[];
         constructor(room: Room, paintingName: string, size?: number);
         instantiate(): Promise<void>;
         setLayerMask(mask: number): void;
@@ -1214,6 +1216,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     interface IRoomDecor extends BABYLON.Mesh {
         setLayerMask(mask: number): void;
+        getAllMeshes(): BABYLON.Mesh[];
     }
     class Room {
         game: IGame;
@@ -1237,6 +1240,7 @@ declare namespace MarbleRunSimulatorCore {
         contextualRoomIndex(n: number): number;
         instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, wallPaperIndex: number): Promise<void>;
         instantiateMuseum(useDecors?: boolean, skyboxPath?: string): Promise<void>;
+        instantiateOpenRoom(useDecors?: boolean, skyboxPath?: string): Promise<void>;
         animateShow(duration?: number): Promise<void>;
         animateHide(duration?: number): Promise<void>;
         setGroundHeight(h: number): void;
@@ -1247,6 +1251,8 @@ declare namespace MarbleRunSimulatorCore {
     class Sculpt extends BABYLON.Mesh implements IRoomDecor {
         room: Room;
         mat: BABYLON.Material;
+        private _steel;
+        getAllMeshes(): BABYLON.Mesh[];
         constructor(room: Room, mat: BABYLON.Material);
         instantiate(): Promise<void>;
         setLayerMask(mask: number): void;

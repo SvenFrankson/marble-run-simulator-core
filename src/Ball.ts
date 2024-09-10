@@ -761,7 +761,7 @@ namespace MarbleRunSimulatorCore {
                         }
                         acceleration.addInPlace(boost);
                         */
-                       acceleration.scaleInPlace(2);
+                       acceleration.scaleInPlace(2.5);
                     }
                     acceleration.addInPlace(reactions)
                     acceleration.addInPlace(friction);

@@ -691,7 +691,7 @@ var MarbleRunSimulatorCore;
                         }
                         acceleration.addInPlace(boost);
                         */
-                        acceleration.scaleInPlace(2);
+                        acceleration.scaleInPlace(2.5);
                     }
                     acceleration.addInPlace(reactions);
                     acceleration.addInPlace(friction);
@@ -943,6 +943,10 @@ var MarbleRunSimulatorCore;
             this.groundMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/concrete.png");
             this.groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#3f4c52");
             this.groundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.whiteGroundMaterial = new BABYLON.StandardMaterial("ground-material");
+            this.whiteGroundMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/concrete.png");
+            this.whiteGroundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#ffffff");
+            this.whiteGroundMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             let cableMaterial = new BABYLON.StandardMaterial("cable-material");
             cableMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
             cableMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7).scale(0.75);
@@ -1626,7 +1630,6 @@ var MarbleRunSimulatorCore;
             this.isChallengeMachine = false;
             this.name = MachineName.GetRandom();
             this.author = "";
-            this.roomIndex = 0;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
         }
         dispose() {
@@ -1854,6 +1857,14 @@ var MarbleRunSimulatorCore;
                 let h = 1;
                 let d = this.baseMeshMaxZ - this.baseMeshMinZ;
                 if (this.baseFrame) {
+                    let i1 = this.game.room.light1.includedOnlyMeshes.indexOf(this.baseFrame);
+                    if (i1 != -1) {
+                        this.game.room.light1.includedOnlyMeshes.splice(i1, 1);
+                    }
+                    let i2 = this.game.room.light2.includedOnlyMeshes.indexOf(this.baseFrame);
+                    if (i2 != -1) {
+                        this.game.room.light2.includedOnlyMeshes.splice(i2, 1);
+                    }
                     this.baseFrame.dispose();
                 }
                 this.baseFrame = new BABYLON.Mesh("base-stand");
@@ -1861,8 +1872,12 @@ var MarbleRunSimulatorCore;
                 this.baseFrame.position.y = this.baseMeshMinY;
                 this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
                 this.baseFrame.material = this.game.materials.whiteMaterial;
+                this.game.spotLight.excludedMeshes = [this.baseFrame];
+                this.game.room.light1.includedOnlyMeshes.push(this.baseFrame);
+                this.game.room.light2.includedOnlyMeshes.push(this.baseFrame);
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/museum-stand.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
+                Mummu.ColorizeVertexDataInPlace(data, new BABYLON.Color3(0.9, 0.95, 1));
                 let positions = [...data.positions];
                 for (let i = 0; i < positions.length / 3; i++) {
                     let x = positions[3 * i];
@@ -2301,7 +2316,8 @@ var MarbleRunSimulatorCore;
             let data = {
                 n: this.name,
                 a: this.author,
-                v: version
+                v: version,
+                r: this.roomIndex
             };
             let dataString = "";
             // Add ball count
@@ -9707,6 +9723,15 @@ var MarbleRunSimulatorCore;
             this._paintPlane.parent = this;
             this.layerMask = 0x10000000;
         }
+        getAllMeshes() {
+            return [
+                this,
+                this._steelFrame,
+                this._lightedPlane,
+                this._paintBody,
+                this._paintPlane,
+            ];
+        }
         async instantiate() {
             let vertexDatas = await this.room.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/paint-support.babylon");
             if (vertexDatas && vertexDatas[0]) {
@@ -9769,11 +9794,10 @@ var MarbleRunSimulatorCore;
             this.game = game;
             this.decors = [];
             this._isBlurred = false;
-            this._currentRoomIndex = 1;
+            this._currentRoomIndex = 9;
             this.ground = new BABYLON.Mesh("room-ground");
             this.ground.layerMask = 0x10000000;
             this.ground.position.y = -2;
-            this.ground.receiveShadows = true;
             this.ground.material = this.game.materials.wallShadow;
             this.wall = new BABYLON.Mesh("room-wall");
             this.wall.layerMask = 0x10000000;
@@ -9785,14 +9809,12 @@ var MarbleRunSimulatorCore;
             this.frame.layerMask = 0x10000000;
             this.frame.material = this.game.materials.getMaterial(0);
             this.frame.parent = this.wall;
-            this.light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 3, 0).normalize(), this.game.scene);
+            this.light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 3, 0.5).normalize(), this.game.scene);
             this.light1.groundColor.copyFromFloats(0.3, 0.3, 0.3);
-            this.light1.intensity = 0.2;
-            this.light1.includeOnlyWithLayerMask = 0x10000000;
-            this.light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(-1, 3, 0).normalize(), this.game.scene);
+            this.light1.intensity = 0.6;
+            this.light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(-1, 3, -0.7).normalize(), this.game.scene);
             this.light2.groundColor.copyFromFloats(0.3, 0.3, 0.3);
-            this.light2.intensity = 0.2;
-            this.light2.includeOnlyWithLayerMask = 0x10000000;
+            this.light2.intensity = 0.1;
             this.skybox = BABYLON.MeshBuilder.CreateSphere("room-skybox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE, segments: 4 }, this.game.scene);
             this.skybox.layerMask = 0x10000000;
             this.skyboxMaterial = new BABYLON.StandardMaterial("room-skybox-material", this.game.scene);
@@ -9808,16 +9830,7 @@ var MarbleRunSimulatorCore;
         }
         set isBlurred(v) {
             this._isBlurred = v;
-            let layerMask = 0x0FFFFFFF;
-            if (this._isBlurred) {
-                this.light1.includeOnlyWithLayerMask = 0x10000000;
-                this.light2.includeOnlyWithLayerMask = 0x10000000;
-                layerMask = 0x10000000;
-            }
-            else {
-                this.light1.includeOnlyWithLayerMask = 0;
-                this.light2.includeOnlyWithLayerMask = 0;
-            }
+            let layerMask = 0x10000000;
             this.skybox.layerMask = layerMask;
             this.ground.layerMask = layerMask;
             this.wall.layerMask = layerMask;
@@ -9859,6 +9872,9 @@ var MarbleRunSimulatorCore;
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
                     await this.instantiateSimple(groundColor, wallColor, 1);
+                }
+                if (this._currentRoomIndex === 9) {
+                    await this.instantiateOpenRoom(true, "./lib/marble-run-simulator-core/datas/skyboxes/sky.jpeg");
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
@@ -9911,6 +9927,14 @@ var MarbleRunSimulatorCore;
             slice9Top.applyToMesh(this.ceiling);
             this.ceiling.material = this.game.materials.wallShadow;
             this.isBlurred = false;
+            this.light1.intensity = 0.2;
+            this.light2.intensity = 0.2;
+            this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.light2.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.decors.forEach(decor => {
+                this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
+                this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
+            });
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
             }
@@ -9925,10 +9949,13 @@ var MarbleRunSimulatorCore;
             this.skyboxMaterial.diffuseTexture = skyTexture;
             let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/room.babylon");
             vertexDatas[0].applyToMesh(this.ground);
+            this.ground.receiveShadows = true;
             this.ground.material = this.game.materials.groundMaterial;
             vertexDatas[1].applyToMesh(this.wall);
             this.wall.material = this.game.materials.whiteMaterial;
             vertexDatas[2].applyToMesh(this.frame);
+            this.frame.parent = this.wall;
+            this.frame.material = this.game.materials.getMaterial(0);
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.05 });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, -Math.PI * 0.5, BABYLON.Axis.X);
             slice9Top.applyToMesh(this.ceiling);
@@ -9994,6 +10021,48 @@ var MarbleRunSimulatorCore;
                 this.decors.push(sculpt2);
             }
             this.isBlurred = true;
+            this.light1.intensity = 0.2;
+            this.light2.intensity = 0.2;
+            this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.light2.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.decors.forEach(decor => {
+                this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
+                this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
+            });
+            if (this.game.machine) {
+                this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
+            }
+        }
+        async instantiateOpenRoom(useDecors, skyboxPath) {
+            this.decors.forEach(decor => {
+                decor.dispose();
+            });
+            this.decors = [];
+            this.frame.isVisible = true;
+            let skyTexture = new BABYLON.Texture(skyboxPath);
+            this.skyboxMaterial.diffuseTexture = skyTexture;
+            let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/open-room.babylon");
+            vertexDatas[0].applyToMesh(this.ground);
+            this.ground.receiveShadows = false;
+            this.ground.material = this.game.materials.whiteGroundMaterial;
+            vertexDatas[1].applyToMesh(this.wall);
+            this.wall.material = this.game.materials.whiteMaterial;
+            vertexDatas[2].applyToMesh(this.frame);
+            this.frame.parent = this.ground;
+            this.frame.material = this.game.materials.whiteMaterial;
+            vertexDatas[3].applyToMesh(this.ceiling);
+            this.ceiling.material = this.game.materials.whiteMaterial;
+            if (useDecors) {
+            }
+            this.isBlurred = true;
+            this.light1.intensity = 0.8;
+            this.light2.intensity = 0;
+            this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.light2.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.decors.forEach(decor => {
+                this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
+                this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
+            });
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
             }
@@ -10111,17 +10180,23 @@ var MarbleRunSimulatorCore;
             this.mat = mat;
             this.layerMask = 0x10000000;
         }
+        getAllMeshes() {
+            return [
+                this,
+                this._steel
+            ];
+        }
         async instantiate() {
             let vertexDatas = await this.room.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/museum-stand-decoy.babylon");
             if (vertexDatas && vertexDatas[0]) {
                 vertexDatas[0].applyToMesh(this);
             }
             if (vertexDatas && vertexDatas[1]) {
-                let steel = new BABYLON.Mesh("steel");
-                vertexDatas[1].applyToMesh(steel);
-                steel.parent = this;
-                steel.material = this.mat;
-                steel.layerMask = 0x10000000;
+                this._steel = new BABYLON.Mesh("steel");
+                vertexDatas[1].applyToMesh(this._steel);
+                this._steel.parent = this;
+                this._steel.material = this.mat;
+                this._steel.layerMask = 0x10000000;
             }
         }
         setLayerMask(mask) {

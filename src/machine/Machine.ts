@@ -286,7 +286,6 @@ namespace MarbleRunSimulatorCore {
             this.isChallengeMachine = false;
             this.name = MachineName.GetRandom();
             this.author = "";
-            this.roomIndex = 0;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
         }
         
@@ -550,6 +549,14 @@ namespace MarbleRunSimulatorCore {
                 let d = this.baseMeshMaxZ - this.baseMeshMinZ;
 
                 if (this.baseFrame) {
+                    let i1 = this.game.room.light1.includedOnlyMeshes.indexOf(this.baseFrame);
+                    if (i1 != -1) {
+                        this.game.room.light1.includedOnlyMeshes.splice(i1, 1);
+                    }
+                    let i2 = this.game.room.light2.includedOnlyMeshes.indexOf(this.baseFrame);
+                    if (i2 != -1) {
+                        this.game.room.light2.includedOnlyMeshes.splice(i2, 1);
+                    }
                     this.baseFrame.dispose();
                 }
                 this.baseFrame = new BABYLON.Mesh("base-stand");
@@ -558,8 +565,13 @@ namespace MarbleRunSimulatorCore {
                 this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
                 this.baseFrame.material = this.game.materials.whiteMaterial;
 
+                this.game.spotLight.excludedMeshes = [this.baseFrame];
+                this.game.room.light1.includedOnlyMeshes.push(this.baseFrame);
+                this.game.room.light2.includedOnlyMeshes.push(this.baseFrame);
+
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/museum-stand.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
+                Mummu.ColorizeVertexDataInPlace(data, new BABYLON.Color3(0.9, 0.95, 1));
                 let positions = [...data.positions];
                 for (let i = 0; i < positions.length / 3; i++) {
                     let x = positions[3 * i];
@@ -1051,7 +1063,8 @@ namespace MarbleRunSimulatorCore {
             let data: IMachineData = {
                 n: this.name,
                 a: this.author,
-                v: version
+                v: version,
+                r: this.roomIndex
             };
 
             let dataString = "";

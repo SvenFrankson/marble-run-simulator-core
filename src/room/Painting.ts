@@ -6,6 +6,16 @@ namespace MarbleRunSimulatorCore {
         private _paintBody: BABYLON.Mesh;
         private _paintPlane: BABYLON.Mesh;
 
+        public getAllMeshes(): BABYLON.Mesh[] {
+            return [
+                this,
+                this._steelFrame,
+                this._lightedPlane,
+                this._paintBody,
+                this._paintPlane,
+            ]
+        }
+
         constructor(public room: Room, public paintingName: string, public size: number = 0.5) {
             super("painting-" + paintingName);
             this._steelFrame = new BABYLON.Mesh("steel");

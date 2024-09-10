@@ -12,11 +12,11 @@ namespace MarbleRunSimulatorCore {
 
     export interface IRoomDecor extends BABYLON.Mesh {
         setLayerMask(mask: number): void;
+        getAllMeshes(): BABYLON.Mesh[];
     }
 
     export class Room {
         
-
         public skybox: BABYLON.Mesh;
         public skyboxMaterial: BABYLON.StandardMaterial;
         public ground: BABYLON.Mesh;
@@ -34,16 +34,7 @@ namespace MarbleRunSimulatorCore {
         public set isBlurred(v: boolean) {
             this._isBlurred = v;
 
-            let layerMask = 0x0FFFFFFF;
-            if (this._isBlurred){
-                this.light1.includeOnlyWithLayerMask = 0x10000000;
-                this.light2.includeOnlyWithLayerMask = 0x10000000;
-                layerMask = 0x10000000;
-            }
-            else {
-                this.light1.includeOnlyWithLayerMask = 0;
-                this.light2.includeOnlyWithLayerMask = 0;
-            }
+            let layerMask = 0x10000000;
             this.skybox.layerMask = layerMask;
             this.ground.layerMask = layerMask;
             this.wall.layerMask = layerMask;
@@ -58,7 +49,6 @@ namespace MarbleRunSimulatorCore {
             this.ground = new BABYLON.Mesh("room-ground");
             this.ground.layerMask = 0x10000000;
             this.ground.position.y = -2;
-            this.ground.receiveShadows = true;
 
             this.ground.material = this.game.materials.wallShadow;
 
@@ -75,15 +65,13 @@ namespace MarbleRunSimulatorCore {
             this.frame.material = this.game.materials.getMaterial(0);
             this.frame.parent = this.wall;
 
-            this.light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 3, 0).normalize(), this.game.scene);
+            this.light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 3, 0.5).normalize(), this.game.scene);
             this.light1.groundColor.copyFromFloats(0.3, 0.3, 0.3);
-            this.light1.intensity = 0.2;
-            this.light1.includeOnlyWithLayerMask = 0x10000000;
+            this.light1.intensity = 0.6;
 
-            this.light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(-1, 3, 0).normalize(), this.game.scene);
+            this.light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(-1, 3, -0.7).normalize(), this.game.scene);
             this.light2.groundColor.copyFromFloats(0.3, 0.3, 0.3);
-            this.light2.intensity = 0.2;
-            this.light2.includeOnlyWithLayerMask = 0x10000000;
+            this.light2.intensity = 0.1;
 
             this.skybox = BABYLON.MeshBuilder.CreateSphere("room-skybox", { diameter: 20, sideOrientation: BABYLON.Mesh.BACKSIDE, segments: 4 }, this.game.scene);
             this.skybox.layerMask = 0x10000000;
@@ -98,7 +86,7 @@ namespace MarbleRunSimulatorCore {
 
         public onRoomJustInstantiated: () => void;
 
-        private _currentRoomIndex: number = 1;
+        private _currentRoomIndex: number = 9;
         public get currentRoomIndex(): number {
             return this._currentRoomIndex;
         }
@@ -131,6 +119,9 @@ namespace MarbleRunSimulatorCore {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
                     await this.instantiateSimple(groundColor, wallColor, 1);
+                }
+                if (this._currentRoomIndex === 9) {
+                    await this.instantiateOpenRoom(true, "./lib/marble-run-simulator-core/datas/skyboxes/sky.jpeg");
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
@@ -195,6 +186,16 @@ namespace MarbleRunSimulatorCore {
 
             this.isBlurred = false;
 
+            this.light1.intensity = 0.2;
+            this.light2.intensity = 0.2;
+
+            this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.light2.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.decors.forEach(decor => {
+                this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
+                this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
+            })
+
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
             }
@@ -214,10 +215,14 @@ namespace MarbleRunSimulatorCore {
             let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/room.babylon");
 
             vertexDatas[0].applyToMesh(this.ground);
+            this.ground.receiveShadows = true;
             this.ground.material = this.game.materials.groundMaterial;
             vertexDatas[1].applyToMesh(this.wall);
             this.wall.material = this.game.materials.whiteMaterial;
+
             vertexDatas[2].applyToMesh(this.frame);
+            this.frame.parent = this.wall;
+            this.frame.material = this.game.materials.getMaterial(0);
             
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.05 });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, - Math.PI * 0.5, BABYLON.Axis.X);
@@ -297,6 +302,64 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.isBlurred = true;
+
+            this.light1.intensity = 0.2;
+            this.light2.intensity = 0.2;
+
+            this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.light2.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.decors.forEach(decor => {
+                this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
+                this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
+            })
+
+            if (this.game.machine) {
+                this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
+            }
+        }
+
+        public async instantiateOpenRoom(useDecors?: boolean, skyboxPath?: string): Promise<void> {
+            this.decors.forEach(decor => {
+                decor.dispose();
+            });
+            this.decors = [];
+
+            this.frame.isVisible = true;
+
+            let skyTexture = new BABYLON.Texture(skyboxPath);
+            this.skyboxMaterial.diffuseTexture = skyTexture;
+
+            let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/open-room.babylon");
+
+            vertexDatas[0].applyToMesh(this.ground);
+            this.ground.receiveShadows = false;
+            this.ground.material = this.game.materials.whiteGroundMaterial;
+
+            vertexDatas[1].applyToMesh(this.wall);
+            this.wall.material = this.game.materials.whiteMaterial;
+
+            vertexDatas[2].applyToMesh(this.frame);
+            this.frame.parent = this.ground;
+            this.frame.material = this.game.materials.whiteMaterial;
+
+            vertexDatas[3].applyToMesh(this.ceiling);
+            this.ceiling.material = this.game.materials.whiteMaterial;
+
+            if (useDecors) {
+                
+            }
+
+            this.isBlurred = true;
+
+            this.light1.intensity = 0.8;
+            this.light2.intensity = 0;
+
+            this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.light2.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.decors.forEach(decor => {
+                this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
+                this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
+            })
 
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);

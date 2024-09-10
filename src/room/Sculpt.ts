@@ -1,5 +1,15 @@
 namespace MarbleRunSimulatorCore {
     export class Sculpt extends BABYLON.Mesh implements IRoomDecor {
+
+        private _steel: BABYLON.Mesh;
+
+        public getAllMeshes(): BABYLON.Mesh[] {
+            return [
+                this,
+                this._steel
+            ]
+        }
+
         constructor(public room: Room, public mat: BABYLON.Material) {
             super("sculpt");
             this.layerMask = 0x10000000;
@@ -11,11 +21,11 @@ namespace MarbleRunSimulatorCore {
                 vertexDatas[0].applyToMesh(this);
             }
             if (vertexDatas && vertexDatas[1]) {
-                let steel = new BABYLON.Mesh("steel");
-                vertexDatas[1].applyToMesh(steel);
-                steel.parent = this;
-                steel.material = this.mat;
-                steel.layerMask = 0x10000000;
+                this._steel = new BABYLON.Mesh("steel");
+                vertexDatas[1].applyToMesh(this._steel);
+                this._steel.parent = this;
+                this._steel.material = this.mat;
+                this._steel.layerMask = 0x10000000;
             }
         }
 
