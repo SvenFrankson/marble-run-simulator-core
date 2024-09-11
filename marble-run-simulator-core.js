@@ -1489,7 +1489,7 @@ var MarbleRunSimulatorCore;
             this.hasBeenOpenedInEditor = false;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.playing = false;
-            this.roomIndex = 0;
+            this._roomIndex = 0;
             this.onPlayCallbacks = new Nabu.UniqueList();
             this._paused = false;
             this.onStopCallbacks = new Nabu.UniqueList();
@@ -1579,6 +1579,13 @@ var MarbleRunSimulatorCore;
                 this.fpsMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
                 this.fpsMaterial.alpha = 0.6;
             }
+        }
+        get roomIndex() {
+            return this._roomIndex;
+        }
+        setRoomIndex(roomIndex) {
+            this._roomIndex = roomIndex;
+            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this._roomIndex));
         }
         setAllIsSelectable(isSelectable) {
             for (let i = 0; i < this.parts.length; i++) {
@@ -2552,10 +2559,10 @@ var MarbleRunSimulatorCore;
                     this.author = data.a;
                 }
                 if (data.r) {
-                    this.roomIndex = data.r;
+                    this._roomIndex = data.r;
                 }
                 else {
-                    this.roomIndex = 0;
+                    this._roomIndex = 0;
                 }
                 this.balls = [];
                 this.parts = [];
@@ -2667,10 +2674,10 @@ var MarbleRunSimulatorCore;
                     this.author = data.a;
                 }
                 if (data.r) {
-                    this.roomIndex = data.r;
+                    this._roomIndex = data.r;
                 }
                 else {
-                    this.roomIndex = 0;
+                    this._roomIndex = 0;
                 }
                 this.balls = [];
                 this.parts = [];
@@ -2782,10 +2789,10 @@ var MarbleRunSimulatorCore;
                     this.author = data.a;
                 }
                 if (data.r) {
-                    this.roomIndex = data.r;
+                    this._roomIndex = data.r;
                 }
                 else {
-                    this.roomIndex = 0;
+                    this._roomIndex = 0;
                 }
                 if (data.v === 10) {
                     if (data.sp) {
@@ -9699,12 +9706,41 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
+    class Art extends BABYLON.Mesh {
+        constructor(room, url, meshIndex = 0) {
+            super("art");
+            this.room = room;
+            this.url = url;
+            this.meshIndex = meshIndex;
+            this.h = 0;
+            this.layerMask = 0x10000000;
+        }
+        getAllMeshes() {
+            return [
+                this
+            ];
+        }
+        async instantiate() {
+            let vertexDatas = await this.room.game.vertexDataLoader.get(this.url);
+            if (vertexDatas && vertexDatas[0]) {
+                vertexDatas[this.meshIndex].applyToMesh(this);
+            }
+        }
+        setLayerMask(mask) {
+            this.layerMask = mask;
+        }
+    }
+    MarbleRunSimulatorCore.Art = Art;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
     class Painting extends BABYLON.Mesh {
         constructor(room, paintingName, size = 0.5) {
             super("painting-" + paintingName);
             this.room = room;
             this.paintingName = paintingName;
             this.size = size;
+            this.h = 0;
             this._steelFrame = new BABYLON.Mesh("steel");
             this._steelFrame.layerMask = 0x10000000;
             this._steelFrame.parent = this;
@@ -9794,7 +9830,7 @@ var MarbleRunSimulatorCore;
             this.game = game;
             this.decors = [];
             this._isBlurred = false;
-            this._currentRoomIndex = 9;
+            this._currentRoomIndex = 0;
             this.ground = new BABYLON.Mesh("room-ground");
             this.ground.layerMask = 0x10000000;
             this.ground.position.y = -2;
@@ -9820,7 +9856,6 @@ var MarbleRunSimulatorCore;
             this.skyboxMaterial = new BABYLON.StandardMaterial("room-skybox-material", this.game.scene);
             this.skyboxMaterial.backFaceCulling = false;
             this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
-            this.skyboxMaterial.emissiveColor.copyFromFloats(0, 0, 0);
             this.skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
             this.skybox.material = this.skyboxMaterial;
             this.skybox.rotation.y = 0.16 * Math.PI;
@@ -9873,8 +9908,18 @@ var MarbleRunSimulatorCore;
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
                     await this.instantiateSimple(groundColor, wallColor, 1);
                 }
-                if (this._currentRoomIndex === 9) {
+                else if (this._currentRoomIndex === 9) {
                     await this.instantiateOpenRoom(true, "./lib/marble-run-simulator-core/datas/skyboxes/sky.jpeg");
+                }
+                else if (this._currentRoomIndex === 10) {
+                    let groundColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
+                    let wallColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
+                    await this.instantiateSimple(groundColor, wallColor, 0);
+                }
+                else if (this._currentRoomIndex === 11) {
+                    let groundColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
+                    let wallColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
+                    await this.instantiateSimple(groundColor, wallColor, 0);
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
@@ -9897,6 +9942,13 @@ var MarbleRunSimulatorCore;
             if (n === 8 && this.game.getGraphicQ() > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 7;
             }
+            // 10 is the lite version of 9
+            if (n === 9 && this.game.getGraphicQ() === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+                return 10;
+            }
+            if (n === 10 && this.game.getGraphicQ() > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+                return 9;
+            }
             return n;
         }
         async instantiateSimple(groundColor, wallColor, wallPaperIndex) {
@@ -9908,7 +9960,7 @@ var MarbleRunSimulatorCore;
             let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.1, color: groundColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
-            this.ground.material = this.game.materials.groundMaterial;
+            this.ground.material = this.game.materials.whiteMaterial;
             let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
             let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
@@ -9927,7 +9979,7 @@ var MarbleRunSimulatorCore;
             slice9Top.applyToMesh(this.ceiling);
             this.ceiling.material = this.game.materials.wallShadow;
             this.isBlurred = false;
-            this.light1.intensity = 0.2;
+            this.light1.intensity = 0.6;
             this.light2.intensity = 0.2;
             this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
             this.light2.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
@@ -9935,6 +9987,10 @@ var MarbleRunSimulatorCore;
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             });
+            if (this.game.machine && this.game.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            }
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
             }
@@ -10029,6 +10085,10 @@ var MarbleRunSimulatorCore;
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             });
+            if (this.game.machine && this.game.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            }
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
             }
@@ -10041,6 +10101,7 @@ var MarbleRunSimulatorCore;
             this.frame.isVisible = true;
             let skyTexture = new BABYLON.Texture(skyboxPath);
             this.skyboxMaterial.diffuseTexture = skyTexture;
+            this.skyboxMaterial.emissiveTexture = skyTexture;
             let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/open-room.babylon");
             vertexDatas[0].applyToMesh(this.ground);
             this.ground.receiveShadows = false;
@@ -10053,6 +10114,25 @@ var MarbleRunSimulatorCore;
             vertexDatas[3].applyToMesh(this.ceiling);
             this.ceiling.material = this.game.materials.whiteMaterial;
             if (useDecors) {
+                let art1 = new MarbleRunSimulatorCore.Art(this, "./lib/marble-run-simulator-core/datas/meshes/arts.babylon", 0);
+                await art1.instantiate();
+                art1.position.copyFromFloats(3.5, 0, 3.5);
+                this.decors.push(art1);
+                let art2 = new MarbleRunSimulatorCore.Art(this, "./lib/marble-run-simulator-core/datas/meshes/arts.babylon", 1);
+                art2.h = 0.2;
+                await art2.instantiate();
+                art2.position.copyFromFloats(-4, 0, 3.5);
+                this.decors.push(art2);
+                let art3 = new MarbleRunSimulatorCore.Art(this, "./lib/marble-run-simulator-core/datas/meshes/arts.babylon", 0);
+                art3.h = 0.2;
+                await art3.instantiate();
+                art3.position.copyFromFloats(-4, 0, -3.5);
+                this.decors.push(art3);
+                let art4 = new MarbleRunSimulatorCore.Art(this, "./lib/marble-run-simulator-core/datas/meshes/arts.babylon", 1);
+                art4.h = -0.2;
+                await art4.instantiate();
+                art4.position.copyFromFloats(4, 0, -4.2);
+                this.decors.push(art4);
             }
             this.isBlurred = true;
             this.light1.intensity = 0.8;
@@ -10063,6 +10143,10 @@ var MarbleRunSimulatorCore;
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             });
+            if (this.game.machine && this.game.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            }
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
             }
@@ -10075,7 +10159,7 @@ var MarbleRunSimulatorCore;
                     let dt = (t - t0) / 1000;
                     if (dt >= duration) {
                         this.decors.forEach(decor => {
-                            decor.position.y = this.ground.position.y;
+                            decor.position.y = this.ground.position.y + decor.h;
                             decor.scaling.copyFromFloats(1, 1, 1);
                         });
                         this.skyboxMaterial.diffuseColor.copyFromFloats(1, 1, 1);
@@ -10092,7 +10176,7 @@ var MarbleRunSimulatorCore;
                         let f = dt / duration;
                         f = Nabu.Easing.easeOutCubic(f);
                         this.decors.forEach(decor => {
-                            decor.position.y = this.ground.position.y - 2 * (1 - f);
+                            decor.position.y = this.ground.position.y + decor.h - 2 * (1 - f);
                             decor.scaling.copyFromFloats(f, f, f);
                         });
                         this.skyboxMaterial.diffuseColor.copyFromFloats(f, f, f);
@@ -10117,7 +10201,7 @@ var MarbleRunSimulatorCore;
                     let dt = (t - t0) / 1000;
                     if (dt >= duration) {
                         this.decors.forEach(decor => {
-                            decor.position.y = this.ground.position.y - 2;
+                            decor.position.y = this.ground.position.y + decor.h - 2;
                             decor.scaling.copyFromFloats(0, 0, 0);
                         });
                         this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
@@ -10134,7 +10218,7 @@ var MarbleRunSimulatorCore;
                         let f = dt / duration;
                         f = Nabu.Easing.easeInCubic(f);
                         this.decors.forEach(decor => {
-                            decor.position.y = this.ground.position.y - 2 * f;
+                            decor.position.y = this.ground.position.y + decor.h - 2 * f;
                             decor.scaling.copyFromFloats(1 - f, 1 - f, 1 - f);
                         });
                         this.skyboxMaterial.diffuseColor.copyFromFloats(1 - f, 1 - f, 1 - f);
@@ -10157,7 +10241,7 @@ var MarbleRunSimulatorCore;
                 this.wall.position.y = this.ground.position.y + 1.6;
                 this.ceiling.position.y = this.ground.position.y + 3.2;
                 this.decors.forEach(decor => {
-                    decor.position.y = this.ground.position.y;
+                    decor.position.y = this.ground.position.y + decor.h;
                 });
             }
         }
@@ -10178,6 +10262,7 @@ var MarbleRunSimulatorCore;
             super("sculpt");
             this.room = room;
             this.mat = mat;
+            this.h = 0;
             this.layerMask = 0x10000000;
         }
         getAllMeshes() {

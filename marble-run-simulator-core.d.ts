@@ -313,7 +313,9 @@ declare namespace MarbleRunSimulatorCore {
         exitHoleIn: BABYLON.Mesh;
         exitHolePath: BABYLON.Vector3[];
         exitHoleOut: BABYLON.Mesh;
-        roomIndex: number;
+        private _roomIndex;
+        get roomIndex(): number;
+        setRoomIndex(roomIndex: number): void;
         constructor(game: IGame);
         setAllIsSelectable(isSelectable: boolean): void;
         instantiate(hotReload?: boolean): Promise<void>;
@@ -1191,10 +1193,23 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Art extends BABYLON.Mesh implements IRoomDecor {
+        room: Room;
+        url: string;
+        meshIndex: number;
+        h: number;
+        getAllMeshes(): BABYLON.Mesh[];
+        constructor(room: Room, url: string, meshIndex?: number);
+        instantiate(): Promise<void>;
+        setLayerMask(mask: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class Painting extends BABYLON.Mesh implements IRoomDecor {
         room: Room;
         paintingName: string;
         size: number;
+        h: number;
         private _steelFrame;
         private _lightedPlane;
         private _paintBody;
@@ -1215,6 +1230,7 @@ declare namespace MarbleRunSimulatorCore {
         isBlurred: boolean;
     }
     interface IRoomDecor extends BABYLON.Mesh {
+        h: number;
         setLayerMask(mask: number): void;
         getAllMeshes(): BABYLON.Mesh[];
     }
@@ -1251,6 +1267,7 @@ declare namespace MarbleRunSimulatorCore {
     class Sculpt extends BABYLON.Mesh implements IRoomDecor {
         room: Room;
         mat: BABYLON.Material;
+        h: number;
         private _steel;
         getAllMeshes(): BABYLON.Mesh[];
         constructor(room: Room, mat: BABYLON.Material);

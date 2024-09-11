@@ -136,7 +136,14 @@ namespace MarbleRunSimulatorCore {
         public exitHolePath: BABYLON.Vector3[];
         public exitHoleOut: BABYLON.Mesh;
 
-        public roomIndex: number = 0;
+        private _roomIndex: number = 0;
+        public get roomIndex(): number {
+            return this._roomIndex;
+        }
+        public setRoomIndex(roomIndex: number): void {
+            this._roomIndex = roomIndex;
+            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this._roomIndex));
+        }
 
         constructor(public game: IGame) {
             this.name = MachineName.GetRandom();
@@ -1329,10 +1336,10 @@ namespace MarbleRunSimulatorCore {
                     this.author = data.a;
                 }
                 if (data.r) {
-                    this.roomIndex = data.r;
+                    this._roomIndex = data.r;
                 }
                 else {
-                    this.roomIndex = 0;
+                    this._roomIndex = 0;
                 }
             
                 this.balls = [];
@@ -1459,10 +1466,10 @@ namespace MarbleRunSimulatorCore {
                     this.author = data.a;
                 }
                 if (data.r) {
-                    this.roomIndex = data.r;
+                    this._roomIndex = data.r;
                 }
                 else {
-                    this.roomIndex = 0;
+                    this._roomIndex = 0;
                 }
             
                 this.balls = [];
@@ -1593,10 +1600,10 @@ namespace MarbleRunSimulatorCore {
                     this.author = data.a;
                 }
                 if (data.r) {
-                    this.roomIndex = data.r;
+                    this._roomIndex = data.r;
                 }
                 else {
-                    this.roomIndex = 0;
+                    this._roomIndex = 0;
                 }
                 if (data.v === 10) {
                     if (data.sp) {

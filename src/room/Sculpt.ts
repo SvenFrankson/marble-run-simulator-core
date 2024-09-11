@@ -1,6 +1,8 @@
 namespace MarbleRunSimulatorCore {
     export class Sculpt extends BABYLON.Mesh implements IRoomDecor {
 
+        public h: number = 0;
+        
         private _steel: BABYLON.Mesh;
 
         public getAllMeshes(): BABYLON.Mesh[] {

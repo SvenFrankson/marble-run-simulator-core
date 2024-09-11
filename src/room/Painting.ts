@@ -1,6 +1,8 @@
 namespace MarbleRunSimulatorCore {
     export class Painting extends BABYLON.Mesh implements IRoomDecor {
 
+        public h: number = 0;
+        
         private _steelFrame: BABYLON.Mesh;
         private _lightedPlane: BABYLON.Mesh;
         private _paintBody: BABYLON.Mesh;

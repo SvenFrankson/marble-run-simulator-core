@@ -11,6 +11,7 @@ namespace MarbleRunSimulatorCore {
     }
 
     export interface IRoomDecor extends BABYLON.Mesh {
+        h: number;
         setLayerMask(mask: number): void;
         getAllMeshes(): BABYLON.Mesh[];
     }
@@ -78,7 +79,6 @@ namespace MarbleRunSimulatorCore {
             this.skyboxMaterial = new BABYLON.StandardMaterial("room-skybox-material", this.game.scene);
             this.skyboxMaterial.backFaceCulling = false;
             this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
-            this.skyboxMaterial.emissiveColor.copyFromFloats(0, 0, 0);
             this.skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
             this.skybox.material = this.skyboxMaterial;
             this.skybox.rotation.y = 0.16 * Math.PI;
@@ -86,7 +86,7 @@ namespace MarbleRunSimulatorCore {
 
         public onRoomJustInstantiated: () => void;
 
-        private _currentRoomIndex: number = 9;
+        private _currentRoomIndex: number = 0;
         public get currentRoomIndex(): number {
             return this._currentRoomIndex;
         }
@@ -120,8 +120,18 @@ namespace MarbleRunSimulatorCore {
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
                     await this.instantiateSimple(groundColor, wallColor, 1);
                 }
-                if (this._currentRoomIndex === 9) {
+                else if (this._currentRoomIndex === 9) {
                     await this.instantiateOpenRoom(true, "./lib/marble-run-simulator-core/datas/skyboxes/sky.jpeg");
+                }
+                else if (this._currentRoomIndex === 10) {
+                    let groundColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
+                    let wallColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
+                    await this.instantiateSimple(groundColor, wallColor, 0);
+                }
+                else if (this._currentRoomIndex === 11) {
+                    let groundColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
+                    let wallColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
+                    await this.instantiateSimple(groundColor, wallColor, 0);
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
@@ -145,6 +155,13 @@ namespace MarbleRunSimulatorCore {
             if (n === 8 && this.game.getGraphicQ() > GraphicQuality.VeryLow) {
                 return 7;
             }
+            // 10 is the lite version of 9
+            if (n === 9 && this.game.getGraphicQ() === GraphicQuality.VeryLow) {
+                return 10;
+            }
+            if (n === 10 && this.game.getGraphicQ() > GraphicQuality.VeryLow) {
+                return 9;
+            }
             return n;
         }
 
@@ -159,7 +176,7 @@ namespace MarbleRunSimulatorCore {
             let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.1, color: groundColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
-            this.ground.material = this.game.materials.groundMaterial;
+            this.ground.material = this.game.materials.whiteMaterial;
 
             let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
@@ -186,7 +203,7 @@ namespace MarbleRunSimulatorCore {
 
             this.isBlurred = false;
 
-            this.light1.intensity = 0.2;
+            this.light1.intensity = 0.6;
             this.light2.intensity = 0.2;
 
             this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
@@ -195,6 +212,10 @@ namespace MarbleRunSimulatorCore {
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             })
+            if (this.game.machine && this.game.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            }
 
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
@@ -312,6 +333,10 @@ namespace MarbleRunSimulatorCore {
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             })
+            if (this.game.machine && this.game.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            }
 
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
@@ -328,6 +353,7 @@ namespace MarbleRunSimulatorCore {
 
             let skyTexture = new BABYLON.Texture(skyboxPath);
             this.skyboxMaterial.diffuseTexture = skyTexture;
+            this.skyboxMaterial.emissiveTexture = skyTexture;
 
             let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/open-room.babylon");
 
@@ -346,7 +372,28 @@ namespace MarbleRunSimulatorCore {
             this.ceiling.material = this.game.materials.whiteMaterial;
 
             if (useDecors) {
+                let art1 = new Art(this, "./lib/marble-run-simulator-core/datas/meshes/arts.babylon", 0);
+                await art1.instantiate();
+                art1.position.copyFromFloats(3.5, 0, 3.5);
+                this.decors.push(art1);
                 
+                let art2 = new Art(this, "./lib/marble-run-simulator-core/datas/meshes/arts.babylon", 1);
+                art2.h = 0.2;
+                await art2.instantiate();
+                art2.position.copyFromFloats(-4, 0, 3.5);
+                this.decors.push(art2);
+                
+                let art3 = new Art(this, "./lib/marble-run-simulator-core/datas/meshes/arts.babylon", 0);
+                art3.h = 0.2;
+                await art3.instantiate();
+                art3.position.copyFromFloats(-4, 0, -3.5);
+                this.decors.push(art3);
+
+                let art4 = new Art(this, "./lib/marble-run-simulator-core/datas/meshes/arts.babylon", 1);
+                art4.h = -0.2;
+                await art4.instantiate();
+                art4.position.copyFromFloats(4, 0, -4.2);
+                this.decors.push(art4);
             }
 
             this.isBlurred = true;
@@ -360,6 +407,10 @@ namespace MarbleRunSimulatorCore {
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             })
+            if (this.game.machine && this.game.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            }
 
             if (this.game.machine) {
                 this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
@@ -374,7 +425,7 @@ namespace MarbleRunSimulatorCore {
                     let dt = (t - t0) / 1000;
                     if (dt >= duration) {
                         this.decors.forEach(decor => {
-                            decor.position.y = this.ground.position.y;
+                            decor.position.y = this.ground.position.y + decor.h;
                             decor.scaling.copyFromFloats(1, 1, 1);
                         });
                         
@@ -397,7 +448,7 @@ namespace MarbleRunSimulatorCore {
                         f = Nabu.Easing.easeOutCubic(f);
 
                         this.decors.forEach(decor => {
-                            decor.position.y = this.ground.position.y - 2 * (1 - f);
+                            decor.position.y = this.ground.position.y + decor.h - 2 * (1 - f);
                             decor.scaling.copyFromFloats(f, f, f);
                         });
                         
@@ -428,7 +479,7 @@ namespace MarbleRunSimulatorCore {
                     let dt = (t - t0) / 1000;
                     if (dt >= duration) {
                         this.decors.forEach(decor => {
-                            decor.position.y = this.ground.position.y - 2;
+                            decor.position.y = this.ground.position.y + decor.h - 2;
                             decor.scaling.copyFromFloats(0, 0, 0);
                         });
 
@@ -451,7 +502,7 @@ namespace MarbleRunSimulatorCore {
                         f = Nabu.Easing.easeInCubic(f);
 
                         this.decors.forEach(decor => {
-                            decor.position.y = this.ground.position.y - 2 * f;
+                            decor.position.y = this.ground.position.y + decor.h - 2 * f;
                             decor.scaling.copyFromFloats(1 - f, 1 - f, 1 - f);
                         });
                         
@@ -480,7 +531,7 @@ namespace MarbleRunSimulatorCore {
                 this.wall.position.y = this.ground.position.y + 1.6;
                 this.ceiling.position.y = this.ground.position.y + 3.2;
                 this.decors.forEach(decor => {
-                    decor.position.y = this.ground.position.y;
+                    decor.position.y = this.ground.position.y + decor.h;
                 });
             }
         }
