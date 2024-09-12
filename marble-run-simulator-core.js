@@ -842,6 +842,11 @@ var MarbleRunSimulatorCore;
             this._materialsSTD = [];
             this._ballMaterialsPBR = [];
             this._ballMaterialsSTD = [];
+            this.materialToBallMaterialTable = [
+                { baseIndex: 3, ballIndex: 2 },
+                { baseIndex: 4, ballIndex: 3 },
+                { baseIndex: 5, ballIndex: 4 },
+            ];
             this._wallpapers = [];
             let envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
             this.handleMaterial = new BABYLON.StandardMaterial("handle-material");
@@ -1133,6 +1138,20 @@ var MarbleRunSimulatorCore;
         }
         get ballMaterialsCount() {
             return Math.min(this._ballMaterialsPBR.length, this._ballMaterialsSTD.length);
+        }
+        ballMaterialIndexToBaseMaterialIndex(ballMaterialIndex) {
+            let e = this.materialToBallMaterialTable.find(e => { return e.ballIndex === ballMaterialIndex; });
+            if (e) {
+                return e.baseIndex;
+            }
+            return 0;
+        }
+        baseMaterialIndexToBallMaterialIndex(baseMaterialIndex) {
+            let e = this.materialToBallMaterialTable.find(e => { return e.baseIndex === baseMaterialIndex; });
+            if (e) {
+                return e.ballIndex;
+            }
+            return 0;
         }
         getWallpaperMaterial(index) {
             return this._wallpapers[index];
@@ -6174,7 +6193,23 @@ var MarbleRunSimulatorCore;
             if (isNaN(this.colors[1])) {
                 this.colors[1] = 1;
             }
+            this.panel = new BABYLON.Mesh("panel");
+            this.panel.position = new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4, -1.4 * MarbleRunSimulatorCore.tileHeight - 0.005, this.wireGauge * 0.5);
+            this.panel.parent = this;
+            this.panelSupport = new BABYLON.Mesh("panel-support");
+            this.panelSupport.parent = this.panel;
+            this.panelPicture = new BABYLON.Mesh("panel-picture");
+            this.panelPicture.parent = this.panel;
             this.generateWires();
+        }
+        async instantiateMachineSpecific() {
+            let panelData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/panel.babylon");
+            panelData[0].applyToMesh(this.panel);
+            this.panel.material = this.game.materials.getMaterial(0);
+            panelData[1].applyToMesh(this.panelSupport);
+            this.panelSupport.material = this.game.materials.getMaterial(this.getColor(1));
+            panelData[2].applyToMesh(this.panelPicture);
+            this.panelPicture.material = this.game.materials.getBallMaterial(this.game.materials.baseMaterialIndexToBallMaterialIndex(this.getColor(1)));
         }
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();

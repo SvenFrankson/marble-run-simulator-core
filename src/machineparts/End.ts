@@ -1,5 +1,10 @@
 namespace MarbleRunSimulatorCore {
     export class End extends MachinePart {
+
+        public panel: BABYLON.Mesh;
+        public panelSupport: BABYLON.Mesh;
+        public panelPicture: BABYLON.Mesh;
+
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
@@ -10,7 +15,29 @@ namespace MarbleRunSimulatorCore {
                 this.colors[1] = 1;
             }
 
+            this.panel = new BABYLON.Mesh("panel");
+            this.panel.position = new BABYLON.Vector3(tileWidth * 0.4, - 1.4 * tileHeight - 0.005, this.wireGauge * 0.5);
+            this.panel.parent = this;
+            
+            this.panelSupport = new BABYLON.Mesh("panel-support");
+            this.panelSupport.parent = this.panel;
+            
+            this.panelPicture = new BABYLON.Mesh("panel-picture");
+            this.panelPicture.parent = this.panel;
+
             this.generateWires();
+        }
+        
+        protected async instantiateMachineSpecific(): Promise<void> {
+            let panelData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/panel.babylon");
+            panelData[0].applyToMesh(this.panel);
+            this.panel.material = this.game.materials.getMaterial(0);
+            panelData[1].applyToMesh(this.panelSupport);
+            this.panelSupport.material = this.game.materials.getMaterial(this.getColor(1));
+            panelData[2].applyToMesh(this.panelPicture);
+            this.panelPicture.material = this.game.materials.getBallMaterial(
+                this.game.materials.baseMaterialIndexToBallMaterialIndex(this.getColor(1))
+            );
         }
 
         public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {

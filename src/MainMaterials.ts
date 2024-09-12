@@ -86,6 +86,26 @@ namespace MarbleRunSimulatorCore {
             return Math.min(this._ballMaterialsPBR.length, this._ballMaterialsSTD.length);
         }
 
+        private materialToBallMaterialTable = [
+            { baseIndex: 3, ballIndex: 2 },
+            { baseIndex: 4, ballIndex: 3 },
+            { baseIndex: 5, ballIndex: 4 },
+        ];
+        public ballMaterialIndexToBaseMaterialIndex(ballMaterialIndex: number): number {
+            let e = this.materialToBallMaterialTable.find(e => { return e.ballIndex === ballMaterialIndex });
+            if (e) {
+                return e.baseIndex;
+            }
+            return 0;
+        }
+        public baseMaterialIndexToBallMaterialIndex(baseMaterialIndex: number): number {
+            let e = this.materialToBallMaterialTable.find(e => { return e.baseIndex === baseMaterialIndex });
+            if (e) {
+                return e.ballIndex;
+            }
+            return 0;
+        }
+
         private _wallpapers: BABYLON.Material[] = [];
         public getWallpaperMaterial(index: number): BABYLON.Material {
             return this._wallpapers[index];

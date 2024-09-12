@@ -137,6 +137,9 @@ declare namespace MarbleRunSimulatorCore {
         getBallMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
         getParkourBallMaterial(materialQ?: number): BABYLON.Material;
         get ballMaterialsCount(): number;
+        private materialToBallMaterialTable;
+        ballMaterialIndexToBaseMaterialIndex(ballMaterialIndex: number): number;
+        baseMaterialIndexToBallMaterialIndex(baseMaterialIndex: number): number;
         private _wallpapers;
         getWallpaperMaterial(index: number): BABYLON.Material;
         cableMaterial: BABYLON.Material;
@@ -862,7 +865,11 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class End extends MachinePart {
+        panel: BABYLON.Mesh;
+        panelSupport: BABYLON.Mesh;
+        panelPicture: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
     }
 }
