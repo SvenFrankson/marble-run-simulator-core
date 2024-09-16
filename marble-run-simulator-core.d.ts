@@ -137,7 +137,7 @@ declare namespace MarbleRunSimulatorCore {
         getBallMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
         getParkourBallMaterial(materialQ?: number): BABYLON.Material;
         get ballMaterialsCount(): number;
-        private materialToBallMaterialTable;
+        private baseMaterialToBallMaterialTable;
         ballMaterialIndexToBaseMaterialIndex(ballMaterialIndex: number): number;
         baseMaterialIndexToBallMaterialIndex(baseMaterialIndex: number): number;
         private _wallpapers;
@@ -1044,6 +1044,51 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(w: number, s: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Snake;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class Sort extends MachinePart {
+        private _animatePivot;
+        anchor: BABYLON.Mesh;
+        pivot: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
+        clicSound: BABYLON.Sound;
+        static pivotL: number;
+        panel: BABYLON.Mesh;
+        panelSupport: BABYLON.Mesh;
+        panelPicture: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        private _moving;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class Spawner extends MachinePart {
+        private _animatePivot;
+        pivotPass: BABYLON.Mesh;
+        pivotSpawner: BABYLON.Mesh;
+        pivotSpawnerCollider: BABYLON.Mesh;
+        support: BABYLON.Mesh;
+        cog13: BABYLON.Mesh;
+        cog8: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
+        clicSound: BABYLON.Sound;
+        private angleOpened;
+        private angleClosed;
+        static pivotL: number;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        private _moving;
+        update(dt: number): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {

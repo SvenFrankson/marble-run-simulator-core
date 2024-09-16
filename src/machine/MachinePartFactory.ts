@@ -26,7 +26,9 @@ namespace MarbleRunSimulatorCore {
         "spiralUTurn-3.2",
         "piperamp-1.1.1",
         "pipeuturn-0.2",
-        "steamelevator-4"
+        "steamelevator-4",
+        "sort",
+        "spawner"
     ];
 
     export interface IMachinePartProp {
@@ -235,8 +237,14 @@ namespace MarbleRunSimulatorCore {
             if (partName === "forwardSplit") {
                 return new ForwardSplit(this.machine, prop);
             }
+            if (partName === "sort") {
+                return new Sort(this.machine, prop);
+            }
             if (partName === "controler") {
                 return new Controler(this.machine, prop);
+            }
+            if (partName === "spawner") {
+                return new Spawner(this.machine, prop);
             }
             if (partName === "elevator" || partName.startsWith("elevator-")) {
                 let argStr = partName.split("-")[1];
@@ -362,8 +370,14 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "forwardSplit") {
                 return new ForwardSplit(this.machine, prop);
             }
+            if (baseName === "sort") {
+                return new Sort(this.machine, prop);
+            }
             if (baseName === "controler") {
                 return new Controler(this.machine, prop);
+            }
+            if (baseName === "spawner") {
+                return new Spawner(this.machine, prop);
             }
             if (baseName === "elevator") {
                 return new Elevator(this.machine, prop);

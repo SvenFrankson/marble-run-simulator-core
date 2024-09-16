@@ -562,6 +562,16 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
                             }
+                            if (part instanceof Spawner) {
+                                let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.pivotSpawnerCollider);
+                                if (col.hit) {
+                                    // Move away from collision
+                                    forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                    if (this.velocity.length() > 0.5) {
+                                        this.velocity.scaleInPlace(0.9);
+                                    }
+                                }
+                            }
                             if (part instanceof Screen) {
                                 let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.cameInCollider);
                                 if (col.hit) {

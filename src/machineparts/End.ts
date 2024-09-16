@@ -14,9 +14,12 @@ namespace MarbleRunSimulatorCore {
             if (isNaN(this.colors[1])) {
                 this.colors[1] = 1;
             }
+            if (isNaN(this.colors[2])) {
+                this.colors[2] = 0;
+            }
 
             this.panel = new BABYLON.Mesh("panel");
-            this.panel.position = new BABYLON.Vector3(tileWidth * 0.4, - 1.4 * tileHeight - 0.005, this.wireGauge * 0.5);
+            this.panel.position = new BABYLON.Vector3((this.mirrorX ? tileWidth * 0.6 : tileWidth * 0.4), - 1.4 * tileHeight - 0.005, this.wireGauge * 0.5);
             this.panel.parent = this;
             
             this.panelSupport = new BABYLON.Mesh("panel-support");
@@ -31,7 +34,7 @@ namespace MarbleRunSimulatorCore {
         protected async instantiateMachineSpecific(): Promise<void> {
             let panelData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/panel.babylon");
             panelData[0].applyToMesh(this.panel);
-            this.panel.material = this.game.materials.getMaterial(0);
+            this.panel.material = this.game.materials.getMaterial(this.getColor(2));
             panelData[1].applyToMesh(this.panelSupport);
             this.panelSupport.material = this.game.materials.getMaterial(this.getColor(1));
             panelData[2].applyToMesh(this.panelPicture);
