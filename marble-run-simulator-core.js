@@ -1633,7 +1633,9 @@ var MarbleRunSimulatorCore;
         async instantiate(hotReload) {
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
-            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
+            if (this.game.room) {
+                this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
+            }
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             if (this.exitShooter) {
                 this.exitShooter.instantiate();
@@ -1902,13 +1904,15 @@ var MarbleRunSimulatorCore;
                 let h = 1;
                 let d = this.baseMeshMaxZ - this.baseMeshMinZ;
                 if (this.baseFrame) {
-                    let i1 = this.game.room.light1.includedOnlyMeshes.indexOf(this.baseFrame);
-                    if (i1 != -1) {
-                        this.game.room.light1.includedOnlyMeshes.splice(i1, 1);
-                    }
-                    let i2 = this.game.room.light2.includedOnlyMeshes.indexOf(this.baseFrame);
-                    if (i2 != -1) {
-                        this.game.room.light2.includedOnlyMeshes.splice(i2, 1);
+                    if (this.game.room) {
+                        let i1 = this.game.room.light1.includedOnlyMeshes.indexOf(this.baseFrame);
+                        if (i1 != -1) {
+                            this.game.room.light1.includedOnlyMeshes.splice(i1, 1);
+                        }
+                        let i2 = this.game.room.light2.includedOnlyMeshes.indexOf(this.baseFrame);
+                        if (i2 != -1) {
+                            this.game.room.light2.includedOnlyMeshes.splice(i2, 1);
+                        }
                     }
                     this.baseFrame.dispose();
                 }
@@ -1919,8 +1923,10 @@ var MarbleRunSimulatorCore;
                 this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
                 this.baseFrame.material = this.game.materials.whiteMaterial;
                 this.game.spotLight.excludedMeshes = [this.baseFrame];
-                this.game.room.light1.includedOnlyMeshes.push(this.baseFrame);
-                this.game.room.light2.includedOnlyMeshes.push(this.baseFrame);
+                if (this.game.room) {
+                    this.game.room.light1.includedOnlyMeshes.push(this.baseFrame);
+                    this.game.room.light2.includedOnlyMeshes.push(this.baseFrame);
+                }
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/museum-stand.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
                 Mummu.ColorizeVertexDataInPlace(data, new BABYLON.Color3(0.9, 0.95, 1));
@@ -10378,7 +10384,8 @@ var MarbleRunSimulatorCore;
     }
     MarbleRunSimulatorCore.RoomProp = RoomProp;
     class Room {
-        constructor(game) {
+        constructor(machine, game) {
+            this.machine = machine;
             this.game = game;
             this.decors = [];
             this._isBlurred = false;
@@ -10539,12 +10546,12 @@ var MarbleRunSimulatorCore;
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             });
-            if (this.game.machine && this.game.machine.baseFrame) {
-                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
-                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            if (this.machine && this.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.machine.baseFrame);
             }
-            if (this.game.machine) {
-                this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
+            if (this.machine) {
+                this.setGroundHeight(this.machine.baseMeshMinY - 0.8);
             }
         }
         async instantiateMuseum(useDecors, skyboxPath) {
@@ -10637,12 +10644,12 @@ var MarbleRunSimulatorCore;
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             });
-            if (this.game.machine && this.game.machine.baseFrame) {
-                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
-                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            if (this.machine && this.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.machine.baseFrame);
             }
-            if (this.game.machine) {
-                this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
+            if (this.machine) {
+                this.setGroundHeight(this.machine.baseMeshMinY - 0.8);
             }
         }
         async instantiateOpenRoom(useDecors, skyboxPath) {
@@ -10695,12 +10702,12 @@ var MarbleRunSimulatorCore;
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             });
-            if (this.game.machine && this.game.machine.baseFrame) {
-                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
-                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            if (this.machine && this.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.machine.baseFrame);
             }
-            if (this.game.machine) {
-                this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
+            if (this.machine) {
+                this.setGroundHeight(this.machine.baseMeshMinY - 0.8);
             }
         }
         async animateShow(duration = 1) {

@@ -230,9 +230,8 @@ declare namespace MarbleRunSimulatorCore {
         DEBUG_MODE: boolean;
         vertexDataLoader: Mummu.VertexDataLoader;
         materials: MainMaterials;
-        room: Room;
+        room?: Room;
         spotLight: BABYLON.SpotLight;
-        machine: Machine;
         mode: GameMode;
         shadowGenerator: BABYLON.ShadowGenerator;
         getGraphicQ: () => GraphicQuality;
@@ -1288,6 +1287,7 @@ declare namespace MarbleRunSimulatorCore {
         getAllMeshes(): BABYLON.Mesh[];
     }
     class Room {
+        machine: Machine;
         game: IGame;
         skybox: BABYLON.Mesh;
         skyboxMaterial: BABYLON.StandardMaterial;
@@ -1301,7 +1301,7 @@ declare namespace MarbleRunSimulatorCore {
         private _isBlurred;
         get isBlurred(): boolean;
         set isBlurred(v: boolean);
-        constructor(game: IGame);
+        constructor(machine: Machine, game: IGame);
         onRoomJustInstantiated: () => void;
         private _currentRoomIndex;
         get currentRoomIndex(): number;

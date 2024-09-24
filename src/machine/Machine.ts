@@ -38,9 +38,8 @@ namespace MarbleRunSimulatorCore {
         DEBUG_MODE: boolean;
         vertexDataLoader: Mummu.VertexDataLoader;
         materials: MainMaterials;
-        room: Room;
+        room?: Room;
         spotLight: BABYLON.SpotLight;
-        machine: Machine;
         mode: GameMode;
         shadowGenerator: BABYLON.ShadowGenerator;
         getGraphicQ: () => GraphicQuality;
@@ -250,7 +249,9 @@ namespace MarbleRunSimulatorCore {
         public async instantiate(hotReload?: boolean): Promise<void> {
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
-            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
+            if (this.game.room) {
+                this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
+            }
 
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             
@@ -562,13 +563,15 @@ namespace MarbleRunSimulatorCore {
                 let d = this.baseMeshMaxZ - this.baseMeshMinZ;
 
                 if (this.baseFrame) {
-                    let i1 = this.game.room.light1.includedOnlyMeshes.indexOf(this.baseFrame);
-                    if (i1 != -1) {
-                        this.game.room.light1.includedOnlyMeshes.splice(i1, 1);
-                    }
-                    let i2 = this.game.room.light2.includedOnlyMeshes.indexOf(this.baseFrame);
-                    if (i2 != -1) {
-                        this.game.room.light2.includedOnlyMeshes.splice(i2, 1);
+                    if (this.game.room) {
+                        let i1 = this.game.room.light1.includedOnlyMeshes.indexOf(this.baseFrame);
+                        if (i1 != -1) {
+                            this.game.room.light1.includedOnlyMeshes.splice(i1, 1);
+                        }
+                        let i2 = this.game.room.light2.includedOnlyMeshes.indexOf(this.baseFrame);
+                        if (i2 != -1) {
+                            this.game.room.light2.includedOnlyMeshes.splice(i2, 1);
+                        }
                     }
                     this.baseFrame.dispose();
                 }
@@ -580,8 +583,10 @@ namespace MarbleRunSimulatorCore {
                 this.baseFrame.material = this.game.materials.whiteMaterial;
 
                 this.game.spotLight.excludedMeshes = [this.baseFrame];
-                this.game.room.light1.includedOnlyMeshes.push(this.baseFrame);
-                this.game.room.light2.includedOnlyMeshes.push(this.baseFrame);
+                if (this.game.room) {
+                    this.game.room.light1.includedOnlyMeshes.push(this.baseFrame);
+                    this.game.room.light2.includedOnlyMeshes.push(this.baseFrame);
+                }
 
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/museum-stand.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);

@@ -46,7 +46,7 @@ namespace MarbleRunSimulatorCore {
             });
         }
 
-        constructor(public game: IGame) {
+        constructor(public machine: Machine, public game: IGame) {
             this.ground = new BABYLON.Mesh("room-ground");
             this.ground.layerMask = 0x10000000;
             this.ground.position.y = -2;
@@ -212,13 +212,13 @@ namespace MarbleRunSimulatorCore {
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             })
-            if (this.game.machine && this.game.machine.baseFrame) {
-                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
-                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            if (this.machine && this.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.machine.baseFrame);
             }
 
-            if (this.game.machine) {
-                this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
+            if (this.machine) {
+                this.setGroundHeight(this.machine.baseMeshMinY - 0.8);
             }
         }
 
@@ -333,13 +333,13 @@ namespace MarbleRunSimulatorCore {
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             })
-            if (this.game.machine && this.game.machine.baseFrame) {
-                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
-                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            if (this.machine && this.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.machine.baseFrame);
             }
 
-            if (this.game.machine) {
-                this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
+            if (this.machine) {
+                this.setGroundHeight(this.machine.baseMeshMinY - 0.8);
             }
         }
 
@@ -407,13 +407,13 @@ namespace MarbleRunSimulatorCore {
                 this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
                 this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
             })
-            if (this.game.machine && this.game.machine.baseFrame) {
-                this.light1.includedOnlyMeshes.push(this.game.machine.baseFrame);
-                this.light2.includedOnlyMeshes.push(this.game.machine.baseFrame);
+            if (this.machine && this.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.machine.baseFrame);
             }
 
-            if (this.game.machine) {
-                this.setGroundHeight(this.game.machine.baseMeshMinY - 0.8);
+            if (this.machine) {
+                this.setGroundHeight(this.machine.baseMeshMinY - 0.8);
             }
         }
 
