@@ -474,6 +474,7 @@ namespace MarbleRunSimulatorCore {
 
             this.sleepersMeshProp = this.machine.sleepersMeshProp;
 
+            this.parent = this.machine.root;
             this.tracks = [];
         }
 
@@ -934,8 +935,8 @@ namespace MarbleRunSimulatorCore {
 
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseEnd.y, this.encloseEnd.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
-            this.AABBMin.addInPlace(this.position);
-            this.AABBMax.addInPlace(this.position);
+            this.AABBMin.addInPlace(this.absolutePosition);
+            this.AABBMax.addInPlace(this.absolutePosition);
         }
 
         public dispose(): void {

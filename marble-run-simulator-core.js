@@ -262,7 +262,7 @@ var MarbleRunSimulatorCore;
             this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
-            this.animatePosition(this.positionZero, 0);
+            this.animatePosition(this.positionZero.add(this.machine.root.position), 0);
         }
         getLastIndex(wire) {
             for (let i = 0; i < this.memCount; i++) {
@@ -1540,15 +1540,18 @@ var MarbleRunSimulatorCore;
             this.tracksMinZ = 0;
             this.tracksMaxZ = 0;
             this.requestUpdateShadow = false;
+            this.root = new BABYLON.Mesh("machine-root");
             this.name = MachineName.GetRandom();
             this.trackFactory = new MarbleRunSimulatorCore.MachinePartFactory(this);
             this.templateManager = new MarbleRunSimulatorCore.TemplateManager(this);
             this.sleepersMeshProp = { grndAnchors: true, grndAnchorsMaxY: 0.35 };
             this.exitShooter = new MarbleRunSimulatorCore.Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 0, 6, 3] });
+            this.exitShooter.parent = this.root;
             this.exitShooter.isSelectable = false;
             this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitShooter.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
             this.exitTrack = new MarbleRunSimulatorCore.Start(this, { i: 0, j: 0, k: 0, mirrorX: true, c: [0] });
+            this.exitTrack.parent = this.root;
             this.exitTrack.isSelectable = false;
             this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
             this.exitTrack.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
@@ -1581,9 +1584,11 @@ var MarbleRunSimulatorCore;
             });
             data = Mummu.MergeVertexDatas(data, bottomData);
             this.exitHoleIn = new BABYLON.Mesh("exit-hole-in");
+            this.exitHoleIn.parent = this.root;
             this.exitHoleIn.material = this.game.materials.plasticBlack;
             data.applyToMesh(this.exitHoleIn);
             this.exitHoleOut = new BABYLON.Mesh("exit-hole-out");
+            this.exitHoleOut.parent = this.root;
             this.exitHoleOut.material = this.game.materials.plasticBlack;
             data.applyToMesh(this.exitHoleOut);
             this.exitHoleOut.rotation.x = -Math.PI * 0.5;
@@ -1908,6 +1913,7 @@ var MarbleRunSimulatorCore;
                     this.baseFrame.dispose();
                 }
                 this.baseFrame = new BABYLON.Mesh("base-stand");
+                this.baseFrame.parent = this.root;
                 this.baseFrame.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
                 this.baseFrame.position.y = this.baseMeshMinY;
                 this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
@@ -1941,6 +1947,7 @@ var MarbleRunSimulatorCore;
                     this.pedestalTop.dispose();
                 }
                 this.pedestalTop = new BABYLON.Mesh("pedestal-top");
+                this.pedestalTop.parent = this.root;
                 this.pedestalTop.receiveShadows = true;
                 this.pedestalTop.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
                 this.pedestalTop.position.y = this.baseMeshMinY;
@@ -1974,6 +1981,7 @@ var MarbleRunSimulatorCore;
                     this.baseLogo.dispose();
                 }
                 this.baseLogo = new BABYLON.Mesh("base-logo");
+                this.baseLogo.parent = this.root;
                 this.baseLogo.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
                 this.baseLogo.position.y = this.baseMeshMinY + 0.0001;
                 this.baseLogo.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
@@ -2002,6 +2010,7 @@ var MarbleRunSimulatorCore;
                         this.baseFPS.dispose();
                     }
                     this.baseFPS = new BABYLON.Mesh("base-logo");
+                    this.baseFPS.parent = this.root;
                     this.baseFPS.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
                     this.baseFPS.position.y = this.baseMeshMinY + 0.0001;
                     this.baseFPS.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
@@ -2047,6 +2056,7 @@ var MarbleRunSimulatorCore;
                 this.exitHoleOut.position.z = this.baseMeshMinZ - 0.05;
             }
             this.game.spotLight.position.y = this.baseMeshMinY + 2.2;
+            this.game.spotLight.parent = this.root;
             let dir = new BABYLON.Vector3((this.baseMeshMinX + this.baseMeshMaxX) * 0.5, -3, (this.baseMeshMinZ + this.baseMeshMaxZ) * 0.5).normalize();
             this.game.spotLight.direction = dir;
             this.ready = true;
@@ -2062,6 +2072,7 @@ var MarbleRunSimulatorCore;
                 let d05 = d * 0.5;
                 let s = Math.min(w05, d05) * 0.9;
                 this.baseAxis = new BABYLON.Mesh("base-logo");
+                this.baseAxis.parent = this.root;
                 let axisSquareData = Mummu.CreateQuadVertexData({
                     p1: new BABYLON.Vector3(-s, 0, -s),
                     p2: new BABYLON.Vector3(s, 0, -s),
@@ -3227,6 +3238,7 @@ var MarbleRunSimulatorCore;
             this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight;
             this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth;
             this.sleepersMeshProp = this.machine.sleepersMeshProp;
+            this.parent = this.machine.root;
             this.tracks = [];
         }
         get partName() {
@@ -3817,8 +3829,8 @@ var MarbleRunSimulatorCore;
             this.encloseMesh.visibility = 0;
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseEnd.y, this.encloseEnd.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
-            this.AABBMin.addInPlace(this.position);
-            this.AABBMax.addInPlace(this.position);
+            this.AABBMin.addInPlace(this.absolutePosition);
+            this.AABBMax.addInPlace(this.absolutePosition);
         }
         dispose() {
             this.endPoints.forEach(endpoint => {

@@ -283,7 +283,7 @@ namespace MarbleRunSimulatorCore {
             this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
-            this.animatePosition(this.positionZero, 0);
+            this.animatePosition(this.positionZero.add(this.machine.root.position), 0);
         }
 
         private memCount = 2;
