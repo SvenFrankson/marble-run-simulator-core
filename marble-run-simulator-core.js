@@ -97,7 +97,7 @@ var MarbleRunSimulatorCore;
         useBoostingMaterial() {
             if (!this._hasBoostMaterial) {
                 this._hasBoostMaterial = true;
-                this.material = this.game.materials.getParkourBallMaterial();
+                this.material = this.game.materials.getParkourBallMaterial(this.machine.materialQ);
                 if (this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
                     this._baseColor = this.material.baseColor.clone();
                 }
@@ -117,7 +117,7 @@ var MarbleRunSimulatorCore;
             if (this._boostAnimation.instantiated) {
                 this._boostAnimation.uninstantiate();
             }
-            this.material = this.game.materials.getBallMaterial(this.materialIndex);
+            this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
         }
         get showPositionZeroGhost() {
             return this._showPositionZeroGhost;
@@ -133,7 +133,7 @@ var MarbleRunSimulatorCore;
         }
         set materialIndex(v) {
             this._materialIndex = v;
-            this.material = this.game.materials.getBallMaterial(this.materialIndex);
+            this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
         }
         setPositionZero(p) {
             this.positionZero.copyFrom(p);
@@ -189,10 +189,10 @@ var MarbleRunSimulatorCore;
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
             let segmentsCount = 6;
-            if (this.game.getGeometryQ() === MarbleRunSimulatorCore.GeometryQuality.Medium) {
+            if (this.machine.geometryQ === MarbleRunSimulatorCore.GeometryQuality.Medium) {
                 segmentsCount = 10;
             }
-            else if (this.game.getGeometryQ() === MarbleRunSimulatorCore.GeometryQuality.High) {
+            else if (this.machine.geometryQ === MarbleRunSimulatorCore.GeometryQuality.High) {
                 segmentsCount = 14;
             }
             let data = BABYLON.CreateSphereVertexData({ diameter: this.size, segments: segmentsCount });
@@ -203,7 +203,7 @@ var MarbleRunSimulatorCore;
             data.applyToMesh(this);
             if (!hotReload) {
                 this._hasBoostMaterial = false;
-                this.material = this.game.materials.getBallMaterial(this.materialIndex);
+                this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
             }
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.dispose();
@@ -1088,10 +1088,7 @@ var MarbleRunSimulatorCore;
             this._wallpapers[1] = abstractSquaresMaterial;
             */
         }
-        getMaterial(colorIndex, materialQ = -1) {
-            if (materialQ === -1) {
-                materialQ = this.game.getMaterialQ();
-            }
+        getMaterial(colorIndex, materialQ) {
             if (materialQ === MarbleRunSimulatorCore.MaterialQuality.PBR) {
                 return this._materialsPBR[colorIndex % this._materialsPBR.length];
             }
@@ -1109,8 +1106,8 @@ var MarbleRunSimulatorCore;
             }
             return BallMaterialType.Metal;
         }
-        getMaterialHexBaseColor(colorIndex) {
-            let material = this.getMaterial(colorIndex);
+        getMaterialHexBaseColor(colorIndex, materialQ) {
+            let material = this.getMaterial(colorIndex, materialQ);
             if (material instanceof BABYLON.StandardMaterial) {
                 return material.diffuseColor.toHexString();
             }
@@ -1119,8 +1116,8 @@ var MarbleRunSimulatorCore;
             }
             return "#ffffff";
         }
-        getBallMaterialHexBaseColor(colorIndex) {
-            let material = this.getBallMaterial(colorIndex);
+        getBallMaterialHexBaseColor(colorIndex, materialQ) {
+            let material = this.getBallMaterial(colorIndex, materialQ);
             if (material instanceof BABYLON.StandardMaterial) {
                 return material.diffuseColor.toHexString();
             }
@@ -1132,19 +1129,13 @@ var MarbleRunSimulatorCore;
         get metalMaterialsCount() {
             return Math.min(this._materialsPBR.length, this._materialsSTD.length);
         }
-        getBallMaterial(colorIndex, materialQ = -1) {
-            if (materialQ === -1) {
-                materialQ = this.game.getMaterialQ();
-            }
+        getBallMaterial(colorIndex, materialQ) {
             if (materialQ === MarbleRunSimulatorCore.MaterialQuality.PBR) {
                 return this._ballMaterialsPBR[colorIndex % this._ballMaterialsPBR.length];
             }
             return this._ballMaterialsSTD[colorIndex % this._ballMaterialsSTD.length];
         }
-        getParkourBallMaterial(materialQ = -1) {
-            if (materialQ === -1) {
-                materialQ = this.game.getMaterialQ();
-            }
+        getParkourBallMaterial(materialQ) {
             if (materialQ === MarbleRunSimulatorCore.MaterialQuality.PBR) {
                 return this._parkourBallMaterialPBR;
             }
@@ -1171,7 +1162,7 @@ var MarbleRunSimulatorCore;
             return this._wallpapers[index];
         }
         get plasticBlack() {
-            return this.getMaterial(6);
+            return this.getMaterial(6, MarbleRunSimulatorCore.MaterialQuality.Standard);
         }
         _makePlasticPBR(name, color, envTexture) {
             let plastic = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
@@ -1353,20 +1344,20 @@ var MarbleRunSimulatorCore;
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     class Wire extends BABYLON.Mesh {
-        constructor(track) {
+        constructor(part) {
             super("wire");
-            this.track = track;
+            this.part = part;
             this.path = [];
             this.normals = [];
             this.absolutePath = [];
-            this.parent = this.track;
+            this.parent = this.part;
             this.rotationQuaternion = BABYLON.Quaternion.Identity();
         }
         get size() {
             if (isFinite(this.wireSize)) {
                 return this.wireSize;
             }
-            return this.track.wireSize;
+            return this.part.wireSize;
         }
         get radius() {
             return this.size * 0.5;
@@ -1394,7 +1385,7 @@ var MarbleRunSimulatorCore;
             }
         }
         async instantiate(color = 0) {
-            let q = this.track.game.getGeometryQ();
+            let q = this.part.machine.geometryQ;
             while (this.getChildren().length > 0) {
                 this.getChildren()[0].dispose();
             }
@@ -1424,7 +1415,7 @@ var MarbleRunSimulatorCore;
                         .clone()
                         .normalize()
                         .scaleInPlace(-1)
-                        .scaleInPlace(this.track.wireGauge * 0.5);
+                        .scaleInPlace(this.part.wireGauge * 0.5);
                     Mummu.RotateInPlace(d, this.startTipNormal, -Math.PI / 2);
                     let tipPath = [d.add(this.startTipCenter)];
                     for (let i = 0; i < 8 - 1; i++) {
@@ -1434,7 +1425,7 @@ var MarbleRunSimulatorCore;
                     path = [...tipPath, ...path];
                 }
                 if (this.endTipDir) {
-                    let d = this.endTipDir.clone().normalize().scaleInPlace(this.track.wireGauge * 0.5);
+                    let d = this.endTipDir.clone().normalize().scaleInPlace(this.part.wireGauge * 0.5);
                     Mummu.RotateInPlace(d, this.endTipNormal, -Math.PI / 2);
                     let tipPath = [];
                     for (let i = 0; i < 8; i++) {
@@ -1445,7 +1436,7 @@ var MarbleRunSimulatorCore;
                 }
                 let wire = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 wire.parent = this;
-                wire.material = this.track.game.materials.getMaterial(color);
+                wire.material = this.part.game.materials.getMaterial(color, this.part.machine.materialQ);
             }
             if (Wire.DEBUG_DISPLAY) {
                 for (let i = 0; i < this.path.length - 1; i++) {
@@ -1523,6 +1514,7 @@ var MarbleRunSimulatorCore;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.playing = false;
             this._roomIndex = 0;
+            this.graphicQ = GraphicQuality.Medium;
             this.onPlayCallbacks = new Nabu.UniqueList();
             this._paused = false;
             this.onStopCallbacks = new Nabu.UniqueList();
@@ -1623,7 +1615,24 @@ var MarbleRunSimulatorCore;
         }
         setRoomIndex(roomIndex) {
             this._roomIndex = roomIndex;
-            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this._roomIndex));
+            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this._roomIndex, this.graphicQ));
+        }
+        get geometryQ() {
+            let graphicQ = this.graphicQ;
+            if (graphicQ === GraphicQuality.Low) {
+                return GeometryQuality.Medium;
+            }
+            else if (graphicQ >= GraphicQuality.Medium) {
+                return GeometryQuality.High;
+            }
+            return GeometryQuality.Low;
+        }
+        get materialQ() {
+            let graphicQ = this.graphicQ;
+            if (graphicQ >= GraphicQuality.High) {
+                return MaterialQuality.PBR;
+            }
+            return MaterialQuality.Standard;
         }
         setAllIsSelectable(isSelectable) {
             for (let i = 0; i < this.parts.length; i++) {
@@ -1634,7 +1643,7 @@ var MarbleRunSimulatorCore;
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
             if (this.game.room) {
-                this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
+                this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex, this.graphicQ));
             }
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
             if (this.exitShooter) {
@@ -1876,7 +1885,7 @@ var MarbleRunSimulatorCore;
                 }
                 this.baseFrame = new BABYLON.Mesh("base-frame");
                 this.baseFrame.position.copyFrom(this.pedestalTop.position);
-                this.baseFrame.material = this.game.materials.getMaterial(0);
+                this.baseFrame.material = this.game.materials.getMaterial(0, this.materialQ);
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/base-frame.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
                 let positions = [...data.positions];
@@ -3924,7 +3933,7 @@ var MarbleRunSimulatorCore;
                     this.sleepersMeshes.set(colorIndex, sleeperMesh);
                 }
                 let sleeperMesh = this.sleepersMeshes.get(colorIndex);
-                sleeperMesh.material = this.game.materials.getMaterial(colorIndex);
+                sleeperMesh.material = this.game.materials.getMaterial(colorIndex, this.machine.materialQ);
                 vData.applyToMesh(sleeperMesh);
                 sleeperMesh.freezeWorldMatrix();
             });
@@ -4705,7 +4714,7 @@ var MarbleRunSimulatorCore;
             }
             track.mesh = new BABYLON.Mesh("track-mesh");
             track.mesh.parent = track.part;
-            track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0));
+            track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
             let ringIn = await vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/steampunk-pipe.babylon", 0);
             ringIn = Mummu.CloneVertexData(ringIn);
             let ringOut = Mummu.CloneVertexData(ringIn);
@@ -4765,7 +4774,7 @@ var MarbleRunSimulatorCore;
             if (!isFinite(props.grndAnchorsMaxY)) {
                 props.grndAnchorsMaxY = 1;
             }
-            let q = part.game.getGeometryQ();
+            let q = part.machine.geometryQ;
             let partialsDatas = [];
             for (let j = 0; j < part.tracks.length; j++) {
                 let track = part.tracks[j];
@@ -5666,11 +5675,11 @@ var MarbleRunSimulatorCore;
         async instantiateMachineDecorSpecific() {
             let data = await this.machine.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/xylophone.babylon");
             data[0].applyToMesh(this);
-            this.material = this.machine.game.materials.getMaterial(0);
+            this.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
             data[1].applyToMesh(this.trigger);
             this.trigger.material = this.machine.game.materials.plasticWhite;
             data[2].applyToMesh(this.blade);
-            this.blade.material = this.machine.game.materials.getMaterial(1);
+            this.blade.material = this.machine.game.materials.getMaterial(1, this.machine.materialQ);
             this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (this.n + 1).toFixed(0) + ").mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.sound.setVolume(1);
         }
@@ -5851,25 +5860,25 @@ var MarbleRunSimulatorCore;
             let supportData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 2);
             supportData = Mummu.MergeVertexDatas(axisControlerVertexData, axisPassVertexData, supportData);
             supportData.applyToMesh(this.support);
-            this.support.material = this.game.materials.getMaterial(this.getColor(4));
+            this.support.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             let cog8Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 0);
             cog8Data = Mummu.CloneVertexData(cog8Data);
             Mummu.TranslateVertexDataInPlace(cog8Data, new BABYLON.Vector3(0, 0, -MarbleRunSimulatorCore.tileDepth * 0.5));
             cog8Data.applyToMesh(this.cog8);
-            this.cog8.material = this.game.materials.getMaterial(this.getColor(5));
+            this.cog8.material = this.game.materials.getMaterial(this.getColor(5), this.machine.materialQ);
             let cog13Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 1);
             cog13Data = Mummu.CloneVertexData(cog13Data);
             Mummu.TranslateVertexDataInPlace(cog13Data, new BABYLON.Vector3(0, 0, -MarbleRunSimulatorCore.tileDepth * 0.5));
             cog13Data.applyToMesh(this.cog13);
-            this.cog13.material = this.game.materials.getMaterial(this.getColor(5));
+            this.cog13.material = this.game.materials.getMaterial(this.getColor(5), this.machine.materialQ);
             let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
             arrowData = Mummu.CloneVertexData(arrowData);
             Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
             arrowData.applyToMesh(this.pivotPass);
-            this.pivotPass.material = this.game.materials.getMaterial(this.getColor(4));
+            this.pivotPass.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             let triggerData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 0);
             triggerData.applyToMesh(this.pivotControler);
-            this.pivotControler.material = this.game.materials.getMaterial(this.getColor(5));
+            this.pivotControler.material = this.game.materials.getMaterial(this.getColor(5), this.machine.materialQ);
             let triggerColliderData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 1);
             triggerColliderData.applyToMesh(this.pivotControlerCollider);
         }
@@ -6119,8 +6128,8 @@ var MarbleRunSimulatorCore;
             let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 0);
             wheelData.applyToMesh(this.wheels[0]);
             wheelData.applyToMesh(this.wheels[1]);
-            this.wheels[0].material = this.game.materials.getMaterial(this.getColor(3));
-            this.wheels[1].material = this.game.materials.getMaterial(this.getColor(3));
+            this.wheels[0].material = this.game.materials.getMaterial(this.getColor(3), this.machine.materialQ);
+            this.wheels[1].material = this.game.materials.getMaterial(this.getColor(3), this.machine.materialQ);
         }
         static GenerateTemplate(h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -6260,11 +6269,11 @@ var MarbleRunSimulatorCore;
         async instantiateMachineSpecific() {
             let panelData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/panel.babylon");
             panelData[0].applyToMesh(this.panel);
-            this.panel.material = this.game.materials.getMaterial(this.getColor(2));
+            this.panel.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             panelData[1].applyToMesh(this.panelSupport);
-            this.panelSupport.material = this.game.materials.getMaterial(this.getColor(1));
+            this.panelSupport.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
             panelData[2].applyToMesh(this.panelPicture);
-            this.panelPicture.material = this.game.materials.getBallMaterial(this.game.materials.baseMaterialIndexToBallMaterialIndex(this.getColor(1)));
+            this.panelPicture.material = this.game.materials.getBallMaterial(this.game.materials.baseMaterialIndexToBallMaterialIndex(this.getColor(1)), this.machine.materialQ);
         }
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -6491,7 +6500,7 @@ var MarbleRunSimulatorCore;
             Mummu.RotateVertexDataInPlace(tmpVertexData, q);
             Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (this.axisZMax + this.axisZMin) * 0.5));
             anchorDatas.push(tmpVertexData);
-            this.anchor.material = this.game.materials.getMaterial(this.getColor(4));
+            this.anchor.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(this.anchor);
             let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
             if (arrowData) {
@@ -6499,7 +6508,7 @@ var MarbleRunSimulatorCore;
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
                 arrowData.applyToMesh(this.pivot);
             }
-            this.pivot.material = this.game.materials.getMaterial(this.getColor(4));
+            this.pivot.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
         }
         static GenerateTemplate(mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -6645,7 +6654,7 @@ var MarbleRunSimulatorCore;
             this.wellMesh = BABYLON.MeshBuilder.CreateLathe("gravitywell-mesh", { shape: this.wellPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
             this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
-            this.wellMesh.material = this.machine.game.materials.getMaterial(0);
+            this.wellMesh.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
             BABYLON.CreateTorusVertexData({ diameter: MarbleRunSimulatorCore.tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
             this.circleTop.material = this.wellMesh.material;
             BABYLON.CreateTorusVertexData({ diameter: 0.01 * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleBottom);
@@ -7314,19 +7323,19 @@ var MarbleRunSimulatorCore;
         async instantiateMachineSpecific() {
             let screenData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/screen.babylon");
             screenData[0].applyToMesh(this.came);
-            this.came.material = this.game.materials.getMaterial(0);
+            this.came.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             screenData[1].applyToMesh(this.cameInCollider);
             screenData[2].applyToMesh(this.cameOutCollider);
             for (let i = 0; i < 4; i++) {
                 screenData[3 + i].applyToMesh(this.pixels[i]);
-                this.pixels[i].material = this.game.materials.getMaterial(2);
+                this.pixels[i].material = this.game.materials.getMaterial(2, this.machine.materialQ);
                 screenData[9].applyToMesh(this.pixelPictures[i]);
-                this.pixelPictures[i].material = this.game.materials.getMaterial(0);
+                this.pixelPictures[i].material = this.game.materials.getMaterial(0, this.machine.materialQ);
             }
             screenData[7].applyToMesh(this.lock0);
-            this.lock0.material = this.game.materials.getMaterial(2);
+            this.lock0.material = this.game.materials.getMaterial(2, this.machine.materialQ);
             screenData[7].applyToMesh(this.lock2);
-            this.lock2.material = this.game.materials.getMaterial(2);
+            this.lock2.material = this.game.materials.getMaterial(2, this.machine.materialQ);
             screenData[8].applyToMesh(this.cable);
             this.cable.material = this.game.materials.plasticBlack;
         }
@@ -7558,19 +7567,19 @@ var MarbleRunSimulatorCore;
             shieldData = Mummu.CloneVertexData(shieldData);
             Mummu.ScaleVertexDataInPlace(shieldData, 0.024);
             shieldData.applyToMesh(this.shieldConnector);
-            this.shieldConnector.material = this.game.materials.getMaterial(this.getColor(4));
+            this.shieldConnector.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             if (this.shieldConnectorUp) {
                 let shieldDataUp = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/uConnector.babylon", 0);
                 shieldDataUp = Mummu.CloneVertexData(shieldDataUp);
                 Mummu.ScaleVertexDataInPlace(shieldDataUp, 0.033);
                 shieldDataUp.applyToMesh(this.shieldConnectorUp);
-                this.shieldConnectorUp.material = this.game.materials.getMaterial(this.getColor(4));
+                this.shieldConnectorUp.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             }
             let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 1);
             wheelData = Mummu.CloneVertexData(wheelData);
             Mummu.ScaleVertexDataInPlace(wheelData, 1.05);
             wheelData.applyToMesh(this.wheel);
-            this.wheel.material = this.game.materials.getMaterial(this.getColor(2));
+            this.wheel.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
         }
         static GenerateTemplate(w, h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -7794,15 +7803,15 @@ var MarbleRunSimulatorCore;
             if (kickerDatas[1]) {
                 kickerDatas[1].applyToMesh(this.kickerBody);
             }
-            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(2));
+            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             if (kickerDatas[2]) {
                 kickerDatas[2].applyToMesh(this.kickerWeight);
             }
-            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(4));
+            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             if (kickerDatas[4]) {
                 kickerDatas[4].applyToMesh(this.base);
             }
-            this.base.material = this.game.materials.getMaterial(this.getColor(3));
+            this.base.material = this.game.materials.getMaterial(this.getColor(3), this.machine.materialQ);
             if (kickerDatas[3]) {
                 kickerDatas[3].applyToMesh(this.kickerCollider);
                 this.kickerCollider.isVisible = false;
@@ -7811,7 +7820,7 @@ var MarbleRunSimulatorCore;
             if (shieldDatas[0]) {
                 shieldDatas[0].applyToMesh(this.shield);
             }
-            this.shield.material = this.game.materials.getMaterial(this.getColor(4));
+            this.shield.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             if (shieldDatas[1]) {
                 shieldDatas[1].applyToMesh(this.shieldCollider);
                 this.shieldCollider.isVisible = false;
@@ -8327,15 +8336,15 @@ var MarbleRunSimulatorCore;
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
                 anchorDatas.push(arrowData);
             }
-            this.anchor.material = this.game.materials.getMaterial(this.getColor(4));
+            this.anchor.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(this.anchor);
             let panelData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/panel.babylon");
             panelData[0].applyToMesh(this.panel);
-            this.panel.material = this.game.materials.getMaterial(this.getColor(6));
+            this.panel.material = this.game.materials.getMaterial(this.getColor(6), this.machine.materialQ);
             panelData[1].applyToMesh(this.panelSupport);
-            this.panelSupport.material = this.game.materials.getMaterial(this.getColor(4));
+            this.panelSupport.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             panelData[2].applyToMesh(this.panelPicture);
-            this.panelPicture.material = this.game.materials.getBallMaterial(this.game.materials.baseMaterialIndexToBallMaterialIndex(this.getColor(4)));
+            this.panelPicture.material = this.game.materials.getBallMaterial(this.game.materials.baseMaterialIndexToBallMaterialIndex(this.getColor(4)), this.machine.materialQ);
         }
         static GenerateTemplate(mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -8567,25 +8576,25 @@ var MarbleRunSimulatorCore;
             let supportData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 2);
             supportData = Mummu.MergeVertexDatas(axisSpawnerVertexData, axisPassVertexData, supportData);
             supportData.applyToMesh(this.support);
-            this.support.material = this.game.materials.getMaterial(this.getColor(4));
+            this.support.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             let cog8Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 0);
             cog8Data = Mummu.CloneVertexData(cog8Data);
             Mummu.TranslateVertexDataInPlace(cog8Data, new BABYLON.Vector3(0, 0, -MarbleRunSimulatorCore.tileDepth * 0.5));
             cog8Data.applyToMesh(this.cog8);
-            this.cog8.material = this.game.materials.getMaterial(this.getColor(5));
+            this.cog8.material = this.game.materials.getMaterial(this.getColor(5), this.machine.materialQ);
             let cog13Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 1);
             cog13Data = Mummu.CloneVertexData(cog13Data);
             Mummu.TranslateVertexDataInPlace(cog13Data, new BABYLON.Vector3(0, 0, -MarbleRunSimulatorCore.tileDepth * 0.5));
             cog13Data.applyToMesh(this.cog13);
-            this.cog13.material = this.game.materials.getMaterial(this.getColor(5));
+            this.cog13.material = this.game.materials.getMaterial(this.getColor(5), this.machine.materialQ);
             let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
             arrowData = Mummu.CloneVertexData(arrowData);
             Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
             arrowData.applyToMesh(this.pivotPass);
-            this.pivotPass.material = this.game.materials.getMaterial(this.getColor(4));
+            this.pivotPass.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             let triggerData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 0);
             triggerData.applyToMesh(this.pivotSpawner);
-            this.pivotSpawner.material = this.game.materials.getMaterial(this.getColor(5));
+            this.pivotSpawner.material = this.game.materials.getMaterial(this.getColor(5), this.machine.materialQ);
             let triggerColliderData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/control-trigger.babylon", 1);
             triggerColliderData.applyToMesh(this.pivotSpawnerCollider);
         }
@@ -8692,7 +8701,7 @@ var MarbleRunSimulatorCore;
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             this.generateWires();
             this.base = new BABYLON.Mesh("base");
-            this.base.material = this.game.materials.getMaterial(this.getColor(0));
+            this.base.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
             this.base.parent = this;
             this.wheel0 = new BABYLON.Mesh("wheel0");
             this.wheel0.parent = this;
@@ -8714,9 +8723,9 @@ var MarbleRunSimulatorCore;
             speederDatas[0].applyToMesh(this.rubber1);
             this.rubber1.material = this.game.materials.plasticBlack;
             speederDatas[1].applyToMesh(this.wheel0);
-            this.wheel0.material = this.game.materials.getMaterial(0);
+            this.wheel0.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             speederDatas[1].applyToMesh(this.wheel1);
-            this.wheel1.material = this.game.materials.getMaterial(0);
+            this.wheel1.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             speederDatas[2].applyToMesh(this.base);
         }
         static GenerateTemplate(mirrorX) {
@@ -9038,7 +9047,7 @@ var MarbleRunSimulatorCore;
             Mummu.RotateVertexDataInPlace(tmpVertexData, q);
             Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (this.axisZMax + this.axisZMin) * 0.5));
             anchorDatas.push(tmpVertexData);
-            this.anchor.material = this.game.materials.getMaterial(this.getColor(4));
+            this.anchor.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(this.anchor);
             let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
             if (arrowData) {
@@ -9046,7 +9055,7 @@ var MarbleRunSimulatorCore;
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
                 arrowData.applyToMesh(this.pivot);
             }
-            this.pivot.material = this.game.materials.getMaterial(this.getColor(4));
+            this.pivot.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
         }
         static GenerateTemplate(mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -9268,7 +9277,7 @@ var MarbleRunSimulatorCore;
                 BABYLON.VertexData.ComputeNormals(vertexData.positions, vertexData.indices, normals);
                 vertexData.normals = normals;
                 vertexData.applyToMesh(this.bielles[i]);
-                this.bielles[i].material = this.game.materials.getMaterial(this.getColor(2));
+                this.bielles[i].material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
                 let stepVertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-step.babylon", 0);
                 stepVertexData = Mummu.CloneVertexData(stepVertexData);
                 positions = stepVertexData.positions;
@@ -9316,7 +9325,7 @@ var MarbleRunSimulatorCore;
                 stepVertexData.positions = positions;
                 stepVertexData.applyToMesh(this.boxesDisplayedMesh[i]);
                 this.boxesDisplayedMesh[i].parent = this.boxesColliders[i];
-                this.boxesDisplayedMesh[i].material = this.game.materials.getMaterial(this.getColor(1));
+                this.boxesDisplayedMesh[i].material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
             }
             let vertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-vil.babylon", 0);
             vertexData = Mummu.CloneVertexData(vertexData);
@@ -9361,7 +9370,7 @@ var MarbleRunSimulatorCore;
             Mummu.RotateVertexDataInPlace(wheel1Data, BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, Math.PI * 0.5));
             Mummu.TranslateVertexDataInPlace(wheel1Data, new BABYLON.Vector3(this.x1 + 0.001, 0, 0));
             Mummu.MergeVertexDatas(...vilPartsDatas, wheel0Data, wheel1Data).applyToMesh(this.vil);
-            this.vil.material = this.game.materials.getMaterial(this.getColor(3));
+            this.vil.material = this.game.materials.getMaterial(this.getColor(3), this.machine.materialQ);
         }
         static GenerateTemplate(w, h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -9545,23 +9554,23 @@ var MarbleRunSimulatorCore;
         async instantiateMachineSpecific() {
             let datas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/steampunk-elevator.babylon");
             datas[0].applyToMesh(this.gearTop);
-            this.gearTop.material = this.game.materials.getMaterial(1);
+            this.gearTop.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             datas[0].applyToMesh(this.gearBottom);
-            this.gearBottom.material = this.game.materials.getMaterial(1);
+            this.gearBottom.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             datas[1].applyToMesh(this.flyWheel);
-            this.flyWheel.material = this.game.materials.getMaterial(1);
+            this.flyWheel.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             datas[2].applyToMesh(this.largeWheel);
-            this.largeWheel.material = this.game.materials.getMaterial(1);
+            this.largeWheel.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             datas[3].applyToMesh(this.smallWheel);
-            this.smallWheel.material = this.game.materials.getMaterial(1);
+            this.smallWheel.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             datas[4].applyToMesh(this.engineAxis);
-            this.engineAxis.material = this.game.materials.getMaterial(1);
+            this.engineAxis.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             datas[5].applyToMesh(this.pistonBielle);
-            this.pistonBielle.material = this.game.materials.getMaterial(1);
+            this.pistonBielle.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             datas[6].applyToMesh(this.pistonMove);
-            this.pistonMove.material = this.game.materials.getMaterial(1);
+            this.pistonMove.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             datas[7].applyToMesh(this.pistonBody);
-            this.pistonBody.material = this.game.materials.getMaterial(1);
+            this.pistonBody.material = this.game.materials.getMaterial(1, this.machine.materialQ);
             let nCable = 6;
             let rChain = 0.003;
             let x0 = this.gearBottom.position.x;
@@ -10138,7 +10147,7 @@ var MarbleRunSimulatorCore;
             let note = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note);
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile.material = this.game.materials.getMaterial(0);
+            tile.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             tile.position.copyFrom(ting.position);
             tile.rotation.copyFrom(ting.rotation);
             tile.parent = this;
@@ -10204,7 +10213,7 @@ var MarbleRunSimulatorCore;
             let note = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note);
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile.material = this.game.materials.getMaterial(0);
+            tile.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             tile.position.copyFrom(ting.position);
             tile.rotation.copyFrom(ting.rotation);
             tile.parent = this;
@@ -10224,7 +10233,7 @@ var MarbleRunSimulatorCore;
             let note2 = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note2);
             let tile2 = BABYLON.MeshBuilder.CreateBox("tile2", { width: 0.015, height: 0.005, depth: 0.06 });
-            tile2.material = this.game.materials.getMaterial(0);
+            tile2.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             tile2.position.copyFrom(ting2.position);
             tile2.rotation.copyFrom(ting2.rotation);
             tile2.parent = this;
@@ -10333,7 +10342,7 @@ var MarbleRunSimulatorCore;
             }
             if (vertexDatas && vertexDatas[1]) {
                 vertexDatas[1].applyToMesh(this._steelFrame);
-                this._steelFrame.material = this.room.game.materials.getMaterial(0);
+                this._steelFrame.material = this.room.game.materials.getMaterial(0, this.room.machine.materialQ);
             }
             if (vertexDatas && vertexDatas[2]) {
                 vertexDatas[2].applyToMesh(this._lightedPlane);
@@ -10402,7 +10411,7 @@ var MarbleRunSimulatorCore;
             this.ceiling.material = this.game.materials.wallShadow;
             this.frame = new BABYLON.Mesh("room-frame");
             this.frame.layerMask = 0x10000000;
-            this.frame.material = this.game.materials.getMaterial(0);
+            this.frame.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             this.frame.parent = this.wall;
             this.light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 3, 0.5).normalize(), this.game.scene);
             this.light1.groundColor.copyFromFloats(0.3, 0.3, 0.3);
@@ -10486,29 +10495,29 @@ var MarbleRunSimulatorCore;
                 await this.animateShow(forceAndskipAnimation ? 0 : 1);
             }
         }
-        contextualRoomIndex(n) {
+        contextualRoomIndex(index, q) {
             // 1 is the lite version of 0
-            if (n === 0 && this.game.getGraphicQ() === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+            if (index === 0 && q === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 1;
             }
-            if (n === 1 && this.game.getGraphicQ() > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+            if (index === 1 && q > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 0;
             }
             // 8 is the lite version of 7
-            if (n === 7 && this.game.getGraphicQ() === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+            if (index === 7 && q === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 8;
             }
-            if (n === 8 && this.game.getGraphicQ() > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+            if (index === 8 && q > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 7;
             }
             // 10 is the lite version of 9
-            if (n === 9 && this.game.getGraphicQ() === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+            if (index === 9 && q === MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 10;
             }
-            if (n === 10 && this.game.getGraphicQ() > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
+            if (index === 10 && q > MarbleRunSimulatorCore.GraphicQuality.VeryLow) {
                 return 9;
             }
-            return n;
+            return index;
         }
         async instantiateSimple(groundColor, wallColor, wallPaperIndex) {
             this.decors.forEach(decor => {
@@ -10570,7 +10579,7 @@ var MarbleRunSimulatorCore;
             this.wall.material = this.game.materials.whiteMaterial;
             vertexDatas[2].applyToMesh(this.frame);
             this.frame.parent = this.wall;
-            this.frame.material = this.game.materials.getMaterial(0);
+            this.frame.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.05 });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, -Math.PI * 0.5, BABYLON.Axis.X);
             slice9Top.applyToMesh(this.ceiling);
@@ -10624,12 +10633,12 @@ var MarbleRunSimulatorCore;
                 paint41.position.copyFromFloats(-2.8, 0, 4.5);
                 paint41.rotation.y = Math.PI;
                 this.decors.push(paint41);
-                let sculpt1 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(0));
+                let sculpt1 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(0, this.machine.materialQ));
                 await sculpt1.instantiate();
                 sculpt1.position.copyFromFloats(4.5, 0, 0);
                 sculpt1.rotation.y = -0.5 * Math.PI;
                 this.decors.push(sculpt1);
-                let sculpt2 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(1));
+                let sculpt2 = new MarbleRunSimulatorCore.Sculpt(this, this.game.materials.getMaterial(1, this.machine.materialQ));
                 await sculpt2.instantiate();
                 sculpt2.position.copyFromFloats(-4.5, 0, 0);
                 sculpt2.rotation.y = 0.5 * Math.PI;

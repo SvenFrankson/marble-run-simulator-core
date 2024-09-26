@@ -34,12 +34,13 @@ namespace MarbleRunSimulatorCore {
         protected async instantiateMachineSpecific(): Promise<void> {
             let panelData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/panel.babylon");
             panelData[0].applyToMesh(this.panel);
-            this.panel.material = this.game.materials.getMaterial(this.getColor(2));
+            this.panel.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             panelData[1].applyToMesh(this.panelSupport);
-            this.panelSupport.material = this.game.materials.getMaterial(this.getColor(1));
+            this.panelSupport.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
             panelData[2].applyToMesh(this.panelPicture);
             this.panelPicture.material = this.game.materials.getBallMaterial(
-                this.game.materials.baseMaterialIndexToBallMaterialIndex(this.getColor(1))
+                this.game.materials.baseMaterialIndexToBallMaterialIndex(this.getColor(1)),
+                this.machine.materialQ
             );
         }
 

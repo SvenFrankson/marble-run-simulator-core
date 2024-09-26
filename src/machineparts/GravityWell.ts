@@ -44,7 +44,7 @@ namespace MarbleRunSimulatorCore {
             this.wellMesh = BABYLON.MeshBuilder.CreateLathe("gravitywell-mesh", { shape: this.wellPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
             this.wellMesh.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth);
             this.wellMesh.parent = this;
-            this.wellMesh.material = this.machine.game.materials.getMaterial(0);
+            this.wellMesh.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
             
             BABYLON.CreateTorusVertexData({ diameter: tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
             this.circleTop.material = this.wellMesh.material;

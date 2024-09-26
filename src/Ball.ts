@@ -60,7 +60,7 @@ namespace MarbleRunSimulatorCore {
         public useBoostingMaterial(): void {
             if (!this._hasBoostMaterial) {
                 this._hasBoostMaterial = true;
-                this.material = this.game.materials.getParkourBallMaterial();
+                this.material = this.game.materials.getParkourBallMaterial(this.machine.materialQ);
                 if (this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
                     this._baseColor = this.material.baseColor.clone();
                 }
@@ -80,7 +80,7 @@ namespace MarbleRunSimulatorCore {
             if (this._boostAnimation.instantiated) {
                 this._boostAnimation.uninstantiate();
             }
-            this.material = this.game.materials.getBallMaterial(this.materialIndex);
+            this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
         }
         
 
@@ -106,7 +106,7 @@ namespace MarbleRunSimulatorCore {
         }
         public set materialIndex(v: number) {
             this._materialIndex = v;
-            this.material = this.game.materials.getBallMaterial(this.materialIndex);
+            this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
         }
 
         public setPositionZero(p: BABYLON.Vector3): void {
@@ -203,10 +203,10 @@ namespace MarbleRunSimulatorCore {
             this.marbleLoopSound.setVolume(0);
             this.marbleBowlLoopSound.setVolume(0);
             let segmentsCount = 6;
-            if (this.game.getGeometryQ() === GeometryQuality.Medium) {
+            if (this.machine.geometryQ === GeometryQuality.Medium) {
                 segmentsCount = 10;
             }
-            else if (this.game.getGeometryQ() === GeometryQuality.High) {
+            else if (this.machine.geometryQ === GeometryQuality.High) {
                 segmentsCount = 14;
             }
             let data = BABYLON.CreateSphereVertexData({ diameter: this.size, segments: segmentsCount});
@@ -218,7 +218,7 @@ namespace MarbleRunSimulatorCore {
 
             if (!hotReload) {
                 this._hasBoostMaterial = false;
-                this.material = this.game.materials.getBallMaterial(this.materialIndex);
+                this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
             }
 
             if (this.positionZeroGhost) {

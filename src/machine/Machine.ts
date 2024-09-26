@@ -42,9 +42,6 @@ namespace MarbleRunSimulatorCore {
         spotLight: BABYLON.SpotLight;
         mode: GameMode;
         shadowGenerator: BABYLON.ShadowGenerator;
-        getGraphicQ: () => GraphicQuality;
-        getGeometryQ: () => GeometryQuality;
-        getMaterialQ: () => MaterialQuality;
         gridIMin: number;
         gridIMax: number;
         gridJMin: number;
@@ -142,7 +139,27 @@ namespace MarbleRunSimulatorCore {
         }
         public setRoomIndex(roomIndex: number): void {
             this._roomIndex = roomIndex;
-            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this._roomIndex));
+            this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this._roomIndex, this.graphicQ));
+        }
+
+        public graphicQ: GraphicQuality = GraphicQuality.Medium;
+        public get geometryQ(): GeometryQuality {
+            let graphicQ = this.graphicQ;
+            if (graphicQ === GraphicQuality.Low) {
+                return GeometryQuality.Medium;
+            }
+            else if (graphicQ >= GraphicQuality.Medium) {
+                return GeometryQuality.High
+            }
+            return GeometryQuality.Low;
+        }
+    
+        public get materialQ(): MaterialQuality {
+            let graphicQ = this.graphicQ;
+            if (graphicQ >= GraphicQuality.High) {
+                return MaterialQuality.PBR
+            }
+            return MaterialQuality.Standard;
         }
 
         constructor(public game: IGame) {
@@ -250,7 +267,7 @@ namespace MarbleRunSimulatorCore {
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
             if (this.game.room) {
-                this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex));
+                this.game.room.setRoomIndex(this.game.room.contextualRoomIndex(this.roomIndex, this.graphicQ));
             }
 
             this.sleeperVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/sleepers.babylon");
@@ -535,7 +552,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 this.baseFrame = new BABYLON.Mesh("base-frame");
                 this.baseFrame.position.copyFrom(this.pedestalTop.position);
-                this.baseFrame.material = this.game.materials.getMaterial(0);
+                this.baseFrame.material = this.game.materials.getMaterial(0, this.materialQ);
 
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/base-frame.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);

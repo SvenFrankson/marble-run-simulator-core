@@ -124,18 +124,18 @@ declare namespace MarbleRunSimulatorCore {
         game: IGame;
         private _materialsPBR;
         private _materialsSTD;
-        getMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
+        getMaterial(colorIndex: number, materialQ: number): BABYLON.Material;
         getMaterialType(colorIndex: number): MaterialType;
         getBallMaterialType(colorIndex: number): BallMaterialType;
-        getMaterialHexBaseColor(colorIndex: number): string;
-        getBallMaterialHexBaseColor(colorIndex: number): string;
+        getMaterialHexBaseColor(colorIndex: number, materialQ: number): string;
+        getBallMaterialHexBaseColor(colorIndex: number, materialQ: number): string;
         get metalMaterialsCount(): number;
         private _ballMaterialsPBR;
         private _ballMaterialsSTD;
         private _parkourBallMaterialPBR;
         private _parkourBallMaterialSTD;
-        getBallMaterial(colorIndex: number, materialQ?: number): BABYLON.Material;
-        getParkourBallMaterial(materialQ?: number): BABYLON.Material;
+        getBallMaterial(colorIndex: number, materialQ: number): BABYLON.Material;
+        getParkourBallMaterial(materialQ: number): BABYLON.Material;
         get ballMaterialsCount(): number;
         private baseMaterialToBallMaterialTable;
         ballMaterialIndexToBaseMaterialIndex(ballMaterialIndex: number): number;
@@ -184,7 +184,7 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class Wire extends BABYLON.Mesh {
-        track: MachinePart;
+        part: MachinePart;
         static DEBUG_DISPLAY: boolean;
         path: BABYLON.Vector3[];
         normals: BABYLON.Vector3[];
@@ -199,7 +199,7 @@ declare namespace MarbleRunSimulatorCore {
         endTipCenter: BABYLON.Vector3;
         endTipNormal: BABYLON.Vector3;
         endTipDir: BABYLON.Vector3;
-        constructor(track: MachinePart);
+        constructor(part: MachinePart);
         show(): void;
         hide(): void;
         recomputeAbsolutePath(): void;
@@ -234,9 +234,6 @@ declare namespace MarbleRunSimulatorCore {
         spotLight: BABYLON.SpotLight;
         mode: GameMode;
         shadowGenerator: BABYLON.ShadowGenerator;
-        getGraphicQ: () => GraphicQuality;
-        getGeometryQ: () => GeometryQuality;
-        getMaterialQ: () => MaterialQuality;
         gridIMin: number;
         gridIMax: number;
         gridJMin: number;
@@ -319,6 +316,9 @@ declare namespace MarbleRunSimulatorCore {
         private _roomIndex;
         get roomIndex(): number;
         setRoomIndex(roomIndex: number): void;
+        graphicQ: GraphicQuality;
+        get geometryQ(): GeometryQuality;
+        get materialQ(): MaterialQuality;
         constructor(game: IGame);
         setAllIsSelectable(isSelectable: boolean): void;
         instantiate(hotReload?: boolean): Promise<void>;
@@ -1306,7 +1306,7 @@ declare namespace MarbleRunSimulatorCore {
         private _currentRoomIndex;
         get currentRoomIndex(): number;
         setRoomIndex(roomIndex: number, forceAndskipAnimation?: boolean): Promise<void>;
-        contextualRoomIndex(n: number): number;
+        contextualRoomIndex(index: number, q: GraphicQuality): number;
         instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, wallPaperIndex: number): Promise<void>;
         instantiateMuseum(useDecors?: boolean, skyboxPath?: string): Promise<void>;
         instantiateOpenRoom(useDecors?: boolean, skyboxPath?: string): Promise<void>;

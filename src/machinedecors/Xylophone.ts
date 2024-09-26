@@ -120,11 +120,11 @@ namespace MarbleRunSimulatorCore {
         protected async instantiateMachineDecorSpecific(): Promise<void> {
             let data = await this.machine.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/xylophone.babylon");
             data[0].applyToMesh(this);
-            this.material = this.machine.game.materials.getMaterial(0);
+            this.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
             data[1].applyToMesh(this.trigger);
             this.trigger.material = this.machine.game.materials.plasticWhite;
             data[2].applyToMesh(this.blade);
-            this.blade.material = this.machine.game.materials.getMaterial(1);
+            this.blade.material = this.machine.game.materials.getMaterial(1, this.machine.materialQ);
 
             this.sound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/xylophone/A (" + (this.n + 1).toFixed(0) + ").mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.sound.setVolume(1);

@@ -94,31 +94,31 @@ namespace MarbleRunSimulatorCore {
             let datas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/steampunk-elevator.babylon");
 
             datas[0].applyToMesh(this.gearTop);
-            this.gearTop.material = this.game.materials.getMaterial(1);
+            this.gearTop.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             datas[0].applyToMesh(this.gearBottom);
-            this.gearBottom.material = this.game.materials.getMaterial(1);
+            this.gearBottom.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             datas[1].applyToMesh(this.flyWheel);
-            this.flyWheel.material = this.game.materials.getMaterial(1);
+            this.flyWheel.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             datas[2].applyToMesh(this.largeWheel);
-            this.largeWheel.material = this.game.materials.getMaterial(1);
+            this.largeWheel.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             datas[3].applyToMesh(this.smallWheel);
-            this.smallWheel.material = this.game.materials.getMaterial(1);
+            this.smallWheel.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             datas[4].applyToMesh(this.engineAxis);
-            this.engineAxis.material = this.game.materials.getMaterial(1);
+            this.engineAxis.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             datas[5].applyToMesh(this.pistonBielle);
-            this.pistonBielle.material = this.game.materials.getMaterial(1);
+            this.pistonBielle.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             datas[6].applyToMesh(this.pistonMove);
-            this.pistonMove.material = this.game.materials.getMaterial(1);
+            this.pistonMove.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             datas[7].applyToMesh(this.pistonBody);
-            this.pistonBody.material = this.game.materials.getMaterial(1);
+            this.pistonBody.material = this.game.materials.getMaterial(1, this.machine.materialQ);
 
             let nCable = 6;
 

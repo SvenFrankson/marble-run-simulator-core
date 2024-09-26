@@ -152,7 +152,7 @@ namespace MarbleRunSimulatorCore {
             Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (this.axisZMax + this.axisZMin) * 0.5));
             anchorDatas.push(tmpVertexData);
 
-            this.anchor.material = this.game.materials.getMaterial(this.getColor(4));
+            this.anchor.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             Mummu.MergeVertexDatas(...anchorDatas).applyToMesh(this.anchor);
 
             let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
@@ -161,7 +161,7 @@ namespace MarbleRunSimulatorCore {
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, 0, this.axisZMin));
                 arrowData.applyToMesh(this.pivot);
             }
-            this.pivot.material = this.game.materials.getMaterial(this.getColor(4));
+            this.pivot.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
         }
 
         public static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean) {

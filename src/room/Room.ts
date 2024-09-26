@@ -63,7 +63,7 @@ namespace MarbleRunSimulatorCore {
 
             this.frame = new BABYLON.Mesh("room-frame");
             this.frame.layerMask = 0x10000000;
-            this.frame.material = this.game.materials.getMaterial(0);
+            this.frame.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             this.frame.parent = this.wall;
 
             this.light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 3, 0.5).normalize(), this.game.scene);
@@ -140,29 +140,29 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public contextualRoomIndex(n: number): number {
+        public contextualRoomIndex(index: number, q: GraphicQuality): number {
             // 1 is the lite version of 0
-            if (n === 0 && this.game.getGraphicQ() === GraphicQuality.VeryLow) {
+            if (index === 0 && q === GraphicQuality.VeryLow) {
                 return 1;
             }
-            if (n === 1 && this.game.getGraphicQ() > GraphicQuality.VeryLow) {
+            if (index === 1 && q > GraphicQuality.VeryLow) {
                 return 0;
             }
             // 8 is the lite version of 7
-            if (n === 7 && this.game.getGraphicQ() === GraphicQuality.VeryLow) {
+            if (index === 7 && q === GraphicQuality.VeryLow) {
                 return 8;
             }
-            if (n === 8 && this.game.getGraphicQ() > GraphicQuality.VeryLow) {
+            if (index === 8 && q > GraphicQuality.VeryLow) {
                 return 7;
             }
             // 10 is the lite version of 9
-            if (n === 9 && this.game.getGraphicQ() === GraphicQuality.VeryLow) {
+            if (index === 9 && q === GraphicQuality.VeryLow) {
                 return 10;
             }
-            if (n === 10 && this.game.getGraphicQ() > GraphicQuality.VeryLow) {
+            if (index === 10 && q > GraphicQuality.VeryLow) {
                 return 9;
             }
-            return n;
+            return index;
         }
 
         public async instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, wallPaperIndex: number): Promise<void> {
@@ -243,7 +243,7 @@ namespace MarbleRunSimulatorCore {
 
             vertexDatas[2].applyToMesh(this.frame);
             this.frame.parent = this.wall;
-            this.frame.material = this.game.materials.getMaterial(0);
+            this.frame.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.05 });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, - Math.PI * 0.5, BABYLON.Axis.X);
@@ -309,13 +309,13 @@ namespace MarbleRunSimulatorCore {
                 paint41.rotation.y = Math.PI;
                 this.decors.push(paint41);
     
-                let sculpt1 = new Sculpt(this, this.game.materials.getMaterial(0));
+                let sculpt1 = new Sculpt(this, this.game.materials.getMaterial(0, this.machine.materialQ));
                 await sculpt1.instantiate();
                 sculpt1.position.copyFromFloats(4.5, 0, 0);
                 sculpt1.rotation.y = -0.5 * Math.PI;
                 this.decors.push(sculpt1);
     
-                let sculpt2 = new Sculpt(this, this.game.materials.getMaterial(1));
+                let sculpt2 = new Sculpt(this, this.game.materials.getMaterial(1, this.machine.materialQ));
                 await sculpt2.instantiate();
                 sculpt2.position.copyFromFloats(-4.5, 0, 0);
                 sculpt2.rotation.y = 0.5 * Math.PI;

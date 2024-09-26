@@ -153,17 +153,17 @@ namespace MarbleRunSimulatorCore {
             if (kickerDatas[1]) {
                 kickerDatas[1].applyToMesh(this.kickerBody);
             }
-            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(2));
+            this.kickerBody.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
 
             if (kickerDatas[2]) {
                 kickerDatas[2].applyToMesh(this.kickerWeight);
             }
-            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(4));
+            this.kickerWeight.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
 
             if (kickerDatas[4]) {
                 kickerDatas[4].applyToMesh(this.base);
             }
-            this.base.material = this.game.materials.getMaterial(this.getColor(3));
+            this.base.material = this.game.materials.getMaterial(this.getColor(3), this.machine.materialQ);
 
             if (kickerDatas[3]) {
                 kickerDatas[3].applyToMesh(this.kickerCollider);
@@ -175,7 +175,7 @@ namespace MarbleRunSimulatorCore {
             if (shieldDatas[0]) {
                 shieldDatas[0].applyToMesh(this.shield);
             }
-            this.shield.material = this.game.materials.getMaterial(this.getColor(4));
+            this.shield.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             
             if (shieldDatas[1]) {
                 shieldDatas[1].applyToMesh(this.shieldCollider);

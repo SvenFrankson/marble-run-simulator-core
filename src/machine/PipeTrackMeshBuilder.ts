@@ -14,7 +14,7 @@ namespace MarbleRunSimulatorCore {
 
             track.mesh = new BABYLON.Mesh("track-mesh");
             track.mesh.parent = track.part;
-            track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0));
+            track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
 
             let ringIn = await vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/steampunk-pipe.babylon", 0);
             ringIn = Mummu.CloneVertexData(ringIn);

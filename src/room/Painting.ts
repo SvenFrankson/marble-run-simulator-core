@@ -50,7 +50,7 @@ namespace MarbleRunSimulatorCore {
             }
             if (vertexDatas && vertexDatas[1]) {
                 vertexDatas[1].applyToMesh(this._steelFrame);
-                this._steelFrame.material = this.room.game.materials.getMaterial(0);
+                this._steelFrame.material = this.room.game.materials.getMaterial(0, this.room.machine.materialQ);
             }
             if (vertexDatas && vertexDatas[2]) {
                 vertexDatas[2].applyToMesh(this._lightedPlane);

@@ -15,7 +15,7 @@ namespace MarbleRunSimulatorCore {
             this.generateWires();
 
             this.base = new BABYLON.Mesh("base");
-            this.base.material = this.game.materials.getMaterial(this.getColor(0));
+            this.base.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
             this.base.parent = this;
 
             this.wheel0 = new BABYLON.Mesh("wheel0");
@@ -43,9 +43,9 @@ namespace MarbleRunSimulatorCore {
             speederDatas[0].applyToMesh(this.rubber1);
             this.rubber1.material = this.game.materials.plasticBlack;
             speederDatas[1].applyToMesh(this.wheel0);
-            this.wheel0.material = this.game.materials.getMaterial(0);
+            this.wheel0.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             speederDatas[1].applyToMesh(this.wheel1);
-            this.wheel1.material = this.game.materials.getMaterial(0);
+            this.wheel1.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             speederDatas[2].applyToMesh(this.base);
         }
 

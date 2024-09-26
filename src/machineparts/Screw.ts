@@ -139,21 +139,21 @@ namespace MarbleRunSimulatorCore {
             shieldData = Mummu.CloneVertexData(shieldData);
             Mummu.ScaleVertexDataInPlace(shieldData, 0.024);
             shieldData.applyToMesh(this.shieldConnector);
-            this.shieldConnector.material = this.game.materials.getMaterial(this.getColor(4));
+            this.shieldConnector.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             
             if (this.shieldConnectorUp) {
                 let shieldDataUp = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/uConnector.babylon", 0);
                 shieldDataUp = Mummu.CloneVertexData(shieldDataUp);
                 Mummu.ScaleVertexDataInPlace(shieldDataUp, 0.033);
                 shieldDataUp.applyToMesh(this.shieldConnectorUp);
-                this.shieldConnectorUp.material = this.game.materials.getMaterial(this.getColor(4));
+                this.shieldConnectorUp.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
             }
 
             let wheelData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/wheel.babylon", 1);
             wheelData = Mummu.CloneVertexData(wheelData);
             Mummu.ScaleVertexDataInPlace(wheelData, 1.05);
             wheelData.applyToMesh(this.wheel);
-            this.wheel.material = this.game.materials.getMaterial(this.getColor(2));
+            this.wheel.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
         }
 
         public static GenerateTemplate(w: number, h: number, mirrorX: boolean) {

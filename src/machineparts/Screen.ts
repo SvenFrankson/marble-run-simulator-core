@@ -264,19 +264,19 @@ namespace MarbleRunSimulatorCore {
 
             let screenData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/screen.babylon");
             screenData[0].applyToMesh(this.came);
-            this.came.material = this.game.materials.getMaterial(0);
+            this.came.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             screenData[1].applyToMesh(this.cameInCollider);
             screenData[2].applyToMesh(this.cameOutCollider);
             for (let i = 0; i < 4; i++) {
                 screenData[3 + i].applyToMesh(this.pixels[i]);
-                this.pixels[i].material = this.game.materials.getMaterial(2);
+                this.pixels[i].material = this.game.materials.getMaterial(2, this.machine.materialQ);
                 screenData[9].applyToMesh(this.pixelPictures[i]);
-                this.pixelPictures[i].material = this.game.materials.getMaterial(0);
+                this.pixelPictures[i].material = this.game.materials.getMaterial(0, this.machine.materialQ);
             }
             screenData[7].applyToMesh(this.lock0);
-            this.lock0.material = this.game.materials.getMaterial(2);
+            this.lock0.material = this.game.materials.getMaterial(2, this.machine.materialQ);
             screenData[7].applyToMesh(this.lock2);
-            this.lock2.material = this.game.materials.getMaterial(2);
+            this.lock2.material = this.game.materials.getMaterial(2, this.machine.materialQ);
             screenData[8].applyToMesh(this.cable);
             this.cable.material = this.game.materials.plasticBlack;
         }

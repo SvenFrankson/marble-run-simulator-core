@@ -12,11 +12,7 @@ namespace MarbleRunSimulatorCore {
     export class MainMaterials {
         private _materialsPBR: BABYLON.Material[] = [];
         private _materialsSTD: BABYLON.Material[] = [];
-        public getMaterial(colorIndex: number, materialQ: number = -1): BABYLON.Material {
-            if (materialQ === -1) {
-                materialQ = this.game.getMaterialQ();
-            }
-
+        public getMaterial(colorIndex: number, materialQ: number): BABYLON.Material {
             if (materialQ === MaterialQuality.PBR) {
                 return this._materialsPBR[colorIndex % this._materialsPBR.length];
             }
@@ -34,8 +30,8 @@ namespace MarbleRunSimulatorCore {
             }
             return BallMaterialType.Metal;
         }
-        public getMaterialHexBaseColor(colorIndex: number): string {
-            let material = this.getMaterial(colorIndex);
+        public getMaterialHexBaseColor(colorIndex: number, materialQ: number): string {
+            let material = this.getMaterial(colorIndex, materialQ);
             if (material instanceof BABYLON.StandardMaterial) {
                 return material.diffuseColor.toHexString();
             }
@@ -44,8 +40,8 @@ namespace MarbleRunSimulatorCore {
             }
             return "#ffffff";
         }
-        public getBallMaterialHexBaseColor(colorIndex: number): string {
-            let material = this.getBallMaterial(colorIndex);
+        public getBallMaterialHexBaseColor(colorIndex: number, materialQ: number): string {
+            let material = this.getBallMaterial(colorIndex, materialQ);
             if (material instanceof BABYLON.StandardMaterial) {
                 return material.diffuseColor.toHexString();
             }
@@ -62,21 +58,13 @@ namespace MarbleRunSimulatorCore {
         private _ballMaterialsSTD: BABYLON.Material[] = [];
         private _parkourBallMaterialPBR: BABYLON.Material;
         private _parkourBallMaterialSTD: BABYLON.Material;
-        public getBallMaterial(colorIndex: number, materialQ: number = - 1): BABYLON.Material {
-            if (materialQ === -1) {
-                materialQ = this.game.getMaterialQ();
-            }
-
+        public getBallMaterial(colorIndex: number, materialQ: number): BABYLON.Material {
             if (materialQ === MaterialQuality.PBR) {
                 return this._ballMaterialsPBR[colorIndex % this._ballMaterialsPBR.length];
             }
             return this._ballMaterialsSTD[colorIndex % this._ballMaterialsSTD.length];
         }
-        public getParkourBallMaterial(materialQ: number = - 1): BABYLON.Material {
-            if (materialQ === -1) {
-                materialQ = this.game.getMaterialQ();
-            }
-
+        public getParkourBallMaterial(materialQ: number): BABYLON.Material {
             if (materialQ === MaterialQuality.PBR) {
                 return this._parkourBallMaterialPBR;
             }
@@ -138,7 +126,7 @@ namespace MarbleRunSimulatorCore {
         public steelFullLitMaterial: BABYLON.StandardMaterial;
         public copperFullLitMaterial: BABYLON.StandardMaterial;
         public get plasticBlack() {
-            return this.getMaterial(6);
+            return this.getMaterial(6, MaterialQuality.Standard);
         }
         public plasticWhite: BABYLON.StandardMaterial;
 

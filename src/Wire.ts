@@ -10,7 +10,7 @@ namespace MarbleRunSimulatorCore {
             if (isFinite(this.wireSize)) {
                 return this.wireSize;
             }
-            return this.track.wireSize;
+            return this.part.wireSize;
         }
         public get radius(): number {
             return this.size * 0.5;
@@ -24,9 +24,9 @@ namespace MarbleRunSimulatorCore {
         public endTipNormal: BABYLON.Vector3;
         public endTipDir: BABYLON.Vector3;
 
-        constructor(public track: MachinePart) {
+        constructor(public part: MachinePart) {
             super("wire");
-            this.parent = this.track;
+            this.parent = this.part;
             this.rotationQuaternion = BABYLON.Quaternion.Identity();
         }
 
@@ -56,7 +56,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public async instantiate(color: number = 0): Promise<void> {
-            let q = this.track.game.getGeometryQ();
+            let q = this.part.machine.geometryQ;
 
             while (this.getChildren().length > 0) {
                 this.getChildren()[0].dispose();
@@ -90,7 +90,7 @@ namespace MarbleRunSimulatorCore {
                         .clone()
                         .normalize()
                         .scaleInPlace(-1)
-                        .scaleInPlace(this.track.wireGauge * 0.5);
+                        .scaleInPlace(this.part.wireGauge * 0.5);
                     Mummu.RotateInPlace(d, this.startTipNormal, -Math.PI / 2);
                     let tipPath: BABYLON.Vector3[] = [d.add(this.startTipCenter)];
                     for (let i = 0; i < 8 - 1; i++) {
@@ -101,7 +101,7 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 if (this.endTipDir) {
-                    let d = this.endTipDir.clone().normalize().scaleInPlace(this.track.wireGauge * 0.5);
+                    let d = this.endTipDir.clone().normalize().scaleInPlace(this.part.wireGauge * 0.5);
                     Mummu.RotateInPlace(d, this.endTipNormal, -Math.PI / 2);
                     let tipPath: BABYLON.Vector3[] = [];
                     for (let i = 0; i < 8; i++) {
@@ -113,7 +113,7 @@ namespace MarbleRunSimulatorCore {
 
                 let wire = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                 wire.parent = this;
-                wire.material = this.track.game.materials.getMaterial(color);
+                wire.material = this.part.game.materials.getMaterial(color, this.part.machine.materialQ);
             }
 
             if (Wire.DEBUG_DISPLAY) {
