@@ -565,21 +565,21 @@ var MarbleRunSimulatorCore;
                 }
                 // Collide with playground limits
                 if (this.collisionState === CollisionState.Normal) {
-                    if (this.position.x - this.radius < this.machine.baseMeshMinX - this.machine.margin + 0.015) {
+                    if (this.position.x - this.radius < this.machine.baseMeshMinX + this.machine.root.position.x - this.machine.margin + 0.015) {
                         this.velocity.x = Math.abs(this.velocity.x) * 0.5;
-                        this.position.x = this.machine.baseMeshMinX - this.machine.margin + 0.015 + this.radius;
+                        this.position.x = this.machine.baseMeshMinX + this.machine.root.position.x - this.machine.margin + 0.015 + this.radius;
                     }
-                    if (this.position.x + this.radius > this.machine.baseMeshMaxX + this.machine.margin - 0.015) {
+                    if (this.position.x + this.radius > this.machine.baseMeshMaxX + this.machine.root.position.x + this.machine.margin - 0.015) {
                         this.velocity.x = -Math.abs(this.velocity.x) * 0.5;
-                        this.position.x = this.machine.baseMeshMaxX + this.machine.margin - 0.015 - this.radius;
+                        this.position.x = this.machine.baseMeshMaxX + this.machine.root.position.x + this.machine.margin - 0.015 - this.radius;
                     }
-                    if (this.position.z - this.radius < this.machine.baseMeshMinZ - this.machine.margin + 0.015) {
+                    if (this.position.z - this.radius < this.machine.baseMeshMinZ + this.machine.root.position.z - this.machine.margin + 0.015) {
                         this.velocity.z = Math.abs(this.velocity.z) * 0.5;
-                        this.position.z = this.machine.baseMeshMinZ - this.machine.margin + 0.015 + this.radius;
+                        this.position.z = this.machine.baseMeshMinZ + this.machine.root.position.z - this.machine.margin + 0.015 + this.radius;
                     }
-                    if (this.position.z + this.radius > this.machine.baseMeshMaxZ + this.machine.margin - 0.015) {
+                    if (this.position.z + this.radius > this.machine.baseMeshMaxZ + this.machine.root.position.z + this.machine.margin - 0.015) {
                         this.velocity.z = -Math.abs(this.velocity.z) * 0.5;
-                        this.position.z = this.machine.baseMeshMaxZ + this.machine.margin - 0.015 - this.radius;
+                        this.position.z = this.machine.baseMeshMaxZ + this.machine.root.position.z + this.machine.margin - 0.015 - this.radius;
                     }
                     let colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHolePath);
                     if (colExitInHole.hit) {
