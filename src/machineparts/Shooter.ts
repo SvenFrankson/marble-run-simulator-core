@@ -297,7 +297,7 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (Math.abs(ball.position.x - this.kickerCollider.absolutePosition.x) < ball.radius + this.kickerRadius + 0.001) {
-                    if (Math.abs(ball.position.y - (this.position.y + this.kickerYIdle)) < tileHeight * 0.5) {
+                    if (Math.abs(ball.position.y - (this.absolutePosition.y + this.kickerYIdle)) < tileHeight * 0.5) {
                         if (Math.abs(ball.position.z - this.kickerCollider.absolutePosition.z) < 0.001) {
                             return ball;
                         }
@@ -309,7 +309,7 @@ namespace MarbleRunSimulatorCore {
 
         public getBallArmed(): Ball {
             let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? - 1 : 1), - tileHeight * (this.h - 2) - 0.0004, 0);
-            center.addInPlace(this.position);
+            center.addInPlace(this.absolutePosition);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (ball.velocity.length() < 0.02 && Math.abs(ball.velocity.x) < 0.001) {
@@ -355,9 +355,8 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            let balls = this.machine.balls;
             let center = new BABYLON.Vector3(0.0301, - tileHeight * (this.h - 2) - 0.0004, 0);
-            center.addInPlace(this.position);
+            center.addInPlace(this.absolutePosition);
             if (this.currentShootState === 0) {
                 this.shieldClose = false;
                 this.hasCollidingKicker = true;
@@ -402,7 +401,7 @@ namespace MarbleRunSimulatorCore {
                     if (this.h === 3) {
                         // This is not real physic. It just works.
                         ballArmed.flybackOrigin = ballArmed.position.clone();
-                        ballArmed.flybackDestination = ballArmed.positionZero.clone();
+                        ballArmed.flybackDestination = ballArmed.positionZero.clone().add(this.machine.root.position);
                         ballArmed.flybackPeak = ballArmed.flybackOrigin.add(ballArmed.flybackDestination).scaleInPlace(0.5);
                         let d = BABYLON.Vector3.Distance(ballArmed.flybackOrigin, ballArmed.flybackDestination);
                         d = Math.max(d, 0.4);
