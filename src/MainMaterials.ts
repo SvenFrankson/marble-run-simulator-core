@@ -125,7 +125,7 @@ namespace MarbleRunSimulatorCore {
         public whiteFullLitMaterial: BABYLON.StandardMaterial;
         public steelFullLitMaterial: BABYLON.StandardMaterial;
         public copperFullLitMaterial: BABYLON.StandardMaterial;
-        public get plasticBlack() {
+        public get plasticBlack(): BABYLON.Material {
             return this.getMaterial(6, MaterialQuality.Standard);
         }
         public plasticWhite: BABYLON.StandardMaterial;

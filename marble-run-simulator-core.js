@@ -1513,6 +1513,7 @@ var MarbleRunSimulatorCore;
             this.hasBeenOpenedInEditor = false;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.playing = false;
+            this.baseColor = "#ffffff";
             this._roomIndex = 0;
             this.graphicQ = GraphicQuality.Medium;
             this.onPlayCallbacks = new Nabu.UniqueList();
@@ -1533,6 +1534,11 @@ var MarbleRunSimulatorCore;
             this.tracksMaxZ = 0;
             this.requestUpdateShadow = false;
             this.root = new BABYLON.Mesh("machine-root");
+            let material = new BABYLON.StandardMaterial("white-material");
+            material.diffuseColor.copyFromFloats(1, 1, 1);
+            material.specularColor.copyFromFloats(0.2, 0.2, 0.2);
+            material.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
+            this.root.material = material;
             this.name = MachineName.GetRandom();
             this.trackFactory = new MarbleRunSimulatorCore.MachinePartFactory(this);
             this.templateManager = new MarbleRunSimulatorCore.TemplateManager(this);
@@ -1930,7 +1936,7 @@ var MarbleRunSimulatorCore;
                 this.baseFrame.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
                 this.baseFrame.position.y = this.baseMeshMinY;
                 this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
-                this.baseFrame.material = this.game.materials.whiteMaterial;
+                this.baseFrame.material = this.root.material;
                 this.game.spotLight.excludedMeshes = [this.baseFrame];
                 if (this.game.room) {
                     this.game.room.light1.includedOnlyMeshes.push(this.baseFrame);
@@ -1938,7 +1944,7 @@ var MarbleRunSimulatorCore;
                 }
                 let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/museum-stand.babylon");
                 let data = Mummu.CloneVertexData(vertexDatas[0]);
-                Mummu.ColorizeVertexDataInPlace(data, new BABYLON.Color3(0.9, 0.95, 1));
+                Mummu.ColorizeVertexDataInPlace(data, BABYLON.Color3.FromHexString(this.baseColor));
                 let positions = [...data.positions];
                 for (let i = 0; i < positions.length / 3; i++) {
                     let x = positions[3 * i];

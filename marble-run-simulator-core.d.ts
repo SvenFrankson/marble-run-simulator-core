@@ -313,6 +313,7 @@ declare namespace MarbleRunSimulatorCore {
         exitHoleIn: BABYLON.Mesh;
         exitHolePath: BABYLON.Vector3[];
         exitHoleOut: BABYLON.Mesh;
+        baseColor: string;
         private _roomIndex;
         get roomIndex(): number;
         setRoomIndex(roomIndex: number): void;
