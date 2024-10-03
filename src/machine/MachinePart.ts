@@ -869,7 +869,9 @@ namespace MarbleRunSimulatorCore {
 
             this.refreshEncloseMeshAndAABB();
 
-            await this.instantiateMachineSpecific();
+            if (this.machine.geometryQ > GeometryQuality.Proxy) {
+                await this.instantiateMachineSpecific();
+            }
 
             this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
 

@@ -15,6 +15,7 @@ namespace MarbleRunSimulatorCore {
     var partOffset = 648; // it's 36 * 36 / 2
 
     export enum GraphicQuality {
+        Proxy,
         VeryLow,
         Low,
         Medium,
@@ -23,6 +24,7 @@ namespace MarbleRunSimulatorCore {
     }
 
     export enum GeometryQuality {
+        Proxy,
         Low,
         Medium,
         High
@@ -147,7 +149,10 @@ namespace MarbleRunSimulatorCore {
         public graphicQ: GraphicQuality = GraphicQuality.Medium;
         public get geometryQ(): GeometryQuality {
             let graphicQ = this.graphicQ;
-            if (graphicQ === GraphicQuality.Low) {
+            if (graphicQ === GraphicQuality.Proxy) {
+                return GeometryQuality.Proxy;
+            }
+            else if (graphicQ === GraphicQuality.Low) {
                 return GeometryQuality.Medium;
             }
             else if (graphicQ >= GraphicQuality.Medium) {
