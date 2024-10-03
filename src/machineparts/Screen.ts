@@ -405,9 +405,9 @@ namespace MarbleRunSimulatorCore {
 
             let cY = (yIn + yOut + dY) * 0.5;
             let center = new BABYLON.Vector3(- tileWidth * 0.5 + dY, cY, 0);
-            center.addInPlace(this.position);
+            center.addInPlace(this.absolutePosition);
 
-            let delta = ball.position.subtract(this.position);
+            let delta = ball.position.subtract(this.absolutePosition);
             if (Math.abs(delta.z) < 0.03) {
                 if (Math.abs(delta.y) < 0.03) {
                     if (this.mirrorX) {
@@ -431,9 +431,9 @@ namespace MarbleRunSimulatorCore {
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
-                    if (Math.abs(ball.position.z - this.position.z) < 0.002) {
+                    if (Math.abs(ball.position.z - this.absolutePosition.z) < 0.002) {
                         let sx = this.mirrorX ? - 1 : 1;
-                        let relativePos = ball.position.subtract(this.position);
+                        let relativePos = ball.position.subtract(this.absolutePosition);
                         if (Math.abs(relativePos.x + sx * 0.022) < 0.003) {
                             if (Math.abs(relativePos.y - 0.007) < 0.003) {
                                 this._moving = true;
