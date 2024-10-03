@@ -210,16 +210,18 @@ declare var THE_ORIGIN_OF_TIME_ms: any;
 declare var IsTouchScreen: number;
 declare namespace MarbleRunSimulatorCore {
     enum GraphicQuality {
-        VeryLow = 0,
-        Low = 1,
-        Medium = 2,
-        High = 3,
-        VeryHigh = 4
+        Proxy = 0,
+        VeryLow = 1,
+        Low = 2,
+        Medium = 3,
+        High = 4,
+        VeryHigh = 5
     }
     enum GeometryQuality {
-        Low = 0,
-        Medium = 1,
-        High = 2
+        Proxy = 0,
+        Low = 1,
+        Medium = 2,
+        High = 3
     }
     enum MaterialQuality {
         Standard = 0,

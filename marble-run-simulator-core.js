@@ -1471,17 +1471,19 @@ var MarbleRunSimulatorCore;
     var partOffset = 648; // it's 36 * 36 / 2
     let GraphicQuality;
     (function (GraphicQuality) {
-        GraphicQuality[GraphicQuality["VeryLow"] = 0] = "VeryLow";
-        GraphicQuality[GraphicQuality["Low"] = 1] = "Low";
-        GraphicQuality[GraphicQuality["Medium"] = 2] = "Medium";
-        GraphicQuality[GraphicQuality["High"] = 3] = "High";
-        GraphicQuality[GraphicQuality["VeryHigh"] = 4] = "VeryHigh";
+        GraphicQuality[GraphicQuality["Proxy"] = 0] = "Proxy";
+        GraphicQuality[GraphicQuality["VeryLow"] = 1] = "VeryLow";
+        GraphicQuality[GraphicQuality["Low"] = 2] = "Low";
+        GraphicQuality[GraphicQuality["Medium"] = 3] = "Medium";
+        GraphicQuality[GraphicQuality["High"] = 4] = "High";
+        GraphicQuality[GraphicQuality["VeryHigh"] = 5] = "VeryHigh";
     })(GraphicQuality = MarbleRunSimulatorCore.GraphicQuality || (MarbleRunSimulatorCore.GraphicQuality = {}));
     let GeometryQuality;
     (function (GeometryQuality) {
-        GeometryQuality[GeometryQuality["Low"] = 0] = "Low";
-        GeometryQuality[GeometryQuality["Medium"] = 1] = "Medium";
-        GeometryQuality[GeometryQuality["High"] = 2] = "High";
+        GeometryQuality[GeometryQuality["Proxy"] = 0] = "Proxy";
+        GeometryQuality[GeometryQuality["Low"] = 1] = "Low";
+        GeometryQuality[GeometryQuality["Medium"] = 2] = "Medium";
+        GeometryQuality[GeometryQuality["High"] = 3] = "High";
     })(GeometryQuality = MarbleRunSimulatorCore.GeometryQuality || (MarbleRunSimulatorCore.GeometryQuality = {}));
     let MaterialQuality;
     (function (MaterialQuality) {
@@ -1625,7 +1627,10 @@ var MarbleRunSimulatorCore;
         }
         get geometryQ() {
             let graphicQ = this.graphicQ;
-            if (graphicQ === GraphicQuality.Low) {
+            if (graphicQ === GraphicQuality.Proxy) {
+                return GeometryQuality.Proxy;
+            }
+            else if (graphicQ === GraphicQuality.Low) {
                 return GeometryQuality.Medium;
             }
             else if (graphicQ >= GraphicQuality.Medium) {
@@ -3793,7 +3798,9 @@ var MarbleRunSimulatorCore;
                 });
             }
             this.refreshEncloseMeshAndAABB();
-            await this.instantiateMachineSpecific();
+            if (this.machine.geometryQ > MarbleRunSimulatorCore.GeometryQuality.Proxy) {
+                await this.instantiateMachineSpecific();
+            }
             this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
             this.freezeWorldMatrix();
             this.getChildMeshes().forEach((m) => {
@@ -4010,10 +4017,9 @@ var MarbleRunSimulatorCore;
                 partName = partName.replace("_X", "");
             }
             if (partName.indexOf("_Z") != -1) {
-                prop.mirrorX = true;
+                prop.mirrorZ = true;
                 partName = partName.replace("_Z", "");
             }
-            console.log(prop.c);
             if (partName === "ramp" || partName.startsWith("ramp-")) {
                 let argStr = partName.split("-")[1];
                 if (argStr) {
@@ -6258,10 +6264,10 @@ var MarbleRunSimulatorCore;
             let partName = "end";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             if (isNaN(this.colors[1])) {
-                this.colors[1] = 1;
+                this.colors[1] = 0;
             }
             if (isNaN(this.colors[2])) {
-                this.colors[2] = 0;
+                this.colors[2] = 17;
             }
             this.panel = new BABYLON.Mesh("panel");
             this.panel.position = new BABYLON.Vector3((this.mirrorX ? MarbleRunSimulatorCore.tileWidth * 0.6 : MarbleRunSimulatorCore.tileWidth * 0.4), -1.4 * MarbleRunSimulatorCore.tileHeight - 0.005, this.wireGauge * 0.5);
@@ -7408,8 +7414,8 @@ var MarbleRunSimulatorCore;
             let yOut = -MarbleRunSimulatorCore.tileHeight;
             let cY = (yIn + yOut + dY) * 0.5;
             let center = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY, 0);
-            center.addInPlace(this.position);
-            let delta = ball.position.subtract(this.position);
+            center.addInPlace(this.absolutePosition);
+            let delta = ball.position.subtract(this.absolutePosition);
             if (Math.abs(delta.z) < 0.03) {
                 if (Math.abs(delta.y) < 0.03) {
                     if (this.mirrorX) {
@@ -7428,9 +7434,9 @@ var MarbleRunSimulatorCore;
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
-                    if (Math.abs(ball.position.z - this.position.z) < 0.002) {
+                    if (Math.abs(ball.position.z - this.absolutePosition.z) < 0.002) {
                         let sx = this.mirrorX ? -1 : 1;
-                        let relativePos = ball.position.subtract(this.position);
+                        let relativePos = ball.position.subtract(this.absolutePosition);
                         if (Math.abs(relativePos.x + sx * 0.022) < 0.003) {
                             if (Math.abs(relativePos.y - 0.007) < 0.003) {
                                 this._moving = true;
