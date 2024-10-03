@@ -12,10 +12,10 @@ namespace MarbleRunSimulatorCore {
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             if (isNaN(this.colors[1])) {
-                this.colors[1] = 1;
+                this.colors[1] = 0;
             }
             if (isNaN(this.colors[2])) {
-                this.colors[2] = 0;
+                this.colors[2] = 17;
             }
 
             this.panel = new BABYLON.Mesh("panel");
