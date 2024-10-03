@@ -68,11 +68,9 @@ namespace MarbleRunSimulatorCore {
                 partName = partName.replace("_X", "");
             }
             if (partName.indexOf("_Z") != -1) {
-                prop.mirrorX = true;
+                prop.mirrorZ = true;
                 partName = partName.replace("_Z", "");
             }
-
-            console.log(prop.c);
 
             if (partName === "ramp" || partName.startsWith("ramp-")) {
                 let argStr = partName.split("-")[1];
