@@ -29,6 +29,10 @@ namespace MarbleRunSimulatorCore {
 
         public colorIndex: number = 0;
         public isPipe: boolean = false;
+        public isWood: boolean = false;
+        public get isPipeOrWood(): boolean {
+            return this.isPipe || this.isWood;
+        }
 
         public summedLength: number[] = [0];
         public totalLength: number = 0;
@@ -352,6 +356,11 @@ namespace MarbleRunSimulatorCore {
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
                     data = UTurn.GenerateTemplate(h, d, 2, mirrorX, mirrorZ, true);
                 }
+                else if (partName.startsWith("wooduturn-")) {
+                    let h = parseInt(partName.split("-")[1].split(".")[0]);
+                    let d = parseInt(partName.split("-")[1].split(".")[1]);
+                    data = UTurn.GenerateTemplate(h, d, 0, mirrorX, mirrorZ, false, true);
+                }
                 else if (partName.startsWith("wall-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
@@ -375,7 +384,13 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);
                     let h = parseInt(partName.split("-")[1].split(".")[1]);
                     let d = parseInt(partName.split("-")[1].split(".")[2]);
-                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 2, mirrorX, mirrorZ, true);
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, mirrorX, mirrorZ, true);
+                }
+                else if (partName.startsWith("woodramp-")) {
+                    let w = parseInt(partName.split("-")[1].split(".")[0]);
+                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                    let d = parseInt(partName.split("-")[1].split(".")[2]);
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, mirrorX, mirrorZ, false, true);
                 }
                 else if (partName.startsWith("wave-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);

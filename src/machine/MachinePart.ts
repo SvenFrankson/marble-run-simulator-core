@@ -741,7 +741,7 @@ namespace MarbleRunSimulatorCore {
                 let points = [...this.tracks[n].templateInterpolatedPoints].map((p) => {
                     return p.clone();
                 });
-                if (this.tracks[n].template.isPipe) {
+                if (this.tracks[n].template.isPipeOrWood) {
                     let normals = this.tracks[n].trackInterpolatedNormals;
                     points = points.map((pt, i) => {
                         return pt.add(normals[i].scale(0.008));
@@ -756,7 +756,7 @@ namespace MarbleRunSimulatorCore {
                         Mummu.RemoveFromStartForDistanceInPlace(points, 0.017, originTip);
                         Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.002);
                         
-                        let shapeTip = this.tracks[n].template.isPipe ? selectorHullPipeShapeDisplayTip : selectorHullShapeDisplayTip;
+                        let shapeTip = this.tracks[n].template.isPipeOrWood ? selectorHullPipeShapeDisplayTip : selectorHullShapeDisplayTip;
 
                         let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: shapeTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
@@ -787,7 +787,7 @@ namespace MarbleRunSimulatorCore {
                         Mummu.RemoveFromEndForDistanceInPlace(points, 0.017, destinationTip);
                         Mummu.RemoveFromStartForDistanceInPlace(destinationTip, 0.002);
                         
-                        let shapeTip = this.tracks[n].template.isPipe ? selectorHullPipeShapeDisplayTip : selectorHullShapeDisplayTip;
+                        let shapeTip = this.tracks[n].template.isPipeOrWood ? selectorHullPipeShapeDisplayTip : selectorHullShapeDisplayTip;
 
                         let dataDestinationTip = Mummu.CreateExtrudeShapeVertexData({ shape: shapeTip, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                         Mummu.ColorizeVertexDataInPlace(dataDestinationTip, BABYLON.Color3.FromHexString("#80FFFF"));
@@ -812,7 +812,7 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 if (points.length >= 2) {
-                    let shape = this.tracks[n].template.isPipe ? selectorHullPipeShapeDisplay : selectorHullShapeDisplay;
+                    let shape = this.tracks[n].template.isPipeOrWood ? selectorHullPipeShapeDisplay : selectorHullShapeDisplay;
 
                     let dataDisplay = Mummu.CreateExtrudeShapeVertexData({ shape: shape, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                     Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#00FFFF"));
@@ -939,6 +939,9 @@ namespace MarbleRunSimulatorCore {
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
             this.AABBMin.addInPlace(this.absolutePosition);
             this.AABBMax.addInPlace(this.absolutePosition);
+            if (this.tracks[0] && this.tracks[0].template.isWood) {
+                this.AABBMax.y += tileHeight;
+            }
         }
 
         public dispose(): void {
@@ -961,6 +964,9 @@ namespace MarbleRunSimulatorCore {
                     if (!track) {
                         if (this.template.trackTemplates[i].isPipe) {
                             track = new PipeTrack(this);
+                        }
+                        else if (this.template.trackTemplates[i].isWood) {
+                            track = new WoodTrack(this);
                         }
                         else {
                             track = new Track(this);
@@ -997,6 +1003,9 @@ namespace MarbleRunSimulatorCore {
                 track.recomputeAbsolutePath();
                 if (track instanceof PipeTrack) {
                     PipeTrackMeshBuilder.BuildPipeTrackMesh(track, {});
+                }
+                else if (track instanceof WoodTrack) {
+                    WoodTrackMeshBuilder.BuildWoodTrackMesh(track, {});
                 }
                 else {
                     track.wires.forEach((wire) => {

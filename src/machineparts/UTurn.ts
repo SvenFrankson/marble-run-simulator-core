@@ -3,15 +3,15 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
             
-            let partName = (prop.pipeVersion ? "pipe" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
-            if (!prop.pipeVersion) {
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            if (!prop.pipeVersion && !prop.woodVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
 
-        public static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
             template.getWidthForDepth = (argD) => {
                 if (argD >= 8) {
@@ -20,8 +20,8 @@ namespace MarbleRunSimulatorCore {
                 return argD - 1;
             }
 
-            template.partName = (pipeVersion ? "pipe" : "") + "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
-            if (!pipeVersion) {
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
+            if (!pipeVersion && !woodVersion) {
                 template.partName += "." + s.toFixed(0)
             }
             template.angleSmoothSteps = 50;
@@ -52,6 +52,7 @@ namespace MarbleRunSimulatorCore {
             let r2 = r / Math.SQRT2;
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].isPipe = pipeVersion;
+            template.trackTemplates[0].isWood = woodVersion;
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 0)),
@@ -134,7 +135,8 @@ namespace MarbleRunSimulatorCore {
                 c: this.colors,
                 mirrorX: mirrorX,
                 mirrorZ: mirrorZ,
-                pipeVersion: this.tracks[0].template.isPipe
+                pipeVersion: this.tracks[0].template.isPipe,
+                woodVersion: this.tracks[0].template.isWood
             });
         }
 

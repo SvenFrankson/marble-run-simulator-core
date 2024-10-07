@@ -82,7 +82,7 @@ namespace MarbleRunSimulatorCore {
                         addSleeper = false;
                     }
 
-                    if (track instanceof PipeTrack) {
+                    if (track instanceof PipeTrack || track instanceof WoodTrack) {
                         addSleeper = false;
                     }
 

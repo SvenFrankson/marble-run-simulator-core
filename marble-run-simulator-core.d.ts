@@ -597,6 +597,7 @@ declare namespace MarbleRunSimulatorCore {
         mirrorX?: boolean;
         mirrorZ?: boolean;
         pipeVersion?: boolean;
+        woodVersion?: boolean;
     }
     class MachinePartFactory {
         machine: Machine;
@@ -688,6 +689,8 @@ declare namespace MarbleRunSimulatorCore {
         cutOutSleeper: (n: number) => boolean;
         colorIndex: number;
         isPipe: boolean;
+        isWood: boolean;
+        get isPipeOrWood(): boolean;
         summedLength: number[];
         totalLength: number;
         globalSlope: number;
@@ -761,6 +764,32 @@ declare namespace MarbleRunSimulatorCore {
         constructor(template: TrackTemplate, position: BABYLON.Vector3, dir?: BABYLON.Vector3, normal?: BABYLON.Vector3, tangentIn?: number, tangentOut?: number);
         setDir(dir: BABYLON.Vector3): void;
         isFirstOrLast(): boolean;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class WoodTrack extends Track {
+        mesh: BABYLON.Mesh;
+        tubeRadius: number;
+        radiusToRaise(r: number): number;
+        tubePath: BABYLON.Vector3[];
+        get preferedStartBank(): number;
+        get preferedEndBank(): number;
+        AABBMin: BABYLON.Vector3;
+        AABBMax: BABYLON.Vector3;
+        constructor(part: MachinePart);
+        get trackIndex(): number;
+        getSlopeAt(index: number): number;
+        getBankAt(index: number): number;
+        initialize(template: TrackTemplate): void;
+        recomputeWiresPath(forceDisconnexion?: boolean): void;
+        recomputeAbsolutePath(): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    interface IWoodTrackMeshProps {
+    }
+    class WoodTrackMeshBuilder {
+        static BuildWoodTrackMesh(track: WoodTrack, props: IWoodTrackMeshProps): Promise<void>;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -938,7 +967,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class Ramp extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(w: number, h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate;
+        static GenerateTemplate(w: number, h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
     }
 }
@@ -1204,7 +1233,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class UTurn extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
         getOrigin(): Nabu.IJK;
         getDestination(): Nabu.IJK;

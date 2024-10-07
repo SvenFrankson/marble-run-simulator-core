@@ -825,10 +825,10 @@ namespace MarbleRunSimulatorCore {
                     for (let j = 0; j < part.tracks.length; j++) {
                         let track = part.tracks[j];
                         if (BABYLON.Vector3.DistanceSquared(track.startWorldPosition, pos) < 0.000001) {
-                            return { isEnd: false, bank: track.preferedStartBank, part: part, pipeTrack: track instanceof PipeTrack };
+                            return { isEnd: false, bank: track.preferedStartBank, part: part, pipeTrack: track instanceof PipeTrack || track instanceof WoodTrack };
                         }
                         if (BABYLON.Vector3.DistanceSquared(track.endWorldPosition, pos) < 0.000001) {
-                            return { isEnd: true, bank: track.preferedEndBank, part: part, pipeTrack: track instanceof PipeTrack };
+                            return { isEnd: true, bank: track.preferedEndBank, part: part, pipeTrack: track instanceof PipeTrack || track instanceof WoodTrack };
                         }
                     }
                 }
@@ -1646,12 +1646,6 @@ namespace MarbleRunSimulatorCore {
                 if (data.a) {
                     this.author = data.a;
                 }
-                if (data.r) {
-                    this._roomIndex = data.r;
-                }
-                else {
-                    this._roomIndex = 0;
-                }
                 if (data.v === 10) {
                     if (data.sp) {
                         this.sleepersMeshProp = data.sp;
@@ -1683,52 +1677,54 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < partCount; i++) {
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = TrackNames[index].split("-")[0];
+                    if (index >= 0 && index < TrackNames.length) {
+                        let baseName = TrackNames[index].split("-")[0];
 
-                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                        let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                        let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                        let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
 
-                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
+                        //console.log("part ijk " + pI + " " + pJ + " " + pK);
 
-                    let w = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let s = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let s = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
 
-                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                        //console.log("part whdn " + w + " " + h + " " + d + " " + n);
 
-                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                    //console.log(colorCount);
-                    let colors: number[] = [];
-                    for (let ii = 0; ii < colorCount; ii++) {
-                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
-                    }
+                        let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                        //console.log(colorCount);
+                        let colors: number[] = [];
+                        for (let ii = 0; ii < colorCount; ii++) {
+                            colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                        }
 
-                    let prop: IMachinePartProp = {
-                        i: pI,
-                        j: pJ,
-                        k: pK,
-                        w: w,
-                        h: h,
-                        d: d,
-                        n: n,
-                        s: s,
-                        mirrorX: (mirror % 2) === 1,
-                        mirrorZ: mirror >= 2,
-                        c: colors
-                    }
-                    
-                    let track = this.trackFactory.createTrackBaseName(baseName, prop);
-                    if (track) {
-                        this.parts.push(track);
-                    }
-                    else {
-                        console.warn("failed to createTrackBaseName");
-                        console.log(baseName);
-                        console.log(prop);
+                        let prop: IMachinePartProp = {
+                            i: pI,
+                            j: pJ,
+                            k: pK,
+                            w: w,
+                            h: h,
+                            d: d,
+                            n: n,
+                            s: s,
+                            mirrorX: (mirror % 2) === 1,
+                            mirrorZ: mirror >= 2,
+                            c: colors
+                        }
+                        
+                        let track = this.trackFactory.createTrackBaseName(baseName, prop);
+                        if (track) {
+                            this.parts.push(track);
+                        }
+                        else {
+                            console.warn("failed to createTrackBaseName");
+                            console.log(baseName);
+                            console.log(prop);
+                        }
                     }
                 }
 
@@ -1749,6 +1745,21 @@ namespace MarbleRunSimulatorCore {
                     if (data.v === 8) {
                         let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
                         decor.setFlip(f);
+                    }
+                }
+
+                if (data.r) {
+                    this._roomIndex = data.r;
+                }
+                else {
+                    if (partCount % 2 === 0) {
+                        this._roomIndex = 0;
+                    }
+                    else if(partCount % 2 === 1) {
+                        this._roomIndex = 9;
+                    }
+                    else {
+                        this._roomIndex = 0;
                     }
                 }
             }

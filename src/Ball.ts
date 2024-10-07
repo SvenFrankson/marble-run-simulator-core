@@ -216,10 +216,8 @@ namespace MarbleRunSimulatorCore {
             }
             data.applyToMesh(this);
 
-            if (!hotReload) {
-                this._hasBoostMaterial = false;
-                this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
-            }
+            this._hasBoostMaterial = false;
+            this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
 
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.dispose();
@@ -433,29 +431,33 @@ namespace MarbleRunSimulatorCore {
                                 }
                             });
                             part.tracks.forEach(track => {
-                                if (track instanceof PipeTrack) {
+                                if (track instanceof PipeTrack || track instanceof WoodTrack) {
                                     let col: Mummu.IIntersection;
-                                    col = Mummu.SphereInTubeIntersection(this.position, this.radius, track.tubePath, 0.011);
+                                    let r = 0.011;
+                                    if (track instanceof WoodTrack) {
+                                        r = track.tubeRadius;
+                                    }
+                                    col = Mummu.SphereInTubeIntersection(this.position, this.radius, track.tubePath, r);
                                     if (col.hit) {
-                                        //this.setLastHit(wire, col.index);
-                                        let colDig = col.normal.scale(-1);
-                                        // Move away from collision
-                                        forcedDisplacement.addInPlace(col.normal.scale(col.depth));
-                                        // Cancel depth component of speed
-                                        let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
-                                        if (depthSpeed > 0) {
-                                            canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                        if (track instanceof WoodTrack && col.normal.y < -0.1) {
+
                                         }
-                                        // Add ground reaction
-                                        let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
-                                        reactions.addInPlace(reaction);
-                                        reactionsCount++;
-        
-                                        this.surface = Surface.Bowl;
-        
-                                        if (part instanceof Elevator) {
-                                            this.position.z = part.absolutePosition.z;
-                                            this.velocity.z = 0;
+                                        else {
+                                            //this.setLastHit(wire, col.index);
+                                            let colDig = col.normal.scale(-1);
+                                            // Move away from collision
+                                            forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                            // Cancel depth component of speed
+                                            let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                            if (depthSpeed > 0) {
+                                                canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                            }
+                                            // Add ground reaction
+                                            let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                            reactions.addInPlace(reaction);
+                                            reactionsCount++;
+            
+                                            this.surface = Surface.Bowl;
                                         }
                                     }
                                 }
