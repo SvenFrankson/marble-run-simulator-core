@@ -63,7 +63,7 @@ declare namespace MarbleRunSimulatorCore {
         flybackPeak: BABYLON.Vector3;
         flyBackProgress: number;
         flyBackDuration: number;
-        animatePosition: (target: BABYLON.Vector3, duration: number) => Promise<void>;
+        animatePosition: (target: BABYLON.Vector3, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
         constructor(positionZero: BABYLON.Vector3, machine: Machine, _materialIndex?: number);
         private _selected;
         select(): void;
@@ -1243,6 +1243,15 @@ declare namespace MarbleRunSimulatorCore {
     class UTurnSharp extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(h: number, mirrorX?: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class UTurnV2 extends MachinePartWithOriginDestination {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
+        recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): UTurnV2;
+        getOrigin(): Nabu.IJK;
+        getDestination(): Nabu.IJK;
     }
 }
 declare namespace MarbleRunSimulatorCore {

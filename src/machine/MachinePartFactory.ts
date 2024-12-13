@@ -31,6 +31,7 @@ namespace MarbleRunSimulatorCore {
         "spawner",
         "woodramp-1.1.1",
         "wooduturn-0.2",
+        "uturnv2-0.2",
     ];
 
     export interface IMachinePartProp {
@@ -160,6 +161,23 @@ namespace MarbleRunSimulatorCore {
                     prop.s = TrackSpeed.Medium;
                 }
                 return new UTurn(this.machine, prop);
+            }
+            if (partName === "uturnv2" || partName.startsWith("uturnv2-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    let s = parseInt(argStr.split(".")[2]);
+                    prop.h = h;
+                    prop.d = d;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
+                }
+                if (isNaN(prop.s)) {
+                    prop.s = TrackSpeed.Medium;
+                }
+                return new UTurnV2(this.machine, prop);
             }
             if (partName === "pipeuturn" || partName.startsWith("pipeuturn-")) {
                 let argStr = partName.split("-")[1];

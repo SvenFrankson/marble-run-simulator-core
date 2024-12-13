@@ -133,6 +133,11 @@ namespace MarbleRunSimulatorCore {
                     let wallColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
                     await this.instantiateSimple(groundColor, wallColor, 0);
                 }
+                else if (this._currentRoomIndex === 12) {
+                    let groundColor = BABYLON.Color4.FromHexString("#000000FF");
+                    let wallColor = BABYLON.Color4.FromHexString("#000000FF");
+                    await this.instantiateSimple(groundColor, wallColor, 0);
+                }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
                 }
