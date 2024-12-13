@@ -1213,6 +1213,7 @@ namespace MarbleRunSimulatorCore {
                 if (isFinite(data.v)) {
                     version = data.v;
                 }
+                console.log("deserialize version " + version);
 
                 if (!isFinite(version) || version === 1) {
                     return this.deserializeV1(data);
@@ -1292,10 +1293,12 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    x = x / 0.075 * 0.07;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    y = y / 0.03 * 0.035;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    z = z / 0.06 * 0.07;
 
-                    //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                 }
@@ -1398,10 +1401,12 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    x = x / 0.075 * 0.07;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    y = y / 0.03 * 0.035;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    z = z / 0.06 * 0.07;
 
-                    //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
 
@@ -1528,10 +1533,12 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    x = x / 0.075 * 0.07;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    y = y / 0.03 * 0.035;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    z = z / 0.06 * 0.07;
 
-                    //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
 
@@ -1661,10 +1668,12 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    x = x / 0.075 * 0.07;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    y = y / 0.03 * 0.035;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    z = z / 0.06 * 0.07;
 
-                    //console.log("ball xyz " + x + " " + y + " " + z);
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
 

@@ -2479,6 +2479,7 @@ var MarbleRunSimulatorCore;
                 if (isFinite(data.v)) {
                     version = data.v;
                 }
+                console.log("deserialize version " + version);
                 if (!isFinite(version) || version === 1) {
                     return this.deserializeV1(data);
                 }
@@ -2550,9 +2551,11 @@ var MarbleRunSimulatorCore;
                 //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    x = x / 0.075 * 0.07;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    y = y / 0.03 * 0.035;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    z = z / 0.06 * 0.07;
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                 }
@@ -2643,9 +2646,11 @@ var MarbleRunSimulatorCore;
                 //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    x = x / 0.075 * 0.07;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    y = y / 0.03 * 0.035;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    z = z / 0.06 * 0.07;
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                     if (data.v === 4 || data.v >= 6) {
@@ -2758,9 +2763,11 @@ var MarbleRunSimulatorCore;
                 //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    x = x / 0.075 * 0.07;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    y = y / 0.03 * 0.035;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    z = z / 0.06 * 0.07;
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                     let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -2872,9 +2879,11 @@ var MarbleRunSimulatorCore;
                 //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    x = x / 0.075 * 0.07;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
+                    y = y / 0.03 * 0.035;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    //console.log("ball xyz " + x + " " + y + " " + z);
+                    z = z / 0.06 * 0.07;
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                     let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -8192,7 +8201,7 @@ var MarbleRunSimulatorCore;
             this.generateWires();
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-            this.velocityKick = Shooter.velocityKicks[this.h];
+            this.velocityKick = Shooter.velocityKicks[this.h] * 1.08;
             this.base = new BABYLON.Mesh("base");
             this.kicker = new BABYLON.Mesh("kicker");
             this.kickerCollider = new BABYLON.Mesh("collider-kicker");
@@ -8356,8 +8365,9 @@ var MarbleRunSimulatorCore;
             return undefined;
         }
         getBallArmed() {
-            let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? -1 : 1), -MarbleRunSimulatorCore.tileHeight * (this.h - 2) - 0.0004, 0);
+            let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? -1 : 1) / 0.075 * 0.07, -MarbleRunSimulatorCore.tileHeight * (this.h - 2) - 0.0004, 0);
             center.addInPlace(this.absolutePosition);
+            Mummu.DrawDebugPoint(center, 2, BABYLON.Color3.Red(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (ball.velocity.length() < 0.02 && Math.abs(ball.velocity.x) < 0.001) {
@@ -8396,8 +8406,6 @@ var MarbleRunSimulatorCore;
                     this.shieldCollider.freezeWorldMatrix();
                 }
             }
-            let center = new BABYLON.Vector3(0.0301, -MarbleRunSimulatorCore.tileHeight * (this.h - 2) - 0.0004, 0);
-            center.addInPlace(this.absolutePosition);
             if (this.currentShootState === 0) {
                 this.shieldClose = false;
                 this.hasCollidingKicker = true;

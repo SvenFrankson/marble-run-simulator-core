@@ -73,7 +73,7 @@ namespace MarbleRunSimulatorCore {
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
 
-            this.velocityKick = Shooter.velocityKicks[this.h];
+            this.velocityKick = Shooter.velocityKicks[this.h] * 1.08;
 
             this.base = new BABYLON.Mesh("base");
 
@@ -308,8 +308,9 @@ namespace MarbleRunSimulatorCore {
         }
 
         public getBallArmed(): Ball {
-            let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? - 1 : 1), - tileHeight * (this.h - 2) - 0.0004, 0);
+            let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? - 1 : 1) / 0.075 * 0.07, - tileHeight * (this.h - 2) - 0.0004, 0);
             center.addInPlace(this.absolutePosition);
+            Mummu.DrawDebugPoint(center, 2, BABYLON.Color3.Red(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (ball.velocity.length() < 0.02 && Math.abs(ball.velocity.x) < 0.001) {
@@ -355,8 +356,6 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            let center = new BABYLON.Vector3(0.0301, - tileHeight * (this.h - 2) - 0.0004, 0);
-            center.addInPlace(this.absolutePosition);
             if (this.currentShootState === 0) {
                 this.shieldClose = false;
                 this.hasCollidingKicker = true;
