@@ -2606,9 +2606,9 @@ var MarbleRunSimulatorCore;
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
                     }
                     let prop = {
-                        i: pI,
+                        i: pI * 2,
                         j: pJ,
-                        k: pK,
+                        k: pK * 2,
                         w: w,
                         h: h,
                         d: d,
@@ -2718,9 +2718,9 @@ var MarbleRunSimulatorCore;
                         }
                     }
                     let prop = {
-                        i: pI,
+                        i: pI * 2,
                         j: pJ,
-                        k: pK,
+                        k: pK * 2,
                         w: w,
                         h: h,
                         d: d,
@@ -2819,9 +2819,9 @@ var MarbleRunSimulatorCore;
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
                     }
                     let prop = {
-                        i: pI,
+                        i: pI * 2,
                         j: pJ,
-                        k: pK,
+                        k: pK * 2,
                         w: w,
                         h: h,
                         d: d,
@@ -2913,9 +2913,9 @@ var MarbleRunSimulatorCore;
                             colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
                         }
                         let prop = {
-                            i: pI,
+                            i: pI * 2,
                             j: pJ,
-                            k: pK,
+                            k: pK * 2,
                             w: w,
                             h: h,
                             d: d,
@@ -3074,6 +3074,7 @@ MachineName.PartFours = [
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     MarbleRunSimulatorCore.baseRadius = 0.075;
+    MarbleRunSimulatorCore.tileSize = 0.035;
     MarbleRunSimulatorCore.tileWidth = 0.07;
     MarbleRunSimulatorCore.tileHeight = 0.035;
     MarbleRunSimulatorCore.tileDepth = 0.07;
@@ -3297,9 +3298,9 @@ var MarbleRunSimulatorCore;
             else if (prop.c instanceof Array) {
                 this.colors = [...prop.c];
             }
-            this.position.x = this._i * MarbleRunSimulatorCore.tileWidth;
-            this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight;
-            this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth;
+            this.position.x = this._i * MarbleRunSimulatorCore.tileSize;
+            this.position.y = -this._j * MarbleRunSimulatorCore.tileSize;
+            this.position.z = -this._k * MarbleRunSimulatorCore.tileSize;
             this.sleepersMeshProp = this.machine.sleepersMeshProp;
             this.parent = this.machine.root;
             this.tracks = [];
@@ -3506,7 +3507,7 @@ var MarbleRunSimulatorCore;
                         this._i = i;
                     }
                 }
-                this.position.x = this._i * MarbleRunSimulatorCore.tileWidth + this.offsetPosition.x;
+                this.position.x = this._i * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -3527,7 +3528,7 @@ var MarbleRunSimulatorCore;
                         this._j = j;
                     }
                 }
-                this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y;
+                this.position.y = -this._j * MarbleRunSimulatorCore.tileSize + this.offsetPosition.y;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -3548,7 +3549,7 @@ var MarbleRunSimulatorCore;
                         this._k = k;
                     }
                 }
-                this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth + this.offsetPosition.z;
+                this.position.z = -this._k * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();

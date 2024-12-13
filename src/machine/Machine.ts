@@ -1357,9 +1357,9 @@ namespace MarbleRunSimulatorCore {
                     }
 
                     let prop: IMachinePartProp = {
-                        i: pI,
+                        i: pI * 2,
                         j: pJ,
-                        k: pK,
+                        k: pK * 2,
                         w: w,
                         h: h,
                         d: d,
@@ -1484,9 +1484,9 @@ namespace MarbleRunSimulatorCore {
                     }
 
                     let prop: IMachinePartProp = {
-                        i: pI,
+                        i: pI * 2,
                         j: pJ,
-                        k: pK,
+                        k: pK * 2,
                         w: w,
                         h: h,
                         d: d,
@@ -1599,9 +1599,9 @@ namespace MarbleRunSimulatorCore {
                     }
 
                     let prop: IMachinePartProp = {
-                        i: pI,
+                        i: pI * 2,
                         j: pJ,
-                        k: pK,
+                        k: pK * 2,
                         w: w,
                         h: h,
                         d: d,
@@ -1712,9 +1712,9 @@ namespace MarbleRunSimulatorCore {
                         }
 
                         let prop: IMachinePartProp = {
-                            i: pI,
+                            i: pI * 2,
                             j: pJ,
-                            k: pK,
+                            k: pK * 2,
                             w: w,
                             h: h,
                             d: d,

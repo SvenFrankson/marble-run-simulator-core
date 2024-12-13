@@ -389,6 +389,7 @@ declare class MachineName {
 }
 declare namespace MarbleRunSimulatorCore {
     var baseRadius: number;
+    var tileSize: number;
     var tileWidth: number;
     var tileHeight: number;
     var tileDepth: number;
