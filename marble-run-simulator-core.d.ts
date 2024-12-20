@@ -389,8 +389,10 @@ declare class MachineName {
 }
 declare namespace MarbleRunSimulatorCore {
     var baseRadius: number;
+    var tileSize: number;
     var tileWidth: number;
     var tileHeight: number;
+    var legacyTileDepth: number;
     var tileDepth: number;
     var colorSlotsCount: number;
     enum PartVisibilityMode {
