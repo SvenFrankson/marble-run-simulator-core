@@ -1293,11 +1293,11 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * 0.07;
+                    x = x / 0.075 * tileWidth;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * 0.035;
+                    y = y / 0.03 * tileHeight;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * 0.07;
+                    z = z / 0.06 * tileDepth;
 
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
@@ -1357,9 +1357,9 @@ namespace MarbleRunSimulatorCore {
                     }
 
                     let prop: IMachinePartProp = {
-                        i: pI * 2,
+                        i: pI,
                         j: pJ,
-                        k: pK * 2,
+                        k: pK,
                         w: w,
                         h: h,
                         d: d,
@@ -1401,11 +1401,11 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * 0.07;
+                    x = x / 0.075 * tileWidth;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * 0.035;
+                    y = y / 0.03 * tileHeight;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * 0.07;
+                    z = z / 0.06 * tileDepth;
 
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
@@ -1484,9 +1484,9 @@ namespace MarbleRunSimulatorCore {
                     }
 
                     let prop: IMachinePartProp = {
-                        i: pI * 2,
+                        i: pI,
                         j: pJ,
-                        k: pK * 2,
+                        k: pK,
                         w: w,
                         h: h,
                         d: d,
@@ -1533,11 +1533,11 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * 0.07;
+                    x = x / 0.075 * tileWidth;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * 0.035;
+                    y = y / 0.03 * tileHeight;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * 0.07;
+                    z = z / 0.06 * tileDepth;
 
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
@@ -1599,9 +1599,9 @@ namespace MarbleRunSimulatorCore {
                     }
 
                     let prop: IMachinePartProp = {
-                        i: pI * 2,
+                        i: pI,
                         j: pJ,
-                        k: pK * 2,
+                        k: pK,
                         w: w,
                         h: h,
                         d: d,
@@ -1668,11 +1668,11 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * 0.07;
+                    x = x / 0.075 * tileWidth;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * 0.035;
+                    y = y / 0.03 * tileHeight;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * 0.07;
+                    z = z / 0.06 * tileDepth;
 
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
@@ -1711,10 +1711,17 @@ namespace MarbleRunSimulatorCore {
                             colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
                         }
 
+                        if (baseName === "spiralUTurn") {
+                            if ((mirror % 2) === 1) {
+                                if (d >= 3) {
+                                    pI--;
+                                }
+                            }
+                        }
                         let prop: IMachinePartProp = {
-                            i: pI * 2,
+                            i: pI,
                             j: pJ,
-                            k: pK * 2,
+                            k: pK,
                             w: w,
                             h: h,
                             d: d,

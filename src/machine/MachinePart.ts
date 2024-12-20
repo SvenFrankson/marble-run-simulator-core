@@ -1,9 +1,9 @@
 namespace MarbleRunSimulatorCore {
     export var baseRadius = 0.075;
-    export var tileSize = 0.035;
-    export var tileWidth = 0.07;
-    export var tileHeight = 0.035;
-    export var tileDepth = 0.07;
+    //export var tileSize = 0.035;
+    export var tileWidth = 0.075;
+    export var tileHeight = 0.03;
+    export var tileDepth = 0.075;
     export var colorSlotsCount = 6;
 
     export enum PartVisibilityMode {
@@ -469,9 +469,9 @@ namespace MarbleRunSimulatorCore {
                 this.colors = [...prop.c];
             }
 
-            this.position.x = this._i * tileSize;
-            this.position.y = -this._j * tileSize;
-            this.position.z = -this._k * tileSize;
+            this.position.x = this._i * tileWidth;
+            this.position.y = -this._j * tileHeight;
+            this.position.z = -this._k * tileDepth;
 
             this.sleepersMeshProp = this.machine.sleepersMeshProp;
 
@@ -494,7 +494,7 @@ namespace MarbleRunSimulatorCore {
                         this._i = i;
                     }
                 }
-                this.position.x = this._i * tileSize + this.offsetPosition.x;
+                this.position.x = this._i * tileWidth + this.offsetPosition.x;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -517,7 +517,7 @@ namespace MarbleRunSimulatorCore {
                         this._j = j;
                     }
                 }
-                this.position.y = -this._j * tileSize + this.offsetPosition.y;
+                this.position.y = -this._j * tileHeight + this.offsetPosition.y;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -540,7 +540,7 @@ namespace MarbleRunSimulatorCore {
                         this._k = k;
                     }
                 }
-                this.position.z = -this._k * tileSize + this.offsetPosition.z;
+                this.position.z = -this._k * tileDepth + this.offsetPosition.z;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();

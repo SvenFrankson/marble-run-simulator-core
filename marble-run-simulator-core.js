@@ -2551,11 +2551,11 @@ var MarbleRunSimulatorCore;
                 //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * 0.07;
+                    x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * 0.035;
+                    y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * 0.07;
+                    z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                 }
@@ -2606,9 +2606,9 @@ var MarbleRunSimulatorCore;
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
                     }
                     let prop = {
-                        i: pI * 2,
+                        i: pI,
                         j: pJ,
-                        k: pK * 2,
+                        k: pK,
                         w: w,
                         h: h,
                         d: d,
@@ -2646,11 +2646,11 @@ var MarbleRunSimulatorCore;
                 //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * 0.07;
+                    x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * 0.035;
+                    y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * 0.07;
+                    z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                     if (data.v === 4 || data.v >= 6) {
@@ -2718,9 +2718,9 @@ var MarbleRunSimulatorCore;
                         }
                     }
                     let prop = {
-                        i: pI * 2,
+                        i: pI,
                         j: pJ,
-                        k: pK * 2,
+                        k: pK,
                         w: w,
                         h: h,
                         d: d,
@@ -2763,11 +2763,11 @@ var MarbleRunSimulatorCore;
                 //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * 0.07;
+                    x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * 0.035;
+                    y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * 0.07;
+                    z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                     let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -2819,9 +2819,9 @@ var MarbleRunSimulatorCore;
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
                     }
                     let prop = {
-                        i: pI * 2,
+                        i: pI,
                         j: pJ,
-                        k: pK * 2,
+                        k: pK,
                         w: w,
                         h: h,
                         d: d,
@@ -2879,11 +2879,11 @@ var MarbleRunSimulatorCore;
                 //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * 0.07;
+                    x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * 0.035;
+                    y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * 0.07;
+                    z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
                     this.balls.push(ball);
                     let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -2912,10 +2912,17 @@ var MarbleRunSimulatorCore;
                         for (let ii = 0; ii < colorCount; ii++) {
                             colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
                         }
+                        if (baseName === "spiralUTurn") {
+                            if ((mirror % 2) === 1) {
+                                if (d >= 3) {
+                                    pI--;
+                                }
+                            }
+                        }
                         let prop = {
-                            i: pI * 2,
+                            i: pI,
                             j: pJ,
-                            k: pK * 2,
+                            k: pK,
                             w: w,
                             h: h,
                             d: d,
@@ -3074,10 +3081,10 @@ MachineName.PartFours = [
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     MarbleRunSimulatorCore.baseRadius = 0.075;
-    MarbleRunSimulatorCore.tileSize = 0.035;
-    MarbleRunSimulatorCore.tileWidth = 0.07;
-    MarbleRunSimulatorCore.tileHeight = 0.035;
-    MarbleRunSimulatorCore.tileDepth = 0.07;
+    //export var tileSize = 0.035;
+    MarbleRunSimulatorCore.tileWidth = 0.075;
+    MarbleRunSimulatorCore.tileHeight = 0.03;
+    MarbleRunSimulatorCore.tileDepth = 0.075;
     MarbleRunSimulatorCore.colorSlotsCount = 6;
     let PartVisibilityMode;
     (function (PartVisibilityMode) {
@@ -3298,9 +3305,9 @@ var MarbleRunSimulatorCore;
             else if (prop.c instanceof Array) {
                 this.colors = [...prop.c];
             }
-            this.position.x = this._i * MarbleRunSimulatorCore.tileSize;
-            this.position.y = -this._j * MarbleRunSimulatorCore.tileSize;
-            this.position.z = -this._k * MarbleRunSimulatorCore.tileSize;
+            this.position.x = this._i * MarbleRunSimulatorCore.tileWidth;
+            this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight;
+            this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth;
             this.sleepersMeshProp = this.machine.sleepersMeshProp;
             this.parent = this.machine.root;
             this.tracks = [];
@@ -3507,7 +3514,7 @@ var MarbleRunSimulatorCore;
                         this._i = i;
                     }
                 }
-                this.position.x = this._i * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x;
+                this.position.x = this._i * MarbleRunSimulatorCore.tileWidth + this.offsetPosition.x;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -3528,7 +3535,7 @@ var MarbleRunSimulatorCore;
                         this._j = j;
                     }
                 }
-                this.position.y = -this._j * MarbleRunSimulatorCore.tileSize + this.offsetPosition.y;
+                this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -3549,7 +3556,7 @@ var MarbleRunSimulatorCore;
                         this._k = k;
                     }
                 }
-                this.position.z = -this._k * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z;
+                this.position.z = -this._k * MarbleRunSimulatorCore.tileDepth + this.offsetPosition.z;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -8202,7 +8209,7 @@ var MarbleRunSimulatorCore;
             this.generateWires();
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-            this.velocityKick = Shooter.velocityKicks[this.h] * 1.08;
+            this.velocityKick = Shooter.velocityKicks[this.h];
             this.base = new BABYLON.Mesh("base");
             this.kicker = new BABYLON.Mesh("kicker");
             this.kickerCollider = new BABYLON.Mesh("collider-kicker");
@@ -8366,7 +8373,7 @@ var MarbleRunSimulatorCore;
             return undefined;
         }
         getBallArmed() {
-            let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? -1 : 1) / 0.075 * 0.07, -MarbleRunSimulatorCore.tileHeight * (this.h - 2) - 0.0004, 0);
+            let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? -1 : 1) / 0.075 * MarbleRunSimulatorCore.tileWidth, -MarbleRunSimulatorCore.tileHeight * (this.h - 2) - 0.0004, 0);
             center.addInPlace(this.absolutePosition);
             Mummu.DrawDebugPoint(center, 2, BABYLON.Color3.Red(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
@@ -9307,7 +9314,7 @@ var MarbleRunSimulatorCore;
                 if (d < 3) {
                     return d;
                 }
-                return d - 1;
+                return d;
             };
             template.partName = "spiralUTurn-" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 200;

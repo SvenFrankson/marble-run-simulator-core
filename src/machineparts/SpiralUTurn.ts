@@ -18,7 +18,7 @@ namespace MarbleRunSimulatorCore {
                 if (d < 3) {
                     return d;
                 }
-                return d - 1;
+                return d;
             }
 
             template.partName = "spiralUTurn-" + h.toFixed(0) + "." + d.toFixed(0);
