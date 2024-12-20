@@ -47,21 +47,39 @@ namespace MarbleRunSimulatorCore {
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
+            let legacyR = legacyTileDepth * (d - 1) * 0.5;
+            let legacyX0 = - tileWidth * 0.5 + (2 * Math.PI * legacyR) / 6;
+            let legacyXMax = legacyX0 + legacyR;
+
             let r = tileDepth * (d - 1) * 0.5;
-            let x0 = -tileWidth * 0.5 + (2 * Math.PI * r) / 6;
+            let x0 = legacyXMax - r;
+            let hasStraightPart = true;
+            if (x0 < - tileWidth * 0.5) {
+                x0 = 0;
+                hasStraightPart = false;
+            }
             let r2 = r / Math.SQRT2;
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].isPipe = pipeVersion;
             template.trackTemplates[0].isWood = woodVersion;
-            template.trackTemplates[0].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0)),
+            template.trackTemplates[0].trackpoints = []
+            if (hasStraightPart) {
+                template.trackTemplates[0].trackpoints.push(
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0))
+                );
+            }
+            template.trackTemplates[0].trackpoints.push(
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 0)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, -r + r2)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r, 0, -r)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, -r - r2)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, -2 * r)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
-            ];
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, -2 * r))
+            );
+            if (hasStraightPart) {
+                template.trackTemplates[0].trackpoints.push(
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
+                );
+            }
             template.maxAngle = Math.PI / 4 / 2 * template.s;
 
             let hermite = (x: number) => {

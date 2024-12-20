@@ -28,7 +28,7 @@ namespace MarbleRunSimulatorCore {
             template.xMirrorable = true;
 
             let r = tileWidth;
-            let rY = template.h * tileHeight * 0.5;
+            let rY = template.h * tileHeight * 0.45;
             let depthStart = 0;
             let depthEnd = -tileDepth * (template.d - 1);
 
