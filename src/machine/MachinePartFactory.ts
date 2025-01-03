@@ -39,6 +39,7 @@ namespace MarbleRunSimulatorCore {
         i?: number;
         j?: number;
         k?: number;
+        r?: number;
         w?: number;
         h?: number;
         d?: number;

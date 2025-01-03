@@ -464,6 +464,9 @@ namespace MarbleRunSimulatorCore {
             this._i = prop.i;
             this._j = prop.j;
             this._k = prop.k;
+            if (isFinite(prop.r)) {
+                this._r = prop.r;
+            }
             if (typeof prop.c === "number") {
                 this.colors = [prop.c];
             } else if (prop.c instanceof Array) {
@@ -473,6 +476,7 @@ namespace MarbleRunSimulatorCore {
             this.position.x = this._i * tileSize;
             this.position.y = -this._j * tileHeight;
             this.position.z = -this._k * tileSize;
+            this.rotation.y = - this._r * Math.PI * 0.5;
 
             this.sleepersMeshProp = this.machine.sleepersMeshProp;
 
@@ -542,6 +546,29 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
                 this.position.z = -this._k * tileSize + this.offsetPosition.z;
+                this.freezeWorldMatrix();
+                this.getChildMeshes().forEach((m) => {
+                    m.freezeWorldMatrix();
+                });
+                this.update(0);
+                this.machine.requestUpdateShadow = true;
+            }
+        }
+
+        private _r: number = 0;
+        public get r(): number {
+            return this._r;
+        }
+        public setR(v: number, doNotCheckGridLimits?: boolean) {
+            if (this._r != v) {
+                this._r = v;
+                if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
+                    let r = this._r;
+                    if (isFinite(r)) {
+                        this._r = r;
+                    }
+                }
+                this.rotation.y = - this._r * Math.PI * 0.5;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();

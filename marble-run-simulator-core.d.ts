@@ -367,6 +367,7 @@ declare namespace MarbleRunSimulatorCore {
         serializeV3456(version: number): IMachineData;
         serializeV8(): IMachineData;
         serializeV910(version: number): IMachineData;
+        serializeV11(): IMachineData;
         lastDeserializedData: IMachineData;
         deserialize(data: IMachineData): void;
         deserializeV1(data: IMachineData): void;
@@ -374,6 +375,7 @@ declare namespace MarbleRunSimulatorCore {
         deserializeV3456(data: IMachineData): void;
         deserializeV78(data: IMachineData): void;
         deserializeV910(data: IMachineData): void;
+        deserializeV11(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;
@@ -551,6 +553,9 @@ declare namespace MarbleRunSimulatorCore {
         private _k;
         get k(): number;
         setK(v: number, doNotCheckGridLimits?: boolean): void;
+        private _r;
+        get r(): number;
+        setR(v: number, doNotCheckGridLimits?: boolean): void;
         setIsVisible(isVisible: boolean): void;
         private _partVisibilityMode;
         get partVisilibityMode(): PartVisibilityMode;
@@ -590,6 +595,7 @@ declare namespace MarbleRunSimulatorCore {
         i?: number;
         j?: number;
         k?: number;
+        r?: number;
         w?: number;
         h?: number;
         d?: number;
