@@ -3761,21 +3761,29 @@ var MarbleRunSimulatorCore;
             return this._r;
         }
         setR(v, doNotCheckGridLimits) {
-            if (this._r != v) {
-                this._r = v;
-                if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                    let r = this._r;
-                    if (isFinite(r)) {
-                        this._r = r;
-                    }
+            if (isFinite(v)) {
+                while (v < 0) {
+                    v += 4;
                 }
-                this.rotation.y = -this._r * Math.PI * 0.5;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
-                this.update(0);
-                this.machine.requestUpdateShadow = true;
+                while (v >= 4) {
+                    v -= 4;
+                }
+                if (this._r != v) {
+                    this._r = v;
+                    if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
+                        let r = this._r;
+                        if (isFinite(r)) {
+                            this._r = r;
+                        }
+                    }
+                    this.rotation.y = -this._r * Math.PI * 0.5;
+                    this.freezeWorldMatrix();
+                    this.getChildMeshes().forEach((m) => {
+                        m.freezeWorldMatrix();
+                    });
+                    this.update(0);
+                    this.machine.requestUpdateShadow = true;
+                }
             }
         }
         setIsVisible(isVisible) {
@@ -4691,14 +4699,14 @@ var MarbleRunSimulatorCore;
             return this.template ? this.template.preferedStartBank : 0;
         }
         get startWorldPosition() {
-            this._startWorldPosition.copyFrom(this.part.position).addInPlace(this.templateInterpolatedPoints[0]);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[0], this.part.getWorldMatrix(), this._startWorldPosition);
             return this._startWorldPosition;
         }
         get preferedEndBank() {
             return this.template ? this.template.preferedEndBank : 0;
         }
         get endWorldPosition() {
-            this._endWorldPosition.copyFrom(this.part.position).addInPlace(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1]);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1], this.part.getWorldMatrix(), this._endWorldPosition);
             return this._endWorldPosition;
         }
         get trackIndex() {

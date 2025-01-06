@@ -560,21 +560,29 @@ namespace MarbleRunSimulatorCore {
             return this._r;
         }
         public setR(v: number, doNotCheckGridLimits?: boolean) {
-            if (this._r != v) {
-                this._r = v;
-                if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let r = this._r;
-                    if (isFinite(r)) {
-                        this._r = r;
-                    }
+            if (isFinite(v)) {
+                while (v < 0) {
+                    v += 4;
                 }
-                this.rotation.y = - this._r * Math.PI * 0.5;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
-                this.update(0);
-                this.machine.requestUpdateShadow = true;
+                while (v >= 4) {
+                    v -= 4;
+                }
+                if (this._r != v) {
+                    this._r = v;
+                    if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
+                        let r = this._r;
+                        if (isFinite(r)) {
+                            this._r = r;
+                        }
+                    }
+                    this.rotation.y = - this._r * Math.PI * 0.5;
+                    this.freezeWorldMatrix();
+                    this.getChildMeshes().forEach((m) => {
+                        m.freezeWorldMatrix();
+                    });
+                    this.update(0);
+                    this.machine.requestUpdateShadow = true;
+                }
             }
         }
 
