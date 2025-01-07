@@ -3091,7 +3091,7 @@ var MarbleRunSimulatorCore;
                         let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let pR = parseInt(dataString.substring(pt, pt += 1), 36) - partOffset;
+                        let pR = parseInt(dataString.substring(pt, pt += 1), 36);
                         //console.log("part ijk " + pI + " " + pJ + " " + pK);
                         let w = parseInt(dataString.substring(pt, pt += 1), 36);
                         let h = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -3492,6 +3492,7 @@ var MarbleRunSimulatorCore;
             if (isFinite(prop.r)) {
                 this._r = prop.r;
             }
+            console.log("R = " + this._r.toFixed(0));
             if (typeof prop.c === "number") {
                 this.colors = [prop.c];
             }
@@ -4125,8 +4126,8 @@ var MarbleRunSimulatorCore;
             this.encloseMesh.visibility = 0;
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseEnd.y, this.encloseEnd.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
-            this.AABBMin.addInPlace(this.absolutePosition);
-            this.AABBMax.addInPlace(this.absolutePosition);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.getWorldMatrix(), this.AABBMin);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.getWorldMatrix(), this.AABBMax);
             if (this.tracks[0] && this.tracks[0].template.isWood) {
                 this.AABBMax.y += MarbleRunSimulatorCore.tileHeight;
             }

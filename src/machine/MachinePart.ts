@@ -467,6 +467,7 @@ namespace MarbleRunSimulatorCore {
             if (isFinite(prop.r)) {
                 this._r = prop.r;
             }
+            console.log("R = " + this._r.toFixed(0));
             if (typeof prop.c === "number") {
                 this.colors = [prop.c];
             } else if (prop.c instanceof Array) {
@@ -974,8 +975,8 @@ namespace MarbleRunSimulatorCore {
 
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseEnd.y, this.encloseEnd.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
-            this.AABBMin.addInPlace(this.absolutePosition);
-            this.AABBMax.addInPlace(this.absolutePosition);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.getWorldMatrix(), this.AABBMin);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.getWorldMatrix(), this.AABBMax);
             if (this.tracks[0] && this.tracks[0].template.isWood) {
                 this.AABBMax.y += tileHeight;
             }

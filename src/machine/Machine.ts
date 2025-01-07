@@ -1914,7 +1914,7 @@ namespace MarbleRunSimulatorCore {
                         let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let pR = parseInt(dataString.substring(pt, pt += 1), 36) - partOffset;
+                        let pR = parseInt(dataString.substring(pt, pt += 1), 36);
 
                         //console.log("part ijk " + pI + " " + pJ + " " + pK);
 
