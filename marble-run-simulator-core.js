@@ -4128,6 +4128,10 @@ var MarbleRunSimulatorCore;
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
             BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.getWorldMatrix(), this.AABBMin);
             BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.getWorldMatrix(), this.AABBMax);
+            let min = BABYLON.Vector3.Minimize(this.AABBMin, this.AABBMax);
+            let max = BABYLON.Vector3.Maximize(this.AABBMin, this.AABBMax);
+            this.AABBMin = min;
+            this.AABBMax = max;
             if (this.tracks[0] && this.tracks[0].template.isWood) {
                 this.AABBMax.y += MarbleRunSimulatorCore.tileHeight;
             }
