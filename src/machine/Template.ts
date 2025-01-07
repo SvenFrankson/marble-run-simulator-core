@@ -342,7 +342,16 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (!data) {
-                if (partName.startsWith("uturn-")) {
+                if (partName.startsWith("curb-")) {
+                    let l = parseInt(partName.split("-")[1].split(".")[0]);
+                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                    let s = parseInt(partName.split("-")[1].split(".")[2]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = Curb.GenerateTemplate(l, h, s, false, false);
+                }
+                else if (partName.startsWith("uturn-")) {
                     let h = parseInt(partName.split("-")[1].split(".")[0]);
                     let d = parseInt(partName.split("-")[1].split(".")[1]);
                     let s = parseInt(partName.split("-")[1].split(".")[2]);

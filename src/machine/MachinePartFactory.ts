@@ -32,6 +32,7 @@ namespace MarbleRunSimulatorCore {
         "woodramp-1.1.1",
         "wooduturn-0.2",
         "uturnv2-0.2",
+        "curb-2.0"
     ];
 
     export interface IMachinePartProp {
@@ -145,6 +146,23 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
                 return new Snake(this.machine, prop);
+            }
+            if (partName === "curb" || partName.startsWith("curb-")) {
+                let argStr = partName.split("-")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    let s = parseInt(argStr.split(".")[2]);
+                    prop.w = l;
+                    prop.h = h;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
+                }
+                if (isNaN(prop.s)) {
+                    prop.s = TrackSpeed.Medium;
+                }
+                return new Curb(this.machine, prop);
             }
             if (partName === "uturn" || partName.startsWith("uturn-")) {
                 let argStr = partName.split("-")[1];
@@ -371,6 +389,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "snake") {
                 return new Snake(this.machine, prop);
+            }
+            if (baseName === "curb") {
+                return new Curb(this.machine, prop);
             }
             if (baseName === "uturn") {
                 return new UTurn(this.machine, prop);

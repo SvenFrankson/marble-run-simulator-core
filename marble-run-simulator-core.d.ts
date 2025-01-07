@@ -882,6 +882,12 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Curb extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class Elevator extends MachinePart {
         boxesCount: number;
         rWheel: number;
