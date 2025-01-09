@@ -1852,8 +1852,8 @@ var MarbleRunSimulatorCore;
                 this.tracksMaxZ = 0;
             }
             let maxI = 1;
-            let maxJ = -1;
-            let maxK = 1;
+            let minJ = -1;
+            let minK = -1;
             for (let i = 0; i < this.parts.length; i++) {
                 let track = this.parts[i];
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - MarbleRunSimulatorCore.tileWidth * 0.5);
@@ -1869,8 +1869,8 @@ var MarbleRunSimulatorCore;
                 this.tracksMinZ = Math.min(this.tracksMinZ, track.position.z - MarbleRunSimulatorCore.tileDepth * (track.d - 0.5));
                 this.tracksMaxZ = Math.max(this.tracksMaxZ, track.position.z + MarbleRunSimulatorCore.tileDepth * 0.5);
                 maxI = Math.max(maxI, track.i + track.w);
-                maxJ = Math.max(maxJ, track.j + track.h);
-                maxK = Math.max(maxK, track.k + track.d);
+                minJ = Math.min(minJ, track.j);
+                minK = Math.min(minK, track.k);
             }
             if (false && this.game.DEBUG_MODE) {
                 if (this.debugAxis) {
@@ -2062,16 +2062,18 @@ var MarbleRunSimulatorCore;
                 this.game.room.setGroundHeight(this.baseMeshMinY - 0.8);
             }
             if (this.exitShooter) {
+                console.log("minK = " + minK);
                 this.exitShooter.setI(maxI - 2, true);
-                this.exitShooter.setJ(maxJ + 3, true);
-                this.exitShooter.setK(maxK + 1, true);
+                this.exitShooter.setJ(minJ - 5, true);
+                this.exitShooter.setK(minK - 1, true);
                 this.exitShooter.recomputeAbsolutePath();
                 this.exitShooter.refreshEncloseMeshAndAABB();
+                console.log(this.exitShooter.i + " " + this.exitShooter.j + " " + this.exitShooter.k);
             }
             if (this.exitTrack) {
-                this.exitTrack.setI(maxI - 1, true);
-                this.exitTrack.setJ(maxJ + 4, true);
-                this.exitTrack.setK(maxK + 1, true);
+                this.exitTrack.setI(maxI + 1, true);
+                this.exitTrack.setJ(minJ - 5, true);
+                this.exitTrack.setK(minK - 2, true);
                 this.exitTrack.recomputeAbsolutePath();
                 this.exitTrack.refreshEncloseMeshAndAABB();
             }
@@ -2727,7 +2729,6 @@ var MarbleRunSimulatorCore;
                 this.parts = [];
                 let pt = 0;
                 let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("ballCount = " + ballCount);
                 for (let i = 0; i < ballCount; i++) {
                     let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
@@ -2743,46 +2744,22 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("partCount = " + partCount);
                 for (let i = 0; i < partCount; i++) {
-                    /*
-                    partDataString += NToHex(index, 2);
-                    
-                    let pI = part.i + partOffset;
-                    let pJ = part.j + partOffset;
-                    let pK = part.k + partOffset;
-                    partDataString += NToHex(pI, 2);
-                    partDataString += NToHex(pJ, 2);
-                    partDataString += NToHex(pK, 2);
-
-                    partDataString += NToHex(part.w, 1);
-                    partDataString += NToHex(part.h, 1);
-                    partDataString += NToHex(part.d, 1);
-                    partDataString += NToHex(part.n, 1);
-                    let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                    partDataString += NToHex(m, 1);
-
-                    let colourCount = part.colors.length;
-                    partDataString += NToHex(colourCount, 1);
-                    for (let j = 0; j < part.colors.length; j++) {
-                        let c = part.colors[j];
-                        partDataString += NToHex(c, 1);
-                    }
-                    */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
+                    let correctedPI = pI * 3;
+                    let correctedPJ = -pK * 3;
+                    let correctedPK = -pJ;
+                    console.log(correctedPI + " " + correctedPJ + " " + correctedPK);
                     let w = parseInt(dataString.substring(pt, pt += 1), 36);
                     let h = parseInt(dataString.substring(pt, pt += 1), 36);
                     let d = parseInt(dataString.substring(pt, pt += 1), 36);
                     let n = parseInt(dataString.substring(pt, pt += 1), 36);
                     let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
-                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
                     let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                    //console.log(colorCount);
                     let colors = [];
                     for (let ii = 0; ii < colorCount; ii++) {
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -2802,9 +2779,9 @@ var MarbleRunSimulatorCore;
                         }
                     }
                     let prop = {
-                        i: pI * 3,
-                        j: pJ,
-                        k: pK * 3,
+                        i: correctedPI,
+                        j: correctedPJ,
+                        k: correctedPK,
                         w: w,
                         h: h,
                         d: d,
@@ -3500,8 +3477,8 @@ var MarbleRunSimulatorCore;
                 this.colors = [...prop.c];
             }
             this.position.x = this._i * MarbleRunSimulatorCore.tileSize;
-            this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight;
-            this.position.z = -this._k * MarbleRunSimulatorCore.tileSize;
+            this.position.y = this._k * MarbleRunSimulatorCore.tileHeight;
+            this.position.z = this._j * MarbleRunSimulatorCore.tileSize;
             this.rotation.y = -this._r * Math.PI * 0.5;
             this.sleepersMeshProp = this.machine.sleepersMeshProp;
             this.parent = this.machine.root;
@@ -3730,7 +3707,7 @@ var MarbleRunSimulatorCore;
                         this._j = j;
                     }
                 }
-                this.position.y = -this._j * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y;
+                this.position.z = this._j * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
@@ -3751,7 +3728,7 @@ var MarbleRunSimulatorCore;
                         this._k = k;
                     }
                 }
-                this.position.z = -this._k * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z;
+                this.position.y = this._k * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
