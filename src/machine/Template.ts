@@ -161,7 +161,8 @@ namespace MarbleRunSimulatorCore {
             }
 
             let maxR = 0;
-            this.angles = [this.preferedStartBank];
+            this.angles = new Array<number>(N);
+            this.angles.fill(0);
             for (let i = 1; i < N - 1; i++) {
                 let n = this.interpolatedNormals[i];
 
@@ -169,11 +170,11 @@ namespace MarbleRunSimulatorCore {
                 let point = this.interpolatedPoints[i];
                 let nextPoint = this.interpolatedPoints[i + 1];
 
-                let dirPrev = point.subtract(prevPoint);
-                let dPrev = dirPrev.length();
+                let dirPrev: BABYLON.Vector3 = point.subtract(prevPoint);
+                let dPrev: number = dirPrev.length();
 
-                let dirNext = nextPoint.subtract(point);
-                let dNext = dirNext.length();
+                let dirNext: BABYLON.Vector3 = nextPoint.subtract(point);
+                let dNext: number = dirNext.length();
 
                 let a = Mummu.AngleFromToAround(dirPrev.scale(-1), dirNext, n);
                 if (Math.abs(a) < Math.PI * 0.9999999) {
@@ -191,31 +192,10 @@ namespace MarbleRunSimulatorCore {
                     this.angles[i] = 0;
                 }
             }
-            this.angles.push(this.preferedEndBank);
-
-            let dec = 1;
-            for (let i = 1; i < 0.5 * (N - 1); i++) {
-                if (Math.abs(this.angles[i]) < Math.abs(this.preferedStartBank) * dec) {
-                    this.angles[i] = this.preferedStartBank * dec;
-                    dec *= 0.9;
-                } else {
-                    i = Infinity;
-                }
-            }
-
-            dec = 1;
-            for (let i = N - 1 - 1; i > 0.5 * (N - 1); i--) {
-                if (Math.abs(this.angles[i]) < Math.abs(this.preferedEndBank) * dec) {
-                    this.angles[i] = this.preferedEndBank * dec;
-                    dec *= 0.9;
-                } else {
-                    i = -Infinity;
-                }
-            }
 
             let tmpAngles = [...this.angles];
             let f = 1;
-            for (let n = 0; n < this.partTemplate.angleSmoothSteps; n++) {
+            for (let n = 0; n < 10; n++) {
                 for (let i = 0; i < N; i++) {
                     let aPrev = tmpAngles[i - 1];
                     let a = tmpAngles[i];
@@ -241,9 +221,13 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
             }
+            this.angles = tmpAngles;
 
-            this.preferedStartBank = tmpAngles[0];
-            this.preferedEndBank = tmpAngles[tmpAngles.length - 1];
+            this.angles[0] = this.angles[1];
+            this.angles[N - 1] = this.angles[N - 2];
+
+            this.preferedStartBank = this.angles[0];
+            this.preferedEndBank = this.angles[this.angles.length - 1];
 
             this.summedLength = [0];
             this.totalLength = 0;
