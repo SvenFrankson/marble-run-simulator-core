@@ -140,7 +140,9 @@ var MarbleRunSimulatorCore;
             this.positionZero.x = Math.round(this.positionZero.x * 1000) / 1000;
             this.positionZero.y = Math.round(this.positionZero.y * 1000) / 1000;
             this.positionZero.z = Math.round(this.positionZero.z / MarbleRunSimulatorCore.tileDepth) * MarbleRunSimulatorCore.tileDepth;
-            this.positionZeroGhost.position.copyFrom(this.positionZero);
+            if (this.positionZeroGhost) {
+                this.positionZeroGhost.position.copyFrom(this.positionZero);
+            }
         }
         get k() {
             return -Math.round(this.positionZero.z / MarbleRunSimulatorCore.tileDepth);
@@ -1833,7 +1835,7 @@ var MarbleRunSimulatorCore;
             let previousBaseMinY = this.baseMeshMinY;
             this.baseMeshMinX = -MarbleRunSimulatorCore.tileWidth * 0.5;
             this.baseMeshMaxX = MarbleRunSimulatorCore.tileWidth * 0.5;
-            this.baseMeshMinY = 0;
+            this.baseMeshMinY = -MarbleRunSimulatorCore.tileHeight * 0.5;
             this.baseMeshMaxY = MarbleRunSimulatorCore.tileHeight;
             this.baseMeshMinZ = -MarbleRunSimulatorCore.tileDepth * 0.5;
             this.baseMeshMaxZ = MarbleRunSimulatorCore.tileDepth * 0.5;
@@ -1858,7 +1860,7 @@ var MarbleRunSimulatorCore;
                 let track = this.parts[i];
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - MarbleRunSimulatorCore.tileWidth * 0.5);
                 this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.position.x + MarbleRunSimulatorCore.tileWidth * (track.w - 0.5));
-                this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - MarbleRunSimulatorCore.tileHeight * (track.h + 1));
+                //this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
                 this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
                 this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.position.z - MarbleRunSimulatorCore.tileDepth * (track.d - 0.5));
                 this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z + MarbleRunSimulatorCore.tileDepth * 0.5);
@@ -2798,6 +2800,21 @@ var MarbleRunSimulatorCore;
                         console.warn("failed to createTrackBaseName");
                         console.log(baseName);
                         console.log(prop);
+                    }
+                }
+                let minK = 0;
+                for (let i = 0; i < this.parts.length; i++) {
+                    let part = this.parts[i];
+                    minK = Math.min(minK, part.k - part.h);
+                }
+                if (minK < 0) {
+                    for (let i = 0; i < this.parts.length; i++) {
+                        let part = this.parts[i];
+                        part.setK(part.k - minK);
+                    }
+                    for (let i = 0; i < this.balls.length; i++) {
+                        let ball = this.balls[i];
+                        ball.setPositionZero(ball.positionZero.add(new BABYLON.Vector3(0, -minK * MarbleRunSimulatorCore.tileHeight, 0)));
                     }
                 }
             }

@@ -490,7 +490,7 @@ namespace MarbleRunSimulatorCore {
 
             this.baseMeshMinX = - tileWidth * 0.5;
             this.baseMeshMaxX = tileWidth * 0.5;
-            this.baseMeshMinY = 0;
+            this.baseMeshMinY = - tileHeight * 0.5;
             this.baseMeshMaxY = tileHeight;
             this.baseMeshMinZ = - tileDepth * 0.5;
             this.baseMeshMaxZ = tileDepth * 0.5;
@@ -517,7 +517,7 @@ namespace MarbleRunSimulatorCore {
                 let track = this.parts[i];
                 this.baseMeshMinX = Math.min(this.baseMeshMinX, track.position.x - tileWidth * 0.5);
                 this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.position.x + tileWidth * (track.w - 0.5));
-                this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
+                //this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
                 this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.position.y);
                 this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.position.z - tileDepth * (track.d - 0.5));
                 this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.position.z + tileDepth * 0.5);
@@ -1573,6 +1573,23 @@ namespace MarbleRunSimulatorCore {
                         console.warn("failed to createTrackBaseName");
                         console.log(baseName);
                         console.log(prop);
+                    }
+                }
+
+                let minK = 0;
+                for (let i = 0; i < this.parts.length; i++) {
+                    let part = this.parts[i];
+                    minK = Math.min(minK, part.k - part.h);
+                }
+
+                if (minK < 0) {
+                    for (let i = 0; i < this.parts.length; i++) {
+                        let part = this.parts[i];
+                        part.setK(part.k - minK);
+                    }
+                    for (let i = 0; i < this.balls.length; i++) {
+                        let ball = this.balls[i];
+                        ball.setPositionZero(ball.positionZero.add(new BABYLON.Vector3(0, - minK * tileHeight, 0)));
                     }
                 }
             }

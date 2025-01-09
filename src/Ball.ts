@@ -114,7 +114,9 @@ namespace MarbleRunSimulatorCore {
             this.positionZero.x = Math.round(this.positionZero.x * 1000) / 1000;
             this.positionZero.y = Math.round(this.positionZero.y * 1000) / 1000;
             this.positionZero.z = Math.round(this.positionZero.z / tileDepth) * tileDepth;
-            this.positionZeroGhost.position.copyFrom(this.positionZero);
+            if (this.positionZeroGhost) {
+                this.positionZeroGhost.position.copyFrom(this.positionZero);
+            }
         }
 
         public get k(): number {
