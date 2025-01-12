@@ -80,6 +80,7 @@ namespace MarbleRunSimulatorCore {
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
                 );
             }
+            template.defaultAngle = Math.PI / 4 / 4 * template.s;
             template.maxAngle = Math.PI / 4 / 2 * template.s;
 
             let hermite = (x: number) => {

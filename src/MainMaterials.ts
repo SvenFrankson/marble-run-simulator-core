@@ -111,6 +111,7 @@ namespace MarbleRunSimulatorCore {
         public whiteMaterial: BABYLON.StandardMaterial;
         public paintingLight: BABYLON.StandardMaterial;
         public wallShadow: BABYLON.StandardMaterial;
+        public slice9Cutoff: BABYLON.StandardMaterial;
         public groundMaterial: BABYLON.StandardMaterial;
         public whiteGroundMaterial: BABYLON.StandardMaterial;
         public handleMaterial: BABYLON.StandardMaterial;
@@ -249,6 +250,14 @@ namespace MarbleRunSimulatorCore {
             this.wallShadow.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
             this.wallShadow.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             this.wallShadow.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
+
+            this.slice9Cutoff = new BABYLON.StandardMaterial("9-slice-cutoff-material");
+            this.slice9Cutoff.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/9-slice-rounded.png");
+            this.slice9Cutoff.diffuseTexture.hasAlpha = true;
+            this.slice9Cutoff.useAlphaFromDiffuseTexture = true;
+            this.slice9Cutoff.specularColor.copyFromFloats(0, 0, 0);
+            this.slice9Cutoff.emissiveColor.copyFromFloats(1, 1, 1);
+            this.slice9Cutoff.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST; 
 
             this.groundMaterial = new BABYLON.StandardMaterial("ground-material");
             this.groundMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/concrete.png");

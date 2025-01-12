@@ -19,7 +19,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "screw-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "screw-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             let x = 1;
@@ -261,7 +261,7 @@ namespace MarbleRunSimulatorCore {
                 i: i,
                 j: j,
                 k: this.k,
-                w: w,
+                l: w,
                 h: h,
                 c: this.colors,
                 mirrorX: mirrorX,

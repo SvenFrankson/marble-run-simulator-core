@@ -10,7 +10,7 @@ namespace MarbleRunSimulatorCore {
             }
             prop.n = Math.min(prop.n, 2 * prop.d);
 
-            let partName = "loop-" + prop.w.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
+            let partName = "loop-" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }

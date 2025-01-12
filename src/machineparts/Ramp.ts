@@ -66,7 +66,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
             
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "ramp-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "ramp-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             if (!prop.pipeVersion && !prop.woodVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
@@ -206,7 +206,7 @@ namespace MarbleRunSimulatorCore {
                 i: i,
                 j: j,
                 k: k,
-                w: w,
+                l: w,
                 h: h,
                 d: d,
                 s: this.s,

@@ -186,13 +186,13 @@ namespace MarbleRunSimulatorCore {
             this.exitShooter = new Shooter(this, { i: 0, j: 0, k: 0, h: 3, mirrorX: true, c: [0, 0, 0, 6, 3] });
             this.exitShooter.parent = this.root;
             this.exitShooter.isSelectable = false;
-            this.exitShooter.offsetPosition.copyFromFloats(0, 0, 0.02);
+            this.exitShooter.offsetPosition.copyFromFloats(0, 0, -0.007);
             this.exitShooter.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
 
             this.exitTrack = new Start(this, { i: 0, j: 0, k: 0, mirrorX: true, c: [0] });
             this.exitTrack.parent = this.root;
             this.exitTrack.isSelectable = false;
-            this.exitTrack.offsetPosition.copyFromFloats(0, 0, 0.02);
+            this.exitTrack.offsetPosition.copyFromFloats(0, 0, -0.007);
             this.exitTrack.sleepersMeshProp = { forceDrawWallAnchors: true, forcedWallAnchorsZ: 0.019 };
             
             this.exitHolePath = [new BABYLON.Vector3(0.011, -0.002, 0), new BABYLON.Vector3(0.01835, 0, 0)];
@@ -529,8 +529,8 @@ namespace MarbleRunSimulatorCore {
                 this.tracksMinZ = Math.min(this.tracksMinZ, track.position.z - tileDepth * (track.d - 0.5));
                 this.tracksMaxZ = Math.max(this.tracksMaxZ, track.position.z + tileDepth * 0.5);
 
-                maxI = Math.max(maxI, track.i + track.w);
-                minJ = Math.min(minJ, track.j);
+                maxI = Math.max(maxI, track.i + track.w * 3);
+                minJ = Math.min(minJ, track.j - track.d * 3);
                 minK = Math.min(minK, track.k);
             }
 
@@ -742,18 +742,16 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (this.exitShooter) {
-                console.log("minK = " + minK);
-                this.exitShooter.setI(maxI - 2, true);
-                this.exitShooter.setJ(minJ - 5, true);
-                this.exitShooter.setK(minK - 1, true);
+                this.exitShooter.setI(maxI - 6, true);
+                this.exitShooter.setJ(minJ - 1, true);
+                this.exitShooter.setK(minK - 2, true);
                 this.exitShooter.recomputeAbsolutePath();
                 this.exitShooter.refreshEncloseMeshAndAABB();
-                console.log(this.exitShooter.i + " " + this.exitShooter.j + " " + this.exitShooter.k);
             }
             if (this.exitTrack) {
-                this.exitTrack.setI(maxI + 1, true);
-                this.exitTrack.setJ(minJ - 5, true);
-                this.exitTrack.setK(minK - 2, true);
+                this.exitTrack.setI(maxI - 3, true);
+                this.exitTrack.setJ(minJ - 1, true);
+                this.exitTrack.setK(minK - 3, true);
                 this.exitTrack.recomputeAbsolutePath();
                 this.exitTrack.refreshEncloseMeshAndAABB();
             }
@@ -1455,7 +1453,7 @@ namespace MarbleRunSimulatorCore {
                         i: pI * 3,
                         j: pJ,
                         k: pK * 3,
-                        w: w,
+                        l: w,
                         h: h,
                         d: d,
                         n: n,
@@ -1524,8 +1522,6 @@ namespace MarbleRunSimulatorCore {
                     let correctedPJ = - pK * 3;
                     let correctedPK = -pJ;
 
-                    console.log(correctedPI + " " + correctedPJ + " " + correctedPK);
-
                     let w = parseInt(dataString.substring(pt, pt += 1), 36);
                     let h = parseInt(dataString.substring(pt, pt += 1), 36);
                     let d = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -1557,7 +1553,7 @@ namespace MarbleRunSimulatorCore {
                         i: correctedPI,
                         j: correctedPJ,
                         k: correctedPK,
-                        w: w,
+                        l: w,
                         h: h,
                         d: d,
                         n: n,
@@ -1576,20 +1572,20 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
 
-                let minK = 0;
+                let minK = Infinity;
                 for (let i = 0; i < this.parts.length; i++) {
                     let part = this.parts[i];
                     minK = Math.min(minK, part.k - part.h);
                 }
 
-                if (minK < 0) {
+                if (isFinite(minK) && minK != 0) {
                     for (let i = 0; i < this.parts.length; i++) {
                         let part = this.parts[i];
                         part.setK(part.k - minK);
                     }
                     for (let i = 0; i < this.balls.length; i++) {
                         let ball = this.balls[i];
-                        ball.setPositionZero(ball.positionZero.add(new BABYLON.Vector3(0, - minK * tileHeight, 0)));
+                        ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * tileHeight, 0)));
                     }
                 }
             }
@@ -1668,6 +1664,10 @@ namespace MarbleRunSimulatorCore {
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
 
+                    let correctedPI = pI * 3;
+                    let correctedPJ = - pK * 3;
+                    let correctedPK = -pJ;
+
                     //console.log("part ijk " + pI + " " + pJ + " " + pK);
 
                     let w = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -1686,10 +1686,10 @@ namespace MarbleRunSimulatorCore {
                     }
 
                     let prop: IMachinePartProp = {
-                        i: pI,
-                        j: pJ,
-                        k: pK,
-                        w: w,
+                        i: correctedPI,
+                        j: correctedPJ,
+                        k: correctedPK,
+                        l: w,
                         h: h,
                         d: d,
                         n: n,
@@ -1726,6 +1726,23 @@ namespace MarbleRunSimulatorCore {
                     if (data.v === 8) {
                         let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
                         decor.setFlip(f);
+                    }
+                }
+
+                let minK = Infinity;
+                for (let i = 0; i < this.parts.length; i++) {
+                    let part = this.parts[i];
+                    minK = Math.min(minK, part.k - part.h);
+                }
+
+                if (isFinite(minK) && minK != 0) {
+                    for (let i = 0; i < this.parts.length; i++) {
+                        let part = this.parts[i];
+                        part.setK(part.k - minK);
+                    }
+                    for (let i = 0; i < this.balls.length; i++) {
+                        let ball = this.balls[i];
+                        ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * tileHeight, 0)));
                     }
                 }
             }
@@ -1780,6 +1797,10 @@ namespace MarbleRunSimulatorCore {
                         let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
 
+                        let correctedPI = pI * 3;
+                        let correctedPJ = - pK * 3;
+                        let correctedPK = -pJ;
+
                         //console.log("part ijk " + pI + " " + pJ + " " + pK);
 
                         let w = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -1801,15 +1822,15 @@ namespace MarbleRunSimulatorCore {
                         if (baseName === "spiralUTurn") {
                             if ((mirror % 2) === 1) {
                                 if (d >= 3) {
-                                    pI--;
+                                    correctedPI -= 3;
                                 }
                             }
                         }
                         let prop: IMachinePartProp = {
-                            i: pI * 3,
-                            j: pJ,
-                            k: pK * 3,
-                            w: w,
+                            i: correctedPI,
+                            j: correctedPJ,
+                            k: correctedPK,
+                            l: w,
                             h: h,
                             d: d,
                             n: n,
@@ -1848,6 +1869,23 @@ namespace MarbleRunSimulatorCore {
                     if (data.v === 8) {
                         let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
                         decor.setFlip(f);
+                    }
+                }
+
+                let minK = Infinity;
+                for (let i = 0; i < this.parts.length; i++) {
+                    let part = this.parts[i];
+                    minK = Math.min(minK, part.k - part.h);
+                }
+
+                if (isFinite(minK) && minK != 0) {
+                    for (let i = 0; i < this.parts.length; i++) {
+                        let part = this.parts[i];
+                        part.setK(part.k - minK);
+                    }
+                    for (let i = 0; i < this.balls.length; i++) {
+                        let ball = this.balls[i];
+                        ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * tileHeight, 0)));
                     }
                 }
 
@@ -1912,7 +1950,7 @@ namespace MarbleRunSimulatorCore {
 
                         //console.log("part ijk " + pI + " " + pJ + " " + pK);
 
-                        let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let l = parseInt(dataString.substring(pt, pt += 1), 36);
                         let h = parseInt(dataString.substring(pt, pt += 1), 36);
                         let d = parseInt(dataString.substring(pt, pt += 1), 36);
                         let n = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -1933,7 +1971,7 @@ namespace MarbleRunSimulatorCore {
                             j: pJ,
                             k: pK,
                             r: pR,
-                            w: w,
+                            l: l,
                             h: h,
                             d: d,
                             n: n,

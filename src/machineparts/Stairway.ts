@@ -59,7 +59,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "stairway-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "stairway-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             for (let i = this.colors.length; i < 4; i++) {

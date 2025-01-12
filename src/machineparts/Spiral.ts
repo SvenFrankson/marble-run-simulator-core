@@ -5,9 +5,9 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            prop.w = Nabu.MinMax(prop.w, 1, 2);
+            prop.l = Nabu.MinMax(prop.l, 1, 2);
 
-            let partName = "spiral-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "spiral-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
@@ -16,7 +16,6 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "spiral-" + w.toFixed(0) + "." + h.toFixed(0);
-            template.angleSmoothSteps = 200;
 
             template.w = w;
             template.d = w === 1 ? 2 : 3;
@@ -29,6 +28,9 @@ namespace MarbleRunSimulatorCore {
             template.yExtendable = true;
             template.xMirrorable = true;
             template.zMirrorable = true;
+            
+            template.defaultAngle = Math.PI / 6;
+            template.maxAngle = Math.PI / 3;
 
             template.trackTemplates[0] = new TrackTemplate(template);
             //template.trackTemplates[0].preferedStartBank = - Math.PI / 10 * (template.mirrorX ? - 1 : 1);
@@ -63,7 +65,7 @@ namespace MarbleRunSimulatorCore {
                     }
                     
                     template.trackTemplates[0].trackpoints.push(
-                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x + sina * r, f * (heightEnd - heightStart) + heightStart, - r + cosa * r), dir)
+                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x + sina * r, f * (heightEnd - heightStart) + heightStart, - r + cosa * r - 0.002 * template.w), dir)
                     );
                 }
             }

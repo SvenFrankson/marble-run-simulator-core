@@ -3,9 +3,9 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            prop.w = Math.max(prop.w, 2);
+            prop.l = Math.max(prop.l, 2);
 
-            let partName = "snake-" + prop.w.toFixed(0) + "." + prop.s.toFixed(0);
+            let partName = "snake-" + prop.l.toFixed(0) + "." + prop.s.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
@@ -136,7 +136,7 @@ namespace MarbleRunSimulatorCore {
                 i: i,
                 j: j,
                 k: k,
-                w: w,
+                l: w,
                 h: h,
                 d: d,
                 c: this.colors,

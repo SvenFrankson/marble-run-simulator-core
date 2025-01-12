@@ -4,7 +4,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
             
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb-" + prop.w.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName));
             this.generateWires();
         }

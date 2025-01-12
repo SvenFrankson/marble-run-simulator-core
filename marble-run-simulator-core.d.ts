@@ -150,6 +150,7 @@ declare namespace MarbleRunSimulatorCore {
         whiteMaterial: BABYLON.StandardMaterial;
         paintingLight: BABYLON.StandardMaterial;
         wallShadow: BABYLON.StandardMaterial;
+        slice9Cutoff: BABYLON.StandardMaterial;
         groundMaterial: BABYLON.StandardMaterial;
         whiteGroundMaterial: BABYLON.StandardMaterial;
         handleMaterial: BABYLON.StandardMaterial;
@@ -180,6 +181,7 @@ declare namespace MarbleRunSimulatorCore {
     class Tools {
         static V3Dir(angleInDegrees: number, length?: number): BABYLON.Vector3;
         static IsWorldPosAConnexion(worldPos: BABYLON.Vector3): boolean;
+        static Box9SliceVertexData(min: BABYLON.Vector3, max: BABYLON.Vector3, margin: number): BABYLON.VertexData;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -390,9 +392,9 @@ declare class MachineName {
     static GetRandom(): string;
 }
 declare namespace MarbleRunSimulatorCore {
-    var baseRadius: number;
     var tileSize: number;
     var tileWidth: number;
+    var legacyTileHeight: number;
     var tileHeight: number;
     var legacyTileDepth: number;
     var tileDepth: number;
@@ -596,7 +598,7 @@ declare namespace MarbleRunSimulatorCore {
         j?: number;
         k?: number;
         r?: number;
-        w?: number;
+        l?: number;
         h?: number;
         d?: number;
         n?: number;
@@ -720,6 +722,7 @@ declare namespace MarbleRunSimulatorCore {
         mirrorX: boolean;
         mirrorZ: boolean;
         angleSmoothSteps: number;
+        defaultAngle: number;
         maxAngle: number;
         minTurnRadius: number;
         xExtendable: boolean;
@@ -983,6 +986,12 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(w: number, h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class RampV2 extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static GenerateTemplate(l: number, h: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

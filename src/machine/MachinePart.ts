@@ -1,8 +1,9 @@
 namespace MarbleRunSimulatorCore {
-    export var baseRadius = 0.075;
+    
     export var tileSize = 0.025;
     export var tileWidth = 0.075;
-    export var tileHeight = 0.03;
+    export var legacyTileHeight = 0.03;
+    export var tileHeight = 0.025;
     export var legacyTileDepth = 0.06;
     export var tileDepth = 0.075;
     export var colorSlotsCount = 6;
@@ -927,15 +928,39 @@ namespace MarbleRunSimulatorCore {
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
             }
-            let w = this.w * tileWidth;
-            let h = (this.h + 1) * tileHeight;
-            let d = this.d * tileDepth;
-            let x0 = -tileWidth * 0.5;
-            let y0 = tileHeight * 0.5;
-            let z0 = tileDepth * 0.5;
-            let x1 = x0 + w;
-            let y1 = y0 - h;
-            let z1 = z0 - d;
+
+            let x0 = 0;
+            let y0 = - tileSize * 0.5;
+            let z0 = - tileSize * 0.5;
+            let x1 = tileSize;
+            let y1 = tileSize * 0.5;
+            let z1 = tileSize * 0.5;
+
+            for (let i = 0; i < this.tracks.length; i++) {
+                let track = this.tracks[i];
+                for (let j = 0; j < track.template.trackpoints.length; j++){
+                    let trackpoint = track.template.trackpoints[j];
+
+                    let dx = 0;
+                    let dy = tileSize * 0.5;
+                    let dz = tileSize * 0.5;
+                    if (trackpoint.dir) {
+                        if (Math.abs(trackpoint.dir.z) > Math.abs(trackpoint.dir.x)) {
+                            dx = tileSize * 0.5
+                            dz = 0;
+                        }
+                    }
+                    x0 = Math.min(trackpoint.position.x - dx, x0);
+                    x1 = Math.max(trackpoint.position.x + dx, x1);
+
+                    y0 = Math.min(trackpoint.position.y - dy, y0);
+                    y1 = Math.max(trackpoint.position.y + dy, y1);
+
+                    z0 = Math.min(trackpoint.position.z - dz, z0);
+                    z1 = Math.max(trackpoint.position.z + dz, z1);
+                }
+            }
+
             this.encloseStart.copyFromFloats(x0, y0, z0);
             this.encloseEnd.copyFromFloats(x1, y1, z1);
             this.enclose13
@@ -947,42 +972,20 @@ namespace MarbleRunSimulatorCore {
                 .copyFrom(this.encloseStart)
                 .scaleInPlace(1 / 3)
                 .addInPlace(this.encloseEnd.scale(2 / 3));
-            let color = new BABYLON.Color4(1, 1, 1, 0.2);
-            this.encloseMesh = BABYLON.MeshBuilder.CreateLineSystem(
-                "enclose-mesh",
-                {
-                    lines: [
-                        [new BABYLON.Vector3(x0, y0, z0), new BABYLON.Vector3(x1, y0, z0), new BABYLON.Vector3(x1, y1, z0), new BABYLON.Vector3(x0, y1, z0), new BABYLON.Vector3(x0, y0, z0)],
-                        [new BABYLON.Vector3(x0, y0, z0), new BABYLON.Vector3(x0, y0, z1)],
-                        [new BABYLON.Vector3(x1, y0, z0), new BABYLON.Vector3(x1, y0, z1)],
-                        [new BABYLON.Vector3(x1, y1, z0), new BABYLON.Vector3(x1, y1, z1)],
-                        [new BABYLON.Vector3(x0, y1, z0), new BABYLON.Vector3(x0, y1, z1)],
-                        [new BABYLON.Vector3(x0, y0, z1), new BABYLON.Vector3(x1, y0, z1), new BABYLON.Vector3(x1, y1, z1), new BABYLON.Vector3(x0, y1, z1), new BABYLON.Vector3(x0, y0, z1)],
-                    ],
-                    colors: [
-                        [color, color, color, color, color],
-                        [color, color],
-                        [color, color],
-                        [color, color],
-                        [color, color],
-                        [color, color, color, color, color],
-                    ]
-                },
-                this.getScene()
-            );
+                
+            this.encloseMesh = new BABYLON.Mesh("enclose-mesh");
+            let data = Tools.Box9SliceVertexData(this.encloseStart.add(new BABYLON.Vector3(0.001, 0.001, 0.001)), this.encloseEnd.subtract(new BABYLON.Vector3(0.001, 0.001, 0.001)), 0.002);
+            data.applyToMesh(this.encloseMesh);
+            this.encloseMesh.material = this.game.materials.slice9Cutoff;
             this.encloseMesh.parent = this;
             this.encloseMesh.visibility = 0;
 
-            this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseEnd.y, this.encloseEnd.z);
-            this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseStart.y, this.encloseStart.z);
-            BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMin, this.getWorldMatrix(), this.AABBMin);
-            BABYLON.Vector3.TransformCoordinatesToRef(this.AABBMax, this.getWorldMatrix(), this.AABBMax);
-            let min = BABYLON.Vector3.Minimize(this.AABBMin, this.AABBMax);
-            let max = BABYLON.Vector3.Maximize(this.AABBMin, this.AABBMax);
-            this.AABBMin = min;
-            this.AABBMax = max;
+            this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseStart.y, this.encloseStart.z);
+            this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseEnd.y, this.encloseEnd.z);
+            this.AABBMin.addInPlace(this.absolutePosition);
+            this.AABBMax.addInPlace(this.absolutePosition);
             if (this.tracks[0] && this.tracks[0].template.isWood) {
-                this.AABBMax.y += tileHeight;
+                this.AABBMax.y += tileSize;
             }
         }
 

@@ -163,6 +163,8 @@ namespace MarbleRunSimulatorCore {
             let maxR = 0;
             this.angles = new Array<number>(N);
             this.angles.fill(0);
+            let lastSign = 0;
+            console.log("signing " + this.partTemplate.partName);
             for (let i = 1; i < N - 1; i++) {
                 let n = this.interpolatedNormals[i];
 
@@ -179,6 +181,9 @@ namespace MarbleRunSimulatorCore {
                 let a = Mummu.AngleFromToAround(dirPrev.scale(-1), dirNext, n);
                 if (Math.abs(a) < Math.PI * 0.9999999) {
                     let sign = Math.sign(a);
+                    console.log(sign);
+                    lastSign += sign / 10;
+                    lastSign = Nabu.MinMax(lastSign, -1, 1);
 
                     let rPrev = Math.tan(Math.abs(a) / 2) * (dPrev * 0.5);
                     let rNext = Math.tan(Math.abs(a) / 2) * (dNext * 0.5);
@@ -187,15 +192,38 @@ namespace MarbleRunSimulatorCore {
 
                     let f = this.partTemplate.minTurnRadius / r;
                     f = Math.max(Math.min(f, 1), 0);
-                    this.angles[i] = this.partTemplate.maxAngle * sign * f;
-                } else {
-                    this.angles[i] = 0;
+                    this.angles[i] = Math.max(this.partTemplate.maxAngle * f, this.partTemplate.defaultAngle) * sign;
+
+                    if (Math.abs(lastSign) >= 1) {
+                        if (i > 0 && this.angles[i - 1] === undefined) {
+                            for (let ii = i; ii >= 0; ii--) {
+                                if (this.angles[ii] === undefined) {
+                                    this.angles[ii] = this.partTemplate.defaultAngle * lastSign;
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (Math.abs(lastSign) >= 1) {
+                        this.angles[i] = this.partTemplate.defaultAngle * lastSign;
+                    }
+                    else {
+                        this.angles[i] = undefined;
+                    }
                 }
             }
 
+            this.angles = this.angles.map(a => {
+                if (a === undefined) {
+                    return 0;
+                }
+                return a;
+            })
+
             let tmpAngles = [...this.angles];
             let f = 1;
-            for (let n = 0; n < 10; n++) {
+            for (let n = 0; n < 30; n++) {
                 for (let i = 0; i < N; i++) {
                     let aPrev = tmpAngles[i - 1];
                     let a = tmpAngles[i];
@@ -259,6 +287,7 @@ namespace MarbleRunSimulatorCore {
         public mirrorX: boolean = false;
         public mirrorZ: boolean = false;
         public angleSmoothSteps: number = 30;
+        public defaultAngle: number = 0;
         public maxAngle: number = Math.PI / 4;
         public minTurnRadius: number = 0.06;
 
@@ -372,6 +401,11 @@ namespace MarbleRunSimulatorCore {
                         s = 2;
                     }
                     data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, s, mirrorX, mirrorZ);
+                }
+                else if (partName.startsWith("rampv2_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = RampV2.GenerateTemplate(l, h, false, false);
                 }
                 else if (partName.startsWith("piperamp-")) {
                     let w = parseInt(partName.split("-")[1].split(".")[0]);

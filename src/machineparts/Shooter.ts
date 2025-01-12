@@ -294,13 +294,21 @@ namespace MarbleRunSimulatorCore {
         }
 
         public getBallReady(): Ball {
+            let center = new BABYLON.Vector3(
+                this.kicker.position.x,
+                - tileHeight * (this.h - 2),
+                0
+            );
+            BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
+            Mummu.DrawDebugPoint(center, 2, BABYLON.Color3.Red(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
-                if (Math.abs(ball.position.x - this.kickerCollider.absolutePosition.x) < ball.radius + this.kickerRadius + 0.001) {
-                    if (Math.abs(ball.position.y - (this.absolutePosition.y + this.kickerYIdle)) < tileHeight * 0.5) {
-                        if (Math.abs(ball.position.z - this.kickerCollider.absolutePosition.z) < 0.001) {
-                            return ball;
-                        }
+                if (Math.abs(ball.position.y - center.y) < tileHeight) {
+                    let delta = ball.position.subtract(center);
+                    delta.y = 0;
+                    let distance = delta.length();
+                    if (distance < ball.radius + this.kickerRadius + 0.001) {
+                        return ball;
                     }
                 }
             }
@@ -308,13 +316,17 @@ namespace MarbleRunSimulatorCore {
         }
 
         public getBallArmed(): Ball {
-            let center = new BABYLON.Vector3(0.0301 * (this.mirrorX ? - 1 : 1) / 0.075 * tileWidth, - tileHeight * (this.h - 2) - 0.0004, 0);
-            center.addInPlace(this.absolutePosition);
-            Mummu.DrawDebugPoint(center, 2, BABYLON.Color3.Red(), 0.05);
+            let center = new BABYLON.Vector3(
+                this.kicker.position.x,
+                - tileHeight * (this.h - 2),
+                0
+            );
+            BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
+            Mummu.DrawDebugPoint(center, 200, BABYLON.Color3.Green(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (ball.velocity.length() < 0.02 && Math.abs(ball.velocity.x) < 0.001) {
-                    if (BABYLON.Vector3.DistanceSquared(center, ball.position) < 0.0005 * 0.0005) {
+                    if (BABYLON.Vector3.DistanceSquared(center, ball.position) < 0.005 * 0.005) {
                         return ball;
                     }
                 }

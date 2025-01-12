@@ -24,5 +24,52 @@ namespace MarbleRunSimulatorCore {
 
             return false;
         }
+
+        public static Box9SliceVertexData(min: BABYLON.Vector3, max: BABYLON.Vector3, margin: number): BABYLON.VertexData {
+            let w = Math.abs(min.x - max.x);
+            let h = Math.abs(min.y - max.y);
+            let d = Math.abs(min.z - max.z);
+            let c = min.add(max).scaleInPlace(0.5);
+
+            let top = Mummu.Create9SliceVertexData({
+                width: w,
+                height: d,
+                margin: margin
+            });
+            Mummu.RotateAngleAxisVertexDataInPlace(top, Math.PI * 0.5, BABYLON.Axis.X);
+            let bottom = Mummu.TriFlipVertexDataInPlace(Mummu.CloneVertexData(top));
+
+            Mummu.TranslateVertexDataInPlace(top, new BABYLON.Vector3(c.x, max.y, c.z));
+            Mummu.TranslateVertexDataInPlace(bottom, new BABYLON.Vector3(c.x, min.y, c.z));
+
+            let back = Mummu.Create9SliceVertexData({
+                width: w,
+                height: h,
+                margin: margin
+            });
+            let front = Mummu.TriFlipVertexDataInPlace(Mummu.CloneVertexData(back));
+
+            Mummu.TranslateVertexDataInPlace(front, new BABYLON.Vector3(c.x, c.y, max.z));
+            Mummu.TranslateVertexDataInPlace(back, new BABYLON.Vector3(c.x, c.y, min.z));
+
+            let right = Mummu.Create9SliceVertexData({
+                width: d,
+                height: h,
+                margin: margin
+            });
+            Mummu.RotateAngleAxisVertexDataInPlace(right, - Math.PI * 0.5, BABYLON.Axis.Y);
+            let left = Mummu.TriFlipVertexDataInPlace(Mummu.CloneVertexData(right));
+
+            Mummu.TranslateVertexDataInPlace(right, new BABYLON.Vector3(max.x, c.y, c.z));
+            Mummu.TranslateVertexDataInPlace(left, new BABYLON.Vector3(min.x, c.y, c.z));
+
+            let boxData = Mummu.MergeVertexDatas(right, left, top, bottom, front, back);
+            let boxDataFlipped = Mummu.TriFlipVertexDataInPlace(Mummu.CloneVertexData(boxData));
+            Mummu.ColorizeVertexDataInPlace(boxDataFlipped, new BABYLON.Color3(0.5, 0.5, 0.5));
+
+            boxData = Mummu.MergeVertexDatas(boxData, boxDataFlipped);
+
+            return boxData;
+        }
     }
 }

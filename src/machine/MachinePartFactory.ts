@@ -41,7 +41,7 @@ namespace MarbleRunSimulatorCore {
         j?: number;
         k?: number;
         r?: number;
-        w?: number;
+        l?: number;
         h?: number;
         d?: number;
         n?: number;
@@ -85,7 +85,7 @@ namespace MarbleRunSimulatorCore {
                     let h = parseInt(argStr.split(".")[1]);
                     let d = parseInt(argStr.split(".")[2]);
                     let s = parseInt(argStr.split(".")[3]);
-                    prop.w = w;
+                    prop.l = w;
                     prop.h = h;
                     prop.d = d;
                     if (isFinite(s)) {
@@ -97,13 +97,23 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Ramp(this.machine, prop);
             }
+            if (partName === "rampv2" || partName.startsWith("rampv2_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = w;
+                    prop.h = h;
+                }
+                return new RampV2(this.machine, prop);
+            }
             if (partName === "piperamp" || partName.startsWith("piperamp-")) {
                 let argStr = partName.split("-")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
                     let d = parseInt(argStr.split(".")[2]);
-                    prop.w = w;
+                    prop.l = w;
                     prop.h = h;
                     prop.d = d;
                 }
@@ -116,7 +126,7 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
                     let d = parseInt(argStr.split(".")[2]);
-                    prop.w = w;
+                    prop.l = w;
                     prop.h = h;
                     prop.d = d;
                 }
@@ -129,7 +139,7 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
                     let d = parseInt(argStr.split(".")[2]);
-                    prop.w = w;
+                    prop.l = w;
                     prop.h = h;
                     prop.d = d;
                 }
@@ -140,7 +150,7 @@ namespace MarbleRunSimulatorCore {
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let s = parseInt(argStr.split(".")[1]);
-                    prop.w = w;
+                    prop.l = w;
                     if (isFinite(s)) {
                         prop.s = s;
                     }
@@ -153,7 +163,7 @@ namespace MarbleRunSimulatorCore {
                     let l = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
                     let s = parseInt(argStr.split(".")[2]);
-                    prop.w = l;
+                    prop.l = l;
                     prop.h = h;
                     if (isFinite(s)) {
                         prop.s = s;
@@ -261,7 +271,7 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
                     let n = parseInt(argStr.split(".")[2]);
-                    prop.w = w;
+                    prop.l = w;
                     prop.d = d;
                     prop.n = n;
                 }
@@ -272,7 +282,7 @@ namespace MarbleRunSimulatorCore {
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
-                    prop.w = w;
+                    prop.l = w;
                     prop.h = h;
                 }
                 return new Spiral(this.machine, prop);
@@ -339,7 +349,7 @@ namespace MarbleRunSimulatorCore {
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
-                    prop.w = w;
+                    prop.l = w;
                     prop.h = h;
                 }
                 return new Stairway(this.machine, prop);
@@ -349,7 +359,7 @@ namespace MarbleRunSimulatorCore {
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
-                    prop.w = w;
+                    prop.l = w;
                     prop.h = h;
                 }
                 return new Screw(this.machine, prop);
@@ -375,6 +385,9 @@ namespace MarbleRunSimulatorCore {
             
             if (baseName === "ramp") {
                 return new Ramp(this.machine, prop);
+            }
+            if (baseName === "rampv2") {
+                return new RampV2(this.machine, prop);
             }
             if (baseName === "piperamp") {
                 prop.pipeVersion = true;
