@@ -435,7 +435,9 @@ declare namespace MarbleRunSimulatorCore {
         OriginDestination = 1,
         AxisX = 2,
         AxisY = 3,
-        AxisZ = 4
+        AxisZ = 4,
+        PlaneX = 5,
+        PlaneZ = 6
     }
     class EndpointSelectorMesh extends BABYLON.Mesh {
         endpoint: MachinePartEndpoint;
@@ -456,6 +458,7 @@ declare namespace MarbleRunSimulatorCore {
         get leftSide(): boolean;
         get upperSide(): boolean;
         get farSide(): boolean;
+        get isOrigin(): boolean;
         isIJK(worldIJK: Nabu.IJK): boolean;
         private _absolutePosition;
         get absolutePosition(): BABYLON.Vector3;

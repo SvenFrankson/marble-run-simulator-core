@@ -3394,6 +3394,8 @@ var MarbleRunSimulatorCore;
         EndpointEditionMode[EndpointEditionMode["AxisX"] = 2] = "AxisX";
         EndpointEditionMode[EndpointEditionMode["AxisY"] = 3] = "AxisY";
         EndpointEditionMode[EndpointEditionMode["AxisZ"] = 4] = "AxisZ";
+        EndpointEditionMode[EndpointEditionMode["PlaneX"] = 5] = "PlaneX";
+        EndpointEditionMode[EndpointEditionMode["PlaneZ"] = 6] = "PlaneZ";
     })(EndpointEditionMode = MarbleRunSimulatorCore.EndpointEditionMode || (MarbleRunSimulatorCore.EndpointEditionMode = {}));
     class EndpointSelectorMesh extends BABYLON.Mesh {
         constructor(endpoint) {
@@ -3413,9 +3415,9 @@ var MarbleRunSimulatorCore;
             this.mode = EndpointEditionMode.None;
             this._absolutePosition = BABYLON.Vector3.Zero();
             this._hovered = false;
-            this.i = Math.round((localPosition.x + MarbleRunSimulatorCore.tileWidth * 0.5) / MarbleRunSimulatorCore.tileWidth);
-            this.j = -Math.round((localPosition.y) / MarbleRunSimulatorCore.tileHeight);
-            this.k = -Math.round((localPosition.z) / MarbleRunSimulatorCore.tileDepth);
+            this.i = Math.round((localPosition.x + MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize);
+            this.j = Math.round((localPosition.z) / MarbleRunSimulatorCore.tileSize);
+            this.k = Math.round((localPosition.y) / MarbleRunSimulatorCore.tileHeight);
         }
         get leftSide() {
             return this.localPosition.x < 0;
@@ -3426,12 +3428,14 @@ var MarbleRunSimulatorCore;
         get farSide() {
             return this.localPosition.z > this.machinePart.encloseMid.z;
         }
+        get isOrigin() {
+            return this.i === 0 && this.j === 0 && this.k === 0;
+        }
         isIJK(worldIJK) {
             return (this.i + this.machinePart.i) === worldIJK.i && (this.j + this.machinePart.j) === worldIJK.j && (this.k + this.machinePart.k) === worldIJK.k;
         }
         get absolutePosition() {
-            this._absolutePosition.copyFrom(this.localPosition);
-            this._absolutePosition.addInPlace(this.machinePart.position);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.localPosition, this.machinePart.getWorldMatrix(), this._absolutePosition);
             return this._absolutePosition;
         }
         connectTo(endPoint) {
@@ -4117,7 +4121,12 @@ var MarbleRunSimulatorCore;
             }
             this.selectorBodyLogic.visibility = DEBUG_logicColliderVisibility;
             // Assign EndpointManipulators logic
-            if (this instanceof MarbleRunSimulatorCore.MachinePartWithOriginDestination) {
+            if (this instanceof MarbleRunSimulatorCore.RampV2) {
+                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneZ;
+                });
+            }
+            else if (this instanceof MarbleRunSimulatorCore.MachinePartWithOriginDestination) {
                 this.selectorEndpointsLogic.forEach(selectorEndpoint => {
                     selectorEndpoint.endpoint.mode = EndpointEditionMode.OriginDestination;
                 });
@@ -7963,7 +7972,8 @@ var MarbleRunSimulatorCore;
             template.h = h;
             template.xExtendable = true;
             template.yExtendable = true;
-            console.log(template.w + " " + template.h);
+            template.minH = -32;
+            template.maxH = 32;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);

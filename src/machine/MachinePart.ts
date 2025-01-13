@@ -69,7 +69,9 @@ namespace MarbleRunSimulatorCore {
         OriginDestination,
         AxisX,
         AxisY,
-        AxisZ
+        AxisZ,
+        PlaneX,
+        PlaneZ
     }
 
     export class EndpointSelectorMesh extends BABYLON.Mesh {
@@ -97,9 +99,9 @@ namespace MarbleRunSimulatorCore {
             public localPosition: BABYLON.Vector3,
             public machinePart: MachinePart
         ) {
-            this.i = Math.round((localPosition.x + tileWidth * 0.5) / tileWidth);
-            this.j = - Math.round((localPosition.y) / tileHeight);
-            this.k = - Math.round((localPosition.z) / tileDepth);
+            this.i = Math.round((localPosition.x + tileSize * 0.5) / tileSize);
+            this.j = Math.round((localPosition.z) / tileSize);
+            this.k = Math.round((localPosition.y) / tileHeight);
         }
 
         public get leftSide(): boolean {
@@ -114,14 +116,17 @@ namespace MarbleRunSimulatorCore {
             return this.localPosition.z > this.machinePart.encloseMid.z;
         }
 
+        public get isOrigin(): boolean {
+            return this.i === 0 && this.j === 0 && this.k === 0;
+        }
+
         public isIJK(worldIJK: Nabu.IJK): boolean {
             return (this.i + this.machinePart.i) === worldIJK.i && (this.j + this.machinePart.j) === worldIJK.j && (this.k + this.machinePart.k) === worldIJK.k;
         }
 
         private _absolutePosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public get absolutePosition(): BABYLON.Vector3 {
-            this._absolutePosition.copyFrom(this.localPosition);
-            this._absolutePosition.addInPlace(this.machinePart.position);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.localPosition, this.machinePart.getWorldMatrix(), this._absolutePosition);
             return this._absolutePosition;
         }
 
@@ -885,7 +890,12 @@ namespace MarbleRunSimulatorCore {
             this.selectorBodyLogic.visibility = DEBUG_logicColliderVisibility;
 
             // Assign EndpointManipulators logic
-            if (this instanceof MachinePartWithOriginDestination) {
+            if (this instanceof RampV2) {
+                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneZ;
+                })
+            }
+            else if (this instanceof MachinePartWithOriginDestination) {
                 this.selectorEndpointsLogic.forEach(selectorEndpoint => {
                     selectorEndpoint.endpoint.mode = EndpointEditionMode.OriginDestination;
                 })

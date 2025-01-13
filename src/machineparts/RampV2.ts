@@ -18,8 +18,8 @@ namespace MarbleRunSimulatorCore {
             template.h = h;
             template.xExtendable = true;
             template.yExtendable = true;
-
-            console.log(template.w + " " + template.h);
+            template.minH = -32;
+            template.maxH = 32;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
