@@ -355,48 +355,48 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (!data) {
-                if (partName.startsWith("curb-")) {
-                    let l = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let s = parseInt(partName.split("-")[1].split(".")[2]);
+                if (partName.startsWith("curb_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let s = parseInt(partName.split("_")[1].split(".")[2]);
                     if (isNaN(s)) {
                         s = 2;
                     }
                     data = Curb.GenerateTemplate(l, h, s, false, false);
                 }
-                else if (partName.startsWith("uturn-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
-                    let s = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("uturn_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let s = parseInt(partName.split("_")[1].split(".")[2]);
                     if (isNaN(s)) {
                         s = 2;
                     }
                     data = UTurn.GenerateTemplate(h, d, s, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("pipeuturn-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("pipeuturn_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
                     data = UTurn.GenerateTemplate(h, d, 2, mirrorX, mirrorZ, true);
                 }
-                else if (partName.startsWith("wooduturn-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("wooduturn_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
                     data = UTurn.GenerateTemplate(h, d, 0, mirrorX, mirrorZ, false, true);
                 }
-                else if (partName.startsWith("wall-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("wall_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
                     data = Wall.GenerateTemplate(h, d, mirrorX);
                 }
                 else if (partName.startsWith("uturnsharp")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
                     data = UTurnSharp.GenerateTemplate(h, mirrorX);
                 }
-                else if (partName.startsWith("ramp-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
-                    let s = parseInt(partName.split("-")[1].split(".")[3]);
+                else if (partName.startsWith("ramp_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
+                    let s = parseInt(partName.split("_")[1].split(".")[3]);
                     if (isNaN(s)) {
                         s = 2;
                     }
@@ -407,53 +407,53 @@ namespace MarbleRunSimulatorCore {
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = RampV2.GenerateTemplate(l, h, false, false);
                 }
-                else if (partName.startsWith("piperamp-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("piperamp_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
                     data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, mirrorX, mirrorZ, true);
                 }
-                else if (partName.startsWith("woodramp-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("woodramp_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
                     data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, mirrorX, mirrorZ, false, true);
                 }
-                else if (partName.startsWith("wave-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("wave_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
                     data = Wave.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("snake-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let s = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("snake_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let s = parseInt(partName.split("_")[1].split(".")[1]);
                     if (isNaN(s)) {
                         s = 2;
                     }
                     data = Snake.GenerateTemplate(w, s, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("elevator-")) {
-                    let h = parseInt(partName.split("-")[1]);
+                else if (partName.startsWith("elevator_")) {
+                    let h = parseInt(partName.split("_")[1]);
                     data = Elevator.GenerateTemplate(h, mirrorX);
                 }
-                else if (partName.startsWith("steamelevator-")) {
-                    let h = parseInt(partName.split("-")[1]);
+                else if (partName.startsWith("steamelevator_")) {
+                    let h = parseInt(partName.split("_")[1]);
                     data = SteamElevator.GenerateTemplate(h, mirrorX);
                 }
-                else if (partName.startsWith("shooter-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let n = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("shooter_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let n = parseInt(partName.split("_")[1].split(".")[1]);
                     data = Shooter.GenerateTemplate(h, n, mirrorX);
                 }
-                else if (partName.startsWith("stairway-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("stairway_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = Stairway.GenerateTemplate(w, h, mirrorX);
                 }
-                else if (partName.startsWith("screw-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("screw_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = Screw.GenerateTemplate(w, h, mirrorX);
                 }
                 else if (partName === "split") {
@@ -477,20 +477,20 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "join") {
                     data = Join.GenerateTemplate(mirrorX);
                 }
-                else if (partName.startsWith("loop-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
-                    let n = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("loop_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let n = parseInt(partName.split("_")[1].split(".")[2]);
                     data = Loop.GenerateTemplate(w, d, n, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("spiral-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("spiral_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = Spiral.GenerateTemplate(w, h, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("spiralUTurn-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("spiralUTurn_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = SpiralUTurn.GenerateTemplate(w, h, mirrorX, mirrorZ);
                 }
                 else if (partName === "quarter") {
@@ -505,8 +505,8 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "end") {
                     data = End.GenerateTemplate(mirrorX);
                 }
-                else if (partName.startsWith("jumper-")) {
-                    let n = parseInt(partName.split("-")[1].split(".")[0]);
+                else if (partName.startsWith("jumper_")) {
+                    let n = parseInt(partName.split("_")[1].split(".")[0]);
                     data = Jumper.GenerateTemplate(n, mirrorX);
                 }
                 else if (partName === "gravitywell") {

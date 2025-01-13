@@ -1,38 +1,38 @@
 namespace MarbleRunSimulatorCore {
     export var TrackNames = [
-        "ramp-1.1.1",
-        "wave-2.1.1",
-        "snake-2.1.1",
+        "ramp_1.1.1",
+        "wave_2.1.1",
+        "snake_2.1.1",
         "join",
         "flatjoin",
         "split",
-        "uturn-0.2",
-        "wall-3.3",
-        "uturnsharp-1",
-        "loop-2.2.1",
-        "spiral-1.2",
-        "elevator-4",
-        "stairway-2.4",
-        "screw-2.2",
+        "uturn_0.2",
+        "wall_3.3",
+        "uturnsharp_1",
+        "loop_2.2.1",
+        "spiral_1.2",
+        "elevator_4",
+        "stairway_2.4",
+        "screw_2.2",
         "start",
         "end",
-        "jumper-1",
+        "jumper_1",
         "gravitywell",
-        "shooter-8",
+        "shooter_8",
         "controler",
         "screen",
         "speeder",
         "forwardSplit",
-        "spiralUTurn-3.2",
-        "piperamp-1.1.1",
-        "pipeuturn-0.2",
-        "steamelevator-4",
+        "spiralUTurn_3.2",
+        "piperamp_1.1.1",
+        "pipeuturn_0.2",
+        "steamelevator_4",
         "sort",
         "spawner",
-        "woodramp-1.1.1",
-        "wooduturn-0.2",
-        "uturnv2-0.2",
-        "curb-2.0"
+        "woodramp_1.1.1",
+        "wooduturn_0.2",
+        "uturnv2_0.2",
+        "curb_2.0"
     ];
 
     export interface IMachinePartProp {
@@ -62,7 +62,7 @@ namespace MarbleRunSimulatorCore {
             }
             props.fullPartName = trackname; // hacky but work
 
-            trackname = trackname.split("-")[0];
+            trackname = trackname.split("_")[0];
 
             console.log("createTrackWHDN " + trackname)
             return this.createTrack(trackname, props);
@@ -78,8 +78,8 @@ namespace MarbleRunSimulatorCore {
                 partName = partName.replace("_Z", "");
             }
 
-            if (partName === "ramp" || partName.startsWith("ramp-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "ramp" || partName.startsWith("ramp_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -107,8 +107,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new RampV2(this.machine, prop);
             }
-            if (partName === "piperamp" || partName.startsWith("piperamp-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "piperamp" || partName.startsWith("piperamp_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -120,8 +120,8 @@ namespace MarbleRunSimulatorCore {
                 prop.pipeVersion = true;
                 return new Ramp(this.machine, prop);
             }
-            if (partName === "woodramp" || partName.startsWith("woodramp-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "woodramp" || partName.startsWith("woodramp_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -133,8 +133,8 @@ namespace MarbleRunSimulatorCore {
                 prop.woodVersion = true;
                 return new Ramp(this.machine, prop);
             }
-            if (partName === "wave" || partName.startsWith("wave-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "wave" || partName.startsWith("wave_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -145,8 +145,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Wave(this.machine, prop);
             }
-            if (partName === "snake" || partName.startsWith("snake-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "snake" || partName.startsWith("snake_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let s = parseInt(argStr.split(".")[1]);
@@ -157,8 +157,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Snake(this.machine, prop);
             }
-            if (partName === "curb" || partName.startsWith("curb-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "curb" || partName.startsWith("curb_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let l = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -174,8 +174,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Curb(this.machine, prop);
             }
-            if (partName === "uturn" || partName.startsWith("uturn-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "uturn" || partName.startsWith("uturn_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -191,8 +191,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new UTurn(this.machine, prop);
             }
-            if (partName === "uturnv2" || partName.startsWith("uturnv2-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "uturnv2" || partName.startsWith("uturnv2_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -208,8 +208,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new UTurnV2(this.machine, prop);
             }
-            if (partName === "pipeuturn" || partName.startsWith("pipeuturn-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "pipeuturn" || partName.startsWith("pipeuturn_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -219,8 +219,8 @@ namespace MarbleRunSimulatorCore {
                 prop.pipeVersion = true;
                 return new UTurn(this.machine, prop);
             }
-            if (partName === "wooduturn" || partName.startsWith("wooduturn-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "wooduturn" || partName.startsWith("wooduturn_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -230,8 +230,8 @@ namespace MarbleRunSimulatorCore {
                 prop.woodVersion = true;
                 return new UTurn(this.machine, prop);
             }
-            if (partName === "wall" || partName.startsWith("wall-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "wall" || partName.startsWith("wall_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -240,8 +240,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Wall(this.machine, prop);
             }
-            if (partName === "uturnsharp" || partName.startsWith("uturnsharp-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "uturnsharp" || partName.startsWith("uturnsharp_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     prop.h = h;
@@ -254,8 +254,8 @@ namespace MarbleRunSimulatorCore {
             if (partName === "end") {
                 return new End(this.machine, prop);
             }
-            if (partName === "jumper" || partName.startsWith("jumper-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "jumper" || partName.startsWith("jumper_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let n = parseInt(argStr.split(".")[0]);
                     prop.n = n;
@@ -265,8 +265,8 @@ namespace MarbleRunSimulatorCore {
             if (partName === "gravitywell") {
                 return new GravityWell(this.machine, prop);
             }
-            if (partName === "loop" || partName.startsWith("loop-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "loop" || partName.startsWith("loop_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -277,8 +277,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Loop(this.machine, prop);
             }
-            if (partName === "spiral" || partName.startsWith("spiral-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "spiral" || partName.startsWith("spiral_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -287,8 +287,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Spiral(this.machine, prop);
             }
-            if (partName === "spiralUTurn" || partName.startsWith("spiralUTurn-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "spiralUTurn" || partName.startsWith("spiralUTurn_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -318,24 +318,24 @@ namespace MarbleRunSimulatorCore {
             if (partName === "spawner") {
                 return new Spawner(this.machine, prop);
             }
-            if (partName === "elevator" || partName.startsWith("elevator-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "elevator" || partName.startsWith("elevator_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr);
                     prop.h = h;
                 }
                 return new Elevator(this.machine, prop);
             }
-            if (partName === "steamelevator" || partName.startsWith("steamelevator-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "steamelevator" || partName.startsWith("steamelevator_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr);
                     prop.h = h;
                 }
                 return new SteamElevator(this.machine, prop);
             }
-            if (partName === "shooter" || partName.startsWith("shooter-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "shooter" || partName.startsWith("shooter_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let n = parseInt(argStr.split(".")[1]);
@@ -344,8 +344,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Shooter(this.machine, prop);
             }
-            if (partName === "stairway" || partName.startsWith("stairway-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "stairway" || partName.startsWith("stairway_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -354,8 +354,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Stairway(this.machine, prop);
             }
-            if (partName === "screw" || partName.startsWith("screw-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "screw" || partName.startsWith("screw_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);

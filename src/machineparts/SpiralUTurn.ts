@@ -7,7 +7,7 @@ namespace MarbleRunSimulatorCore {
 
             prop.d = Nabu.MinMax(prop.d, 2, 3);
 
-            let partName = "spiralUTurn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = "spiralUTurn_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
@@ -21,7 +21,7 @@ namespace MarbleRunSimulatorCore {
                 return d;
             }
 
-            template.partName = "spiralUTurn-" + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = "spiralUTurn_" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 200;
 
             template.w = template.getWidthForDepth(d);

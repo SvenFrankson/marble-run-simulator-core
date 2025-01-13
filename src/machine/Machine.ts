@@ -911,7 +911,7 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -984,7 +984,7 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -1056,7 +1056,7 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -1141,7 +1141,7 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -1231,7 +1231,7 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -1425,7 +1425,7 @@ namespace MarbleRunSimulatorCore {
                     }
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = TrackNames[index].split("-")[0];
+                    let baseName = TrackNames[index].split("_")[0];
                     //console.log("basename " + baseName);
 
                     let pI = (parseInt(dataString.substring(pt, pt += 2), 36) - partOffset) * 2;
@@ -1512,7 +1512,7 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < partCount; i++) {
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = TrackNames[index].split("-")[0];
+                    let baseName = TrackNames[index].split("_")[0];
 
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -1658,7 +1658,7 @@ namespace MarbleRunSimulatorCore {
                     }
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = TrackNames[index].split("-")[0];
+                    let baseName = TrackNames[index].split("_")[0];
 
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -1791,7 +1791,7 @@ namespace MarbleRunSimulatorCore {
                 for (let i = 0; i < partCount; i++) {
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     if (index >= 0 && index < TrackNames.length) {
-                        let baseName = TrackNames[index].split("-")[0];
+                        let baseName = TrackNames[index].split("_")[0];
 
                         let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -1941,7 +1941,7 @@ namespace MarbleRunSimulatorCore {
                 for (let i = 0; i < partCount; i++) {
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     if (index >= 0 && index < TrackNames.length) {
-                        let baseName = TrackNames[index].split("-")[0];
+                        let baseName = TrackNames[index].split("_")[0];
 
                         let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;

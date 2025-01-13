@@ -33,7 +33,7 @@ namespace MarbleRunSimulatorCore {
             if (QuarterNote.index >= QuarterNote.NoteNames.length) {
                 QuarterNote.index = 0;
             }
-            let note = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
+            let note = new BABYLON.Sound("note_" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note);
 
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
@@ -117,7 +117,7 @@ namespace MarbleRunSimulatorCore {
             if (QuarterNote.index >= QuarterNote.NoteNames.length) {
                 QuarterNote.index = 0;
             }
-            let note = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
+            let note = new BABYLON.Sound("note_" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note);
 
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
@@ -141,7 +141,7 @@ namespace MarbleRunSimulatorCore {
             if (QuarterNote.index >= QuarterNote.NoteNames.length) {
                 QuarterNote.index = 0;
             }
-            let note2 = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
+            let note2 = new BABYLON.Sound("note_" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note2);
 
             let tile2 = BABYLON.MeshBuilder.CreateBox("tile2", { width: 0.015, height: 0.005, depth: 0.06 });

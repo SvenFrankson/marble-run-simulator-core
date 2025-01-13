@@ -59,7 +59,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "stairway-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "stairway_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             for (let i = this.colors.length; i < 4; i++) {
@@ -87,9 +87,9 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.boxesCount; i++) {
                 let data = Stairway.MakeStairwayColliderVertexData(this.stepW, this.stepH * 2, 0.02, this.dH, 0.001);
 
-                let box = new BABYLON.Mesh("collider-" + i);
+                let box = new BABYLON.Mesh("collider_" + i);
                 this.boxesColliders[i] = box;
-                this.boxesDisplayedMesh[i] = new BABYLON.Mesh("display-box-" + i);
+                this.boxesDisplayedMesh[i] = new BABYLON.Mesh("display-box_" + i);
                 box.isVisible = false;
                 data.applyToMesh(box);
                 if (this.mirrorX) {
@@ -250,7 +250,7 @@ namespace MarbleRunSimulatorCore {
             if (isNaN(h)) {
                 debugger;
             }
-            template.partName = "stairway-" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "stairway_" + w.toFixed(0) + "." + h.toFixed(0);
 
             template.h = h;
             template.w = w;

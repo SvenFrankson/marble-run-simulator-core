@@ -5,7 +5,7 @@ namespace MarbleRunSimulatorCore {
 
             prop.l = Math.max(prop.l, 2);
 
-            let partName = "snake-" + prop.l.toFixed(0) + "." + prop.s.toFixed(0);
+            let partName = "snake_" + prop.l.toFixed(0) + "." + prop.s.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
@@ -13,7 +13,7 @@ namespace MarbleRunSimulatorCore {
         public static GenerateTemplate(w: number, s: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "snake-" + w.toFixed(0) + "." + s.toFixed(0);
+            template.partName = "snake_" + w.toFixed(0) + "." + s.toFixed(0);
             template.angleSmoothSteps = 40;
             template.maxAngle = Math.PI / 8;
 

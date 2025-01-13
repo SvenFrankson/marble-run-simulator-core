@@ -19,7 +19,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "screw-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "screw_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             let x = 1;
@@ -162,7 +162,7 @@ namespace MarbleRunSimulatorCore {
             if (isNaN(h)) {
                 debugger;
             }
-            template.partName = "screw-" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "screw_" + w.toFixed(0) + "." + h.toFixed(0);
 
             template.h = h;
             template.w = w;

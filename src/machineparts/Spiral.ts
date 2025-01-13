@@ -7,7 +7,7 @@ namespace MarbleRunSimulatorCore {
 
             prop.l = Nabu.MinMax(prop.l, 1, 2);
 
-            let partName = "spiral-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "spiral_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
@@ -15,7 +15,7 @@ namespace MarbleRunSimulatorCore {
         public static GenerateTemplate(w: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "spiral-" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "spiral_" + w.toFixed(0) + "." + h.toFixed(0);
 
             template.w = w;
             template.d = w === 1 ? 2 : 3;

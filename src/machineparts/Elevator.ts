@@ -11,7 +11,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "elevator-" + prop.h.toFixed(0);
+            let partName = "elevator_" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             for (let i = this.colors.length; i < 4; i++) {
@@ -133,7 +133,7 @@ namespace MarbleRunSimulatorCore {
         public static GenerateTemplate(h: number, mirrorX: boolean) {
             let template = new MachinePartTemplate();
 
-            template.partName = "elevator-" + h.toFixed(0);
+            template.partName = "elevator_" + h.toFixed(0);
             template.w = 2;
             template.h = h;
             template.mirrorX = mirrorX;

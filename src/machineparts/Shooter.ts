@@ -56,7 +56,7 @@ namespace MarbleRunSimulatorCore {
                 prop.n = 0;
             }
 
-            let partName = "shooter-" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
+            let partName = "shooter_" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             for (let i = this.colors.length; i < 5; i++) {
@@ -186,7 +186,7 @@ namespace MarbleRunSimulatorCore {
         public static GenerateTemplate(h: number, n: number, mirrorX: boolean) {
             let template = new MachinePartTemplate();
 
-            template.partName = "shooter-" + h.toFixed(0) + "." + n.toFixed(0);
+            template.partName = "shooter_" + h.toFixed(0) + "." + n.toFixed(0);
             template.w = 1;
             template.h = h;
             template.n = n;

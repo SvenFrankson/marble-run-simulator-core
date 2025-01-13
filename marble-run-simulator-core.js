@@ -2262,7 +2262,7 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -2326,7 +2326,7 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -2389,7 +2389,7 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -2464,7 +2464,7 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -2543,7 +2543,7 @@ var MarbleRunSimulatorCore;
             for (let i = 0; i < this.parts.length; i++) {
                 let partDataString = "";
                 let part = this.parts[i];
-                let baseName = part.partName.split("-")[0];
+                let baseName = part.partName.split("_")[0];
                 let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
                     return name.startsWith(baseName);
                 });
@@ -2717,7 +2717,7 @@ var MarbleRunSimulatorCore;
                     }
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
+                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
                     //console.log("basename " + baseName);
                     let pI = (parseInt(dataString.substring(pt, pt += 2), 36) - partOffset) * 2;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -2790,7 +2790,7 @@ var MarbleRunSimulatorCore;
                 let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
                 for (let i = 0; i < partCount; i++) {
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
+                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -2920,7 +2920,7 @@ var MarbleRunSimulatorCore;
                     }
                     */
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
+                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
                     let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                     let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -3031,7 +3031,7 @@ var MarbleRunSimulatorCore;
                 for (let i = 0; i < partCount; i++) {
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     if (index >= 0 && index < MarbleRunSimulatorCore.TrackNames.length) {
-                        let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
+                        let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
                         let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -3158,7 +3158,7 @@ var MarbleRunSimulatorCore;
                 for (let i = 0; i < partCount; i++) {
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
                     if (index >= 0 && index < MarbleRunSimulatorCore.TrackNames.length) {
-                        let baseName = MarbleRunSimulatorCore.TrackNames[index].split("-")[0];
+                        let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
                         let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
@@ -4320,39 +4320,39 @@ var MarbleRunSimulatorCore;
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     MarbleRunSimulatorCore.TrackNames = [
-        "ramp-1.1.1",
-        "wave-2.1.1",
-        "snake-2.1.1",
+        "ramp_1.1.1",
+        "wave_2.1.1",
+        "snake_2.1.1",
         "join",
         "flatjoin",
         "split",
-        "uturn-0.2",
-        "wall-3.3",
-        "uturnsharp-1",
-        "loop-2.2.1",
-        "spiral-1.2",
-        "elevator-4",
-        "stairway-2.4",
-        "screw-2.2",
+        "uturn_0.2",
+        "wall_3.3",
+        "uturnsharp_1",
+        "loop_2.2.1",
+        "spiral_1.2",
+        "elevator_4",
+        "stairway_2.4",
+        "screw_2.2",
         "start",
         "end",
-        "jumper-1",
+        "jumper_1",
         "gravitywell",
-        "shooter-8",
+        "shooter_8",
         "controler",
         "screen",
         "speeder",
         "forwardSplit",
-        "spiralUTurn-3.2",
-        "piperamp-1.1.1",
-        "pipeuturn-0.2",
-        "steamelevator-4",
+        "spiralUTurn_3.2",
+        "piperamp_1.1.1",
+        "pipeuturn_0.2",
+        "steamelevator_4",
         "sort",
         "spawner",
-        "woodramp-1.1.1",
-        "wooduturn-0.2",
-        "uturnv2-0.2",
-        "curb-2.0"
+        "woodramp_1.1.1",
+        "wooduturn_0.2",
+        "uturnv2_0.2",
+        "curb_2.0"
     ];
     class MachinePartFactory {
         constructor(machine) {
@@ -4363,7 +4363,7 @@ var MarbleRunSimulatorCore;
                 props = {};
             }
             props.fullPartName = trackname; // hacky but work
-            trackname = trackname.split("-")[0];
+            trackname = trackname.split("_")[0];
             console.log("createTrackWHDN " + trackname);
             return this.createTrack(trackname, props);
         }
@@ -4376,8 +4376,8 @@ var MarbleRunSimulatorCore;
                 prop.mirrorZ = true;
                 partName = partName.replace("_Z", "");
             }
-            if (partName === "ramp" || partName.startsWith("ramp-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "ramp" || partName.startsWith("ramp_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -4405,8 +4405,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.RampV2(this.machine, prop);
             }
-            if (partName === "piperamp" || partName.startsWith("piperamp-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "piperamp" || partName.startsWith("piperamp_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -4418,8 +4418,8 @@ var MarbleRunSimulatorCore;
                 prop.pipeVersion = true;
                 return new MarbleRunSimulatorCore.Ramp(this.machine, prop);
             }
-            if (partName === "woodramp" || partName.startsWith("woodramp-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "woodramp" || partName.startsWith("woodramp_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -4431,8 +4431,8 @@ var MarbleRunSimulatorCore;
                 prop.woodVersion = true;
                 return new MarbleRunSimulatorCore.Ramp(this.machine, prop);
             }
-            if (partName === "wave" || partName.startsWith("wave-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "wave" || partName.startsWith("wave_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -4443,8 +4443,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Wave(this.machine, prop);
             }
-            if (partName === "snake" || partName.startsWith("snake-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "snake" || partName.startsWith("snake_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let s = parseInt(argStr.split(".")[1]);
@@ -4455,8 +4455,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Snake(this.machine, prop);
             }
-            if (partName === "curb" || partName.startsWith("curb-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "curb" || partName.startsWith("curb_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let l = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -4472,8 +4472,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Curb(this.machine, prop);
             }
-            if (partName === "uturn" || partName.startsWith("uturn-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "uturn" || partName.startsWith("uturn_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -4489,8 +4489,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
             }
-            if (partName === "uturnv2" || partName.startsWith("uturnv2-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "uturnv2" || partName.startsWith("uturnv2_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -4506,8 +4506,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.UTurnV2(this.machine, prop);
             }
-            if (partName === "pipeuturn" || partName.startsWith("pipeuturn-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "pipeuturn" || partName.startsWith("pipeuturn_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -4517,8 +4517,8 @@ var MarbleRunSimulatorCore;
                 prop.pipeVersion = true;
                 return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
             }
-            if (partName === "wooduturn" || partName.startsWith("wooduturn-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "wooduturn" || partName.startsWith("wooduturn_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -4528,8 +4528,8 @@ var MarbleRunSimulatorCore;
                 prop.woodVersion = true;
                 return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
             }
-            if (partName === "wall" || partName.startsWith("wall-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "wall" || partName.startsWith("wall_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -4538,8 +4538,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Wall(this.machine, prop);
             }
-            if (partName === "uturnsharp" || partName.startsWith("uturnsharp-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "uturnsharp" || partName.startsWith("uturnsharp_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     prop.h = h;
@@ -4552,8 +4552,8 @@ var MarbleRunSimulatorCore;
             if (partName === "end") {
                 return new MarbleRunSimulatorCore.End(this.machine, prop);
             }
-            if (partName === "jumper" || partName.startsWith("jumper-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "jumper" || partName.startsWith("jumper_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let n = parseInt(argStr.split(".")[0]);
                     prop.n = n;
@@ -4563,8 +4563,8 @@ var MarbleRunSimulatorCore;
             if (partName === "gravitywell") {
                 return new MarbleRunSimulatorCore.GravityWell(this.machine, prop);
             }
-            if (partName === "loop" || partName.startsWith("loop-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "loop" || partName.startsWith("loop_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -4575,8 +4575,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Loop(this.machine, prop);
             }
-            if (partName === "spiral" || partName.startsWith("spiral-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "spiral" || partName.startsWith("spiral_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -4585,8 +4585,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Spiral(this.machine, prop);
             }
-            if (partName === "spiralUTurn" || partName.startsWith("spiralUTurn-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "spiralUTurn" || partName.startsWith("spiralUTurn_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let d = parseInt(argStr.split(".")[1]);
@@ -4616,24 +4616,24 @@ var MarbleRunSimulatorCore;
             if (partName === "spawner") {
                 return new MarbleRunSimulatorCore.Spawner(this.machine, prop);
             }
-            if (partName === "elevator" || partName.startsWith("elevator-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "elevator" || partName.startsWith("elevator_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr);
                     prop.h = h;
                 }
                 return new MarbleRunSimulatorCore.Elevator(this.machine, prop);
             }
-            if (partName === "steamelevator" || partName.startsWith("steamelevator-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "steamelevator" || partName.startsWith("steamelevator_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr);
                     prop.h = h;
                 }
                 return new MarbleRunSimulatorCore.SteamElevator(this.machine, prop);
             }
-            if (partName === "shooter" || partName.startsWith("shooter-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "shooter" || partName.startsWith("shooter_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
                     let n = parseInt(argStr.split(".")[1]);
@@ -4642,8 +4642,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Shooter(this.machine, prop);
             }
-            if (partName === "stairway" || partName.startsWith("stairway-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "stairway" || partName.startsWith("stairway_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -4652,8 +4652,8 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Stairway(this.machine, prop);
             }
-            if (partName === "screw" || partName.startsWith("screw-")) {
-                let argStr = partName.split("-")[1];
+            if (partName === "screw" || partName.startsWith("screw_")) {
+                let argStr = partName.split("_")[1];
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
@@ -5715,48 +5715,48 @@ var MarbleRunSimulatorCore;
                 this._dictionary.set(partName, datas);
             }
             if (!data) {
-                if (partName.startsWith("curb-")) {
-                    let l = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let s = parseInt(partName.split("-")[1].split(".")[2]);
+                if (partName.startsWith("curb_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let s = parseInt(partName.split("_")[1].split(".")[2]);
                     if (isNaN(s)) {
                         s = 2;
                     }
                     data = MarbleRunSimulatorCore.Curb.GenerateTemplate(l, h, s, false, false);
                 }
-                else if (partName.startsWith("uturn-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
-                    let s = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("uturn_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let s = parseInt(partName.split("_")[1].split(".")[2]);
                     if (isNaN(s)) {
                         s = 2;
                     }
                     data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, s, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("pipeuturn-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("pipeuturn_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, 2, mirrorX, mirrorZ, true);
                 }
-                else if (partName.startsWith("wooduturn-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("wooduturn_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, 0, mirrorX, mirrorZ, false, true);
                 }
-                else if (partName.startsWith("wall-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("wall_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.Wall.GenerateTemplate(h, d, mirrorX);
                 }
                 else if (partName.startsWith("uturnsharp")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
                     data = MarbleRunSimulatorCore.UTurnSharp.GenerateTemplate(h, mirrorX);
                 }
-                else if (partName.startsWith("ramp-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
-                    let s = parseInt(partName.split("-")[1].split(".")[3]);
+                else if (partName.startsWith("ramp_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
+                    let s = parseInt(partName.split("_")[1].split(".")[3]);
                     if (isNaN(s)) {
                         s = 2;
                     }
@@ -5767,53 +5767,53 @@ var MarbleRunSimulatorCore;
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.RampV2.GenerateTemplate(l, h, false, false);
                 }
-                else if (partName.startsWith("piperamp-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("piperamp_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
                     data = MarbleRunSimulatorCore.Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, mirrorX, mirrorZ, true);
                 }
-                else if (partName.startsWith("woodramp-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("woodramp_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
                     data = MarbleRunSimulatorCore.Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, mirrorX, mirrorZ, false, true);
                 }
-                else if (partName.startsWith("wave-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
-                    let d = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("wave_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
                     data = MarbleRunSimulatorCore.Wave.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("snake-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let s = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("snake_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let s = parseInt(partName.split("_")[1].split(".")[1]);
                     if (isNaN(s)) {
                         s = 2;
                     }
                     data = MarbleRunSimulatorCore.Snake.GenerateTemplate(w, s, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("elevator-")) {
-                    let h = parseInt(partName.split("-")[1]);
+                else if (partName.startsWith("elevator_")) {
+                    let h = parseInt(partName.split("_")[1]);
                     data = MarbleRunSimulatorCore.Elevator.GenerateTemplate(h, mirrorX);
                 }
-                else if (partName.startsWith("steamelevator-")) {
-                    let h = parseInt(partName.split("-")[1]);
+                else if (partName.startsWith("steamelevator_")) {
+                    let h = parseInt(partName.split("_")[1]);
                     data = MarbleRunSimulatorCore.SteamElevator.GenerateTemplate(h, mirrorX);
                 }
-                else if (partName.startsWith("shooter-")) {
-                    let h = parseInt(partName.split("-")[1].split(".")[0]);
-                    let n = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("shooter_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let n = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.Shooter.GenerateTemplate(h, n, mirrorX);
                 }
-                else if (partName.startsWith("stairway-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("stairway_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.Stairway.GenerateTemplate(w, h, mirrorX);
                 }
-                else if (partName.startsWith("screw-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("screw_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.Screw.GenerateTemplate(w, h, mirrorX);
                 }
                 else if (partName === "split") {
@@ -5837,20 +5837,20 @@ var MarbleRunSimulatorCore;
                 else if (partName === "join") {
                     data = MarbleRunSimulatorCore.Join.GenerateTemplate(mirrorX);
                 }
-                else if (partName.startsWith("loop-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let d = parseInt(partName.split("-")[1].split(".")[1]);
-                    let n = parseInt(partName.split("-")[1].split(".")[2]);
+                else if (partName.startsWith("loop_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let n = parseInt(partName.split("_")[1].split(".")[2]);
                     data = MarbleRunSimulatorCore.Loop.GenerateTemplate(w, d, n, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("spiral-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("spiral_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.Spiral.GenerateTemplate(w, h, mirrorX, mirrorZ);
                 }
-                else if (partName.startsWith("spiralUTurn-")) {
-                    let w = parseInt(partName.split("-")[1].split(".")[0]);
-                    let h = parseInt(partName.split("-")[1].split(".")[1]);
+                else if (partName.startsWith("spiralUTurn_")) {
+                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.SpiralUTurn.GenerateTemplate(w, h, mirrorX, mirrorZ);
                 }
                 else if (partName === "quarter") {
@@ -5865,8 +5865,8 @@ var MarbleRunSimulatorCore;
                 else if (partName === "end") {
                     data = MarbleRunSimulatorCore.End.GenerateTemplate(mirrorX);
                 }
-                else if (partName.startsWith("jumper-")) {
-                    let n = parseInt(partName.split("-")[1].split(".")[0]);
+                else if (partName.startsWith("jumper_")) {
+                    let n = parseInt(partName.split("_")[1].split(".")[0]);
                     data = MarbleRunSimulatorCore.Jumper.GenerateTemplate(n, mirrorX);
                 }
                 else if (partName === "gravitywell") {
@@ -6828,13 +6828,13 @@ var MarbleRunSimulatorCore;
     class Curb extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName));
             this.generateWires();
         }
         static GenerateTemplate(l, h, s, pipeVersion, woodVersion) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb-" + l.toFixed(0) + "." + h.toFixed(0) + "." + s.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb_" + l.toFixed(0) + "." + h.toFixed(0) + "." + s.toFixed(0);
             template.w = l;
             template.h = h;
             let dir = new BABYLON.Vector3(1, 0, 0);
@@ -6883,7 +6883,7 @@ var MarbleRunSimulatorCore;
             this.p = 0;
             this.chainLength = 0;
             this.speed = 0.04; // in m/s
-            let partName = "elevator-" + prop.h.toFixed(0);
+            let partName = "elevator_" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             for (let i = this.colors.length; i < 4; i++) {
                 this.colors[i] = 0;
@@ -6987,7 +6987,7 @@ var MarbleRunSimulatorCore;
         }
         static GenerateTemplate(h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "elevator-" + h.toFixed(0);
+            template.partName = "elevator_" + h.toFixed(0);
             template.w = 2;
             template.h = h;
             template.mirrorX = mirrorX;
@@ -7594,13 +7594,13 @@ var MarbleRunSimulatorCore;
     class Jumper extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "jumper-" + prop.n.toFixed(0);
+            let partName = "jumper_" + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             this.generateWires();
         }
         static GenerateTemplate(n, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "jumper-" + n.toFixed(0);
+            template.partName = "jumper_" + n.toFixed(0);
             template.w = 2;
             template.h = 2;
             template.n = n;
@@ -7646,13 +7646,13 @@ var MarbleRunSimulatorCore;
                 prop.n = 1;
             }
             prop.n = Math.min(prop.n, 2 * prop.d);
-            let partName = "loop-" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
+            let partName = "loop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
         static GenerateTemplate(w, d, n, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "loop-" + w.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
+            template.partName = "loop_" + w.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
             template.angleSmoothSteps = 20;
             template.w = w;
             template.h = 4;
@@ -7804,7 +7804,7 @@ var MarbleRunSimulatorCore;
     class Ramp extends MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "ramp-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "ramp_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             if (!prop.pipeVersion && !prop.woodVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
@@ -7813,7 +7813,7 @@ var MarbleRunSimulatorCore;
         }
         static GenerateTemplate(w, h, d, s, mirrorX, mirrorZ, pipeVersion, woodVersion) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "ramp-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "ramp_" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
             if (!pipeVersion && !woodVersion) {
                 template.partName += "." + s.toFixed(0);
             }
@@ -8362,7 +8362,7 @@ var MarbleRunSimulatorCore;
             this.p = 0;
             this.speed = 2 * Math.PI; // in m/s
             this.a = 0;
-            let partName = "screw-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "screw_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             let x = 1;
             if (prop.mirrorX) {
@@ -8477,7 +8477,7 @@ var MarbleRunSimulatorCore;
             if (isNaN(h)) {
                 debugger;
             }
-            template.partName = "screw-" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "screw_" + w.toFixed(0) + "." + h.toFixed(0);
             template.h = h;
             template.w = w;
             template.mirrorX = mirrorX;
@@ -8630,7 +8630,7 @@ var MarbleRunSimulatorCore;
             if (isNaN(prop.n)) {
                 prop.n = 0;
             }
-            let partName = "shooter-" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
+            let partName = "shooter_" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             for (let i = this.colors.length; i < 5; i++) {
                 this.colors[i] = 0;
@@ -8719,7 +8719,7 @@ var MarbleRunSimulatorCore;
         }
         static GenerateTemplate(h, n, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "shooter-" + h.toFixed(0) + "." + n.toFixed(0);
+            template.partName = "shooter_" + h.toFixed(0) + "." + n.toFixed(0);
             template.w = 1;
             template.h = h;
             template.n = n;
@@ -8986,13 +8986,13 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             prop.l = Math.max(prop.l, 2);
-            let partName = "snake-" + prop.l.toFixed(0) + "." + prop.s.toFixed(0);
+            let partName = "snake_" + prop.l.toFixed(0) + "." + prop.s.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
         static GenerateTemplate(w, s, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "snake-" + w.toFixed(0) + "." + s.toFixed(0);
+            template.partName = "snake_" + w.toFixed(0) + "." + s.toFixed(0);
             template.angleSmoothSteps = 40;
             template.maxAngle = Math.PI / 8;
             template.w = w;
@@ -9673,13 +9673,13 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             prop.l = Nabu.MinMax(prop.l, 1, 2);
-            let partName = "spiral-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "spiral_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
         static GenerateTemplate(w, h, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "spiral-" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "spiral_" + w.toFixed(0) + "." + h.toFixed(0);
             template.w = w;
             template.d = w === 1 ? 2 : 3;
             template.h = h;
@@ -9742,7 +9742,7 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             prop.d = Nabu.MinMax(prop.d, 2, 3);
-            let partName = "spiralUTurn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = "spiralUTurn_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
@@ -9754,7 +9754,7 @@ var MarbleRunSimulatorCore;
                 }
                 return d;
             };
-            template.partName = "spiralUTurn-" + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = "spiralUTurn_" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 200;
             template.w = template.getWidthForDepth(d);
             template.h = h;
@@ -10072,7 +10072,7 @@ var MarbleRunSimulatorCore;
             this.p = 0;
             this.speed = Math.PI; // in m/s
             this.a = 0;
-            let partName = "stairway-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            let partName = "stairway_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             for (let i = this.colors.length; i < 4; i++) {
                 this.colors[i] = 0;
@@ -10095,9 +10095,9 @@ var MarbleRunSimulatorCore;
             this.stepH = Math.abs((this.y1 - this.y0) / this.boxesCount);
             for (let i = 0; i < this.boxesCount; i++) {
                 let data = Stairway.MakeStairwayColliderVertexData(this.stepW, this.stepH * 2, 0.02, this.dH, 0.001);
-                let box = new BABYLON.Mesh("collider-" + i);
+                let box = new BABYLON.Mesh("collider_" + i);
                 this.boxesColliders[i] = box;
-                this.boxesDisplayedMesh[i] = new BABYLON.Mesh("display-box-" + i);
+                this.boxesDisplayedMesh[i] = new BABYLON.Mesh("display-box_" + i);
                 box.isVisible = false;
                 data.applyToMesh(box);
                 if (this.mirrorX) {
@@ -10271,7 +10271,7 @@ var MarbleRunSimulatorCore;
             if (isNaN(h)) {
                 debugger;
             }
-            template.partName = "stairway-" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "stairway_" + w.toFixed(0) + "." + h.toFixed(0);
             template.h = h;
             template.w = w;
             template.mirrorX = mirrorX;
@@ -10396,7 +10396,7 @@ var MarbleRunSimulatorCore;
             this.reset = () => {
                 this.update(0);
             };
-            let partName = "steamelevator-" + prop.h.toFixed(0);
+            let partName = "steamelevator_" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             let x = 1;
             if (prop.mirrorX) {
@@ -10514,7 +10514,7 @@ var MarbleRunSimulatorCore;
         }
         static GenerateTemplate(h, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "steamelevator-" + h.toFixed(0);
+            template.partName = "steamelevator_" + h.toFixed(0);
             template.w = 2;
             template.h = h;
             template.mirrorX = mirrorX;
@@ -10596,7 +10596,7 @@ var MarbleRunSimulatorCore;
     class UTurn extends MarbleRunSimulatorCore.MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturn-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturn_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             if (!prop.pipeVersion && !prop.woodVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
@@ -10611,7 +10611,7 @@ var MarbleRunSimulatorCore;
                 }
                 return argD - 1;
             };
-            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "uturn-" + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "uturn_" + h.toFixed(0) + "." + d.toFixed(0);
             if (!pipeVersion && !woodVersion) {
                 template.partName += "." + s.toFixed(0);
             }
@@ -10781,7 +10781,7 @@ var MarbleRunSimulatorCore;
             if (isNaN(prop.h)) {
                 prop.h = 1;
             }
-            let partName = "uturnsharp-" + prop.h.toFixed(0);
+            let partName = "uturnsharp_" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             for (let i = this.colors.length; i < 2; i++) {
                 this.colors[i] = 0;
@@ -10796,7 +10796,7 @@ var MarbleRunSimulatorCore;
             if (isNaN(h)) {
                 h = 1;
             }
-            template.partName = "uturnsharp-" + h.toFixed(0);
+            template.partName = "uturnsharp_" + h.toFixed(0);
             template.w = template.getWidthForHeight(h);
             template.h = h;
             template.yExtendable = true;
@@ -10867,7 +10867,7 @@ var MarbleRunSimulatorCore;
     class UTurnV2 extends MarbleRunSimulatorCore.MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturnv2-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturnv2_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             if (!prop.pipeVersion && !prop.woodVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
@@ -10882,7 +10882,7 @@ var MarbleRunSimulatorCore;
                 }
                 return argD - 1;
             };
-            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "uturnv2-" + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "uturnv2_" + h.toFixed(0) + "." + d.toFixed(0);
             if (!pipeVersion && !woodVersion) {
                 template.partName += "." + s.toFixed(0);
             }
@@ -11027,13 +11027,13 @@ var MarbleRunSimulatorCore;
     class Wall extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "wall-" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = "wall_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             this.generateWires();
         }
         static GenerateTemplate(h, d, mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "wall-" + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = "wall_" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 100;
             template.maxAngle = (0.8 * Math.PI) / 2;
             template.minTurnRadius = 0.12;
@@ -11093,13 +11093,13 @@ var MarbleRunSimulatorCore;
     class Wave extends MarbleRunSimulatorCore.MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "wave-" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = "wave_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
         static GenerateTemplate(w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "wave-" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = "wave_" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
             template.w = w;
             template.h = h;
             template.d = d;
@@ -11208,7 +11208,7 @@ var MarbleRunSimulatorCore;
             if (QuarterNote.index >= QuarterNote.NoteNames.length) {
                 QuarterNote.index = 0;
             }
-            let note = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
+            let note = new BABYLON.Sound("note_" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note);
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
             tile.material = this.game.materials.getMaterial(0, this.machine.materialQ);
@@ -11274,7 +11274,7 @@ var MarbleRunSimulatorCore;
             if (QuarterNote.index >= QuarterNote.NoteNames.length) {
                 QuarterNote.index = 0;
             }
-            let note = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
+            let note = new BABYLON.Sound("note_" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note);
             let tile = BABYLON.MeshBuilder.CreateBox("tile", { width: 0.015, height: 0.005, depth: 0.06 });
             tile.material = this.game.materials.getMaterial(0, this.machine.materialQ);
@@ -11294,7 +11294,7 @@ var MarbleRunSimulatorCore;
             if (QuarterNote.index >= QuarterNote.NoteNames.length) {
                 QuarterNote.index = 0;
             }
-            let note2 = new BABYLON.Sound("note-" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
+            let note2 = new BABYLON.Sound("note_" + index, "./datas/sounds/notes/" + QuarterNote.NoteNames[index] + ".mp3", this.getScene(), undefined, { loop: false, autoplay: false });
             this.notes.push(note2);
             let tile2 = BABYLON.MeshBuilder.CreateBox("tile2", { width: 0.015, height: 0.005, depth: 0.06 });
             tile2.material = this.game.materials.getMaterial(0, this.machine.materialQ);

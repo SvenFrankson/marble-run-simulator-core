@@ -7,7 +7,7 @@ namespace MarbleRunSimulatorCore {
                 prop.h = 1;
             }
 
-            let partName = "uturnsharp-" + prop.h.toFixed(0);
+            let partName = "uturnsharp_" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
             for (let i = this.colors.length; i < 2; i++) {
@@ -26,7 +26,7 @@ namespace MarbleRunSimulatorCore {
             if (isNaN(h)) {
                 h = 1;
             }
-            template.partName = "uturnsharp-" + h.toFixed(0);
+            template.partName = "uturnsharp_" + h.toFixed(0);
             template.w = template.getWidthForHeight(h);
             template.h = h;
 
