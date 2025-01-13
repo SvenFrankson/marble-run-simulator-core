@@ -71,7 +71,8 @@ namespace MarbleRunSimulatorCore {
         AxisY,
         AxisZ,
         PlaneX,
-        PlaneZ
+        PlaneZ,
+        PlaneXZ,
     }
 
     export class EndpointSelectorMesh extends BABYLON.Mesh {
@@ -893,6 +894,11 @@ namespace MarbleRunSimulatorCore {
             if (this instanceof RampV2) {
                 this.selectorEndpointsLogic.forEach(selectorEndpoint => {
                     selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneZ;
+                })
+            }
+            else if (this instanceof Curb) {
+                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneXZ;
                 })
             }
             else if (this instanceof MachinePartWithOriginDestination) {

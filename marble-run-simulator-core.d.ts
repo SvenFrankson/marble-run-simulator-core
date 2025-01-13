@@ -437,7 +437,8 @@ declare namespace MarbleRunSimulatorCore {
         AxisY = 3,
         AxisZ = 4,
         PlaneX = 5,
-        PlaneZ = 6
+        PlaneZ = 6,
+        PlaneXZ = 7
     }
     class EndpointSelectorMesh extends BABYLON.Mesh {
         endpoint: MachinePartEndpoint;

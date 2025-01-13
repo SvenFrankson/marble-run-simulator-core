@@ -3396,6 +3396,7 @@ var MarbleRunSimulatorCore;
         EndpointEditionMode[EndpointEditionMode["AxisZ"] = 4] = "AxisZ";
         EndpointEditionMode[EndpointEditionMode["PlaneX"] = 5] = "PlaneX";
         EndpointEditionMode[EndpointEditionMode["PlaneZ"] = 6] = "PlaneZ";
+        EndpointEditionMode[EndpointEditionMode["PlaneXZ"] = 7] = "PlaneXZ";
     })(EndpointEditionMode = MarbleRunSimulatorCore.EndpointEditionMode || (MarbleRunSimulatorCore.EndpointEditionMode = {}));
     class EndpointSelectorMesh extends BABYLON.Mesh {
         constructor(endpoint) {
@@ -4124,6 +4125,11 @@ var MarbleRunSimulatorCore;
             if (this instanceof MarbleRunSimulatorCore.RampV2) {
                 this.selectorEndpointsLogic.forEach(selectorEndpoint => {
                     selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneZ;
+                });
+            }
+            else if (this instanceof MarbleRunSimulatorCore.Curb) {
+                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneXZ;
                 });
             }
             else if (this instanceof MarbleRunSimulatorCore.MachinePartWithOriginDestination) {
@@ -6846,6 +6852,10 @@ var MarbleRunSimulatorCore;
             template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb_" + l.toFixed(0) + "." + h.toFixed(0) + "." + s.toFixed(0);
             template.w = l;
             template.h = h;
+            template.xExtendable = true;
+            template.yExtendable = true;
+            template.minH = -32;
+            template.maxH = 32;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
