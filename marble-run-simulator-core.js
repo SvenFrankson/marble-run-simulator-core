@@ -3822,7 +3822,13 @@ var MarbleRunSimulatorCore;
             if (this._k != v) {
                 this._k = v;
                 if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                    let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax - (this.d - 1));
+                    let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax - this.h);
+                    if (isFinite(k)) {
+                        this._k = k;
+                    }
+                }
+                if (!doNotCheckGridLimits) {
+                    let k = Math.max(this._k, 0 - this.h, 0);
                     if (isFinite(k)) {
                         this._k = k;
                     }
