@@ -497,8 +497,12 @@ declare namespace MarbleRunSimulatorCore {
         summedLength: number[];
         totalLength: number;
         globalSlope: number;
+        localBarycenterIJK: BABYLON.Vector3;
         AABBMin: BABYLON.Vector3;
         AABBMax: BABYLON.Vector3;
+        visibleWidth: number;
+        visibleHeight: number;
+        visibleDepth: number;
         encloseStart: BABYLON.Vector3;
         enclose13: BABYLON.Vector3;
         encloseMid: BABYLON.Vector3;

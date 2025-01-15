@@ -3539,8 +3539,12 @@ var MarbleRunSimulatorCore;
             this.summedLength = [0];
             this.totalLength = 0;
             this.globalSlope = 0;
+            this.localBarycenterIJK = BABYLON.Vector3.Zero();
             this.AABBMin = BABYLON.Vector3.Zero();
             this.AABBMax = BABYLON.Vector3.Zero();
+            this.visibleWidth = 1;
+            this.visibleHeight = 1;
+            this.visibleDepth = 1;
             this.encloseStart = BABYLON.Vector3.Zero();
             this.enclose13 = BABYLON.Vector3.One().scaleInPlace(1 / 3);
             this.encloseMid = BABYLON.Vector3.One().scaleInPlace(0.5);
@@ -4175,33 +4179,45 @@ var MarbleRunSimulatorCore;
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
             }
-            let x0 = 0;
-            let y0 = -MarbleRunSimulatorCore.tileSize * 0.5;
-            let z0 = -MarbleRunSimulatorCore.tileSize * 0.5;
-            let x1 = MarbleRunSimulatorCore.tileSize;
-            let y1 = MarbleRunSimulatorCore.tileSize * 0.5;
-            let z1 = MarbleRunSimulatorCore.tileSize * 0.5;
+            let x0 = Infinity;
+            let y0 = Infinity;
+            let z0 = Infinity;
+            let x1 = -Infinity;
+            let y1 = -Infinity;
+            let z1 = -Infinity;
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
                 for (let j = 0; j < track.template.trackpoints.length; j++) {
                     let trackpoint = track.template.trackpoints[j];
                     let dx = 0;
-                    let dy = MarbleRunSimulatorCore.tileSize * 0.5;
-                    let dz = MarbleRunSimulatorCore.tileSize * 0.5;
+                    let dy = this.wireGauge * 0.5;
+                    let dz = this.wireGauge * 0.5;
                     if (trackpoint.dir) {
                         if (Math.abs(trackpoint.dir.z) > Math.abs(trackpoint.dir.x)) {
-                            dx = MarbleRunSimulatorCore.tileSize * 0.5;
+                            dx = this.wireGauge * 0.5;
                             dz = 0;
                         }
                     }
-                    x0 = Math.min(trackpoint.position.x - dx, x0);
-                    x1 = Math.max(trackpoint.position.x + dx, x1);
-                    y0 = Math.min(trackpoint.position.y - dy, y0);
-                    y1 = Math.max(trackpoint.position.y + dy, y1);
-                    z0 = Math.min(trackpoint.position.z - dz, z0);
-                    z1 = Math.max(trackpoint.position.z + dz, z1);
+                    let tX0 = trackpoint.position.x - dx;
+                    x0 = Math.min(tX0, x0);
+                    let tX1 = trackpoint.position.x + dx;
+                    x1 = Math.max(tX1, x1);
+                    let tY0 = trackpoint.position.y - dy;
+                    y0 = Math.min(tY0, y0);
+                    let tY1 = trackpoint.position.y + dy;
+                    y1 = Math.max(tY1, y1);
+                    let tZ0 = trackpoint.position.z - dz;
+                    z0 = Math.min(tZ0, z0);
+                    let tZ1 = trackpoint.position.z + dz;
+                    z1 = Math.max(tZ1, z1);
                 }
             }
+            x0 = Math.round((x0 - MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize) * MarbleRunSimulatorCore.tileSize + MarbleRunSimulatorCore.tileSize * 0.5;
+            x1 = Math.round((x1 + MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize) * MarbleRunSimulatorCore.tileSize - MarbleRunSimulatorCore.tileSize * 0.5;
+            y0 = Math.round((y0 - MarbleRunSimulatorCore.tileHeight * 0.5) / MarbleRunSimulatorCore.tileHeight) * MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * 0.5;
+            y1 = Math.round((y1 + MarbleRunSimulatorCore.tileHeight * 0.5) / MarbleRunSimulatorCore.tileHeight) * MarbleRunSimulatorCore.tileHeight - MarbleRunSimulatorCore.tileHeight * 0.5;
+            z0 = Math.round((z0 - MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize) * MarbleRunSimulatorCore.tileSize + MarbleRunSimulatorCore.tileSize * 0.5;
+            z1 = Math.round((z1 + MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize) * MarbleRunSimulatorCore.tileSize - MarbleRunSimulatorCore.tileSize * 0.5;
             this.encloseStart.copyFromFloats(x0, y0, z0);
             this.encloseEnd.copyFromFloats(x1, y1, z1);
             this.enclose13
@@ -4221,8 +4237,26 @@ var MarbleRunSimulatorCore;
             this.encloseMesh.visibility = 0;
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseStart.y, this.encloseStart.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseEnd.y, this.encloseEnd.z);
-            this.AABBMin.addInPlace(this.absolutePosition);
-            this.AABBMax.addInPlace(this.absolutePosition);
+            this.visibleWidth = Math.round((this.AABBMax.x - this.AABBMin.x) / MarbleRunSimulatorCore.tileSize);
+            this.visibleHeight = Math.round((this.AABBMax.y - this.AABBMin.y) / MarbleRunSimulatorCore.tileHeight);
+            this.visibleDepth = Math.round((this.AABBMax.z - this.AABBMin.z) / MarbleRunSimulatorCore.tileSize);
+            if (this.visibleWidth % 2 === 0) {
+                this.localBarycenterIJK.x = Math.floor((this.AABBMax.x + this.AABBMin.x) * 0.5 / MarbleRunSimulatorCore.tileSize);
+            }
+            else {
+                this.localBarycenterIJK.x = Math.round((this.AABBMax.x + this.AABBMin.x) * 0.5 / MarbleRunSimulatorCore.tileSize);
+            }
+            this.localBarycenterIJK.y = Math.round((this.AABBMax.y + this.AABBMin.y) * 0.5 / MarbleRunSimulatorCore.tileHeight);
+            if (this.visibleDepth % 2 === 0) {
+                this.localBarycenterIJK.z = Math.floor((this.AABBMax.z + this.AABBMin.z) * 0.5 / MarbleRunSimulatorCore.tileSize);
+            }
+            else {
+                this.localBarycenterIJK.z = Math.round((this.AABBMax.z + this.AABBMin.z) * 0.5 / MarbleRunSimulatorCore.tileSize);
+            }
+            let aabb1 = BABYLON.Vector3.TransformCoordinates(this.AABBMin, this.getWorldMatrix());
+            let aabb2 = BABYLON.Vector3.TransformCoordinates(this.AABBMax, this.getWorldMatrix());
+            this.AABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
+            this.AABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
             if (this.tracks[0] && this.tracks[0].template.isWood) {
                 this.AABBMax.y += MarbleRunSimulatorCore.tileSize;
             }
