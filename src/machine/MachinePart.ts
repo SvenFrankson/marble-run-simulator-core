@@ -531,6 +531,12 @@ namespace MarbleRunSimulatorCore {
         public get i(): number {
             return this._i;
         }
+        public get iAfterUpdate(): number {
+            if (isFinite(this._targetI)) {
+                return this._targetI;
+            }
+            return this._i;
+        }
         public setI(v: number, doNotCheckGridLimits?: boolean) {
             if (this._i != v) {
                 this._i = v;
@@ -559,6 +565,12 @@ namespace MarbleRunSimulatorCore {
         public get j(): number {
             return this._j;
         }
+        public get jAfterUpdate(): number {
+            if (isFinite(this._targetJ)) {
+                return this._targetJ;
+            }
+            return this._j;
+        }
         public setJ(v: number, doNotCheckGridLimits?: boolean) {
             if (this._j != v) {
                 this._j = v;
@@ -585,6 +597,12 @@ namespace MarbleRunSimulatorCore {
         private _k: number = 0;
         private _targetK: number;
         public get k(): number {
+            return this._k;
+        }
+        public get kAfterUpdate(): number {
+            if (isFinite(this._targetK)) {
+                return this._targetK;
+            }
             return this._k;
         }
         public setK(v: number, doNotCheckGridLimits?: boolean) {
@@ -620,6 +638,12 @@ namespace MarbleRunSimulatorCore {
         private _r: number = 0;
         private _targetR: number;
         public get r(): number {
+            return this._r;
+        }
+        public get rAfterUpdate(): number {
+            if (isFinite(this._targetR)) {
+                return this._targetR;
+            }
             return this._r;
         }
         public setR(v: number, doNotCheckGridLimits?: boolean) {
@@ -1184,10 +1208,14 @@ namespace MarbleRunSimulatorCore {
                 else {
                     if (this.targetUpdatePivot) {
                         let v0 = this.position.subtract(this.targetUpdatePivot);
+                        let y0 = v0.y;
+                        v0.y = 0;
                         let l0 = v0.length();
                         v0.scaleInPlace(1 / l0);
 
                         let v1 = targetPosition.subtract(this.targetUpdatePivot);
+                        let y1 = v1.y;
+                        v1.y = 0;
                         let l1 = v1.length();
                         v1.scaleInPlace(1 / l1);
 
@@ -1196,6 +1224,7 @@ namespace MarbleRunSimulatorCore {
                         let l = l0 * f + l1 * (1 - f);
                         v.normalize().scaleInPlace(l);
 
+                        v.y = y0 * f + y1 * (1 - f);;
                         this.position.copyFrom(v).addInPlace(this.targetUpdatePivot);
                     }
                     else {

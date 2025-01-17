@@ -3823,6 +3823,12 @@ var MarbleRunSimulatorCore;
         get i() {
             return this._i;
         }
+        get iAfterUpdate() {
+            if (isFinite(this._targetI)) {
+                return this._targetI;
+            }
+            return this._i;
+        }
         setI(v, doNotCheckGridLimits) {
             if (this._i != v) {
                 this._i = v;
@@ -3848,6 +3854,12 @@ var MarbleRunSimulatorCore;
         get j() {
             return this._j;
         }
+        get jAfterUpdate() {
+            if (isFinite(this._targetJ)) {
+                return this._targetJ;
+            }
+            return this._j;
+        }
         setJ(v, doNotCheckGridLimits) {
             if (this._j != v) {
                 this._j = v;
@@ -3871,6 +3883,12 @@ var MarbleRunSimulatorCore;
             this._targetJ = v;
         }
         get k() {
+            return this._k;
+        }
+        get kAfterUpdate() {
+            if (isFinite(this._targetK)) {
+                return this._targetK;
+            }
             return this._k;
         }
         setK(v, doNotCheckGridLimits) {
@@ -3902,6 +3920,12 @@ var MarbleRunSimulatorCore;
             this._targetK = v;
         }
         get r() {
+            return this._r;
+        }
+        get rAfterUpdate() {
+            if (isFinite(this._targetR)) {
+                return this._targetR;
+            }
             return this._r;
         }
         setR(v, doNotCheckGridLimits) {
@@ -4386,15 +4410,21 @@ var MarbleRunSimulatorCore;
                 else {
                     if (this.targetUpdatePivot) {
                         let v0 = this.position.subtract(this.targetUpdatePivot);
+                        let y0 = v0.y;
+                        v0.y = 0;
                         let l0 = v0.length();
                         v0.scaleInPlace(1 / l0);
                         let v1 = targetPosition.subtract(this.targetUpdatePivot);
+                        let y1 = v1.y;
+                        v1.y = 0;
                         let l1 = v1.length();
                         v1.scaleInPlace(1 / l1);
                         let v = BABYLON.Vector3.One();
                         BABYLON.Vector3.SlerpToRef(v0, v1, 1 - f, v);
                         let l = l0 * f + l1 * (1 - f);
                         v.normalize().scaleInPlace(l);
+                        v.y = y0 * f + y1 * (1 - f);
+                        ;
                         this.position.copyFrom(v).addInPlace(this.targetUpdatePivot);
                     }
                     else {
