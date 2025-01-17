@@ -130,6 +130,9 @@ namespace MarbleRunSimulatorCore {
             return this.getMaterial(6, MaterialQuality.Standard);
         }
         public plasticWhite: BABYLON.StandardMaterial;
+        public selectorFullLitLightBlueMaterial: BABYLON.StandardMaterial;
+        public selectorFullLitBlueMaterial: BABYLON.StandardMaterial;
+        public selectorFullLitGreenMaterial: BABYLON.StandardMaterial;
 
         constructor(public game: IGame) {
             let envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
@@ -180,6 +183,21 @@ namespace MarbleRunSimulatorCore {
             this.copperFullLitMaterial.emissiveColor = new BABYLON.Color3(0.7, 0.6, 0.5);
             this.copperFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
 
+            this.selectorFullLitLightBlueMaterial = new BABYLON.StandardMaterial("light-blue-autolit-material");
+            this.selectorFullLitLightBlueMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitLightBlueMaterial.emissiveColor = BABYLON.Color3.FromHexString("#392696");
+            this.selectorFullLitLightBlueMaterial.specularColor.copyFromFloats(0, 0, 0);
+
+            this.selectorFullLitBlueMaterial = new BABYLON.StandardMaterial("blue-autolit-material");
+            this.selectorFullLitBlueMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitBlueMaterial.emissiveColor = BABYLON.Color3.FromHexString("#264b96");
+            this.selectorFullLitBlueMaterial.specularColor.copyFromFloats(0, 0, 0);
+
+            this.selectorFullLitGreenMaterial = new BABYLON.StandardMaterial("green-autolit-material");
+            this.selectorFullLitGreenMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitGreenMaterial.emissiveColor = BABYLON.Color3.FromHexString("#268396");
+            this.selectorFullLitGreenMaterial.specularColor.copyFromFloats(0, 0, 0);
+            
             this._generateMaterials(envTexture);
 
             let plasticIndigo = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);

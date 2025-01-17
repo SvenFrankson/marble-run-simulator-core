@@ -904,6 +904,18 @@ var MarbleRunSimulatorCore;
             this.copperFullLitMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.6, 0.5);
             this.copperFullLitMaterial.emissiveColor = new BABYLON.Color3(0.7, 0.6, 0.5);
             this.copperFullLitMaterial.specularColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitLightBlueMaterial = new BABYLON.StandardMaterial("light-blue-autolit-material");
+            this.selectorFullLitLightBlueMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitLightBlueMaterial.emissiveColor = BABYLON.Color3.FromHexString("#392696");
+            this.selectorFullLitLightBlueMaterial.specularColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitBlueMaterial = new BABYLON.StandardMaterial("blue-autolit-material");
+            this.selectorFullLitBlueMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitBlueMaterial.emissiveColor = BABYLON.Color3.FromHexString("#264b96");
+            this.selectorFullLitBlueMaterial.specularColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitGreenMaterial = new BABYLON.StandardMaterial("green-autolit-material");
+            this.selectorFullLitGreenMaterial.diffuseColor.copyFromFloats(0, 0, 0);
+            this.selectorFullLitGreenMaterial.emissiveColor = BABYLON.Color3.FromHexString("#268396");
+            this.selectorFullLitGreenMaterial.specularColor.copyFromFloats(0, 0, 0);
             this._generateMaterials(envTexture);
             let plasticIndigo = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticIndigo.baseColor = BABYLON.Color3.FromHexString("#004777");
@@ -3460,8 +3472,25 @@ var MarbleRunSimulatorCore;
         updateSelectorMeshVisibility() {
             let selectorMesh = this.machinePart.selectorEndpointsDisplay[this.index];
             if (selectorMesh) {
+                selectorMesh.renderOutline = true;
+                selectorMesh.outlineWidth = 0.001;
+                selectorMesh.outlineColor.copyFromFloats(0.5, 0.5, 0.5);
+                selectorMesh.material = this.machinePart.game.materials.selectorFullLitBlueMaterial;
+                let originEndpoint = this.machinePart.endPoints[0];
+                if (this != this.machinePart.endPoints[0]) {
+                    if (this.localPosition.y < originEndpoint.localPosition.y) {
+                        selectorMesh.material = this.machinePart.game.materials.selectorFullLitGreenMaterial;
+                    }
+                    else if (this.localPosition.y > originEndpoint.localPosition.y) {
+                        selectorMesh.material = this.machinePart.game.materials.selectorFullLitLightBlueMaterial;
+                    }
+                }
                 if (this._hovered) {
-                    selectorMesh.visibility = 0.2;
+                    selectorMesh.visibility = 1;
+                    selectorMesh.outlineColor.copyFromFloats(1, 1, 1);
+                }
+                else if (this.machinePart.selected) {
+                    selectorMesh.visibility = 1;
                 }
                 else {
                     selectorMesh.visibility = 0;
@@ -3470,12 +3499,9 @@ var MarbleRunSimulatorCore;
         }
         showHelperMesh() {
             if (!this.helperMesh) {
-                let data = BABYLON.CreateCylinderVertexData({ height: 0.01, tessellation: 10, diameter: 0.02 });
+                let data = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 0.018 });
                 Mummu.RotateAngleAxisVertexDataInPlace(data, Math.PI * 0.5, BABYLON.Axis.Z);
-                Mummu.TranslateVertexDataInPlace(data, new BABYLON.Vector3(this.leftSide ? 0.02 : -0.02, 0, 0));
-                Mummu.ColorizeVertexDataInPlace(data, BABYLON.Color3.FromHexString("#80FFFF"));
                 this.helperMesh = new BABYLON.Mesh("helper-mesh");
-                this.helperMesh.material = this.machinePart.game.materials.whiteFullLitMaterial;
                 this.helperMesh.alphaIndex = 1;
                 data.applyToMesh(this.helperMesh);
             }
@@ -3486,13 +3512,22 @@ var MarbleRunSimulatorCore;
                 this.helperMesh = undefined;
             }
         }
-        updateHelperMesh(mode, timer) {
+        updateHelperMesh(mode, color, timer) {
             if (this.helperMesh) {
+                if (color === -1) {
+                    this.helperMesh.material = this.machinePart.game.materials.selectorFullLitGreenMaterial;
+                }
+                else if (color === 0) {
+                    this.helperMesh.material = this.machinePart.game.materials.selectorFullLitBlueMaterial;
+                }
+                else if (color === 1) {
+                    this.helperMesh.material = this.machinePart.game.materials.selectorFullLitLightBlueMaterial;
+                }
                 if (mode === 0) {
                     let sign = this.leftSide ? 1 : -1;
                     this.helperMesh.position.copyFrom(this.absolutePosition);
                     this.helperMesh.position.x -= sign * 0.5 * 0.015;
-                    this.helperMesh.visibility = Math.sin(timer * Math.PI) * 0.5;
+                    this.helperMesh.visibility = Math.sin(timer * Math.PI) * 1;
                 }
                 else if (mode === 1) {
                     let sign = this.leftSide ? 1 : -1;
@@ -3795,6 +3830,7 @@ var MarbleRunSimulatorCore;
                     m.freezeWorldMatrix();
                 });
                 this.update(0);
+                this.refreshEncloseMeshAndAABB();
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -3816,6 +3852,7 @@ var MarbleRunSimulatorCore;
                     m.freezeWorldMatrix();
                 });
                 this.update(0);
+                this.refreshEncloseMeshAndAABB();
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -3843,6 +3880,7 @@ var MarbleRunSimulatorCore;
                     m.freezeWorldMatrix();
                 });
                 this.update(0);
+                this.refreshEncloseMeshAndAABB();
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -3903,6 +3941,9 @@ var MarbleRunSimulatorCore;
                 });
             }
         }
+        get selected() {
+            return this._selected;
+        }
         select() {
             this._selected = true;
             this.updateSelectorMeshVisibility();
@@ -3939,6 +3980,9 @@ var MarbleRunSimulatorCore;
                     this.encloseMesh.visibility = 0;
                 }
             }
+            this.endPoints.forEach(endpoint => {
+                endpoint.updateSelectorMeshVisibility();
+            });
         }
         getDirAndUpAtWorldPos(worldPosition) {
             let dir = BABYLON.Vector3.Right();
@@ -4053,53 +4097,45 @@ var MarbleRunSimulatorCore;
                 if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[0])) {
                     let endPoint = this.findEndPoint(this.tracks[n].templateInterpolatedPoints[0]);
                     if (endPoint) {
-                        let originTip = [];
-                        Mummu.RemoveFromStartForDistanceInPlace(points, 0.017, originTip);
-                        Mummu.RemoveFromEndForDistanceInPlace(originTip, 0.002);
-                        let shapeTip = this.tracks[n].template.isPipeOrWood ? selectorHullPipeShapeDisplayTip : selectorHullShapeDisplayTip;
-                        let dataOriginTip = Mummu.CreateExtrudeShapeVertexData({ shape: shapeTip, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                        Mummu.ColorizeVertexDataInPlace(dataOriginTip, BABYLON.Color3.FromHexString("#80FFFF"));
-                        selectorMeshDisplayVertexDatas.push(dataOriginTip);
                         let selectorEndpoint = new BABYLON.Mesh("selector-endpoint-start");
                         selectorEndpoint.material = this.game.materials.whiteFullLitMaterial;
+                        selectorEndpoint.position = endPoint.localPosition;
                         selectorEndpoint.parent = this;
-                        dataOriginTip.applyToMesh(selectorEndpoint);
+                        let endpointDisplayVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 0.018 });
+                        endpointDisplayVertexData.applyToMesh(selectorEndpoint);
                         selectorEndpoint.visibility = 0;
                         this.selectorEndpointsDisplay.push(selectorEndpoint);
                         let selectorOriginMeshLogic = new EndpointSelectorMesh(endPoint);
                         selectorOriginMeshLogic.material = this.game.materials.whiteFullLitMaterial;
+                        selectorOriginMeshLogic.position = endPoint.localPosition;
                         selectorOriginMeshLogic.parent = this;
                         selectorOriginMeshLogic.visibility = DEBUG_logicColliderVisibility;
-                        let selectorOriginVertexDataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: originTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                        Mummu.ColorizeVertexDataInPlace(selectorOriginVertexDataLogic, BABYLON.Color3.Magenta());
-                        selectorOriginVertexDataLogic.applyToMesh(selectorOriginMeshLogic);
+                        let endpointLogicVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 2 * 0.018 });
+                        Mummu.ColorizeVertexDataInPlace(endpointLogicVertexData, BABYLON.Color3.Magenta());
+                        endpointLogicVertexData.applyToMesh(selectorOriginMeshLogic);
                         this.selectorEndpointsLogic.push(selectorOriginMeshLogic);
                     }
                 }
                 if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[this.tracks[n].templateInterpolatedPoints.length - 1])) {
                     let endPoint = this.findEndPoint(this.tracks[n].templateInterpolatedPoints[this.tracks[n].templateInterpolatedPoints.length - 1]);
                     if (endPoint) {
-                        let destinationTip = [];
-                        Mummu.RemoveFromEndForDistanceInPlace(points, 0.017, destinationTip);
-                        Mummu.RemoveFromStartForDistanceInPlace(destinationTip, 0.002);
-                        let shapeTip = this.tracks[n].template.isPipeOrWood ? selectorHullPipeShapeDisplayTip : selectorHullShapeDisplayTip;
-                        let dataDestinationTip = Mummu.CreateExtrudeShapeVertexData({ shape: shapeTip, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                        Mummu.ColorizeVertexDataInPlace(dataDestinationTip, BABYLON.Color3.FromHexString("#80FFFF"));
-                        selectorMeshDisplayVertexDatas.push(dataDestinationTip);
                         let selectorEndpoint = new BABYLON.Mesh("selector-endpoint-end");
                         selectorEndpoint.material = this.game.materials.whiteFullLitMaterial;
+                        selectorEndpoint.position = endPoint.localPosition;
                         selectorEndpoint.parent = this;
-                        dataDestinationTip.applyToMesh(selectorEndpoint);
+                        let endpointDisplayVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 0.018 });
+                        endpointDisplayVertexData.applyToMesh(selectorEndpoint);
                         selectorEndpoint.visibility = 0;
                         this.selectorEndpointsDisplay.push(selectorEndpoint);
-                        let selectorDestinationMeshLogic = new EndpointSelectorMesh(endPoint);
-                        selectorDestinationMeshLogic.material = this.game.materials.whiteFullLitMaterial;
-                        selectorDestinationMeshLogic.parent = this;
-                        selectorDestinationMeshLogic.visibility = DEBUG_logicColliderVisibility;
-                        let selectorDestinationVertexDataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: destinationTip, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                        Mummu.ColorizeVertexDataInPlace(selectorDestinationVertexDataLogic, BABYLON.Color3.Magenta());
-                        selectorDestinationVertexDataLogic.applyToMesh(selectorDestinationMeshLogic);
-                        this.selectorEndpointsLogic.push(selectorDestinationMeshLogic);
+                        let selectorEndpointLogicMesh = new EndpointSelectorMesh(endPoint);
+                        selectorEndpointLogicMesh.material = this.game.materials.whiteFullLitMaterial;
+                        selectorEndpointLogicMesh.position = endPoint.localPosition;
+                        selectorEndpointLogicMesh.parent = this;
+                        selectorEndpointLogicMesh.visibility = DEBUG_logicColliderVisibility;
+                        let endpointLogicVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 2 * 0.018 });
+                        Mummu.ColorizeVertexDataInPlace(endpointLogicVertexData, BABYLON.Color3.Magenta());
+                        endpointLogicVertexData.applyToMesh(selectorEndpointLogicMesh);
+                        this.selectorEndpointsLogic.push(selectorEndpointLogicMesh);
                     }
                 }
                 if (points.length >= 2) {
@@ -4230,7 +4266,7 @@ var MarbleRunSimulatorCore;
                 .scaleInPlace(1 / 3)
                 .addInPlace(this.encloseEnd.scale(2 / 3));
             this.encloseMesh = new BABYLON.Mesh("enclose-mesh");
-            let data = MarbleRunSimulatorCore.Tools.Box9SliceVertexData(this.encloseStart.add(new BABYLON.Vector3(0.001, 0.001, 0.001)), this.encloseEnd.subtract(new BABYLON.Vector3(0.001, 0.001, 0.001)), 0.002);
+            let data = MarbleRunSimulatorCore.Tools.Box9SliceVertexData(this.encloseStart.add(new BABYLON.Vector3(0.001, 0.001, 0.001)), this.encloseEnd.subtract(new BABYLON.Vector3(0.001, 0.001, 0.001)), 0.001);
             data.applyToMesh(this.encloseMesh);
             this.encloseMesh.material = this.game.materials.slice9Cutoff;
             this.encloseMesh.parent = this;

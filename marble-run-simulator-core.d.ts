@@ -167,6 +167,9 @@ declare namespace MarbleRunSimulatorCore {
         copperFullLitMaterial: BABYLON.StandardMaterial;
         get plasticBlack(): BABYLON.Material;
         plasticWhite: BABYLON.StandardMaterial;
+        selectorFullLitLightBlueMaterial: BABYLON.StandardMaterial;
+        selectorFullLitBlueMaterial: BABYLON.StandardMaterial;
+        selectorFullLitGreenMaterial: BABYLON.StandardMaterial;
         constructor(game: IGame);
         private _makePlasticPBR;
         private _makePlasticSTD;
@@ -471,7 +474,7 @@ declare namespace MarbleRunSimulatorCore {
         updateSelectorMeshVisibility(): void;
         showHelperMesh(): void;
         hideHelperMesh(): void;
-        updateHelperMesh(mode: number, timer: number): void;
+        updateHelperMesh(mode: number, color: number, timer: number): void;
     }
     class MachinePart extends BABYLON.Mesh {
         machine: Machine;
@@ -571,6 +574,7 @@ declare namespace MarbleRunSimulatorCore {
         get partVisilibityMode(): PartVisibilityMode;
         set partVisibilityMode(v: PartVisibilityMode);
         private _selected;
+        get selected(): boolean;
         select(): void;
         unselect(): void;
         private _hovered;
