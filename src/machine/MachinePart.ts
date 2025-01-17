@@ -283,6 +283,7 @@ namespace MarbleRunSimulatorCore {
         public summedLength: number[] = [0];
         public totalLength: number = 0;
         public globalSlope: number = 0;
+        public localBarycenter: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public localBarycenterIJK: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public AABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public AABBMax: BABYLON.Vector3 = BABYLON.Vector3.Zero();
@@ -523,8 +524,10 @@ namespace MarbleRunSimulatorCore {
         }
 
         public offsetPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public targetUpdatePivot: BABYLON.Vector3;
 
         private _i: number = 0;
+        private _targetI: number;
         public get i(): number {
             return this._i;
         }
@@ -547,8 +550,12 @@ namespace MarbleRunSimulatorCore {
                 this.machine.requestUpdateShadow = true;
             }
         }
+        public setTargetI(v: number): void {
+            this._targetI = v;
+        }
 
         private _j: number = 0;
+        private _targetJ: number;
         public get j(): number {
             return this._j;
         }
@@ -571,8 +578,12 @@ namespace MarbleRunSimulatorCore {
                 this.machine.requestUpdateShadow = true;
             }
         }
+        public setTargetJ(v: number): void {
+            this._targetJ = v;
+        }
 
         private _k: number = 0;
+        private _targetK: number;
         public get k(): number {
             return this._k;
         }
@@ -602,8 +613,12 @@ namespace MarbleRunSimulatorCore {
                 this.machine.requestUpdateShadow = true;
             }
         }
+        public setTargetK(v: number): void {
+            this._targetK = v;
+        }
 
         private _r: number = 0;
+        private _targetR: number;
         public get r(): number {
             return this._r;
         }
@@ -632,6 +647,17 @@ namespace MarbleRunSimulatorCore {
                     this.machine.requestUpdateShadow = true;
                 }
             }
+        }
+        public setTargetR(v: number): void {
+            this._targetR = v;
+        }
+
+        public getAbsoluteCoordinatesPosition(): BABYLON.Vector3 {
+            return new BABYLON.Vector3(
+                this.i * tileSize + this.offsetPosition.x,
+                this.k * tileHeight + this.offsetPosition.y,
+                this.j * tileSize + this.offsetPosition.z
+            )
         }
 
         public setIsVisible(isVisible: boolean): void {
@@ -1053,20 +1079,26 @@ namespace MarbleRunSimulatorCore {
             this.visibleHeight = Math.round((this.AABBMax.y - this.AABBMin.y) / tileHeight);
             this.visibleDepth = Math.round((this.AABBMax.z - this.AABBMin.z) / tileSize);
 
+            this.localBarycenter.copyFromFloats(
+                (this.AABBMax.x + this.AABBMin.x) * 0.5,
+                (this.AABBMax.y + this.AABBMin.y) * 0.5,
+                (this.AABBMax.z + this.AABBMin.z) * 0.5
+            );
+
             if (this.visibleWidth % 2 === 0) {
-                this.localBarycenterIJK.x = Math.floor((this.AABBMax.x + this.AABBMin.x) * 0.5 / tileSize);
+                this.localBarycenterIJK.x = Math.floor(this.localBarycenter.x / tileSize);
             }
             else {
-                this.localBarycenterIJK.x = Math.round((this.AABBMax.x + this.AABBMin.x) * 0.5 / tileSize);
+                this.localBarycenterIJK.x = Math.round(this.localBarycenter.x / tileSize);
             }
 
-            this.localBarycenterIJK.y = Math.round((this.AABBMax.y + this.AABBMin.y) * 0.5 / tileHeight);
+            this.localBarycenterIJK.y = Math.round(this.localBarycenter.y * 0.5 / tileHeight);
 
             if (this.visibleDepth % 2 === 0) {
-                this.localBarycenterIJK.z = Math.floor((this.AABBMax.z + this.AABBMin.z) * 0.5 / tileSize);
+                this.localBarycenterIJK.z = Math.floor(this.localBarycenter.z / tileSize);
             }
             else {
-                this.localBarycenterIJK.z = Math.round((this.AABBMax.z + this.AABBMin.z) * 0.5 / tileSize);
+                this.localBarycenterIJK.z = Math.round(this.localBarycenter.z / tileSize);
             }
 
             let aabb1 = BABYLON.Vector3.TransformCoordinates(this.AABBMin, this.getWorldMatrix());
@@ -1118,7 +1150,72 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public update(dt: number): void {}
+        public updateTargetCoordinates(dt: number): boolean {
+            if (isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
+                let f = Nabu.Easing.smoothNSec(1 / dt, 0.15);
+                let tI = isFinite(this._targetI) ? this._targetI : this.i;
+                let tJ = isFinite(this._targetJ) ? this._targetJ : this.j;
+                let tK = isFinite(this._targetK) ? this._targetK : this.k;
+                let tR = isFinite(this._targetR) ? this._targetR : this.r;
+
+                let targetPosition = new BABYLON.Vector3(
+                    tI * tileSize + this.offsetPosition.x,
+                    tK * tileHeight + this.offsetPosition.y,
+                    tJ * tileSize + this.offsetPosition.z
+                )
+                let targetRotationY = - tR * Math.PI * 0.5;
+
+                let dist = BABYLON.Vector3.Distance(this.position, targetPosition);
+                if (dist < 0.0001) {
+                    this.position.copyFrom(targetPosition);
+                    this.rotation.y = targetRotationY;
+                    this._i = tI;
+                    this._j = tJ;
+                    this._k = tK;
+                    this._r = tR;
+                    this._targetI = undefined;
+                    this._targetJ = undefined;
+                    this._targetK = undefined;
+                    this._targetR = undefined;
+                    this.targetUpdatePivot = undefined;
+                    this.refreshEncloseMeshAndAABB();
+                    this.machine.requestUpdateShadow = true;
+                }
+                else {
+                    if (this.targetUpdatePivot) {
+                        let v0 = this.position.subtract(this.targetUpdatePivot);
+                        let l0 = v0.length();
+                        v0.scaleInPlace(1 / l0);
+
+                        let v1 = targetPosition.subtract(this.targetUpdatePivot);
+                        let l1 = v1.length();
+                        v1.scaleInPlace(1 / l1);
+
+                        let v = BABYLON.Vector3.One();
+                        BABYLON.Vector3.SlerpToRef(v0, v1, 1 - f, v);
+                        let l = l0 * f + l1 * (1 - f);
+                        v.normalize().scaleInPlace(l);
+
+                        this.position.copyFrom(v).addInPlace(this.targetUpdatePivot);
+                    }
+                    else {
+                        BABYLON.Vector3.LerpToRef(this.position, targetPosition, 1 - f, this.position);
+                    }
+                    this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
+                }
+
+                this.freezeWorldMatrix();
+                this.getChildMeshes().forEach((m) => {
+                    m.freezeWorldMatrix();
+                });
+                return true;
+            }
+            return false;
+        }
+
+        public update(dt: number): void {
+
+        }
 
         public rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void {
             let neighboursToUpdate: MachinePart[];

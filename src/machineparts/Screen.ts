@@ -427,7 +427,7 @@ namespace MarbleRunSimulatorCore {
         private _lastCamRotZ: number = 0;
         private _visibleAngularSpeed: number = 0;
         public update(dt: number): void {
-
+            super.update(dt);
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];

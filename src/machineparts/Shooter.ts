@@ -339,6 +339,7 @@ namespace MarbleRunSimulatorCore {
         public delayTimeout: number = 0;
 
         public update(dt: number): void {
+            super.update(dt);
             if (this.shieldClose && !this.shieldClosed) {
                 if (this.shield.position.y > this.shieldYClosed + this.shieldSpeed * dt * this.game.currentTimeFactor) {
                     this.shield.position.y -= this.shieldSpeed * dt * this.game.currentTimeFactor;

@@ -77,6 +77,7 @@ namespace MarbleRunSimulatorCore {
         
         private _rotationSpeed: number = 0;
         public update(dt: number): void {
+            super.update(dt);
             if (Math.abs(this._rotationSpeed) > 0.01 ) {
                 let fps = 1 / dt;
                 this._rotationSpeed = Nabu.Easing.smooth2Sec(fps) * this._rotationSpeed;

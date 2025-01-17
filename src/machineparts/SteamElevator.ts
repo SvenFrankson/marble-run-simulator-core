@@ -241,6 +241,7 @@ namespace MarbleRunSimulatorCore {
         };
 
         public update(dt: number): void {
+            super.update(dt);
             this.x += this.speed * dt;
             while (this.x > this.chainLength) {
                 this.x -= this.chainLength;

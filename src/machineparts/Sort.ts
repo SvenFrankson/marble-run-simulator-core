@@ -239,6 +239,7 @@ namespace MarbleRunSimulatorCore {
  
         private _moving: boolean = false;
         public update(dt: number): void {
+            super.update(dt);
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];

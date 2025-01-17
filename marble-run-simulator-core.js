@@ -1576,6 +1576,7 @@ var MarbleRunSimulatorCore;
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
+            this.updatingMachinePartCoordinates = false;
             this.playing = false;
             this.baseColor = "#ffffff";
             this._roomIndex = 0;
@@ -1830,8 +1831,14 @@ var MarbleRunSimulatorCore;
             if (this.requestUpdateShadow) {
                 this.updateShadow();
             }
+            this.updatingMachinePartCoordinates = false;
+            let dt = this.game.scene.deltaTime / 1000;
+            if (isFinite(dt)) {
+                for (let i = 0; i < this.parts.length; i++) {
+                    this.updatingMachinePartCoordinates = this.updatingMachinePartCoordinates || this.parts[i].updateTargetCoordinates(dt);
+                }
+            }
             if (this.playing) {
-                let dt = this.game.scene.deltaTime / 1000;
                 if (isFinite(dt)) {
                     for (let i = 0; i < this.balls.length; i++) {
                         this.balls[i].update(dt * this.game.currentTimeFactor);
@@ -3574,6 +3581,7 @@ var MarbleRunSimulatorCore;
             this.summedLength = [0];
             this.totalLength = 0;
             this.globalSlope = 0;
+            this.localBarycenter = BABYLON.Vector3.Zero();
             this.localBarycenterIJK = BABYLON.Vector3.Zero();
             this.AABBMin = BABYLON.Vector3.Zero();
             this.AABBMax = BABYLON.Vector3.Zero();
@@ -3834,6 +3842,9 @@ var MarbleRunSimulatorCore;
                 this.machine.requestUpdateShadow = true;
             }
         }
+        setTargetI(v) {
+            this._targetI = v;
+        }
         get j() {
             return this._j;
         }
@@ -3855,6 +3866,9 @@ var MarbleRunSimulatorCore;
                 this.refreshEncloseMeshAndAABB();
                 this.machine.requestUpdateShadow = true;
             }
+        }
+        setTargetJ(v) {
+            this._targetJ = v;
         }
         get k() {
             return this._k;
@@ -3884,6 +3898,9 @@ var MarbleRunSimulatorCore;
                 this.machine.requestUpdateShadow = true;
             }
         }
+        setTargetK(v) {
+            this._targetK = v;
+        }
         get r() {
             return this._r;
         }
@@ -3912,6 +3929,12 @@ var MarbleRunSimulatorCore;
                     this.machine.requestUpdateShadow = true;
                 }
             }
+        }
+        setTargetR(v) {
+            this._targetR = v;
+        }
+        getAbsoluteCoordinatesPosition() {
+            return new BABYLON.Vector3(this.i * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x, this.k * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y, this.j * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z);
         }
         setIsVisible(isVisible) {
             this.isVisible = isVisible;
@@ -4276,18 +4299,19 @@ var MarbleRunSimulatorCore;
             this.visibleWidth = Math.round((this.AABBMax.x - this.AABBMin.x) / MarbleRunSimulatorCore.tileSize);
             this.visibleHeight = Math.round((this.AABBMax.y - this.AABBMin.y) / MarbleRunSimulatorCore.tileHeight);
             this.visibleDepth = Math.round((this.AABBMax.z - this.AABBMin.z) / MarbleRunSimulatorCore.tileSize);
+            this.localBarycenter.copyFromFloats((this.AABBMax.x + this.AABBMin.x) * 0.5, (this.AABBMax.y + this.AABBMin.y) * 0.5, (this.AABBMax.z + this.AABBMin.z) * 0.5);
             if (this.visibleWidth % 2 === 0) {
-                this.localBarycenterIJK.x = Math.floor((this.AABBMax.x + this.AABBMin.x) * 0.5 / MarbleRunSimulatorCore.tileSize);
+                this.localBarycenterIJK.x = Math.floor(this.localBarycenter.x / MarbleRunSimulatorCore.tileSize);
             }
             else {
-                this.localBarycenterIJK.x = Math.round((this.AABBMax.x + this.AABBMin.x) * 0.5 / MarbleRunSimulatorCore.tileSize);
+                this.localBarycenterIJK.x = Math.round(this.localBarycenter.x / MarbleRunSimulatorCore.tileSize);
             }
-            this.localBarycenterIJK.y = Math.round((this.AABBMax.y + this.AABBMin.y) * 0.5 / MarbleRunSimulatorCore.tileHeight);
+            this.localBarycenterIJK.y = Math.round(this.localBarycenter.y * 0.5 / MarbleRunSimulatorCore.tileHeight);
             if (this.visibleDepth % 2 === 0) {
-                this.localBarycenterIJK.z = Math.floor((this.AABBMax.z + this.AABBMin.z) * 0.5 / MarbleRunSimulatorCore.tileSize);
+                this.localBarycenterIJK.z = Math.floor(this.localBarycenter.z / MarbleRunSimulatorCore.tileSize);
             }
             else {
-                this.localBarycenterIJK.z = Math.round((this.AABBMax.z + this.AABBMin.z) * 0.5 / MarbleRunSimulatorCore.tileSize);
+                this.localBarycenterIJK.z = Math.round(this.localBarycenter.z / MarbleRunSimulatorCore.tileSize);
             }
             let aabb1 = BABYLON.Vector3.TransformCoordinates(this.AABBMin, this.getWorldMatrix());
             let aabb2 = BABYLON.Vector3.TransformCoordinates(this.AABBMax, this.getWorldMatrix());
@@ -4334,7 +4358,60 @@ var MarbleRunSimulatorCore;
                 console.log(this);
             }
         }
-        update(dt) { }
+        updateTargetCoordinates(dt) {
+            if (isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
+                let f = Nabu.Easing.smoothNSec(1 / dt, 0.15);
+                let tI = isFinite(this._targetI) ? this._targetI : this.i;
+                let tJ = isFinite(this._targetJ) ? this._targetJ : this.j;
+                let tK = isFinite(this._targetK) ? this._targetK : this.k;
+                let tR = isFinite(this._targetR) ? this._targetR : this.r;
+                let targetPosition = new BABYLON.Vector3(tI * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x, tK * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y, tJ * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z);
+                let targetRotationY = -tR * Math.PI * 0.5;
+                let dist = BABYLON.Vector3.Distance(this.position, targetPosition);
+                if (dist < 0.0001) {
+                    this.position.copyFrom(targetPosition);
+                    this.rotation.y = targetRotationY;
+                    this._i = tI;
+                    this._j = tJ;
+                    this._k = tK;
+                    this._r = tR;
+                    this._targetI = undefined;
+                    this._targetJ = undefined;
+                    this._targetK = undefined;
+                    this._targetR = undefined;
+                    this.targetUpdatePivot = undefined;
+                    this.refreshEncloseMeshAndAABB();
+                    this.machine.requestUpdateShadow = true;
+                }
+                else {
+                    if (this.targetUpdatePivot) {
+                        let v0 = this.position.subtract(this.targetUpdatePivot);
+                        let l0 = v0.length();
+                        v0.scaleInPlace(1 / l0);
+                        let v1 = targetPosition.subtract(this.targetUpdatePivot);
+                        let l1 = v1.length();
+                        v1.scaleInPlace(1 / l1);
+                        let v = BABYLON.Vector3.One();
+                        BABYLON.Vector3.SlerpToRef(v0, v1, 1 - f, v);
+                        let l = l0 * f + l1 * (1 - f);
+                        v.normalize().scaleInPlace(l);
+                        this.position.copyFrom(v).addInPlace(this.targetUpdatePivot);
+                    }
+                    else {
+                        BABYLON.Vector3.LerpToRef(this.position, targetPosition, 1 - f, this.position);
+                    }
+                    this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
+                }
+                this.freezeWorldMatrix();
+                this.getChildMeshes().forEach((m) => {
+                    m.freezeWorldMatrix();
+                });
+                return true;
+            }
+            return false;
+        }
+        update(dt) {
+        }
         rebuildWireMeshes(rebuildNeighboursWireMeshes) {
             let neighboursToUpdate;
             if (rebuildNeighboursWireMeshes) {
@@ -6875,6 +6952,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
@@ -7132,6 +7210,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             let dx = this.speed * dt * this.game.currentTimeFactor;
             let x = 1;
             if (this.mirrorX) {
@@ -7529,6 +7608,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
@@ -8406,6 +8486,7 @@ var MarbleRunSimulatorCore;
             return this._moving;
         }
         update(dt) {
+            super.update(dt);
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
@@ -8607,6 +8688,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             let dA = this.speed * dt * this.game.currentTimeFactor;
             let x = 1;
             if (this.mirrorX) {
@@ -8919,6 +9001,7 @@ var MarbleRunSimulatorCore;
             }
         }
         update(dt) {
+            super.update(dt);
             if (this.shieldClose && !this.shieldClosed) {
                 if (this.shield.position.y > this.shieldYClosed + this.shieldSpeed * dt * this.game.currentTimeFactor) {
                     this.shield.position.y -= this.shieldSpeed * dt * this.game.currentTimeFactor;
@@ -9392,6 +9475,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
@@ -9649,6 +9733,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
@@ -9736,6 +9821,7 @@ var MarbleRunSimulatorCore;
             return template;
         }
         update(dt) {
+            super.update(dt);
             if (Math.abs(this._rotationSpeed) > 0.01) {
                 let fps = 1 / dt;
                 this._rotationSpeed = Nabu.Easing.smooth2Sec(fps) * this._rotationSpeed;
@@ -10105,6 +10191,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
@@ -10410,6 +10497,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             let dA = this.speed * dt * this.game.currentTimeFactor;
             let x = 1;
             if (this.mirrorX) {
@@ -10658,6 +10746,7 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
         }
         update(dt) {
+            super.update(dt);
             this.x += this.speed * dt;
             while (this.x > this.chainLength) {
                 this.x -= this.chainLength;

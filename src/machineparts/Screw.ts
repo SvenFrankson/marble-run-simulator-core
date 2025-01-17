@@ -215,6 +215,7 @@ namespace MarbleRunSimulatorCore {
         public a: number = 0;
 
         public update(dt: number): void {
+            super.update(dt);
             let dA = this.speed * dt * this.game.currentTimeFactor;
             let x = 1;
             if (this.mirrorX) {

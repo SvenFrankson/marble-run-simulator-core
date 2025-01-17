@@ -126,6 +126,7 @@ namespace MarbleRunSimulatorCore {
         public instantiated: boolean = false;
         public hasBeenOpenedInEditor: boolean = false;
         public minimalAutoQualityFailed: number = GraphicQuality.VeryHigh + 1;
+        public updatingMachinePartCoordinates: boolean = false;
 
         public playing: boolean = false;
 
@@ -405,8 +406,16 @@ namespace MarbleRunSimulatorCore {
             if (this.requestUpdateShadow) {
                 this.updateShadow();
             }
+            
+            this.updatingMachinePartCoordinates = false;
+            let dt = this.game.scene.deltaTime / 1000;
+            if (isFinite(dt)) {
+                for (let i = 0; i < this.parts.length; i++) {
+                    this.updatingMachinePartCoordinates = this.updatingMachinePartCoordinates || this.parts[i].updateTargetCoordinates(dt);
+                }
+            }
+
             if (this.playing) {
-                let dt = this.game.scene.deltaTime / 1000;
                 if (isFinite(dt)) {
                     for (let i = 0; i < this.balls.length; i++) {
                         this.balls[i].update(dt * this.game.currentTimeFactor);
