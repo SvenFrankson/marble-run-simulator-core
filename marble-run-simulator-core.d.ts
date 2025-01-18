@@ -496,6 +496,7 @@ declare namespace MarbleRunSimulatorCore {
         selectorEndpointsDisplay: BABYLON.Mesh[];
         selectorEndpointsLogic: EndpointSelectorMesh[];
         encloseMesh: BABYLON.Mesh;
+        gridRectMesh: BABYLON.Mesh;
         isSelectable: boolean;
         onBeforeDelete: () => void;
         summedLength: number[];

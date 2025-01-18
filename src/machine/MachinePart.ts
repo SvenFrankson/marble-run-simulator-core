@@ -217,7 +217,7 @@ namespace MarbleRunSimulatorCore {
                 if (mode === 0) {
                     let sign = this.leftSide ? 1 : - 1;
                     this.helperMesh.position.copyFrom(this.absolutePosition);
-                    this.helperMesh.position.x -= sign * 0.5 * 0.015;
+                    //this.helperMesh.position.x -= sign * 0.5 * 0.015;
         
                     this.helperMesh.visibility = Math.sin(timer * Math.PI) * 1;
                 }
@@ -277,6 +277,7 @@ namespace MarbleRunSimulatorCore {
         public selectorEndpointsDisplay: BABYLON.Mesh[] = [];
         public selectorEndpointsLogic: EndpointSelectorMesh[] = [];
         public encloseMesh: BABYLON.Mesh;
+        public gridRectMesh: BABYLON.Mesh;
         public isSelectable: boolean = true;
         public onBeforeDelete: () => void;
 
@@ -752,12 +753,22 @@ namespace MarbleRunSimulatorCore {
                     this.selectorBodyDisplay.visibility = 0;
                 }
             }
-            if (this.encloseMesh) {
+
+            if (this.encloseMesh && false) {
                 if (this._selected) {
                     this.encloseMesh.visibility = 1;
                 }
                 else {
                     this.encloseMesh.visibility = 0;
+                }
+            }
+
+            if (this.gridRectMesh) {
+                if (this._selected) {
+                    this.gridRectMesh.isVisible = true;
+                }
+                else {
+                    this.gridRectMesh.isVisible = false;
                 }
             }
 
@@ -1027,6 +1038,9 @@ namespace MarbleRunSimulatorCore {
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
             }
+            if (this.gridRectMesh) {
+                this.gridRectMesh.dispose();
+            }
 
             let x0 = Infinity;
             let y0 = Infinity;
@@ -1090,11 +1104,27 @@ namespace MarbleRunSimulatorCore {
                 .addInPlace(this.encloseEnd.scale(2 / 3));
                 
             this.encloseMesh = new BABYLON.Mesh("enclose-mesh");
-            let data = Tools.Box9SliceVertexData(this.encloseStart.add(new BABYLON.Vector3(0.001, 0.001, 0.001)), this.encloseEnd.subtract(new BABYLON.Vector3(0.001, 0.001, 0.001)), 0.001);
-            data.applyToMesh(this.encloseMesh);
+            let encloseMeshVertexData = Tools.Box9SliceVertexData(this.encloseStart.add(new BABYLON.Vector3(0.001, 0.001, 0.001)), this.encloseEnd.subtract(new BABYLON.Vector3(0.001, 0.001, 0.001)), 0.001);
+            encloseMeshVertexData.applyToMesh(this.encloseMesh);
             this.encloseMesh.material = this.game.materials.slice9Cutoff;
             this.encloseMesh.parent = this;
             this.encloseMesh.visibility = 0;
+
+            this.gridRectMesh = new BABYLON.Mesh("grid-rect-mesh");
+            let points = [
+                new BABYLON.Vector3(x0, 0, z0),
+                new BABYLON.Vector3(x0, 0, z1),
+                new BABYLON.Vector3(x1, 0, z1),
+                new BABYLON.Vector3(x1, 0, z0),
+            ];
+            points = Mummu.BevelClosedPath(points, 0.003);
+            points = Mummu.BevelClosedPath(points, 0.001);
+            let gridRectVertexData = Mummu.CreateWireVertexData({ path: points, radius: 0.0008, closed: true });
+            gridRectVertexData.applyToMesh(this.gridRectMesh);
+            this.gridRectMesh.material = this.game.materials.whiteFullLitMaterial;
+            
+            this.gridRectMesh.parent = this;
+            this.gridRectMesh.isVisible = false;
 
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseStart.y, this.encloseStart.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseEnd.y, this.encloseEnd.z);
@@ -1176,7 +1206,7 @@ namespace MarbleRunSimulatorCore {
 
         public updateTargetCoordinates(dt: number): boolean {
             if (isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
-                let f = Nabu.Easing.smoothNSec(1 / dt, 0.15);
+                let f = Nabu.Easing.smoothNSec(1 / dt, 0.08);
                 let tI = isFinite(this._targetI) ? this._targetI : this.i;
                 let tJ = isFinite(this._targetJ) ? this._targetJ : this.j;
                 let tK = isFinite(this._targetK) ? this._targetK : this.k;
@@ -1203,6 +1233,7 @@ namespace MarbleRunSimulatorCore {
                     this._targetR = undefined;
                     this.targetUpdatePivot = undefined;
                     this.refreshEncloseMeshAndAABB();
+                    this.updateSelectorMeshVisibility();
                     this.machine.requestUpdateShadow = true;
                 }
                 else {
