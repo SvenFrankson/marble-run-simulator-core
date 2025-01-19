@@ -763,7 +763,7 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (this.gridRectMesh) {
+            if (this.gridRectMesh && this.gridRectMesh.parent === this) {
                 if (this._selected) {
                     this.gridRectMesh.isVisible = true;
                 }
@@ -1119,7 +1119,7 @@ namespace MarbleRunSimulatorCore {
             ];
             points = Mummu.BevelClosedPath(points, 0.003);
             points = Mummu.BevelClosedPath(points, 0.001);
-            let gridRectVertexData = Mummu.CreateWireVertexData({ path: points, radius: 0.0008, closed: true });
+            let gridRectVertexData = Mummu.CreateWireVertexData({ path: points, radius: 0.0004, closed: true });
             gridRectVertexData.applyToMesh(this.gridRectMesh);
             this.gridRectMesh.material = this.game.materials.whiteFullLitMaterial;
             
