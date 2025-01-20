@@ -584,6 +584,7 @@ declare namespace MarbleRunSimulatorCore {
         get r(): number;
         get rAfterUpdate(): number;
         setR(v: number, doNotCheckGridLimits?: boolean): void;
+        get targetR(): number;
         setTargetR(v: number): void;
         getAbsoluteCoordinatesPosition(): BABYLON.Vector3;
         setIsVisible(isVisible: boolean): void;

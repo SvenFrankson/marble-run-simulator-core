@@ -496,6 +496,9 @@ namespace MarbleRunSimulatorCore {
         constructor(public machine: Machine, prop: IMachinePartProp, public isPlaced: boolean = true) {
             super("track", machine.game.scene);
 
+            let origin = Mummu.DrawDebugPoint(BABYLON.Vector3.Zero(), Infinity, BABYLON.Color3.Red(), 0.02);
+            origin.parent = this;
+
             if (prop.fullPartName) {
                 this.fullPartName = prop.fullPartName;
             }
@@ -673,7 +676,16 @@ namespace MarbleRunSimulatorCore {
                 }
             }
         }
+        public get targetR(): number {
+            return this._targetR;
+        }
         public setTargetR(v: number): void {
+            while (v < 0) {
+                v += 4;
+            }
+            while (v >= 4) {
+                v -= 4;
+            }
             this._targetR = v;
         }
 
@@ -1128,42 +1140,46 @@ namespace MarbleRunSimulatorCore {
 
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseStart.y, this.encloseStart.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseEnd.y, this.encloseEnd.z);
+            if (this.tracks[0] && this.tracks[0].template.isWood) {
+                this.AABBMax.y += tileSize;
+            }
 
             this.visibleWidth = Math.round((this.AABBMax.x - this.AABBMin.x) / tileSize);
             this.visibleHeight = Math.round((this.AABBMax.y - this.AABBMin.y) / tileHeight);
             this.visibleDepth = Math.round((this.AABBMax.z - this.AABBMin.z) / tileSize);
 
-            this.localBarycenter.copyFromFloats(
+            this.localBarycenter = new BABYLON.Vector3(
                 (this.AABBMax.x + this.AABBMin.x) * 0.5,
                 (this.AABBMax.y + this.AABBMin.y) * 0.5,
                 (this.AABBMax.z + this.AABBMin.z) * 0.5
             );
 
+            let localBarycenterDebug = Mummu.DrawDebugPoint(this.localBarycenter, Infinity, BABYLON.Color3.Green(), 0.02);
+            localBarycenterDebug.parent = this;
+
             if (this.visibleWidth % 2 === 0) {
-                this.localBarycenterIJK.x = Math.floor(this.localBarycenter.x / tileSize);
+                this.localBarycenterIJK.x = Math.sign(this.localBarycenter.x) * Math.floor(Math.abs(this.localBarycenter.x) / tileSize);
             }
             else {
-                this.localBarycenterIJK.x = Math.round(this.localBarycenter.x / tileSize);
+                this.localBarycenterIJK.x = Math.sign(this.localBarycenter.x) * Math.round(Math.abs(this.localBarycenter.x) / tileSize);
             }
-
-            this.localBarycenterIJK.y = Math.round(this.localBarycenter.y * 0.5 / tileHeight);
-
+            this.localBarycenterIJK.y = Math.sign(this.localBarycenter.y) * Math.round(Math.abs(this.localBarycenter.y) / tileHeight);
+            this.localBarycenterIJK.y = 0;
             if (this.visibleDepth % 2 === 0) {
-                this.localBarycenterIJK.z = Math.floor(this.localBarycenter.z / tileSize);
+                this.localBarycenterIJK.z = Math.sign(this.localBarycenter.z) * Math.floor(Math.abs(this.localBarycenter.z) / tileSize);
             }
             else {
-                this.localBarycenterIJK.z = Math.round(this.localBarycenter.z / tileSize);
+                this.localBarycenterIJK.z = Math.sign(this.localBarycenter.z) * Math.round(Math.abs(this.localBarycenter.z) / tileSize);
             }
+
+            let localBarycenterIJKDebug = Mummu.DrawDebugPoint(this.localBarycenterIJK.multiplyByFloats(tileSize, tileHeight, tileSize), Infinity, BABYLON.Color3.Blue(), 0.02);
+            localBarycenterIJKDebug.parent = this;
 
             let aabb1 = BABYLON.Vector3.TransformCoordinates(this.AABBMin, this.getWorldMatrix());
             let aabb2 = BABYLON.Vector3.TransformCoordinates(this.AABBMax, this.getWorldMatrix());
 
             this.AABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
             this.AABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
-
-            if (this.tracks[0] && this.tracks[0].template.isWood) {
-                this.AABBMax.y += tileSize;
-            }
         }
 
         public dispose(): void {

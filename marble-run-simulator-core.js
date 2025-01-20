@@ -3606,6 +3606,8 @@ var MarbleRunSimulatorCore;
             this._selected = false;
             this._hovered = false;
             this.instantiated = false;
+            let origin = Mummu.DrawDebugPoint(BABYLON.Vector3.Zero(), Infinity, BABYLON.Color3.Red(), 0.02);
+            origin.parent = this;
             if (prop.fullPartName) {
                 this.fullPartName = prop.fullPartName;
             }
@@ -3954,7 +3956,16 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
+        get targetR() {
+            return this._targetR;
+        }
         setTargetR(v) {
+            while (v < 0) {
+                v += 4;
+            }
+            while (v >= 4) {
+                v -= 4;
+            }
             this._targetR = v;
         }
         getAbsoluteCoordinatesPosition() {
@@ -4345,30 +4356,35 @@ var MarbleRunSimulatorCore;
             this.gridRectMesh.isVisible = false;
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseStart.y, this.encloseStart.z);
             this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseEnd.y, this.encloseEnd.z);
+            if (this.tracks[0] && this.tracks[0].template.isWood) {
+                this.AABBMax.y += MarbleRunSimulatorCore.tileSize;
+            }
             this.visibleWidth = Math.round((this.AABBMax.x - this.AABBMin.x) / MarbleRunSimulatorCore.tileSize);
             this.visibleHeight = Math.round((this.AABBMax.y - this.AABBMin.y) / MarbleRunSimulatorCore.tileHeight);
             this.visibleDepth = Math.round((this.AABBMax.z - this.AABBMin.z) / MarbleRunSimulatorCore.tileSize);
-            this.localBarycenter.copyFromFloats((this.AABBMax.x + this.AABBMin.x) * 0.5, (this.AABBMax.y + this.AABBMin.y) * 0.5, (this.AABBMax.z + this.AABBMin.z) * 0.5);
+            this.localBarycenter = new BABYLON.Vector3((this.AABBMax.x + this.AABBMin.x) * 0.5, (this.AABBMax.y + this.AABBMin.y) * 0.5, (this.AABBMax.z + this.AABBMin.z) * 0.5);
+            let localBarycenterDebug = Mummu.DrawDebugPoint(this.localBarycenter, Infinity, BABYLON.Color3.Green(), 0.02);
+            localBarycenterDebug.parent = this;
             if (this.visibleWidth % 2 === 0) {
-                this.localBarycenterIJK.x = Math.floor(this.localBarycenter.x / MarbleRunSimulatorCore.tileSize);
+                this.localBarycenterIJK.x = Math.sign(this.localBarycenter.x) * Math.floor(Math.abs(this.localBarycenter.x) / MarbleRunSimulatorCore.tileSize);
             }
             else {
-                this.localBarycenterIJK.x = Math.round(this.localBarycenter.x / MarbleRunSimulatorCore.tileSize);
+                this.localBarycenterIJK.x = Math.sign(this.localBarycenter.x) * Math.round(Math.abs(this.localBarycenter.x) / MarbleRunSimulatorCore.tileSize);
             }
-            this.localBarycenterIJK.y = Math.round(this.localBarycenter.y * 0.5 / MarbleRunSimulatorCore.tileHeight);
+            this.localBarycenterIJK.y = Math.sign(this.localBarycenter.y) * Math.round(Math.abs(this.localBarycenter.y) / MarbleRunSimulatorCore.tileHeight);
+            this.localBarycenterIJK.y = 0;
             if (this.visibleDepth % 2 === 0) {
-                this.localBarycenterIJK.z = Math.floor(this.localBarycenter.z / MarbleRunSimulatorCore.tileSize);
+                this.localBarycenterIJK.z = Math.sign(this.localBarycenter.z) * Math.floor(Math.abs(this.localBarycenter.z) / MarbleRunSimulatorCore.tileSize);
             }
             else {
-                this.localBarycenterIJK.z = Math.round(this.localBarycenter.z / MarbleRunSimulatorCore.tileSize);
+                this.localBarycenterIJK.z = Math.sign(this.localBarycenter.z) * Math.round(Math.abs(this.localBarycenter.z) / MarbleRunSimulatorCore.tileSize);
             }
+            let localBarycenterIJKDebug = Mummu.DrawDebugPoint(this.localBarycenterIJK.multiplyByFloats(MarbleRunSimulatorCore.tileSize, MarbleRunSimulatorCore.tileHeight, MarbleRunSimulatorCore.tileSize), Infinity, BABYLON.Color3.Blue(), 0.02);
+            localBarycenterIJKDebug.parent = this;
             let aabb1 = BABYLON.Vector3.TransformCoordinates(this.AABBMin, this.getWorldMatrix());
             let aabb2 = BABYLON.Vector3.TransformCoordinates(this.AABBMax, this.getWorldMatrix());
             this.AABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
             this.AABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
-            if (this.tracks[0] && this.tracks[0].template.isWood) {
-                this.AABBMax.y += MarbleRunSimulatorCore.tileSize;
-            }
         }
         dispose() {
             this.endPoints.forEach(endpoint => {
