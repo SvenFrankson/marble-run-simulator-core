@@ -2840,9 +2840,6 @@ var MarbleRunSimulatorCore;
                             }
                         }
                     }
-                    if (baseName === "shooter") {
-                        correctedPK -= (h - 2);
-                    }
                     let prop = {
                         i: correctedPI,
                         j: correctedPJ,
@@ -2855,6 +2852,7 @@ var MarbleRunSimulatorCore;
                         mirrorZ: mirror >= 2,
                         c: colors
                     };
+                    this.deserializeAnte11Fix(baseName, prop);
                     let track = this.trackFactory.createTrackBaseName(baseName, prop);
                     if (track) {
                         this.parts.push(track);
@@ -2977,6 +2975,7 @@ var MarbleRunSimulatorCore;
                         mirrorZ: mirror >= 2,
                         c: colors
                     };
+                    this.deserializeAnte11Fix(baseName, prop);
                     let track = this.trackFactory.createTrackBaseName(baseName, prop);
                     if (track) {
                         this.parts.push(track);
@@ -3097,6 +3096,7 @@ var MarbleRunSimulatorCore;
                             mirrorZ: mirror >= 2,
                             c: colors
                         };
+                        this.deserializeAnte11Fix(baseName, prop);
                         let track = this.trackFactory.createTrackBaseName(baseName, prop);
                         if (track) {
                             this.parts.push(track);
@@ -3152,6 +3152,14 @@ var MarbleRunSimulatorCore;
                     else {
                         this._roomIndex = 0;
                     }
+                }
+            }
+        }
+        deserializeAnte11Fix(baseName, prop) {
+            if (baseName === "shooter") {
+                prop.k -= (prop.h - 2);
+                if (prop.mirrorX) {
+                    prop.r = 2;
                 }
             }
         }
@@ -4290,12 +4298,12 @@ var MarbleRunSimulatorCore;
             if (this.gridRectMesh) {
                 this.gridRectMesh.dispose();
             }
-            let x0 = Infinity;
-            let y0 = Infinity;
-            let z0 = Infinity;
-            let x1 = -Infinity;
-            let y1 = -Infinity;
-            let z1 = -Infinity;
+            let x0 = -this.wireGauge * 0.5;
+            let y0 = -this.wireGauge * 0.5;
+            let z0 = -this.wireGauge * 0.5;
+            let x1 = this.wireGauge * 0.5;
+            let y1 = this.wireGauge * 0.5;
+            let z1 = this.wireGauge * 0.5;
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
                 for (let j = 0; j < track.template.trackpoints.length; j++) {
@@ -6049,7 +6057,7 @@ var MarbleRunSimulatorCore;
                 else if (partName.startsWith("shooter_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     let n = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = MarbleRunSimulatorCore.Shooter.GenerateTemplate(h, n, mirrorX);
+                    data = MarbleRunSimulatorCore.Shooter.GenerateTemplate(h, n);
                 }
                 else if (partName.startsWith("stairway_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
@@ -8871,9 +8879,6 @@ var MarbleRunSimulatorCore;
                 this.shieldCollider.freezeWorldMatrix();
                 this.currentShootState = 0;
                 let x = 1;
-                if (this.mirrorX) {
-                    x = -1;
-                }
                 this.kicker.position.copyFromFloats(x * MarbleRunSimulatorCore.tileWidth * 0.4 - 0, this.kickerYIdle, 0);
                 this._freezeKicker();
             };
@@ -8886,14 +8891,11 @@ var MarbleRunSimulatorCore;
                 prop.n = 0;
             }
             let partName = "shooter_" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(partName));
             for (let i = this.colors.length; i < 5; i++) {
                 this.colors[i] = 0;
             }
             let x = 1;
-            if (prop.mirrorX) {
-                x = -1;
-            }
             this.generateWires();
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -8909,26 +8911,17 @@ var MarbleRunSimulatorCore;
             this.kickerWeight.parent = this.kicker;
             let cupR = 0.006;
             let dH = 0.001;
-            this.kickerYIdle = -dH - cupR * 0.8 - 0.004;
+            this.kickerYIdle = -dH - cupR * 0.8 - 0.004 + 0;
             this.kicker.parent = this;
             this.kicker.position.copyFromFloats(x * MarbleRunSimulatorCore.tileWidth * 0.4 - 0, this.kickerYIdle, 0);
-            if (this.mirrorX) {
-                this.kicker.rotation.y = Math.PI;
-            }
             this.shield = new BABYLON.Mesh("shield");
             this.shieldCollider = new BABYLON.Mesh("collider-shield");
             this.shieldCollider.parent = this.shield;
             this.shieldCollider.isVisible = false;
             this.shieldYClosed = 0;
             this.shield.position.copyFromFloats(x * MarbleRunSimulatorCore.tileWidth * 0.4 - 0, this.shieldYClosed, 0);
-            if (this.mirrorX) {
-                this.shield.rotation.y = Math.PI;
-            }
             this.shield.parent = this;
             this.base.position.copyFromFloats(x * MarbleRunSimulatorCore.tileWidth * 0.4 - 0, this.shieldYClosed - 0.02, 0);
-            if (this.mirrorX) {
-                this.base.rotation.y = Math.PI;
-            }
             this.base.parent = this;
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
@@ -8972,19 +8965,17 @@ var MarbleRunSimulatorCore;
                 this.shieldCollider.isVisible = false;
             }
         }
-        static GenerateTemplate(h, n, mirrorX) {
+        static GenerateTemplate(h, n) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "shooter_" + h.toFixed(0) + "." + n.toFixed(0);
             template.w = 1;
             template.h = h;
             template.n = n;
-            template.mirrorX = mirrorX;
             template.yExtendable = true;
             template.minH = 4;
             template.nExtendable = true;
             template.minN = 0;
             template.maxN = 10;
-            template.xMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let norm = new BABYLON.Vector3(0, 1, 0);
@@ -9003,35 +8994,32 @@ var MarbleRunSimulatorCore;
                 template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
                 template.trackTemplates[0].colorIndex = 0;
                 template.trackTemplates[0].trackpoints = [
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), dir),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 1.6 * cupR, 0 - dH, 0), dir),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 0, 0 - dH - cupR * 0.8, 0), dir),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, 0 - dH, 0), norm),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, -MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * (h - 2), 0), norm),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.015, 0.035 - MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * (h - 2), 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0 + 0, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 1.6 * cupR, 0 - dH + 0, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 0, 0 - dH - cupR * 0.8 + 0, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, 0 - dH + 0, 0), norm),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, -MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * (h - 2) + 0, 0), norm),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.015, 0.035 - MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * (h - 2) + 0, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
                 ];
                 template.trackTemplates[0].drawEndTip = true;
                 template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
                 template.trackTemplates[1].colorIndex = 1;
                 template.trackTemplates[1].trackpoints = [
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * (h - 2), 0), dirLeft),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.02, -MarbleRunSimulatorCore.tileHeight * 0.6 + MarbleRunSimulatorCore.tileHeight * (h - 2), 0), dirRight)
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * (h - 2) + 0, 0), dirLeft),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR - 0.02, -MarbleRunSimulatorCore.tileHeight * 0.6 + MarbleRunSimulatorCore.tileHeight * (h - 2) + 0, 0), dirRight)
                 ];
             }
             else {
                 template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
                 template.trackTemplates[0].trackpoints = [
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), dir),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 1.6 * cupR, 0 - dH, 0), dir),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 0, 0 - dH - cupR * 0.8, 0), dir),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, 0 - dH, 0), norm),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, MarbleRunSimulatorCore.tileHeight * 0.5 + MarbleRunSimulatorCore.tileHeight * (h - 2), 0), norm),
-                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR + 0.01, 0.025 + MarbleRunSimulatorCore.tileHeight * 0.5 + MarbleRunSimulatorCore.tileHeight * (h - 2), 0), MarbleRunSimulatorCore.Tools.V3Dir(45), MarbleRunSimulatorCore.Tools.V3Dir(-45)),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0 + 0, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 1.6 * cupR, 0 - dH + 0, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 - 0, 0 - dH - cupR * 0.8 + 0, 0), dir),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, 0 - dH + 0, 0), norm),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR, MarbleRunSimulatorCore.tileHeight * 0.5 + MarbleRunSimulatorCore.tileHeight * (h - 2) + 0, 0), norm),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4 + cupR + 0.01, 0.025 + MarbleRunSimulatorCore.tileHeight * 0.5 + MarbleRunSimulatorCore.tileHeight * (h - 2) + 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(45), MarbleRunSimulatorCore.Tools.V3Dir(-45)),
                 ];
                 template.trackTemplates[0].drawEndTip = true;
-            }
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
             }
             template.initialize();
             return template;
@@ -9048,7 +9036,7 @@ var MarbleRunSimulatorCore;
             return this.shield.position.y <= this.shieldYClosed;
         }
         getBallReady() {
-            let center = new BABYLON.Vector3(this.kicker.position.x, 0, 0);
+            let center = new BABYLON.Vector3(this.kicker.position.x, +0, 0);
             BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
             Mummu.DrawDebugPoint(center, 2, BABYLON.Color3.Red(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
@@ -9065,7 +9053,7 @@ var MarbleRunSimulatorCore;
             return undefined;
         }
         getBallArmed() {
-            let center = new BABYLON.Vector3(this.kicker.position.x, 0, 0);
+            let center = new BABYLON.Vector3(this.kicker.position.x, +0, 0);
             BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
             Mummu.DrawDebugPoint(center, 200, BABYLON.Color3.Green(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {

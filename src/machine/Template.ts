@@ -444,7 +444,7 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("shooter_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     let n = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = Shooter.GenerateTemplate(h, n, mirrorX);
+                    data = Shooter.GenerateTemplate(h, n);
                 }
                 else if (partName.startsWith("stairway_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);

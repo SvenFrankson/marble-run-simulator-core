@@ -381,6 +381,7 @@ declare namespace MarbleRunSimulatorCore {
         deserializeV3456(data: IMachineData): void;
         deserializeV78(data: IMachineData): void;
         deserializeV910(data: IMachineData): void;
+        deserializeAnte11Fix(baseName: string, prop: IMachinePartProp): void;
         deserializeV11(data: IMachineData): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
@@ -1110,7 +1111,7 @@ declare namespace MarbleRunSimulatorCore {
         animateKickerKick: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(h: number, n: number, mirrorX: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number, n: number): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         get shieldOpened(): boolean;

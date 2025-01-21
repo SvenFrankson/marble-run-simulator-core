@@ -1054,12 +1054,12 @@ namespace MarbleRunSimulatorCore {
                 this.gridRectMesh.dispose();
             }
 
-            let x0 = Infinity;
-            let y0 = Infinity;
-            let z0 = Infinity;
-            let x1 = - Infinity;
-            let y1 = - Infinity;
-            let z1 = - Infinity;
+            let x0 = - this.wireGauge * 0.5;
+            let y0 = - this.wireGauge * 0.5;
+            let z0 = - this.wireGauge * 0.5;
+            let x1 = this.wireGauge * 0.5;
+            let y1 = this.wireGauge * 0.5;
+            let z1 = this.wireGauge * 0.5;
 
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
@@ -1163,7 +1163,7 @@ namespace MarbleRunSimulatorCore {
             else {
                 this.localBarycenterIJK.x = Math.round(this.localBarycenter.x / tileSize);
             }
-            
+
             this.localBarycenterIJK.y = Math.round(this.localBarycenter.y / tileHeight);
             
             if (this.visibleDepth % 2 === 0) {

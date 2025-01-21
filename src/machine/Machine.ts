@@ -1558,9 +1558,6 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
 
-                    if (baseName === "shooter") {
-                        correctedPK -= (h - 2);
-                    }
                     let prop: IMachinePartProp = {
                         i: correctedPI,
                         j: correctedPJ,
@@ -1573,6 +1570,7 @@ namespace MarbleRunSimulatorCore {
                         mirrorZ: mirror >= 2,
                         c: colors
                     }
+                    this.deserializeAnte11Fix(baseName, prop);
                     let track = this.trackFactory.createTrackBaseName(baseName, prop);
                     if (track) {
                         this.parts.push(track);
@@ -1712,6 +1710,7 @@ namespace MarbleRunSimulatorCore {
                         mirrorZ: mirror >= 2,
                         c: colors
                     }
+                    this.deserializeAnte11Fix(baseName, prop);
                     
                     let track = this.trackFactory.createTrackBaseName(baseName, prop);
                     if (track) {
@@ -1854,6 +1853,7 @@ namespace MarbleRunSimulatorCore {
                             mirrorZ: mirror >= 2,
                             c: colors
                         }
+                        this.deserializeAnte11Fix(baseName, prop);
                         
                         let track = this.trackFactory.createTrackBaseName(baseName, prop);
                         if (track) {
@@ -1917,6 +1917,15 @@ namespace MarbleRunSimulatorCore {
                     else {
                         this._roomIndex = 0;
                     }
+                }
+            }
+        }
+
+        public deserializeAnte11Fix(baseName: string, prop: IMachinePartProp) {
+            if (baseName === "shooter") {
+                prop.k -= (prop.h - 2);
+                if (prop.mirrorX) {
+                    prop.r = 2;
                 }
             }
         }
