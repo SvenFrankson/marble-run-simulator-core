@@ -1158,18 +1158,18 @@ namespace MarbleRunSimulatorCore {
             localBarycenterDebug.parent = this;
 
             if (this.visibleWidth % 2 === 0) {
-                this.localBarycenterIJK.x = Math.sign(this.localBarycenter.x) * Math.floor(Math.abs(this.localBarycenter.x) / tileSize);
+                this.localBarycenterIJK.x = Math.floor(this.localBarycenter.x / tileSize);
             }
             else {
-                this.localBarycenterIJK.x = Math.sign(this.localBarycenter.x) * Math.round(Math.abs(this.localBarycenter.x) / tileSize);
+                this.localBarycenterIJK.x = Math.round(this.localBarycenter.x / tileSize);
             }
             this.localBarycenterIJK.y = Math.sign(this.localBarycenter.y) * Math.round(Math.abs(this.localBarycenter.y) / tileHeight);
             this.localBarycenterIJK.y = 0;
             if (this.visibleDepth % 2 === 0) {
-                this.localBarycenterIJK.z = Math.sign(this.localBarycenter.z) * Math.floor(Math.abs(this.localBarycenter.z) / tileSize);
+                this.localBarycenterIJK.z = Math.ceil(this.localBarycenter.z / tileSize);
             }
             else {
-                this.localBarycenterIJK.z = Math.sign(this.localBarycenter.z) * Math.round(Math.abs(this.localBarycenter.z) / tileSize);
+                this.localBarycenterIJK.z = Math.round(this.localBarycenter.z / tileSize);
             }
 
             let localBarycenterIJKDebug = Mummu.DrawDebugPoint(this.localBarycenterIJK.multiplyByFloats(tileSize, tileHeight, tileSize), Infinity, BABYLON.Color3.Blue(), 0.02);
