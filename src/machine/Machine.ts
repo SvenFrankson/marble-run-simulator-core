@@ -1558,6 +1558,9 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
 
+                    if (baseName === "shooter") {
+                        correctedPK -= (h - 2);
+                    }
                     let prop: IMachinePartProp = {
                         i: correctedPI,
                         j: correctedPJ,
@@ -1584,7 +1587,7 @@ namespace MarbleRunSimulatorCore {
                 let minK = Infinity;
                 for (let i = 0; i < this.parts.length; i++) {
                     let part = this.parts[i];
-                    minK = Math.min(minK, part.k - part.h);
+                    minK = Math.min(minK, part.k);
                 }
 
                 if (isFinite(minK) && minK != 0) {
@@ -1694,6 +1697,9 @@ namespace MarbleRunSimulatorCore {
                         colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
                     }
 
+                    if (baseName === "shooter") {
+                        correctedPK -= h;
+                    }
                     let prop: IMachinePartProp = {
                         i: correctedPI,
                         j: correctedPJ,

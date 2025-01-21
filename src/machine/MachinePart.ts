@@ -1120,7 +1120,7 @@ namespace MarbleRunSimulatorCore {
             encloseMeshVertexData.applyToMesh(this.encloseMesh);
             this.encloseMesh.material = this.game.materials.slice9Cutoff;
             this.encloseMesh.parent = this;
-            this.encloseMesh.visibility = 0;
+            this.encloseMesh.visibility = 1;
 
             this.gridRectMesh = new BABYLON.Mesh("grid-rect-mesh");
             let points = [
@@ -1163,8 +1163,9 @@ namespace MarbleRunSimulatorCore {
             else {
                 this.localBarycenterIJK.x = Math.round(this.localBarycenter.x / tileSize);
             }
-            this.localBarycenterIJK.y = Math.sign(this.localBarycenter.y) * Math.round(Math.abs(this.localBarycenter.y) / tileHeight);
-            this.localBarycenterIJK.y = 0;
+            
+            this.localBarycenterIJK.y = Math.round(this.localBarycenter.y / tileHeight);
+            
             if (this.visibleDepth % 2 === 0) {
                 this.localBarycenterIJK.z = Math.ceil(this.localBarycenter.z / tileSize);
             }
