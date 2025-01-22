@@ -27,7 +27,7 @@ namespace MarbleRunSimulatorCore {
                 h = 1;
             }
             template.partName = "uturnsharp_" + h.toFixed(0);
-            template.w = template.getWidthForHeight(h);
+            template.l = template.getWidthForHeight(h);
             template.h = h;
 
 

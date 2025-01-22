@@ -253,7 +253,7 @@ namespace MarbleRunSimulatorCore {
             template.partName = "stairway_" + w.toFixed(0) + "." + h.toFixed(0);
 
             template.h = h;
-            template.w = w;
+            template.l = w;
             template.mirrorX = mirrorX;
 
             template.xExtendable = true;
@@ -280,10 +280,10 @@ namespace MarbleRunSimulatorCore {
 
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].trackpoints = [
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.w - 1) * tileWidth + tileWidth * 0.3, tileHeight * 0.05 - 0.02, 0), Tools.V3Dir(0), Tools.V3Dir(-90)),
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.w - 1) * tileWidth + tileWidth * 0.3, tileHeight * 0.05 - 0.003, 0), Tools.V3Dir(0)),
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.w - 1) * tileWidth + tileWidth * 0.3 + 0.003, tileHeight * 0.05, 0), Tools.V3Dir(90)),
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.w - 1) * tileWidth + tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 1) * tileWidth + tileWidth * 0.3, tileHeight * 0.05 - 0.02, 0), Tools.V3Dir(0), Tools.V3Dir(-90)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 1) * tileWidth + tileWidth * 0.3, tileHeight * 0.05 - 0.003, 0), Tools.V3Dir(0)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 1) * tileWidth + tileWidth * 0.3 + 0.003, tileHeight * 0.05, 0), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 1) * tileWidth + tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),
             ];
             template.trackTemplates[1].drawStartTip = true;
 
@@ -309,7 +309,7 @@ namespace MarbleRunSimulatorCore {
             this.update(0);
         };
 
-        public l: number = 0;
+        public length: number = 0;
         public p: number = 0;
         public speed: number = Math.PI; // in m/s
         public a: number = 0;

@@ -21,7 +21,7 @@ namespace MarbleRunSimulatorCore {
             template.partName = "loop_" + w.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
             template.angleSmoothSteps = 20;
 
-            template.w = w;
+            template.l = w;
             template.h = 4;
             template.d = d;
             template.n = n;
@@ -29,7 +29,7 @@ namespace MarbleRunSimulatorCore {
             template.mirrorZ = mirrorZ;
 
             template.xExtendable = true;
-            template.minW = 2;
+            template.minL = 2;
             template.zExtendable = true;
             template.minD = 2;
             template.nExtendable = true;
@@ -45,7 +45,7 @@ namespace MarbleRunSimulatorCore {
 
             let loopsCount = n;
             let xStart = tileWidth * 0.5;
-            let xEnd = tileWidth * 0.5 + tileWidth * (template.w - 2);
+            let xEnd = tileWidth * 0.5 + tileWidth * (template.l - 2);
             let r = tileWidth * 0.7;
             let depthStart = 0.013;
             let depthEnd = -0.013;
@@ -72,7 +72,7 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), -template.h * tileHeight, -tileDepth * (template.d - 1)), Tools.V3Dir(90)));
+            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5), -template.h * tileHeight, -tileDepth * (template.d - 1)), Tools.V3Dir(90)));
 
             let points = template.trackTemplates[0].trackpoints.map((tp) => {
                 return tp.position.clone();

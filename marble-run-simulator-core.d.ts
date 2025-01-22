@@ -529,6 +529,7 @@ declare namespace MarbleRunSimulatorCore {
         decors: MachineDecor[];
         attachDecor(decor: MachineDecor): void;
         detachDecor(decor: MachineDecor): void;
+        get l(): number;
         get w(): number;
         get h(): number;
         get d(): number;
@@ -541,6 +542,8 @@ declare namespace MarbleRunSimulatorCore {
         get zExtendable(): boolean;
         get nExtendable(): boolean;
         get sExtendable(): boolean;
+        get minL(): number;
+        get maxL(): number;
         get minW(): number;
         get maxW(): number;
         get minH(): number;
@@ -746,7 +749,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class MachinePartTemplate {
         partName: string;
-        w: number;
+        l: number;
         h: number;
         d: number;
         n: number;
@@ -762,8 +765,8 @@ declare namespace MarbleRunSimulatorCore {
         zExtendable: boolean;
         nExtendable: boolean;
         sExtendable: boolean;
-        minW: number;
-        maxW: number;
+        minL: number;
+        maxL: number;
         minH: number;
         maxH: number;
         minD: number;
@@ -937,7 +940,7 @@ declare namespace MarbleRunSimulatorCore {
         reset: () => void;
         baseCableUVs: number[];
         x: number;
-        l: number;
+        length: number;
         p: number;
         chainLength: number;
         speed: number;
@@ -1079,7 +1082,7 @@ declare namespace MarbleRunSimulatorCore {
         static GenerateTemplate(w: number, h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
-        l: number;
+        length: number;
         p: number;
         speed: number;
         a: number;
@@ -1243,7 +1246,7 @@ declare namespace MarbleRunSimulatorCore {
         static GenerateTemplate(w: number, h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
-        l: number;
+        length: number;
         p: number;
         speed: number;
         a: number;
@@ -1286,12 +1289,9 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class UTurn extends MachinePartWithOriginDestination {
+    class UTurn extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(h: number, d: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
-        recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
-        getOrigin(): Nabu.IJK;
-        getDestination(): Nabu.IJK;
+        static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

@@ -156,7 +156,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "sort";
 
-            template.w = 1;
+            template.l = 1;
             template.h = 1;
             template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;

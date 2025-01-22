@@ -175,7 +175,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "shooter_" + h.toFixed(0) + "." + n.toFixed(0);
-            template.w = 1;
+            template.l = 1;
             template.h = h;
             template.n = n;
 

@@ -26,7 +26,7 @@ namespace MarbleRunSimulatorCore {
             }
             template.angleSmoothSteps = 50;
 
-            template.w = template.getWidthForDepth(d);
+            template.l = template.getWidthForDepth(d);
             template.h = h;
             template.d = d;
             template.s = s;

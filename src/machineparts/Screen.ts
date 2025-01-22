@@ -286,7 +286,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "screen";
             template.h = 1;
-            template.w = 1;
+            template.l = 1;
 
             template.mirrorX = mirrorX;
             template.xMirrorable = true;

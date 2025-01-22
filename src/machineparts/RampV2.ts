@@ -14,7 +14,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "rampv2_" + l.toFixed(0) + "." + h.toFixed(0);
 
-            template.w = l;
+            template.l = l;
             template.h = h;
             template.xExtendable = true;
             template.yExtendable = true;
@@ -32,7 +32,7 @@ namespace MarbleRunSimulatorCore {
 
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * template.w - tileSize * 0.5, tileSize * template.h, 0), dir)
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * template.l - tileSize * 0.5, tileSize * template.h, 0), dir)
             ];
 
             template.maxAngle = Math.PI / 4 / 2 * template.s;

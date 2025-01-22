@@ -31,9 +31,9 @@ namespace MarbleRunSimulatorCore {
             this.wheels[1].parent = this;
 
             this.wires = [];
-            this.l = Math.abs(this.wheels[1].position.y - this.wheels[0].position.y);
+            this.length = Math.abs(this.wheels[1].position.y - this.wheels[0].position.y);
             this.p = 2 * Math.PI * this.rWheel;
-            this.chainLength = 2 * this.l + this.p;
+            this.chainLength = 2 * this.length + this.p;
 
             this.boxesCount = Math.round(this.chainLength / 0.08);
 
@@ -134,7 +134,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "elevator_" + h.toFixed(0);
-            template.w = 2;
+            template.l = 2;
             template.h = h;
             template.mirrorX = mirrorX;
 
@@ -205,7 +205,7 @@ namespace MarbleRunSimulatorCore {
 
         public baseCableUVs: number[];
         public x: number = 0;
-        public l: number = 0;
+        public length: number = 0;
         public p: number = 0;
         public chainLength: number = 0;
         public speed: number = 0.04; // in m/s
@@ -237,22 +237,22 @@ namespace MarbleRunSimulatorCore {
                     this.boxX[i] -= this.chainLength;
                 }
 
-                if (this.boxX[i] < this.l) {
+                if (this.boxX[i] < this.length) {
                     this.boxes[i].position.x = this.wheels[0].position.x - this.rWheel * x;
                     this.boxes[i].position.y = this.wheels[0].position.y + this.boxX[i];
                     Mummu.QuaternionFromXZAxisToRef(BABYLON.Axis.X, BABYLON.Axis.Z, this.boxes[i].rotationQuaternion);
-                } else if (this.boxX[i] < this.l + 0.5 * this.p) {
-                    let a = ((this.boxX[i] - this.l) / (0.5 * this.p)) * Math.PI;
+                } else if (this.boxX[i] < this.length + 0.5 * this.p) {
+                    let a = ((this.boxX[i] - this.length) / (0.5 * this.p)) * Math.PI;
                     this.boxes[i].position.x = this.wheels[1].position.x - Math.cos(a) * this.rWheel * x;
                     this.boxes[i].position.y = this.wheels[1].position.y + Math.sin(a) * this.rWheel;
                     let right = this.wheels[1].position.subtract(this.boxes[i].position).normalize();
                     Mummu.QuaternionFromXZAxisToRef(right.scale(x), BABYLON.Axis.Z, this.boxes[i].rotationQuaternion);
-                } else if (this.boxX[i] < 2 * this.l + 0.5 * this.p) {
+                } else if (this.boxX[i] < 2 * this.length + 0.5 * this.p) {
                     this.boxes[i].position.x = this.wheels[0].position.x + this.rWheel * x;
-                    this.boxes[i].position.y = this.wheels[1].position.y - (this.boxX[i] - (this.l + 0.5 * this.p));
+                    this.boxes[i].position.y = this.wheels[1].position.y - (this.boxX[i] - (this.length + 0.5 * this.p));
                     Mummu.QuaternionFromXZAxisToRef(BABYLON.Axis.X.scale(-1), BABYLON.Axis.Z, this.boxes[i].rotationQuaternion);
                 } else {
-                    let a = ((this.boxX[i] - (2 * this.l + 0.5 * this.p)) / (0.5 * this.p)) * Math.PI;
+                    let a = ((this.boxX[i] - (2 * this.length + 0.5 * this.p)) / (0.5 * this.p)) * Math.PI;
                     this.boxes[i].position.x = this.wheels[0].position.x + Math.cos(a) * this.rWheel * x;
                     this.boxes[i].position.y = this.wheels[0].position.y - Math.sin(a) * this.rWheel;
                     let right = this.wheels[0].position.subtract(this.boxes[i].position).normalize();

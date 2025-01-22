@@ -1929,7 +1929,7 @@ namespace MarbleRunSimulatorCore {
                 }
             }
             if (baseName === "uturn") {
-                let newD = (prop.d - 1) * 3;
+                let newL = (prop.d - 1) * 3;
                 if (prop.mirrorX) {
                     if (prop.d === 2) {
                         prop.i += 1;
@@ -1944,13 +1944,13 @@ namespace MarbleRunSimulatorCore {
                 }
                 else {
                     prop.i--;
-                    prop.j -= newD;
+                    prop.j -= newL;
                     if (!prop.mirrorZ) {
                         prop.h = - prop.h;
                         prop.k += prop.h;
                     }
                 }
-                prop.d = newD;
+                prop.l = newL;
             }
         }
 

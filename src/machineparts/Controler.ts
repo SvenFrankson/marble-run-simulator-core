@@ -147,7 +147,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "controler";
 
-            template.w = 1;
+            template.l = 1;
             template.h = 1;
             template.d = 2;
             template.mirrorX = mirrorX;

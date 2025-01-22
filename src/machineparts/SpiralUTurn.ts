@@ -24,7 +24,7 @@ namespace MarbleRunSimulatorCore {
             template.partName = "spiralUTurn_" + h.toFixed(0) + "." + d.toFixed(0);
             template.angleSmoothSteps = 200;
 
-            template.w = template.getWidthForDepth(d);
+            template.l = template.getWidthForDepth(d);
             template.h = h;
             template.d = d;
             template.n = h;

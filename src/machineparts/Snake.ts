@@ -17,7 +17,7 @@ namespace MarbleRunSimulatorCore {
             template.angleSmoothSteps = 40;
             template.maxAngle = Math.PI / 8;
 
-            template.w = w;
+            template.l = w;
             template.h = 0;
             template.d = 3;
             template.s = s;
@@ -34,11 +34,11 @@ namespace MarbleRunSimulatorCore {
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
-            let count = 3 * template.w;
+            let count = 3 * template.l;
             if (count % 2 === 1) {
                 count--;
             }
-            let l = tileWidth * template.w;
+            let l = tileWidth * template.l;
             let r = l / count;
             let r2 = r / Math.SQRT2 * 1.0;
             let r12 = r - r2;
@@ -47,7 +47,7 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0] = new TrackTemplate(template);
 
             let start = new BABYLON.Vector3(-tileWidth * 0.5, 0, z0);
-            let end = new BABYLON.Vector3(tileWidth * (template.w - 0.5), 0, z0);
+            let end = new BABYLON.Vector3(tileWidth * (template.l - 0.5), 0, z0);
 
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];
             for (let i = 1; i < count; i++) {

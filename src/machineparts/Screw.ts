@@ -165,11 +165,11 @@ namespace MarbleRunSimulatorCore {
             template.partName = "screw_" + w.toFixed(0) + "." + h.toFixed(0);
 
             template.h = h;
-            template.w = w;
+            template.l = w;
             template.mirrorX = mirrorX;
 
             template.xExtendable = true;
-            template.minW = 1;
+            template.minL = 1;
             template.yExtendable = true;
             template.minH = 1;
             template.xMirrorable = true;
@@ -177,7 +177,7 @@ namespace MarbleRunSimulatorCore {
             let p0 = new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0);
             p0.x += 0.03;
             p0.y -= 0.005;
-            let p1 = new BABYLON.Vector3(tileWidth * (template.w - 0.5), 0, -tileDepth * (template.d - 1));
+            let p1 = new BABYLON.Vector3(tileWidth * (template.l - 0.5), 0, -tileDepth * (template.d - 1));
             p1.x -= 0.03;
             p1.y += 0.005;
             let dir = p1.subtract(p0).normalize();
@@ -187,7 +187,7 @@ namespace MarbleRunSimulatorCore {
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0), Tools.V3Dir(90)),
                 new TrackPoint(template.trackTemplates[0], p0, dir),
                 new TrackPoint(template.trackTemplates[0], p1, dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), 0, -tileDepth * (template.d - 1)), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5), 0, -tileDepth * (template.d - 1)), Tools.V3Dir(90)),
             ];
 
             if (mirrorX) {
@@ -209,7 +209,7 @@ namespace MarbleRunSimulatorCore {
             this.update(0);
         };
 
-        public l: number = 0;
+        public length: number = 0;
         public p: number = 0;
         public speed: number = 2 * Math.PI; // in m/s
         public a: number = 0;

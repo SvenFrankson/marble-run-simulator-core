@@ -53,7 +53,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "speeder";
-            template.w = 1;
+            template.l = 1;
             template.h = 0;
 
             template.mirrorX = mirrorX;

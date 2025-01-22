@@ -82,7 +82,7 @@ namespace MarbleRunSimulatorCore {
                 template.partName += "." + s.toFixed(0)
             }
 
-            template.w = w;
+            template.l = w;
             template.h = h;
             template.d = d;
             template.s = s;
@@ -100,9 +100,9 @@ namespace MarbleRunSimulatorCore {
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
-            let xCenter = (- tileWidth * 0.5 + tileWidth * (template.w - 0.5)) * 0.5;
+            let xCenter = (- tileWidth * 0.5 + tileWidth * (template.l - 0.5)) * 0.5;
             let zCenter = (0 - tileDepth * (template.d - 1)) * 0.5;
-            let widthInM = tileWidth * template.w;
+            let widthInM = tileWidth * template.l;
             let depthInM = tileDepth * (template.d - 1);
             let radius = Math.min(widthInM, depthInM) * 0.5; 
             let r2 = radius / Math.SQRT2 * 1.0;
@@ -114,7 +114,7 @@ namespace MarbleRunSimulatorCore {
             if (radius === 0 || widthInM > depthInM * 1.5) {
                 template.trackTemplates[0].trackpoints = [
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir)
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir)
                 ];
             }
             else {
@@ -126,7 +126,7 @@ namespace MarbleRunSimulatorCore {
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xCenter, 0, zCenter), new BABYLON.Vector3(0, 0, -1)),
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xCenter + r12, 0, zCenter - r2)),
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xCenter + radius, 0, -tileDepth * (template.d - 1)), dir),
-                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir),
+                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir),
                     ];
                 }
                 else if (widthInM < depthInM) {
@@ -135,8 +135,8 @@ namespace MarbleRunSimulatorCore {
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5 + r2, 0, -r12)),
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xCenter, 0, - radius), new BABYLON.Vector3(0, 0, -1)),
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xCenter, 0, -tileDepth * (template.d - 1) + radius), new BABYLON.Vector3(0, 0, -1)),
-                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5) - r2, 0, -tileDepth * (template.d - 1) + r12)),
-                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir),
+                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5) - r2, 0, -tileDepth * (template.d - 1) + r12)),
+                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir),
                     ];
                 }
                 else {
@@ -144,8 +144,8 @@ namespace MarbleRunSimulatorCore {
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5 + r2, 0, -r12)),
                         new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xCenter, 0, zCenter), new BABYLON.Vector3(0, 0, -1)),
-                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5) - r2, 0, -tileDepth * (template.d - 1) + r12)),
-                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.w - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir),
+                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5) - r2, 0, -tileDepth * (template.d - 1) + r12)),
+                        new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1)), dir),
                     ];
                 }
 

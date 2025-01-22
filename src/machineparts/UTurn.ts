@@ -1,34 +1,27 @@
 namespace MarbleRunSimulatorCore {
-    export class UTurn extends MachinePartWithOriginDestination {
+    export class UTurn extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
             
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturn_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturn_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             if (!prop.pipeVersion && !prop.woodVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
+            this.setTemplate(this.machine.templateManager.getTemplate(partName));
             this.generateWires();
         }
 
-        public static GenerateTemplate(h: number, d: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
-            template.getWidthForDepth = (argD) => {
-                if (argD >= 8) {
-                    return argD - 2;
-                }
-                return argD - 1;
-            }
 
-            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "uturn_" + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "uturn_" + l.toFixed(0) + "." + h.toFixed(0);
             if (!pipeVersion && !woodVersion) {
                 template.partName += "." + s.toFixed(0)
             }
             template.angleSmoothSteps = 50;
 
-            template.w = template.getWidthForDepth(d);
+            template.l = l;
             template.h = h;
-            template.d = d;
             template.s = s;
 
             template.yExtendable = true;
@@ -36,6 +29,8 @@ namespace MarbleRunSimulatorCore {
             if (!pipeVersion) {
                 template.sExtendable = true;
             }
+            template.minH = -32;
+            template.maxH = 32;
             template.minD = 2;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
@@ -43,11 +38,11 @@ namespace MarbleRunSimulatorCore {
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
-            let legacyR = legacyTileDepth * (d / 3) * 0.5;
+            let legacyR = legacyTileDepth * (l / 3) * 0.5;
             let legacyX0 = - tileSize * 0.5 + (2 * Math.PI * legacyR) / 6;
             let legacyXMax = legacyX0 + legacyR;
 
-            let r = tileSize * d * 0.5;
+            let r = tileSize * l * 0.5;
             let x0 = legacyXMax - r;
             let hasStraightPart = true;
             if (x0 < - tileSize * 0.5) {
@@ -92,7 +87,7 @@ namespace MarbleRunSimulatorCore {
             for (let n = 0; n < template.trackTemplates[0].trackpoints.length; n++) {
                 let f = summedLength[n] / totalLength;
                 f = hermite(f);
-                template.trackTemplates[0].trackpoints[n].position.y = - f * template.h * tileHeight;
+                template.trackTemplates[0].trackpoints[n].position.y = f * template.h * tileHeight;
             }
 
             let tp1 = trackpoints[1];
@@ -112,86 +107,6 @@ namespace MarbleRunSimulatorCore {
             template.initialize();
 
             return template;
-        }
-
-        public recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp {
-            let j = Math.min(origin.j, dest.j);
-            let k = Math.min(origin.k, dest.k);
-            let h = Math.abs(dest.j - origin.j);
-            h = Nabu.MinMax(h, this.minH, this.maxH);
-            let d = Math.abs(dest.k - origin.k) + 1;
-            d = Nabu.MinMax(d, this.minD, this.maxD);
-            let mirrorX = this.mirrorX;
-            let mirrorZ = false;
-            if (origin.j > dest.j) {
-                mirrorZ = true;
-            }
-            let i = Math.min(origin.i, dest.i);
-            if (this.mirrorX) {
-                i -= this.template.getWidthForDepth(d);
-            }
-            if (!this.getIsNaNOrValidWHD(undefined, h, d)) {
-                return undefined;
-            }
-            return new UTurn(machine, {
-                i: i,
-                j: j,
-                k: k,
-                h: h,
-                d: d,
-                s: this.s,
-                c: this.colors,
-                mirrorX: mirrorX,
-                mirrorZ: mirrorZ,
-                pipeVersion: this.tracks[0].template.isPipe,
-                woodVersion: this.tracks[0].template.isWood
-            });
-        }
-
-        public getOrigin(): Nabu.IJK {
-            let i: number;
-            if (this.mirrorX) {
-                i = this.i + this.w;
-            } else {
-                i = this.i;
-            }
-
-            let j: number;
-            if (this.mirrorZ) {
-                j = this.j + this.h;
-            } else {
-                j = this.j;
-            }
-
-            let k = this.k;
-            return {
-                i: i,
-                j: j,
-                k: k,
-            };
-        }
-
-        public getDestination(): Nabu.IJK {
-            let i: number;
-            if (this.mirrorX) {
-                i = this.i + this.w;
-            } else {
-                i = this.i;
-            }
-
-            let j: number;
-            if (this.mirrorZ) {
-                j = this.j;
-            } else {
-                j = this.j + this.h;
-            }
-
-            let k = this.k + this.d - 1;
-            return {
-                i: i,
-                j: j,
-                k: k,
-            };
         }
     }
 }

@@ -17,7 +17,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "flatjoin";
-            template.w = 1;
+            template.l = 1;
 
             template.mirrorX = mirrorX;
 

@@ -169,7 +169,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "forwardSplit";
 
-            template.w = 1;
+            template.l = 1;
             template.h = 1;
             template.d = 3;
             template.mirrorX = mirrorX;

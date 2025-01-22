@@ -56,7 +56,7 @@ namespace MarbleRunSimulatorCore {
         public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.w = 2;
+            template.l = 2;
             template.h = 3;
             template.d = 3;
             template.partName = "gravitywell";

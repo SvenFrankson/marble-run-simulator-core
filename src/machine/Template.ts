@@ -45,7 +45,7 @@ namespace MarbleRunSimulatorCore {
         public mirrorXTrackPointsInPlace(): void {
             for (let i = 0; i < this.trackpoints.length; i++) {
                 this.trackpoints[i].position.x *= -1;
-                this.trackpoints[i].position.x += (this.partTemplate.w - 1) * tileWidth;
+                this.trackpoints[i].position.x += (this.partTemplate.l - 1) * tileWidth;
                 if (this.trackpoints[i].normal) {
                     this.trackpoints[i].normal.x *= -1;
                 }
@@ -164,7 +164,6 @@ namespace MarbleRunSimulatorCore {
             this.angles = new Array<number>(N);
             this.angles.fill(0);
             let lastSign = 0;
-            console.log("signing " + this.partTemplate.partName);
             for (let i = 1; i < N - 1; i++) {
                 let n = this.interpolatedNormals[i];
 
@@ -181,7 +180,6 @@ namespace MarbleRunSimulatorCore {
                 let a = Mummu.AngleFromToAround(dirPrev.scale(-1), dirNext, n);
                 if (Math.abs(a) < Math.PI * 0.9999999) {
                     let sign = Math.sign(a);
-                    console.log(sign);
                     lastSign += sign / 10;
                     lastSign = Nabu.MinMax(lastSign, -1, 1);
 
@@ -279,7 +277,7 @@ namespace MarbleRunSimulatorCore {
     export class MachinePartTemplate {
         public partName: string = "machine-part-template";
 
-        public w: number = 1;
+        public l: number = 1;
         public h: number = 1;
         public d: number = 1;
         public n: number = 1;
@@ -296,8 +294,8 @@ namespace MarbleRunSimulatorCore {
         public zExtendable: boolean = false;
         public nExtendable: boolean = false;
         public sExtendable: boolean = false;
-        public minW: number = 1;
-        public maxW: number = 35;
+        public minL: number = 1;
+        public maxL: number = 35;
         public minH: number = 0;
         public maxH: number = 35;
         public minD: number = 1;
@@ -365,23 +363,23 @@ namespace MarbleRunSimulatorCore {
                     data = Curb.GenerateTemplate(l, h, s, false, false);
                 }
                 else if (partName.startsWith("uturn_")) {
-                    let h = parseInt(partName.split("_")[1].split(".")[0]);
-                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
                     let s = parseInt(partName.split("_")[1].split(".")[2]);
                     if (isNaN(s)) {
                         s = 2;
                     }
-                    data = UTurn.GenerateTemplate(h, d, s);
+                    data = UTurn.GenerateTemplate(l, h, s);
                 }
                 else if (partName.startsWith("pipeuturn_")) {
-                    let h = parseInt(partName.split("_")[1].split(".")[0]);
-                    let d = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = UTurn.GenerateTemplate(h, d, 2, true);
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = UTurn.GenerateTemplate(l, h, 2, true);
                 }
                 else if (partName.startsWith("wooduturn_")) {
-                    let h = parseInt(partName.split("_")[1].split(".")[0]);
-                    let d = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = UTurn.GenerateTemplate(h, d, 0, false, true);
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = UTurn.GenerateTemplate(l, h, 0, false, true);
                 }
                 else if (partName.startsWith("wall_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);

@@ -14,7 +14,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb_" + l.toFixed(0) + "." + h.toFixed(0) + "." + s.toFixed(0);
 
-            template.w = l;
+            template.l = l;
             template.h = h;
             template.xExtendable = true;
             template.yExtendable = true;
@@ -31,8 +31,8 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].isWood = woodVersion;
 
             let cx = - 0.5 * tileSize;
-            let cy = tileSize * template.w - 0.5 * tileSize;
-            let r = tileSize * template.w - 0.5 * tileSize
+            let cy = tileSize * template.l - 0.5 * tileSize;
+            let r = tileSize * template.l - 0.5 * tileSize
 
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(

@@ -118,7 +118,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public get isOrigin(): boolean {
-            return this.i === 0 && this.j === 0 && this.k === 0;
+            return this.index === 0;
         }
 
         public isIJK(worldIJK: Nabu.IJK): boolean {
@@ -391,8 +391,11 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        public get l(): number {
+            return this.template.l;
+        }
         public get w(): number {
-            return this.template.w;
+            return this.template.l;
         }
         public get h(): number {
             return this.template.h;
@@ -428,11 +431,17 @@ namespace MarbleRunSimulatorCore {
         public get sExtendable(): boolean {
             return this.template.sExtendable;
         }
+        public get minL(): number {
+            return this.template.minL;
+        }
+        public get maxL(): number {
+            return this.template.maxL;
+        }
         public get minW(): number {
-            return this.template.minW;
+            return this.template.minL;
         }
         public get maxW(): number {
-            return this.template.maxW;
+            return this.template.maxL;
         }
         public get minH(): number {
             return this.template.minH;
@@ -509,7 +518,6 @@ namespace MarbleRunSimulatorCore {
             if (isFinite(prop.r)) {
                 this._r = prop.r;
             }
-            console.log("R = " + this._r.toFixed(0));
             if (typeof prop.c === "number") {
                 this.colors = [prop.c];
             } else if (prop.c instanceof Array) {
@@ -1005,6 +1013,11 @@ namespace MarbleRunSimulatorCore {
             else if (this instanceof Curb) {
                 this.selectorEndpointsLogic.forEach(selectorEndpoint => {
                     selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneXZ;
+                })
+            }
+            else if (this instanceof UTurn) {
+                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
+                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneX;
                 })
             }
             else if (this instanceof MachinePartWithOriginDestination) {

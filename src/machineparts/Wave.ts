@@ -13,7 +13,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "wave_" + w.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
 
-            template.w = w;
+            template.l = w;
             template.h = h;
             template.d = d;
             template.mirrorX = mirrorX;
@@ -33,7 +33,7 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0] = new TrackTemplate(template);
 
             let start = new BABYLON.Vector3(-tileWidth * 0.5, 0, 0);
-            let end = new BABYLON.Vector3(tileWidth * (template.w - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1));
+            let end = new BABYLON.Vector3(tileWidth * (template.l - 0.5), -tileHeight * template.h, -tileDepth * (template.d - 1));
             let tanVector = dir.scale(BABYLON.Vector3.Distance(start, end));
 
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];

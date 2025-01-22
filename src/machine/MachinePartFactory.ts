@@ -6,7 +6,7 @@ namespace MarbleRunSimulatorCore {
         "join",
         "flatjoin",
         "split",
-        "uturn_0.2",
+        "uturn_2.0",
         "wall_3.3",
         "uturnsharp_1",
         "loop_2.2.1",
@@ -25,12 +25,12 @@ namespace MarbleRunSimulatorCore {
         "forwardSplit",
         "spiralUTurn_3.2",
         "piperamp_1.1.1",
-        "pipeuturn_0.2",
+        "pipeuturn_2.0",
         "steamelevator_4",
         "sort",
         "spawner",
         "woodramp_1.1.1",
-        "wooduturn_0.2",
+        "wooduturn_2.0",
         "uturnv2_0.2",
         "curb_2.0"
     ];
@@ -177,11 +177,11 @@ namespace MarbleRunSimulatorCore {
             if (partName === "uturn" || partName.startsWith("uturn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let h = parseInt(argStr.split(".")[0]);
-                    let d = parseInt(argStr.split(".")[1]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
                     let s = parseInt(argStr.split(".")[2]);
+                    prop.l = l;
                     prop.h = h;
-                    prop.d = d;
                     if (isFinite(s)) {
                         prop.s = s;
                     }
@@ -194,11 +194,11 @@ namespace MarbleRunSimulatorCore {
             if (partName === "uturnv2" || partName.startsWith("uturnv2_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let h = parseInt(argStr.split(".")[0]);
-                    let d = parseInt(argStr.split(".")[1]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
                     let s = parseInt(argStr.split(".")[2]);
+                    prop.l = l;
                     prop.h = h;
-                    prop.d = d;
                     if (isFinite(s)) {
                         prop.s = s;
                     }
@@ -211,10 +211,10 @@ namespace MarbleRunSimulatorCore {
             if (partName === "pipeuturn" || partName.startsWith("pipeuturn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let h = parseInt(argStr.split(".")[0]);
-                    let d = parseInt(argStr.split(".")[1]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
                     prop.h = h;
-                    prop.d = d;
                 }
                 prop.pipeVersion = true;
                 return new UTurn(this.machine, prop);

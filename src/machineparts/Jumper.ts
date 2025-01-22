@@ -12,7 +12,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "jumper_" + n.toFixed(0);
-            template.w = 2;
+            template.l = 2;
             template.h = 2;
             template.n = n;
 
