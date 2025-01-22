@@ -371,17 +371,17 @@ namespace MarbleRunSimulatorCore {
                     if (isNaN(s)) {
                         s = 2;
                     }
-                    data = UTurn.GenerateTemplate(h, d, s, mirrorX, mirrorZ);
+                    data = UTurn.GenerateTemplate(h, d, s);
                 }
                 else if (partName.startsWith("pipeuturn_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     let d = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = UTurn.GenerateTemplate(h, d, 2, mirrorX, mirrorZ, true);
+                    data = UTurn.GenerateTemplate(h, d, 2, true);
                 }
                 else if (partName.startsWith("wooduturn_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     let d = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = UTurn.GenerateTemplate(h, d, 0, mirrorX, mirrorZ, false, true);
+                    data = UTurn.GenerateTemplate(h, d, 0, false, true);
                 }
                 else if (partName.startsWith("wall_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);

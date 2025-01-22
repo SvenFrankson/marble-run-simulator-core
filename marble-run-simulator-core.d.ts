@@ -1288,7 +1288,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class UTurn extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number, d: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
         getOrigin(): Nabu.IJK;
         getDestination(): Nabu.IJK;

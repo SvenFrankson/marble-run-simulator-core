@@ -11,7 +11,7 @@ namespace MarbleRunSimulatorCore {
             this.generateWires();
         }
 
-        public static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(h: number, d: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
             template.getWidthForDepth = (argD) => {
                 if (argD >= 8) {
@@ -30,8 +30,6 @@ namespace MarbleRunSimulatorCore {
             template.h = h;
             template.d = d;
             template.s = s;
-            template.mirrorX = mirrorX; 
-            template.mirrorZ = mirrorZ;
 
             template.yExtendable = true;
             template.zExtendable = true;
@@ -39,22 +37,20 @@ namespace MarbleRunSimulatorCore {
                 template.sExtendable = true;
             }
             template.minD = 2;
-            template.xMirrorable = true;
-            template.zMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
-            let legacyR = legacyTileDepth * (d - 1) * 0.5;
-            let legacyX0 = - tileWidth * 0.5 + (2 * Math.PI * legacyR) / 6;
+            let legacyR = legacyTileDepth * (d / 3) * 0.5;
+            let legacyX0 = - tileSize * 0.5 + (2 * Math.PI * legacyR) / 6;
             let legacyXMax = legacyX0 + legacyR;
 
-            let r = tileDepth * (d - 1) * 0.5;
+            let r = tileSize * d * 0.5;
             let x0 = legacyXMax - r;
             let hasStraightPart = true;
-            if (x0 < - tileWidth * 0.5) {
+            if (x0 < - tileSize * 0.5) {
                 x0 = 0;
                 hasStraightPart = false;
             }
@@ -65,19 +61,19 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].trackpoints = []
             if (hasStraightPart) {
                 template.trackTemplates[0].trackpoints.push(
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0))
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileSize * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0))
                 );
             }
             template.trackTemplates[0].trackpoints.push(
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 0)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, -r + r2)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r, 0, -r)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, -r - r2)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, -2 * r))
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, r - r2)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r, 0, r)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, r + r2)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 2 * r))
             );
             if (hasStraightPart) {
                 template.trackTemplates[0].trackpoints.push(
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileSize * 0.5, 0, 2 * r), new BABYLON.Vector3(-1, 0, 0)),
                 );
             }
             template.defaultAngle = Math.PI / 4 / 4 * template.s;
@@ -112,13 +108,6 @@ namespace MarbleRunSimulatorCore {
             a = Mummu.AngleFromToAround(dir2, BABYLON.Axis.X.scale(-1), BABYLON.Axis.Y);
             Mummu.RotateInPlace(dir2, BABYLON.Axis.Y, a);
             tp2.setDir(dir2);
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
-            if (mirrorZ) {
-                template.mirrorZTrackPointsInPlace();
-            }
 
             template.initialize();
 

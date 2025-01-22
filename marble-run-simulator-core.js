@@ -3162,6 +3162,30 @@ var MarbleRunSimulatorCore;
                     prop.r = 2;
                 }
             }
+            if (baseName === "uturn") {
+                let newD = (prop.d - 1) * 3;
+                if (prop.mirrorX) {
+                    if (prop.d === 2) {
+                        prop.i += 1;
+                    }
+                    if (prop.d === 3) {
+                        prop.i += 4;
+                    }
+                    if (prop.d === 4) {
+                        prop.i += 7;
+                    }
+                    prop.r = 2;
+                }
+                else {
+                    prop.i--;
+                    prop.j -= newD;
+                    if (!prop.mirrorZ) {
+                        prop.h = -prop.h;
+                        prop.k += prop.h;
+                    }
+                }
+                prop.d = newD;
+            }
         }
         deserializeV11(data) {
             let dataString = data.d;
@@ -5984,17 +6008,17 @@ var MarbleRunSimulatorCore;
                     if (isNaN(s)) {
                         s = 2;
                     }
-                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, s, mirrorX, mirrorZ);
+                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, s);
                 }
                 else if (partName.startsWith("pipeuturn_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     let d = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, 2, mirrorX, mirrorZ, true);
+                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, 2, true);
                 }
                 else if (partName.startsWith("wooduturn_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     let d = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, 0, mirrorX, mirrorZ, false, true);
+                    data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(h, d, 0, false, true);
                 }
                 else if (partName.startsWith("wall_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
@@ -10853,7 +10877,7 @@ var MarbleRunSimulatorCore;
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
-        static GenerateTemplate(h, d, s, mirrorX, mirrorZ, pipeVersion, woodVersion) {
+        static GenerateTemplate(h, d, s, pipeVersion, woodVersion) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.getWidthForDepth = (argD) => {
                 if (argD >= 8) {
@@ -10870,27 +10894,23 @@ var MarbleRunSimulatorCore;
             template.h = h;
             template.d = d;
             template.s = s;
-            template.mirrorX = mirrorX;
-            template.mirrorZ = mirrorZ;
             template.yExtendable = true;
             template.zExtendable = true;
             if (!pipeVersion) {
                 template.sExtendable = true;
             }
             template.minD = 2;
-            template.xMirrorable = true;
-            template.zMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
-            let legacyR = MarbleRunSimulatorCore.legacyTileDepth * (d - 1) * 0.5;
-            let legacyX0 = -MarbleRunSimulatorCore.tileWidth * 0.5 + (2 * Math.PI * legacyR) / 6;
+            let legacyR = MarbleRunSimulatorCore.legacyTileDepth * (d / 3) * 0.5;
+            let legacyX0 = -MarbleRunSimulatorCore.tileSize * 0.5 + (2 * Math.PI * legacyR) / 6;
             let legacyXMax = legacyX0 + legacyR;
-            let r = MarbleRunSimulatorCore.tileDepth * (d - 1) * 0.5;
+            let r = MarbleRunSimulatorCore.tileSize * d * 0.5;
             let x0 = legacyXMax - r;
             let hasStraightPart = true;
-            if (x0 < -MarbleRunSimulatorCore.tileWidth * 0.5) {
+            if (x0 < -MarbleRunSimulatorCore.tileSize * 0.5) {
                 x0 = 0;
                 hasStraightPart = false;
             }
@@ -10900,11 +10920,11 @@ var MarbleRunSimulatorCore;
             template.trackTemplates[0].isWood = woodVersion;
             template.trackTemplates[0].trackpoints = [];
             if (hasStraightPart) {
-                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0)));
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, 0, 0), new BABYLON.Vector3(1, 0, 0)));
             }
-            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 0)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, -r + r2)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r, 0, -r)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, -r - r2)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, -2 * r)));
+            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 0)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, r - r2)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r, 0, r)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + r2, 0, r + r2)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + 0, 0, 2 * r)));
             if (hasStraightPart) {
-                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, -2 * r), new BABYLON.Vector3(-1, 0, 0)));
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, 0, 2 * r), new BABYLON.Vector3(-1, 0, 0)));
             }
             template.defaultAngle = Math.PI / 4 / 4 * template.s;
             template.maxAngle = Math.PI / 4 / 2 * template.s;
@@ -10934,12 +10954,6 @@ var MarbleRunSimulatorCore;
             a = Mummu.AngleFromToAround(dir2, BABYLON.Axis.X.scale(-1), BABYLON.Axis.Y);
             Mummu.RotateInPlace(dir2, BABYLON.Axis.Y, a);
             tp2.setDir(dir2);
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
-            if (mirrorZ) {
-                template.mirrorZTrackPointsInPlace();
-            }
             template.initialize();
             return template;
         }

@@ -1928,6 +1928,30 @@ namespace MarbleRunSimulatorCore {
                     prop.r = 2;
                 }
             }
+            if (baseName === "uturn") {
+                let newD = (prop.d - 1) * 3;
+                if (prop.mirrorX) {
+                    if (prop.d === 2) {
+                        prop.i += 1;
+                    }
+                    if (prop.d === 3) {
+                        prop.i += 4;
+                    }
+                    if (prop.d === 4) {
+                        prop.i += 7;
+                    }
+                    prop.r = 2;
+                }
+                else {
+                    prop.i--;
+                    prop.j -= newD;
+                    if (!prop.mirrorZ) {
+                        prop.h = - prop.h;
+                        prop.k += prop.h;
+                    }
+                }
+                prop.d = newD;
+            }
         }
 
         public deserializeV11(data: IMachineData): void {
