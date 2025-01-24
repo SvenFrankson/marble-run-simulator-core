@@ -137,9 +137,9 @@ var MarbleRunSimulatorCore;
         }
         setPositionZero(p) {
             this.positionZero.copyFrom(p);
-            //this.positionZero.x = Math.round(this.positionZero.x * 1000) / 1000;
-            //this.positionZero.y = Math.round(this.positionZero.y * 1000) / 1000;
-            //this.positionZero.z = Math.round(this.positionZero.z * 1000) / 1000;
+            this.positionZero.x = Math.round(this.positionZero.x * 1000) / 1000;
+            this.positionZero.y = Math.round(this.positionZero.y * 1000) / 1000;
+            this.positionZero.z = Math.round(this.positionZero.z * 1000) / 1000;
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.position.copyFrom(this.positionZero);
             }
