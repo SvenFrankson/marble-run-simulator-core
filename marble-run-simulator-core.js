@@ -168,16 +168,30 @@ var MarbleRunSimulatorCore;
             this.updateSelectorMeshVisibility();
         }
         updateSelectorMeshVisibility() {
-            console.log(this);
-            if (this.selectorMesh) {
+            this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
+            if (this.machine.playing) {
+                this.renderOutline = false;
+                this.positionZeroGhost.visibility = 0.5;
+                this.positionZeroGhost.renderOutline = true;
+                this.positionZeroGhost.outlineWidth = 0.0005;
+                this.positionZeroGhost.outlineColor.copyFromFloats(0.6, 0.6, 0.6);
+                if (this._hovered) {
+                    this.positionZeroGhost.outlineColor.copyFromFloats(0.8, 0.8, 0.8);
+                }
                 if (this._selected) {
-                    this.selectorMesh.isVisible = true;
+                    this.positionZeroGhost.outlineColor.copyFromFloats(1, 1, 1);
                 }
-                else if (this._hovered) {
-                    this.selectorMesh.isVisible = true;
+            }
+            else {
+                this.positionZeroGhost.visibility = 0;
+                this.renderOutline = true;
+                this.outlineWidth = 0.0005;
+                this.outlineColor.copyFromFloats(0.6, 0.6, 0.6);
+                if (this._hovered) {
+                    this.outlineColor.copyFromFloats(0.8, 0.8, 0.8);
                 }
-                else {
-                    this.selectorMesh.isVisible = false;
+                if (this._selected) {
+                    this.outlineColor.copyFromFloats(1, 1, 1);
                 }
             }
         }
@@ -209,25 +223,11 @@ var MarbleRunSimulatorCore;
                 this.positionZeroGhost.dispose();
             }
             this.positionZeroGhost = new BallGhost(this);
-            BABYLON.CreateSphereVertexData({ diameter: this.size * 0.95, segments: segmentsCount }).applyToMesh(this.positionZeroGhost);
-            this.positionZeroGhost.material = this.game.materials.ghostMaterial;
+            data.applyToMesh(this.positionZeroGhost);
+            this.positionZeroGhost.material = this.material;
             this.positionZeroGhost.position.copyFrom(this.positionZero);
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
-            if (this.selectorMesh) {
-                this.selectorMesh.dispose();
-            }
-            let points = [];
-            for (let i = 0; i <= 32; i++) {
-                let a = (i / 32) * 2 * Math.PI;
-                let cosa = Math.cos(a);
-                let sina = Math.sin(a);
-                points.push(new BABYLON.Vector3(cosa * (this.radius + 0.005), sina * (this.radius + 0.005), 0));
-            }
-            this.selectorMesh = BABYLON.MeshBuilder.CreateLines("select-mesh", {
-                points: points,
-            });
-            this.selectorMesh.parent = this.positionZeroGhost;
-            this.selectorMesh.isVisible = false;
+            this.updateSelectorMeshVisibility();
             if (!hotReload) {
                 this.reset();
             }
@@ -874,7 +874,7 @@ var MarbleRunSimulatorCore;
             this.ghostMaterial = new BABYLON.StandardMaterial("ghost-material");
             this.ghostMaterial.diffuseColor.copyFromFloats(0.8, 0.8, 1);
             this.ghostMaterial.specularColor.copyFromFloats(0, 0, 0);
-            this.ghostMaterial.alpha = 0.3;
+            this.ghostMaterial.alpha = 1;
             this.gridMaterial = new BABYLON.StandardMaterial("grid-material");
             this.gridMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.gridMaterial.specularColor.copyFromFloats(0, 0, 0);
@@ -1867,6 +1867,9 @@ var MarbleRunSimulatorCore;
         play() {
             this._paused = false;
             this.playing = true;
+            this.balls.forEach(ball => {
+                ball.updateSelectorMeshVisibility();
+            });
             this.decors.forEach(decor => {
                 decor.findMachinePart();
             });

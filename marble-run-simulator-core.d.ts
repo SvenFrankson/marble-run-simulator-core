@@ -46,7 +46,6 @@ declare namespace MarbleRunSimulatorCore {
         get showPositionZeroGhost(): boolean;
         setShowPositionZeroGhost(v: boolean): void;
         positionZeroGhost: BABYLON.Mesh;
-        selectorMesh: BABYLON.Mesh;
         get materialIndex(): number;
         set materialIndex(v: number);
         setPositionZero(p: BABYLON.Vector3): void;

@@ -145,7 +145,7 @@ namespace MarbleRunSimulatorCore {
             this.ghostMaterial = new BABYLON.StandardMaterial("ghost-material");
             this.ghostMaterial.diffuseColor.copyFromFloats(0.8, 0.8, 1);
             this.ghostMaterial.specularColor.copyFromFloats(0, 0, 0);
-            this.ghostMaterial.alpha = 0.3;
+            this.ghostMaterial.alpha = 1;
 
             this.gridMaterial = new BABYLON.StandardMaterial("grid-material");
             this.gridMaterial.diffuseColor.copyFromFloats(0, 0, 0);

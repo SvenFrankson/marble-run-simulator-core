@@ -446,6 +446,9 @@ namespace MarbleRunSimulatorCore {
         public play(): void {
             this._paused = false;
             this.playing = true;
+            this.balls.forEach(ball => {
+                ball.updateSelectorMeshVisibility();
+            });
             this.decors.forEach(decor => {
                 decor.findMachinePart();
             });
