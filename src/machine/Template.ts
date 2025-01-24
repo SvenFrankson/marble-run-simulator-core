@@ -289,6 +289,12 @@ namespace MarbleRunSimulatorCore {
         public maxAngle: number = Math.PI / 4;
         public minTurnRadius: number = 0.06;
 
+        public lExtendableOnX: boolean = false;
+        public lExtendableOnXZ: boolean = false;
+        public lExtendableOnZ: boolean = false;
+        public hExtendableOnY: boolean = false;
+        public dExtendableOnZ: boolean = false;
+
         public xExtendable: boolean = false;
         public yExtendable: boolean = false;
         public zExtendable: boolean = false;

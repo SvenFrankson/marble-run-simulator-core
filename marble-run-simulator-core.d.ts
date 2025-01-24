@@ -435,16 +435,6 @@ declare namespace MarbleRunSimulatorCore {
         part: MachinePart;
         constructor(part: MachinePart);
     }
-    enum EndpointEditionMode {
-        None = 0,
-        OriginDestination = 1,
-        AxisX = 2,
-        AxisY = 3,
-        AxisZ = 4,
-        PlaneX = 5,
-        PlaneZ = 6,
-        PlaneXZ = 7
-    }
     class EndpointSelectorMesh extends BABYLON.Mesh {
         endpoint: MachinePartEndpoint;
         constructor(endpoint: MachinePartEndpoint);
@@ -459,7 +449,6 @@ declare namespace MarbleRunSimulatorCore {
         index: number;
         selectorMeshDisplay: BABYLON.Mesh;
         helperMesh: BABYLON.Mesh;
-        mode: EndpointEditionMode;
         constructor(localPosition: BABYLON.Vector3, machinePart: MachinePart);
         get leftSide(): boolean;
         get upperSide(): boolean;
@@ -537,6 +526,12 @@ declare namespace MarbleRunSimulatorCore {
         get s(): number;
         get mirrorX(): boolean;
         get mirrorZ(): boolean;
+        get lExtendableOnX(): boolean;
+        get lExtendableOnXZ(): boolean;
+        get lExtendableOnZ(): boolean;
+        get hExtendableOnY(): boolean;
+        get dExtendableOnZ(): boolean;
+        get extendable(): boolean;
         get xExtendable(): boolean;
         get yExtendable(): boolean;
         get zExtendable(): boolean;
@@ -760,6 +755,11 @@ declare namespace MarbleRunSimulatorCore {
         defaultAngle: number;
         maxAngle: number;
         minTurnRadius: number;
+        lExtendableOnX: boolean;
+        lExtendableOnXZ: boolean;
+        lExtendableOnZ: boolean;
+        hExtendableOnY: boolean;
+        dExtendableOnZ: boolean;
         xExtendable: boolean;
         yExtendable: boolean;
         zExtendable: boolean;

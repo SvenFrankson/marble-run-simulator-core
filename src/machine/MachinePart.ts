@@ -64,17 +64,6 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
-    export enum EndpointEditionMode {
-        None,
-        OriginDestination,
-        AxisX,
-        AxisY,
-        AxisZ,
-        PlaneX,
-        PlaneZ,
-        PlaneXZ,
-    }
-
     export class EndpointSelectorMesh extends BABYLON.Mesh {
 
         constructor(public endpoint: MachinePartEndpoint) {
@@ -93,8 +82,6 @@ namespace MarbleRunSimulatorCore {
         public selectorMeshDisplay: BABYLON.Mesh;
 
         public helperMesh: BABYLON.Mesh;
-
-        public mode: EndpointEditionMode = EndpointEditionMode.None;
 
         constructor(
             public localPosition: BABYLON.Vector3,
@@ -414,6 +401,25 @@ namespace MarbleRunSimulatorCore {
         }
         public get mirrorZ(): boolean {
             return this.template.mirrorZ;
+        }
+
+        public get lExtendableOnX(): boolean {
+            return this.template.lExtendableOnX;
+        }
+        public get lExtendableOnXZ(): boolean {
+            return this.template.lExtendableOnXZ;
+        }
+        public get lExtendableOnZ(): boolean {
+            return this.template.lExtendableOnZ;
+        }
+        public get hExtendableOnY(): boolean {
+            return this.template.hExtendableOnY;
+        }
+        public get dExtendableOnZ(): boolean {
+            return this.template.dExtendableOnZ;
+        }
+        public get extendable(): boolean {
+            return this.lExtendableOnX || this.lExtendableOnXZ || this.lExtendableOnZ || this.hExtendableOnY || this.dExtendableOnZ;
         }
 
         public get xExtendable(): boolean {
@@ -1003,43 +1009,6 @@ namespace MarbleRunSimulatorCore {
                 Mummu.MergeVertexDatas(...selectorMeshLogicVertexDatas).applyToMesh(this.selectorBodyLogic);
             }
             this.selectorBodyLogic.visibility = DEBUG_logicColliderVisibility;
-
-            // Assign EndpointManipulators logic
-            if (this instanceof RampV2) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneZ;
-                })
-            }
-            else if (this instanceof Curb) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneXZ;
-                })
-            }
-            else if (this instanceof UTurn) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneX;
-                })
-            }
-            else if (this instanceof MachinePartWithOriginDestination) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.OriginDestination;
-                })
-            }
-            else if (this.xExtendable && !this.yExtendable && !this.zExtendable) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisX;
-                })
-            }
-            else if (!this.xExtendable && this.yExtendable && !this.zExtendable) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisY;
-                })
-            }
-            else if (this instanceof Wall || !this.xExtendable && !this.yExtendable && this.zExtendable) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisZ;
-                })
-            }
 
             this.refreshEncloseMeshAndAABB();
 

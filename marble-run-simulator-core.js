@@ -137,9 +137,9 @@ var MarbleRunSimulatorCore;
         }
         setPositionZero(p) {
             this.positionZero.copyFrom(p);
-            this.positionZero.x = Math.round(this.positionZero.x * 1000) / 1000;
-            this.positionZero.y = Math.round(this.positionZero.y * 1000) / 1000;
-            this.positionZero.z = Math.round(this.positionZero.z / MarbleRunSimulatorCore.tileDepth) * MarbleRunSimulatorCore.tileDepth;
+            //this.positionZero.x = Math.round(this.positionZero.x * 1000) / 1000;
+            //this.positionZero.y = Math.round(this.positionZero.y * 1000) / 1000;
+            //this.positionZero.z = Math.round(this.positionZero.z * 1000) / 1000;
             if (this.positionZeroGhost) {
                 this.positionZeroGhost.position.copyFrom(this.positionZero);
             }
@@ -3444,17 +3444,6 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.MachinePartSelectorMesh = MachinePartSelectorMesh;
-    let EndpointEditionMode;
-    (function (EndpointEditionMode) {
-        EndpointEditionMode[EndpointEditionMode["None"] = 0] = "None";
-        EndpointEditionMode[EndpointEditionMode["OriginDestination"] = 1] = "OriginDestination";
-        EndpointEditionMode[EndpointEditionMode["AxisX"] = 2] = "AxisX";
-        EndpointEditionMode[EndpointEditionMode["AxisY"] = 3] = "AxisY";
-        EndpointEditionMode[EndpointEditionMode["AxisZ"] = 4] = "AxisZ";
-        EndpointEditionMode[EndpointEditionMode["PlaneX"] = 5] = "PlaneX";
-        EndpointEditionMode[EndpointEditionMode["PlaneZ"] = 6] = "PlaneZ";
-        EndpointEditionMode[EndpointEditionMode["PlaneXZ"] = 7] = "PlaneXZ";
-    })(EndpointEditionMode = MarbleRunSimulatorCore.EndpointEditionMode || (MarbleRunSimulatorCore.EndpointEditionMode = {}));
     class EndpointSelectorMesh extends BABYLON.Mesh {
         constructor(endpoint) {
             super("endpoint-selector");
@@ -3470,7 +3459,6 @@ var MarbleRunSimulatorCore;
             this.j = 0;
             this.k = 0;
             this.index = -1;
-            this.mode = EndpointEditionMode.None;
             this._absolutePosition = BABYLON.Vector3.Zero();
             this._hovered = false;
             this.i = Math.round((localPosition.x + MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize);
@@ -3786,6 +3774,24 @@ var MarbleRunSimulatorCore;
         }
         get mirrorZ() {
             return this.template.mirrorZ;
+        }
+        get lExtendableOnX() {
+            return this.template.lExtendableOnX;
+        }
+        get lExtendableOnXZ() {
+            return this.template.lExtendableOnXZ;
+        }
+        get lExtendableOnZ() {
+            return this.template.lExtendableOnZ;
+        }
+        get hExtendableOnY() {
+            return this.template.hExtendableOnY;
+        }
+        get dExtendableOnZ() {
+            return this.template.dExtendableOnZ;
+        }
+        get extendable() {
+            return this.lExtendableOnX || this.lExtendableOnXZ || this.lExtendableOnZ || this.hExtendableOnY || this.dExtendableOnZ;
         }
         get xExtendable() {
             return this.template.xExtendable;
@@ -4279,42 +4285,6 @@ var MarbleRunSimulatorCore;
                 Mummu.MergeVertexDatas(...selectorMeshLogicVertexDatas).applyToMesh(this.selectorBodyLogic);
             }
             this.selectorBodyLogic.visibility = DEBUG_logicColliderVisibility;
-            // Assign EndpointManipulators logic
-            if (this instanceof MarbleRunSimulatorCore.RampV2) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneZ;
-                });
-            }
-            else if (this instanceof MarbleRunSimulatorCore.Curb) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneXZ;
-                });
-            }
-            else if (this instanceof MarbleRunSimulatorCore.UTurn) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.PlaneX;
-                });
-            }
-            else if (this instanceof MarbleRunSimulatorCore.MachinePartWithOriginDestination) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.OriginDestination;
-                });
-            }
-            else if (this.xExtendable && !this.yExtendable && !this.zExtendable) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisX;
-                });
-            }
-            else if (!this.xExtendable && this.yExtendable && !this.zExtendable) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisY;
-                });
-            }
-            else if (this instanceof MarbleRunSimulatorCore.Wall || !this.xExtendable && !this.yExtendable && this.zExtendable) {
-                this.selectorEndpointsLogic.forEach(selectorEndpoint => {
-                    selectorEndpoint.endpoint.mode = EndpointEditionMode.AxisZ;
-                });
-            }
             this.refreshEncloseMeshAndAABB();
             if (this.machine.geometryQ > MarbleRunSimulatorCore.GeometryQuality.Proxy) {
                 await this.instantiateMachineSpecific();
@@ -5946,6 +5916,11 @@ var MarbleRunSimulatorCore;
             this.defaultAngle = 0;
             this.maxAngle = Math.PI / 4;
             this.minTurnRadius = 0.06;
+            this.lExtendableOnX = false;
+            this.lExtendableOnXZ = false;
+            this.lExtendableOnZ = false;
+            this.hExtendableOnY = false;
+            this.dExtendableOnZ = false;
             this.xExtendable = false;
             this.yExtendable = false;
             this.zExtendable = false;
@@ -7126,8 +7101,8 @@ var MarbleRunSimulatorCore;
             template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb_" + l.toFixed(0) + "." + h.toFixed(0) + "." + s.toFixed(0);
             template.l = l;
             template.h = h;
-            template.xExtendable = true;
-            template.yExtendable = true;
+            template.lExtendableOnXZ = true;
+            template.hExtendableOnY = true;
             template.minH = -32;
             template.maxH = 32;
             let dir = new BABYLON.Vector3(1, 0, 0);
@@ -8256,8 +8231,8 @@ var MarbleRunSimulatorCore;
             template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "rampv2_" + l.toFixed(0) + "." + h.toFixed(0);
             template.l = l;
             template.h = h;
-            template.xExtendable = true;
-            template.yExtendable = true;
+            template.lExtendableOnX = true;
+            template.hExtendableOnY = true;
             template.minH = -32;
             template.maxH = 32;
             let dir = new BABYLON.Vector3(1, 0, 0);
@@ -10898,8 +10873,8 @@ var MarbleRunSimulatorCore;
             template.l = l;
             template.h = h;
             template.s = s;
-            template.yExtendable = true;
-            template.zExtendable = true;
+            template.lExtendableOnZ = true;
+            template.hExtendableOnY = true;
             if (!pipeVersion) {
                 template.sExtendable = true;
             }

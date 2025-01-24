@@ -24,8 +24,8 @@ namespace MarbleRunSimulatorCore {
             template.h = h;
             template.s = s;
 
-            template.yExtendable = true;
-            template.zExtendable = true;
+            template.lExtendableOnZ = true;
+            template.hExtendableOnY = true;
             if (!pipeVersion) {
                 template.sExtendable = true;
             }
