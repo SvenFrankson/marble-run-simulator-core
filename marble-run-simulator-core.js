@@ -3635,8 +3635,8 @@ var MarbleRunSimulatorCore;
             this._selected = false;
             this._hovered = false;
             this.instantiated = false;
-            let origin = Mummu.DrawDebugPoint(BABYLON.Vector3.Zero(), Infinity, BABYLON.Color3.Red(), 0.02);
-            origin.parent = this;
+            //let origin = Mummu.DrawDebugPoint(BABYLON.Vector3.Zero(), Infinity, BABYLON.Color3.Red(), 0.02);
+            //origin.parent = this;
             if (prop.fullPartName) {
                 this.fullPartName = prop.fullPartName;
             }
@@ -4111,7 +4111,7 @@ var MarbleRunSimulatorCore;
             return { dir: dir, up: up };
         }
         getProjection(worldPosition, outProj, outDir, outUp) {
-            let localPosition = worldPosition.subtract(this.position);
+            let localPosition = BABYLON.Vector3.TransformCoordinates(worldPosition, this.getWorldMatrix().clone().invert());
             let bestSqrDist = Infinity;
             let bestTrack;
             let bestPointIndex = -1;
@@ -4143,9 +4143,12 @@ var MarbleRunSimulatorCore;
                     dir = next.subtract(point).normalize();
                 }
                 if (point && normal && dir) {
-                    outProj.copyFrom(point).addInPlace(this.position);
+                    outProj.copyFrom(point);
                     outUp.copyFrom(normal);
                     outDir.copyFrom(dir);
+                    BABYLON.Vector3.TransformCoordinatesToRef(outProj, this.getWorldMatrix(), outProj);
+                    BABYLON.Vector3.TransformNormalToRef(outUp, this.getWorldMatrix(), outUp);
+                    BABYLON.Vector3.TransformNormalToRef(outDir, this.getWorldMatrix(), outDir);
                 }
             }
         }
@@ -4363,7 +4366,7 @@ var MarbleRunSimulatorCore;
             encloseMeshVertexData.applyToMesh(this.encloseMesh);
             this.encloseMesh.material = this.game.materials.slice9Cutoff;
             this.encloseMesh.parent = this;
-            this.encloseMesh.visibility = 1;
+            this.encloseMesh.visibility = 0;
             this.gridRectMesh = new BABYLON.Mesh("grid-rect-mesh");
             let points = [
                 new BABYLON.Vector3(x0, 0, z0),
@@ -4387,8 +4390,8 @@ var MarbleRunSimulatorCore;
             this.visibleHeight = Math.round((this.AABBMax.y - this.AABBMin.y) / MarbleRunSimulatorCore.tileHeight);
             this.visibleDepth = Math.round((this.AABBMax.z - this.AABBMin.z) / MarbleRunSimulatorCore.tileSize);
             this.localBarycenter = new BABYLON.Vector3((this.AABBMax.x + this.AABBMin.x) * 0.5, (this.AABBMax.y + this.AABBMin.y) * 0.5, (this.AABBMax.z + this.AABBMin.z) * 0.5);
-            let localBarycenterDebug = Mummu.DrawDebugPoint(this.localBarycenter, Infinity, BABYLON.Color3.Green(), 0.02);
-            localBarycenterDebug.parent = this;
+            //let localBarycenterDebug = Mummu.DrawDebugPoint(this.localBarycenter, Infinity, BABYLON.Color3.Green(), 0.02);
+            //localBarycenterDebug.parent = this;
             if (this.visibleWidth % 2 === 0) {
                 this.localBarycenterIJK.x = Math.floor(this.localBarycenter.x / MarbleRunSimulatorCore.tileSize);
             }
@@ -4402,8 +4405,8 @@ var MarbleRunSimulatorCore;
             else {
                 this.localBarycenterIJK.z = Math.round(this.localBarycenter.z / MarbleRunSimulatorCore.tileSize);
             }
-            let localBarycenterIJKDebug = Mummu.DrawDebugPoint(this.localBarycenterIJK.multiplyByFloats(MarbleRunSimulatorCore.tileSize, MarbleRunSimulatorCore.tileHeight, MarbleRunSimulatorCore.tileSize), Infinity, BABYLON.Color3.Blue(), 0.02);
-            localBarycenterIJKDebug.parent = this;
+            //let localBarycenterIJKDebug = Mummu.DrawDebugPoint(this.localBarycenterIJK.multiplyByFloats(tileSize, tileHeight, tileSize), Infinity, BABYLON.Color3.Blue(), 0.02);
+            //localBarycenterIJKDebug.parent = this;
             let aabb1 = BABYLON.Vector3.TransformCoordinates(this.AABBMin, this.getWorldMatrix());
             let aabb2 = BABYLON.Vector3.TransformCoordinates(this.AABBMax, this.getWorldMatrix());
             this.AABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
@@ -4447,7 +4450,7 @@ var MarbleRunSimulatorCore;
             }
         }
         updateTargetCoordinates(dt) {
-            if (isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
+            if (this.instantiated && isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
                 let f = Nabu.Easing.smoothNSec(1 / dt, 0.08);
                 let tI = isFinite(this._targetI) ? this._targetI : this.i;
                 let tJ = isFinite(this._targetJ) ? this._targetJ : this.j;
@@ -4468,9 +4471,11 @@ var MarbleRunSimulatorCore;
                     this._targetK = undefined;
                     this._targetR = undefined;
                     this.targetUpdatePivot = undefined;
-                    this.refreshEncloseMeshAndAABB();
-                    this.updateSelectorMeshVisibility();
-                    this.machine.requestUpdateShadow = true;
+                    this.instantiate(true).then(() => {
+                        this.refreshEncloseMeshAndAABB();
+                        this.updateSelectorMeshVisibility();
+                        this.machine.requestUpdateShadow = true;
+                    });
                 }
                 else {
                     if (this.targetUpdatePivot) {
