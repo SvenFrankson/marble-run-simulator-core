@@ -14,6 +14,25 @@ Exporter version: 6.4.5, Blender version: 2.90.1
 	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
 	processing begun of mesh:  0-base
 		processing begun of material:  Material.001
+		num positions      :  355
+		num normals        :  355
+		num tangents       :  0
+		num uvs            :  710
+		num uvs2           :  0
+		num colors         :  0
+		num triangles      :  368
+	processing begun of mesh:  1-plane
+		WARNING: No materials have been assigned: 
+		num positions      :  4
+		num normals        :  4
+		num tangents       :  0
+		num uvs            :  8
+		num uvs2           :  0
+		num colors         :  0
+		num triangles      :  2
+	processing begun of mesh:  2-base-hole
+		processing begun of material:  Material.001
+		registered as also a user of material:  Material.001
 		num positions      :  525
 		num normals        :  525
 		num tangents       :  0
@@ -21,7 +40,7 @@ Exporter version: 6.4.5, Blender version: 2.90.1
 		num uvs2           :  0
 		num colors         :  0
 		num triangles      :  542
-	processing begun of mesh:  1-plane
+	processing begun of mesh:  3-plane-hole
 		WARNING: No materials have been assigned: 
 		num positions      :  53
 		num normals        :  53
@@ -33,6 +52,8 @@ Exporter version: 6.4.5, Blender version: 2.90.1
 ========= Writing of JSON file started =========
 	writing mesh:  0-base
 	writing mesh:  1-plane
+	writing mesh:  2-base-hole
+	writing mesh:  3-plane-hole
 ========= Writing of JSON file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.0385 secs
+elapsed time:  0 min, 0.1845 secs

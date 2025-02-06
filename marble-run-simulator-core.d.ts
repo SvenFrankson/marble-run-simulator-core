@@ -144,6 +144,7 @@ declare namespace MarbleRunSimulatorCore {
         cableMaterial: BABYLON.Material;
         chainMaterial: BABYLON.Material;
         velvetMaterial: BABYLON.StandardMaterial;
+        floorMaterial: BABYLON.StandardMaterial;
         logoMaterial: BABYLON.StandardMaterial;
         baseAxisMaterial: BABYLON.StandardMaterial;
         whiteMaterial: BABYLON.StandardMaterial;
@@ -315,6 +316,7 @@ declare namespace MarbleRunSimulatorCore {
         minimalAutoQualityFailed: number;
         updatingMachinePartCoordinates: boolean;
         playing: boolean;
+        hasExitHole: boolean;
         exitShooter: Shooter;
         exitTrack: Start;
         exitHoleIn: BABYLON.Mesh;
@@ -486,6 +488,7 @@ declare namespace MarbleRunSimulatorCore {
         selectorEndpointsLogic: EndpointSelectorMesh[];
         encloseMesh: BABYLON.Mesh;
         gridRectMesh: BABYLON.Mesh;
+        gridHeightMesh: BABYLON.LinesMesh;
         isSelectable: boolean;
         onBeforeDelete: () => void;
         summedLength: number[];
@@ -597,6 +600,7 @@ declare namespace MarbleRunSimulatorCore {
         hover(): void;
         anhover(): void;
         updateSelectorMeshVisibility(): void;
+        private _alignShadow;
         getDirAndUpAtWorldPos(worldPosition: BABYLON.Vector3): {
             dir: BABYLON.Vector3;
             up: BABYLON.Vector3;
@@ -934,7 +938,7 @@ declare namespace MarbleRunSimulatorCore {
         cable: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
+        static GenerateTemplate(h: number): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         baseCableUVs: number[];

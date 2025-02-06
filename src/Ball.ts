@@ -357,7 +357,7 @@ namespace MarbleRunSimulatorCore {
                 this.recordedPositions.push(this.position.clone());
             }
             let sign = Math.sign(this.velocity.y);
-            if (this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.15) {
+            if (this.machine.hasExitHole && this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.15) {
                 this.collisionState = CollisionState.Inside;
                 this.marbleBowlInsideSound.setPlaybackRate(this.game.currentTimeFactor);
                 this.marbleBowlInsideSound.play();
@@ -398,7 +398,7 @@ namespace MarbleRunSimulatorCore {
                 if (this.collisionState === CollisionState.Normal) {
                     collisionableParts = this.machine.parts;
                 }
-                if (this.collisionState === CollisionState.Exit) {
+                if (this.machine.hasExitHole && this.collisionState === CollisionState.Exit) {
                     collisionableParts = [this.machine.exitShooter, this.machine.exitTrack];
                 }
                 if (collisionableParts) {
@@ -646,8 +646,11 @@ namespace MarbleRunSimulatorCore {
                         this.velocity.z = - Math.abs(this.velocity.z) * 0.5;
                         this.position.z = this.machine.baseMeshMaxZ + this.machine.root.position.z + this.machine.margin - 0.015 - this.radius;
                     }
-                    let colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHolePath);
-                    if (colExitInHole.hit) {
+                    let colExitInHole: Mummu.IIntersection;
+                    if (this.machine.hasExitHole) {
+                        colExitInHole = Mummu.SphereLatheIntersection(this.position, this.radius, this.machine.exitHoleIn.absolutePosition, this.machine.exitHolePath);
+                    }
+                    if (colExitInHole && colExitInHole.hit) {
                         //this.setLastHit(wire, col.index);
                         let colDig = colExitInHole.normal.scale(-1);
                         // Move away from collision
@@ -672,10 +675,16 @@ namespace MarbleRunSimulatorCore {
                     }
                     else {
                         // Check for hole in pedestalTop
-                        let dx = this.position.x - this.machine.exitHoleIn.absolutePosition.x;
-                        let dy = this.position.z - this.machine.exitHoleIn.absolutePosition.z;
-                        let sqrDistToExitHoleAxis = dx * dx + dy * dy;
-                        if (sqrDistToExitHoleAxis > 0.01835 * 0.01835) {
+                        let floorCollide = true;
+                        if (this.machine.hasExitHole) {
+                            let dx = this.position.x - this.machine.exitHoleIn.absolutePosition.x;
+                            let dy = this.position.z - this.machine.exitHoleIn.absolutePosition.z;
+                            let sqrDistToExitHoleAxis = dx * dx + dy * dy;
+                            if (sqrDistToExitHoleAxis < 0.01835 * 0.01835) {
+                                floorCollide = false;
+                            }
+                        }
+                        if (floorCollide) {
                             let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
                             if (col.hit) {
                                 //this.setLastHit(wire, col.index);
@@ -694,8 +703,12 @@ namespace MarbleRunSimulatorCore {
             
                                 this.surface = Surface.Velvet;
                                 this.bumpSurfaceIsRail = true;
-                                
-                                weight.copyFromFloats(- 0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
+                                if (this.machine.hasExitHole) {
+                                    weight.copyFromFloats(- 0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
+                                }
+                                else {
+                                    weight.copyFromFloats(0, -1, 0).normalize().scaleInPlace(9 * m);
+                                }
                             }
                         }
                     }

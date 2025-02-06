@@ -12,22 +12,19 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
 
             let partName = "elevator_" + prop.h.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(partName));
 
             for (let i = this.colors.length; i < 4; i++) {
                 this.colors[i] = 0;
             }
 
             let x = 1;
-            if (prop.mirrorX) {
-                x = -1;
-            }
 
             this.wheels = [new BABYLON.Mesh("wheel-0"), new BABYLON.Mesh("wheel-1")];
-            this.wheels[0].position.copyFromFloats(0.03 * x + tileWidth * 0.5, -tileHeight * (this.h + 0.35), 0);
+            this.wheels[0].position.copyFromFloats(0.03 * x + tileWidth * 0.5, tileHeight * (this.h + 1) - tileHeight * (this.h + 0.35), 0);
             this.wheels[0].parent = this;
 
-            this.wheels[1].position.copyFromFloats(0.03 * x + tileWidth * 0.5, 0.035 - tileHeight, 0);
+            this.wheels[1].position.copyFromFloats(0.03 * x + tileWidth * 0.5, tileHeight * this.h + 0.035, 0);
             this.wheels[1].parent = this;
 
             this.wires = [];
@@ -130,17 +127,15 @@ namespace MarbleRunSimulatorCore {
             this.wheels[1].material = this.game.materials.getMaterial(this.getColor(3), this.machine.materialQ);
         }
 
-        public static GenerateTemplate(h: number, mirrorX: boolean) {
+        public static GenerateTemplate(h: number) {
             let template = new MachinePartTemplate();
 
             template.partName = "elevator_" + h.toFixed(0);
             template.l = 2;
             template.h = h;
-            template.mirrorX = mirrorX;
 
             template.minH = 3;
-            template.yExtendable = true;
-            template.xMirrorable = true;
+            template.hExtendableOnY = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -164,27 +159,23 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * h, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, tileHeight, 0), dir),
 
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX - 1.6 * cupR, -tileHeight * h - dH, 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX - 0, -tileHeight * h - dH - cupR * 0.6, 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR, -tileHeight * h - dH, 0), n),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX - 1.6 * cupR, tileHeight - dH, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX - 0, tileHeight - dH - cupR * 0.6, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR, tileHeight - dH, 0), n),
 
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR, - tileHeight, 0), n),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR - 0.015, 0.035 - tileHeight, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR, tileHeight * h, 0), n),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(vertX + cupR - 0.015, tileHeight * h + 0.035, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
             ];
             template.trackTemplates[0].drawEndTip = true;
 
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
             template.trackTemplates[1].trackpoints = [
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight, 0), dirLeft),
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-0.008 + tileWidth * 0.5, -tileHeight * 0.5, 0), dirRight)
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, tileHeight * h, 0), dirLeft),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-0.008 + tileWidth * 0.5, tileHeight * h + tileHeight * 0.5, 0), dirRight)
             ];
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
 
             template.initialize();
 

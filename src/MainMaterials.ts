@@ -106,6 +106,7 @@ namespace MarbleRunSimulatorCore {
         public cableMaterial: BABYLON.Material;
         public chainMaterial: BABYLON.Material;
         public velvetMaterial: BABYLON.StandardMaterial;
+        public floorMaterial: BABYLON.StandardMaterial;
         public logoMaterial: BABYLON.StandardMaterial;
         public baseAxisMaterial: BABYLON.StandardMaterial;
         public whiteMaterial: BABYLON.StandardMaterial;
@@ -239,6 +240,10 @@ namespace MarbleRunSimulatorCore {
             this.velvetMaterial.diffuseColor.copyFromFloats(0.75, 0.75, 0.75);
             this.velvetMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/velvet.jpg");
             this.velvetMaterial.specularColor.copyFromFloats(0, 0, 0);
+
+            this.floorMaterial = new BABYLON.StandardMaterial("velvet-material");
+            this.floorMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/floor.png");
+            this.floorMaterial.specularColor.copyFromFloats(0, 0, 0);
 
             this.logoMaterial = new BABYLON.StandardMaterial("logo-material");
             this.logoMaterial.diffuseColor.copyFromFloats(1, 1, 1);

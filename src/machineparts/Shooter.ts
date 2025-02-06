@@ -87,7 +87,7 @@ namespace MarbleRunSimulatorCore {
 
             let cupR = 0.006;
             let dH = 0.001;
-            this.kickerYIdle = - dH - cupR * 0.8 - 0.004 + 0;
+            this.kickerYIdle = tileHeight * 3 - dH - cupR * 0.8 - 0.004 + 0;
             this.kicker.parent = this;
             this.kicker.position.copyFromFloats(x * tileWidth * 0.4 - 0, this.kickerYIdle, 0);
 
@@ -96,7 +96,7 @@ namespace MarbleRunSimulatorCore {
             this.shieldCollider.parent = this.shield;
             this.shieldCollider.isVisible = false;
 
-            this.shieldYClosed = 0;
+            this.shieldYClosed = tileHeight * 3;
             this.shield.position.copyFromFloats(x * tileWidth * 0.4 - 0, this.shieldYClosed, 0);
             this.shield.parent = this;
             
@@ -179,7 +179,7 @@ namespace MarbleRunSimulatorCore {
             template.h = h;
             template.n = n;
 
-            template.yExtendable = true;
+            template.hExtendableOnY = true;
             template.minH = 4;
             template.nExtendable = true;
             template.minN = 0;
@@ -207,35 +207,35 @@ namespace MarbleRunSimulatorCore {
                 template.trackTemplates[0] = new TrackTemplate(template);
                 template.trackTemplates[0].colorIndex = 0;
                 template.trackTemplates[0].trackpoints = [
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0 + 0, 0), dir),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, tileHeight * 3, 0), dir),
     
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 1.6 * cupR, 0 - dH + 0, 0), dir),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 0, 0 - dH - cupR * 0.8 + 0, 0), dir),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, 0 - dH + 0, 0), norm),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 1.6 * cupR, tileHeight * 3 - dH + 0, 0), dir),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 0, tileHeight * 3 - dH - cupR * 0.8 + 0, 0), dir),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, tileHeight * 3 - dH + 0, 0), norm),
     
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, - tileHeight + tileHeight * (h - 2) + 0, 0), norm),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR - 0.015, 0.035 - tileHeight + tileHeight * (h - 2) + 0, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, tileHeight * h + 0, 0), norm),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR - 0.015, 0.035 + tileHeight * h + 0, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
                 ];
                 template.trackTemplates[0].drawEndTip = true;
 
                 template.trackTemplates[1] = new TrackTemplate(template);
                 template.trackTemplates[1].colorIndex = 1;
                 template.trackTemplates[1].trackpoints = [
-                    new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight + tileHeight * (h - 2) + 0, 0), dirLeft),
-                    new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(tileWidth * 0.4 + cupR -0.02, -tileHeight * 0.6 + tileHeight * (h - 2) + 0, 0), dirRight)
+                    new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-tileWidth * 0.5, tileHeight * h + 0, 0), dirLeft),
+                    new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(tileWidth * 0.4 + cupR -0.02, tileHeight * 0.4 + tileHeight * h, 0), dirRight)
                 ];
             }
             else {
                 template.trackTemplates[0] = new TrackTemplate(template);
                 template.trackTemplates[0].trackpoints = [
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0 + 0, 0), dir),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, tileHeight * 3, 0), dir),
     
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 1.6 * cupR, 0 - dH + 0, 0), dir),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 0, 0 - dH - cupR * 0.8 + 0, 0), dir),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, 0 - dH + 0, 0), norm),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 1.6 * cupR, tileHeight * 3 - dH + 0, 0), dir),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 - 0, tileHeight * 3 - dH - cupR * 0.8 + 0, 0), dir),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, tileHeight * 3 - dH + 0, 0), norm),
     
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, tileHeight * 0.5 + tileHeight * (h - 2) + 0, 0), norm),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR + 0.01, 0.025 + tileHeight * 0.5 + tileHeight * (h - 2) + 0, 0), Tools.V3Dir(45), Tools.V3Dir(- 45)),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR, tileHeight * 1.5 + tileHeight * h + 0, 0), norm),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR + 0.01, 0.025 + tileHeight * 1.5 + tileHeight * h + 0, 0), Tools.V3Dir(45), Tools.V3Dir(- 45)),
                 ];
                 template.trackTemplates[0].drawEndTip = true;
             }
@@ -275,7 +275,7 @@ namespace MarbleRunSimulatorCore {
         public getBallReady(): Ball {
             let center = new BABYLON.Vector3(
                 this.kicker.position.x,
-                + 0,
+                tileHeight * 3,
                 0
             );
             BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
@@ -297,7 +297,7 @@ namespace MarbleRunSimulatorCore {
         public getBallArmed(): Ball {
             let center = new BABYLON.Vector3(
                 this.kicker.position.x,
-                + 0,
+                tileHeight * 3,
                 0
             );
             BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);

@@ -439,7 +439,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName.startsWith("elevator_")) {
                     let h = parseInt(partName.split("_")[1]);
-                    data = Elevator.GenerateTemplate(h, mirrorX);
+                    data = Elevator.GenerateTemplate(h);
                 }
                 else if (partName.startsWith("steamelevator_")) {
                     let h = parseInt(partName.split("_")[1]);

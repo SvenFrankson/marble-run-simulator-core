@@ -265,6 +265,7 @@ namespace MarbleRunSimulatorCore {
         public selectorEndpointsLogic: EndpointSelectorMesh[] = [];
         public encloseMesh: BABYLON.Mesh;
         public gridRectMesh: BABYLON.Mesh;
+        public gridHeightMesh: BABYLON.LinesMesh;
         public isSelectable: boolean = true;
         public onBeforeDelete: () => void;
 
@@ -539,6 +540,8 @@ namespace MarbleRunSimulatorCore {
 
             this.parent = this.machine.root;
             this.tracks = [];
+
+            this.refreshEncloseMeshAndAABB();
         }
 
         public offsetPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
@@ -780,7 +783,7 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (this.encloseMesh && false) {
+            if (this.encloseMesh) {
                 if (this._selected) {
                     this.encloseMesh.visibility = 1;
                 }
@@ -789,12 +792,17 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (this.gridRectMesh && this.gridRectMesh.parent === this) {
+            if (this.gridRectMesh) {
                 if (this._selected) {
                     this.gridRectMesh.isVisible = true;
+                    this._scene.onBeforeRenderObservable.add(this._alignShadow);
                 }
                 else {
                     this.gridRectMesh.isVisible = false;
+                    this._scene.onBeforeRenderObservable.removeCallback(this._alignShadow);
+                    if (this.gridHeightMesh) {
+                        this.gridHeightMesh.dispose();
+                    }
                 }
             }
 
@@ -803,11 +811,87 @@ namespace MarbleRunSimulatorCore {
             })
         }
 
+        private _alignShadow = () => {
+            if (this._selected) {
+                this.gridRectMesh.position.x = this.position.x;
+                this.gridRectMesh.position.y = - tileHeight * 0.5;
+                this.gridRectMesh.position.z = this.position.z;
+                this.gridRectMesh.rotation.y = this.rotation.y;
+    
+                let points = [
+                    new BABYLON.Vector3(this.encloseStart.x, 0, this.encloseStart.z),
+                    new BABYLON.Vector3(this.encloseEnd.x, 0, this.encloseStart.z),
+                    new BABYLON.Vector3(this.encloseEnd.x, 0, this.encloseEnd.z),
+                    new BABYLON.Vector3(this.encloseStart.x, 0, this.encloseEnd.z)
+                ];
+                BABYLON.Vector3.TransformCoordinatesToRef(points[0], this.getWorldMatrix(), points[0]);
+                BABYLON.Vector3.TransformCoordinatesToRef(points[1], this.getWorldMatrix(), points[1]);
+                BABYLON.Vector3.TransformCoordinatesToRef(points[2], this.getWorldMatrix(), points[2]);
+                BABYLON.Vector3.TransformCoordinatesToRef(points[3], this.getWorldMatrix(), points[3]);
+                let dirs = [
+                    points[1].subtract(points[0]).normalize(),
+                    points[2].subtract(points[1]).normalize(),
+                    points[3].subtract(points[2]).normalize(),
+                    points[0].subtract(points[3]).normalize()
+                ]
+                let camRight = this._scene.activeCamera.getDirection(BABYLON.Axis.X);
+                let bestDir = 0;
+                let dots = dirs.map(d => { return BABYLON.Vector3.Dot(d, camRight) });
+                if (dots[0] >= dots[1] && dots[0] >= dots[2] && dots[0] >= dots[3]) {
+                    bestDir = 0;
+                }
+                else if (dots[1] >= dots[0] && dots[1] >= dots[2] && dots[1] >= dots[3]) {
+                    bestDir = 1;
+                }
+                else if (dots[2] >= dots[0] && dots[2] >= dots[1] && dots[2] >= dots[3]) {
+                    bestDir = 2;
+                }
+                else {
+                    bestDir = 3;
+                }
+
+                let lines = [];
+    
+                for (let i = bestDir; i < bestDir + 2; i++) {
+                    let low = new BABYLON.Vector3(points[i % 4].x, - tileHeight * 0.5, points[i % 4].z);
+                    let high = new BABYLON.Vector3(points[i % 4].x, this.position.y + this.encloseStart.y, points[i % 4].z);
+
+                    lines.push([low, high]);
+                    
+                    let l = Math.round((high.y - low.y) / (tileHeight * 0.5));
+                    let d = dirs[bestDir];
+                    for (let j = 1; j < l; j++) {
+                        let p = low.clone();
+                        p.y += j * tileHeight * 0.5;
+        
+                        let r = j % 2 === 0 ? 0.005 : 0.0025;
+                        if (i > bestDir) {
+                            r *= - 1;
+                        }
+        
+                        let px0 = p.clone();
+                        let px1 = p.clone();
+                        px1.x += d.x * r;
+                        px1.z += d.z * r;
+        
+                        //let pz0 = p.clone().addInPlaceFromFloats(0, 0, - r);
+                        //let pz1 = p.clone().addInPlaceFromFloats(0, 0, r);
+        
+                        lines.push([px0, px1]);
+                    }
+                }
+    
+                if (this.gridHeightMesh) {
+                    this.gridHeightMesh.dispose();
+                }
+                this.gridHeightMesh = BABYLON.MeshBuilder.CreateLineSystem("gridHeightMesh", { lines: lines });
+                this.gridHeightMesh.position.y = 0;
+            }
+        }
+
         public getDirAndUpAtWorldPos(worldPosition: BABYLON.Vector3): { dir: BABYLON.Vector3, up: BABYLON.Vector3 } {
             let dir = BABYLON.Vector3.Right();
             let up = BABYLON.Vector3.Up();
-
-
 
             return { dir: dir, up: up };
         }
@@ -1056,6 +1140,11 @@ namespace MarbleRunSimulatorCore {
                     let dy = this.wireGauge * 0.5;
                     let dz = this.wireGauge * 0.5;
                     if (trackpoint.dir) {
+                        if (Math.abs(trackpoint.dir.y) > 0.5) {
+                            dx = this.wireGauge * 0.5
+                            dy = this.wireGauge * 0.5;
+                            dz = this.wireGauge * 0.5;
+                        }
                         if (Math.abs(trackpoint.dir.z) > Math.abs(trackpoint.dir.x)) {
                             dx = this.wireGauge * 0.5
                             dz = 0;
@@ -1102,7 +1191,7 @@ namespace MarbleRunSimulatorCore {
                 .addInPlace(this.encloseEnd.scale(2 / 3));
                 
             this.encloseMesh = new BABYLON.Mesh("enclose-mesh");
-            let encloseMeshVertexData = Tools.Box9SliceVertexData(this.encloseStart.add(new BABYLON.Vector3(0.001, 0.001, 0.001)), this.encloseEnd.subtract(new BABYLON.Vector3(0.001, 0.001, 0.001)), 0.001);
+            let encloseMeshVertexData = Tools.Box9SliceVertexData(this.encloseStart, this.encloseEnd, 0.001);
             encloseMeshVertexData.applyToMesh(this.encloseMesh);
             this.encloseMesh.material = this.game.materials.slice9Cutoff;
             this.encloseMesh.parent = this;
@@ -1115,13 +1204,12 @@ namespace MarbleRunSimulatorCore {
                 new BABYLON.Vector3(x1, 0, z1),
                 new BABYLON.Vector3(x1, 0, z0),
             ];
-            points = Mummu.BevelClosedPath(points, 0.003);
             points = Mummu.BevelClosedPath(points, 0.001);
-            let gridRectVertexData = Mummu.CreateWireVertexData({ path: points, radius: 0.0004, closed: true });
+            points = Mummu.BevelClosedPath(points, 0.0003);
+            let gridRectVertexData = Mummu.CreateWireVertexData({ path: points, radius: 0.0005, closed: true });
             gridRectVertexData.applyToMesh(this.gridRectMesh);
             this.gridRectMesh.material = this.game.materials.whiteFullLitMaterial;
             
-            this.gridRectMesh.parent = this;
             this.gridRectMesh.isVisible = false;
 
             this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseStart.y, this.encloseStart.z);
@@ -1239,6 +1327,7 @@ namespace MarbleRunSimulatorCore {
                     this.instantiate(true).then(() => {
                         this.refreshEncloseMeshAndAABB();
                         this.updateSelectorMeshVisibility();
+                        this.machine.generateBaseMesh();
                         this.machine.requestUpdateShadow = true;
                     })
                 }
