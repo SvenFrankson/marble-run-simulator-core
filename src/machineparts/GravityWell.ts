@@ -11,14 +11,14 @@ namespace MarbleRunSimulatorCore {
             let partName = "gravitywell";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
 
-            this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(tileWidth, tileHeight * 0.9, 0)];
+            this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(tileWidth * 1.2, tileHeight * 0.9, 0)];
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
 
             this.wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
-            this.wellPath.push(new BABYLON.Vector3(tileWidth, tileHeight * 1, 0));
+            this.wellPath.push(new BABYLON.Vector3(tileWidth * 1.2, tileHeight * 1, 0));
 
             this.wellMesh = new BABYLON.Mesh("gravitywell-mesh");
             this.wellMesh.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth);
@@ -46,7 +46,7 @@ namespace MarbleRunSimulatorCore {
             this.wellMesh.parent = this;
             this.wellMesh.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
             
-            BABYLON.CreateTorusVertexData({ diameter: tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
+            BABYLON.CreateTorusVertexData({ diameter: tileWidth * 2 * 1.2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
             this.circleTop.material = this.wellMesh.material;
             
             BABYLON.CreateTorusVertexData({ diameter: 0.01 * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleBottom);

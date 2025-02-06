@@ -1315,7 +1315,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Wall extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(h: number, d: number, mirrorX?: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

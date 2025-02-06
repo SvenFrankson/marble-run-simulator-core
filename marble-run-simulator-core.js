@@ -3202,6 +3202,7 @@ var MarbleRunSimulatorCore;
             if (baseName === "elevator") {
                 prop.k -= prop.h + 1;
                 if (prop.mirrorX) {
+                    prop.i += 3;
                     prop.r = 2;
                 }
             }
@@ -3227,12 +3228,24 @@ var MarbleRunSimulatorCore;
                     prop.j -= newL;
                     if (prop.mirrorZ) {
                         prop.h = -prop.h;
-                        prop.k += prop.h;
                     }
                     else {
                         prop.k -= prop.h;
                     }
                 }
+                prop.l = newL;
+            }
+            if (baseName === "wall") {
+                let newL = (prop.d - 1) * 3;
+                if (prop.mirrorX) {
+                    prop.i += 4;
+                    prop.r = 2;
+                }
+                else {
+                    prop.i--;
+                    prop.j -= newL;
+                }
+                prop.k -= prop.h;
                 prop.l = newL;
             }
         }
@@ -4436,6 +4449,12 @@ var MarbleRunSimulatorCore;
             let x1 = this.wireGauge * 0.5;
             let y1 = this.wireGauge * 0.5;
             let z1 = this.wireGauge * 0.5;
+            if (this instanceof MarbleRunSimulatorCore.GravityWell) {
+                x0 = MarbleRunSimulatorCore.tileWidth * 0.5 - MarbleRunSimulatorCore.tileWidth * 1.2;
+                x1 = MarbleRunSimulatorCore.tileWidth * 0.5 + MarbleRunSimulatorCore.tileWidth * 1.2;
+                z0 = -MarbleRunSimulatorCore.tileDepth - MarbleRunSimulatorCore.tileWidth * 1.2;
+                z1 = -MarbleRunSimulatorCore.tileDepth + MarbleRunSimulatorCore.tileWidth * 1.2;
+            }
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
                 for (let j = 0; j < track.template.trackpoints.length; j++) {
@@ -4923,10 +4942,10 @@ var MarbleRunSimulatorCore;
             if (partName === "wall" || partName.startsWith("wall_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let h = parseInt(argStr.split(".")[0]);
-                    let d = parseInt(argStr.split(".")[1]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
                     prop.h = h;
-                    prop.d = d;
                 }
                 return new MarbleRunSimulatorCore.Wall(this.machine, prop);
             }
@@ -6139,9 +6158,9 @@ var MarbleRunSimulatorCore;
                     data = MarbleRunSimulatorCore.UTurn.GenerateTemplate(l, h, 0, false, true);
                 }
                 else if (partName.startsWith("wall_")) {
-                    let h = parseInt(partName.split("_")[1].split(".")[0]);
-                    let d = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = MarbleRunSimulatorCore.Wall.GenerateTemplate(h, d, mirrorX);
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = MarbleRunSimulatorCore.Wall.GenerateTemplate(l, h);
                 }
                 else if (partName.startsWith("uturnsharp")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
@@ -7875,13 +7894,13 @@ var MarbleRunSimulatorCore;
             this.wellPath = [];
             let partName = "gravitywell";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
-            this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
+            this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.2, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             this.wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
-            this.wellPath.push(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 1, 0));
+            this.wellPath.push(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.2, MarbleRunSimulatorCore.tileHeight * 1, 0));
             this.wellMesh = new BABYLON.Mesh("gravitywell-mesh");
             this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
@@ -7903,7 +7922,7 @@ var MarbleRunSimulatorCore;
             this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
             this.wellMesh.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
-            BABYLON.CreateTorusVertexData({ diameter: MarbleRunSimulatorCore.tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
+            BABYLON.CreateTorusVertexData({ diameter: MarbleRunSimulatorCore.tileWidth * 2 * 1.2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
             this.circleTop.material = this.wellMesh.material;
             BABYLON.CreateTorusVertexData({ diameter: 0.01 * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleBottom);
             this.circleBottom.material = this.wellMesh.material;
@@ -11319,43 +11338,40 @@ var MarbleRunSimulatorCore;
     class Wall extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "wall_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            let partName = "wall_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             this.generateWires();
         }
-        static GenerateTemplate(h, d, mirrorX) {
+        static GenerateTemplate(l, h) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "wall_" + h.toFixed(0) + "." + d.toFixed(0);
+            template.partName = "wall_" + l.toFixed(0) + "." + h.toFixed(0);
             template.angleSmoothSteps = 100;
             template.maxAngle = (0.8 * Math.PI) / 2;
             template.minTurnRadius = 0.12;
-            template.l = 2;
+            template.l = l;
+            template.minL = 3;
             template.h = h;
             template.minH = 3;
-            template.d = d;
-            template.minD = 3;
-            template.mirrorX = mirrorX;
             template.yExtendable = true;
-            template.zExtendable = true;
-            template.xMirrorable = true;
+            template.lExtendableOnZ = true;
             let r = MarbleRunSimulatorCore.tileWidth;
             let rY = template.h * MarbleRunSimulatorCore.tileHeight * 0.45;
             let depthStart = 0;
-            let depthEnd = -MarbleRunSimulatorCore.tileDepth * (template.d - 1);
+            let depthEnd = MarbleRunSimulatorCore.tileSize * template.l;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -template.h * MarbleRunSimulatorCore.tileHeight, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))];
+            template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))];
             for (let n = 0; n <= 8; n++) {
                 let f = n / 8;
                 let cosa = Math.cos(2 * Math.PI * f);
                 let sina = Math.sin(Math.PI * f);
-                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-(1 - sina) * r + r, (1 - cosa) * rY - template.h * MarbleRunSimulatorCore.tileHeight, Nabu.Easing.easeInOutSine(Nabu.Easing.easeInOutSine(f)) * (depthEnd - depthStart) + depthStart), undefined, n === 4 ? MarbleRunSimulatorCore.Tools.V3Dir(Math.PI) : undefined));
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-(1 - sina) * r + r, (1 - cosa) * rY, Nabu.Easing.easeInOutSine(Nabu.Easing.easeInOutSine(f)) * (depthEnd - depthStart) + depthStart), undefined, n === 4 ? MarbleRunSimulatorCore.Tools.V3Dir(Math.PI) : undefined));
             }
-            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, -template.h * MarbleRunSimulatorCore.tileHeight, -MarbleRunSimulatorCore.tileDepth * (template.d - 1)), MarbleRunSimulatorCore.Tools.V3Dir(-90)));
+            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, 0, depthEnd), MarbleRunSimulatorCore.Tools.V3Dir(-90)));
             let points = template.trackTemplates[0].trackpoints.map((tp) => {
                 return tp.position.clone();
             });
             let f = 3;
-            for (let n = 0; n < 2; n++) {
+            for (let n = 0; n < 1; n++) {
                 let smoothedPoints = [...points].map((p) => {
                     return p.clone();
                 });
@@ -11370,9 +11386,6 @@ var MarbleRunSimulatorCore;
             }
             for (let i = 0; i < points.length; i++) {
                 template.trackTemplates[0].trackpoints[i].position.copyFrom(points[i]);
-            }
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
             }
             template.initialize();
             return template;

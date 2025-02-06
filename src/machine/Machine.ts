@@ -1951,6 +1951,7 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "elevator") {
                 prop.k -= prop.h + 1;
                 if (prop.mirrorX) {
+                    prop.i += 3;
                     prop.r = 2;
                 }
             }
@@ -1978,12 +1979,24 @@ namespace MarbleRunSimulatorCore {
                     prop.j -= newL;
                     if (prop.mirrorZ) {
                         prop.h = - prop.h;
-                        prop.k += prop.h;
                     }
                     else {
                         prop.k -= prop.h;
                     }
                 }
+                prop.l = newL;
+            }
+            if (baseName === "wall") {
+                let newL = (prop.d - 1) * 3;
+                if (prop.mirrorX) {
+                    prop.i += 4;
+                    prop.r = 2;
+                }
+                else {
+                    prop.i--;
+                    prop.j -= newL;
+                }
+                prop.k -= prop.h;
                 prop.l = newL;
             }
         }
