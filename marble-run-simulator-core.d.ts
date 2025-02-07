@@ -547,6 +547,7 @@ declare namespace MarbleRunSimulatorCore {
         get maxH(): number;
         get minD(): number;
         get maxD(): number;
+        get minDAbsolute(): number;
         get minN(): number;
         get maxN(): number;
         get minS(): number;
@@ -772,6 +773,7 @@ declare namespace MarbleRunSimulatorCore {
         maxL: number;
         minH: number;
         maxH: number;
+        minDAbsolute: number;
         minD: number;
         maxD: number;
         minN: number;
@@ -1011,7 +1013,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Loop extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(w: number, d: number, n: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, d: number, n: number, mirrorZ: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

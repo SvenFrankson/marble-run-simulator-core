@@ -1999,6 +1999,10 @@ namespace MarbleRunSimulatorCore {
                 prop.k -= prop.h;
                 prop.l = newL;
             }
+            if (baseName === "loop") {
+                prop.l = prop.l * 3;
+                prop.k -= 4;
+            }
         }
 
         public deserializeV11(data: IMachineData): void {

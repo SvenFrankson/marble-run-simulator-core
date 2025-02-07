@@ -304,6 +304,7 @@ namespace MarbleRunSimulatorCore {
         public maxL: number = 35;
         public minH: number = 0;
         public maxH: number = 35;
+        public minDAbsolute: number = 0;
         public minD: number = 1;
         public maxD: number = 35;
         public minN: number = 1;
@@ -482,10 +483,10 @@ namespace MarbleRunSimulatorCore {
                     data = Join.GenerateTemplate(mirrorX);
                 }
                 else if (partName.startsWith("loop_")) {
-                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let d = parseInt(partName.split("_")[1].split(".")[1]);
                     let n = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = Loop.GenerateTemplate(w, d, n, mirrorX, mirrorZ);
+                    data = Loop.GenerateTemplate(l, d, n, mirrorZ);
                 }
                 else if (partName.startsWith("spiral_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);

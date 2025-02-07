@@ -462,6 +462,9 @@ namespace MarbleRunSimulatorCore {
         public get maxD(): number {
             return this.template.maxD;
         }
+        public get minDAbsolute(): number {
+            return this.template.minDAbsolute;
+        }
         public get minN(): number {
             return this.template.minN;
         }
