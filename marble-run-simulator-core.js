@@ -6263,7 +6263,7 @@ var MarbleRunSimulatorCore;
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let d = parseInt(partName.split("_")[1].split(".")[1]);
                     let n = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = MarbleRunSimulatorCore.Loop.GenerateTemplate(l, d, n, mirrorZ);
+                    data = MarbleRunSimulatorCore.Loop.GenerateTemplate(l, d, n);
                 }
                 else if (partName.startsWith("spiral_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
@@ -8071,22 +8071,19 @@ var MarbleRunSimulatorCore;
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
-        static GenerateTemplate(l, d, n, mirrorZ) {
+        static GenerateTemplate(l, d, n) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "loop_" + l.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
             template.l = l;
-            template.h = 4;
             template.d = d;
             template.n = n;
-            template.mirrorZ = mirrorZ;
             template.lExtendableOnX = true;
-            template.minL = 6;
+            template.minL = 3;
             template.dExtendableOnZ = true;
             template.minD = -32;
             template.maxD = 32;
             template.minDAbsolute = 1;
             template.nExtendable = true;
-            template.zMirrorable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].onNormalEvaluated = (n) => {
                 n.z = 0;
@@ -8094,14 +8091,13 @@ var MarbleRunSimulatorCore;
             };
             template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))];
             let loopsCount = n;
-            let xStart = -MarbleRunSimulatorCore.tileSize * 0.5;
-            let xEnd = -MarbleRunSimulatorCore.tileSize * 0.5 + MarbleRunSimulatorCore.tileSize * template.l;
-            let r = MarbleRunSimulatorCore.tileWidth * 0.7;
+            let xCenter = -MarbleRunSimulatorCore.tileSize * 0.5 + MarbleRunSimulatorCore.tileSize * template.l * 0.5;
+            let r = MarbleRunSimulatorCore.tileSize * template.l * 0.5 * 0.7;
             let depthStart = 0;
             let depthEnd = MarbleRunSimulatorCore.tileSize * template.d;
             for (let nLoop = 0; nLoop < loopsCount; nLoop++) {
                 for (let n = 0; n <= 8; n++) {
-                    if (n < 8 || xStart != xEnd || nLoop === loopsCount - 1) {
+                    if (n < 8 || nLoop === loopsCount - 1) {
                         let f = (n + 8 * nLoop) / (8 * loopsCount);
                         let a = (2 * Math.PI * n) / 8;
                         let cosa = Math.cos(a);
@@ -8110,8 +8106,7 @@ var MarbleRunSimulatorCore;
                         if (loopsCount > 1) {
                             fx = nLoop / (loopsCount - 1);
                         }
-                        let x = (1 - fx) * xStart + fx * xEnd;
-                        template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + x, r * 1 - cosa * r, f * (depthEnd - depthStart) + depthStart)));
+                        template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + xCenter, r * 1 - cosa * r, f * (depthEnd - depthStart) + depthStart)));
                     }
                 }
             }
@@ -8135,9 +8130,6 @@ var MarbleRunSimulatorCore;
             }
             for (let i = 0; i < points.length; i++) {
                 template.trackTemplates[0].trackpoints[i].position.copyFrom(points[i]);
-            }
-            if (mirrorZ) {
-                template.mirrorZTrackPointsInPlace();
             }
             template.initialize();
             return template;

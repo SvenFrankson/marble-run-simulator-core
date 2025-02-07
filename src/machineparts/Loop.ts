@@ -15,25 +15,22 @@ namespace MarbleRunSimulatorCore {
             this.generateWires();
         }
 
-        public static GenerateTemplate(l: number, d: number, n: number, mirrorZ: boolean): MachinePartTemplate {
+        public static GenerateTemplate(l: number, d: number, n: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
             template.partName = "loop_" + l.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
 
             template.l = l;
-            template.h = 4;
             template.d = d;
             template.n = n;
-            template.mirrorZ = mirrorZ;
 
             template.lExtendableOnX = true;
-            template.minL = 6;
+            template.minL = 3;
             template.dExtendableOnZ = true;
             template.minD = -32;
             template.maxD = 32;
             template.minDAbsolute = 1;
             template.nExtendable = true;
-            template.zMirrorable = true;
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].onNormalEvaluated = (n) => {
@@ -43,15 +40,14 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, 0), Tools.V3Dir(90))];
 
             let loopsCount = n;
-            let xStart = - tileSize * 0.5;
-            let xEnd = - tileSize * 0.5 + tileSize * template.l;
-            let r = tileWidth * 0.7;
+            let xCenter = - tileSize * 0.5 + tileSize * template.l * 0.5;
+            let r = tileSize * template.l * 0.5 * 0.7;
             let depthStart = 0;
             let depthEnd = tileSize * template.d;
 
             for (let nLoop = 0; nLoop < loopsCount; nLoop++) {
                 for (let n = 0; n <= 8; n++) {
-                    if (n < 8 || xStart != xEnd || nLoop === loopsCount - 1) {
+                    if (n < 8 || nLoop === loopsCount - 1) {
                         let f = (n + 8 * nLoop) / (8 * loopsCount);
                         let a = (2 * Math.PI * n) / 8;
                         let cosa = Math.cos(a);
@@ -61,8 +57,7 @@ namespace MarbleRunSimulatorCore {
                         if (loopsCount > 1) {
                             fx = nLoop / (loopsCount - 1);
                         }
-                        let x = (1 - fx) * xStart + fx * xEnd;
-                        template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + x, r * 1 - cosa * r, f * (depthEnd - depthStart) + depthStart)));
+                        template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + xCenter, r * 1 - cosa * r, f * (depthEnd - depthStart) + depthStart)));
                     }
                 }
             }
@@ -89,10 +84,6 @@ namespace MarbleRunSimulatorCore {
 
             for (let i = 0; i < points.length; i++) {
                 template.trackTemplates[0].trackpoints[i].position.copyFrom(points[i]);
-            }
-
-            if (mirrorZ) {
-                template.mirrorZTrackPointsInPlace();
             }
 
             template.initialize();

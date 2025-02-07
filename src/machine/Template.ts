@@ -486,7 +486,7 @@ namespace MarbleRunSimulatorCore {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let d = parseInt(partName.split("_")[1].split(".")[1]);
                     let n = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = Loop.GenerateTemplate(l, d, n, mirrorZ);
+                    data = Loop.GenerateTemplate(l, d, n);
                 }
                 else if (partName.startsWith("spiral_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
