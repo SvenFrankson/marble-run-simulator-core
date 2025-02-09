@@ -32,7 +32,8 @@ namespace MarbleRunSimulatorCore {
         "woodramp_1.1.1",
         "wooduturn_2.0",
         "uturnv2_0.2",
-        "curb_2.0"
+        "curb_2.0",
+        "rampv2_1.1.1",
     ];
 
     export interface IMachinePartProp {

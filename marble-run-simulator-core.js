@@ -2619,9 +2619,9 @@ var MarbleRunSimulatorCore;
                 partDataString += NToHex(pJ, 2);
                 partDataString += NToHex(pK, 2);
                 partDataString += NToHex(pR, 1);
-                partDataString += NToHex(part.w, 1);
-                partDataString += NToHex(part.h, 1);
-                partDataString += NToHex(part.d, 1);
+                partDataString += NToHex(part.w + partOffset, 2);
+                partDataString += NToHex(part.h + partOffset, 2);
+                partDataString += NToHex(part.d + partOffset, 2);
                 partDataString += NToHex(part.n, 1);
                 partDataString += NToHex(part.s, 1);
                 let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
@@ -3218,7 +3218,10 @@ var MarbleRunSimulatorCore;
                     if (prop.d === 4) {
                         prop.i += 7;
                     }
-                    if (!prop.mirrorZ) {
+                    if (prop.mirrorZ) {
+                        prop.k -= prop.h;
+                    }
+                    else {
                         prop.h = -prop.h;
                     }
                     prop.r = 2;
@@ -3287,9 +3290,9 @@ var MarbleRunSimulatorCore;
                         let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let pR = parseInt(dataString.substring(pt, pt += 1), 36);
                         //console.log("part ijk " + pI + " " + pJ + " " + pK);
-                        let l = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let h = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let l = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                        let h = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                        let d = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let n = parseInt(dataString.substring(pt, pt += 1), 36);
                         let s = parseInt(dataString.substring(pt, pt += 1), 36);
                         let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -4770,7 +4773,8 @@ var MarbleRunSimulatorCore;
         "woodramp_1.1.1",
         "wooduturn_2.0",
         "uturnv2_0.2",
-        "curb_2.0"
+        "curb_2.0",
+        "rampv2_1.1.1",
     ];
     class MachinePartFactory {
         constructor(machine) {

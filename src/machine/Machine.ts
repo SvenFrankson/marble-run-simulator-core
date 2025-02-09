@@ -1282,9 +1282,9 @@ namespace MarbleRunSimulatorCore {
                 partDataString += NToHex(pK, 2);
                 partDataString += NToHex(pR, 1);
 
-                partDataString += NToHex(part.w, 1);
-                partDataString += NToHex(part.h, 1);
-                partDataString += NToHex(part.d, 1);
+                partDataString += NToHex(part.w + partOffset, 2);
+                partDataString += NToHex(part.h + partOffset, 2);
+                partDataString += NToHex(part.d + partOffset, 2);
                 partDataString += NToHex(part.n, 1);
                 partDataString += NToHex(part.s, 1);
                 let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
@@ -1968,7 +1968,10 @@ namespace MarbleRunSimulatorCore {
                         prop.i += 7;
                     }
 
-                    if (!prop.mirrorZ) {
+                    if (prop.mirrorZ) {
+                        prop.k -= prop.h;
+                    }
+                    else {
                         prop.h = - prop.h;
                     }
 
@@ -2049,9 +2052,9 @@ namespace MarbleRunSimulatorCore {
 
                         //console.log("part ijk " + pI + " " + pJ + " " + pK);
 
-                        let l = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let h = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                        let l = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                        let h = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
+                        let d = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                         let n = parseInt(dataString.substring(pt, pt += 1), 36);
                         let s = parseInt(dataString.substring(pt, pt += 1), 36);
                         let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
