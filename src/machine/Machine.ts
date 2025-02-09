@@ -2006,6 +2006,12 @@ namespace MarbleRunSimulatorCore {
                 prop.l = prop.l * 3;
                 prop.k -= 4;
             }
+            if (baseName === "split") {
+                prop.k -= 1;
+                if (prop.mirrorX) {
+                    prop.r = 2;
+                }
+            }
         }
 
         public deserializeV11(data: IMachineData): void {

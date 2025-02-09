@@ -462,7 +462,7 @@ namespace MarbleRunSimulatorCore {
                     data = Screw.GenerateTemplate(w, h, mirrorX);
                 }
                 else if (partName === "split") {
-                    data = Split.GenerateTemplate(mirrorX, mirrorZ);
+                    data = Split.GenerateTemplate(mirrorZ);
                 }
                 else if (partName === "forwardSplit") {
                     data = ForwardSplit.GenerateTemplate(mirrorX, mirrorZ);

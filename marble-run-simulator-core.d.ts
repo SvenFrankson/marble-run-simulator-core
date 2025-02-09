@@ -1215,7 +1215,6 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Split extends MachinePart {
         private _animatePivot;
-        anchor: BABYLON.Mesh;
         pivot: BABYLON.Mesh;
         axisZMin: number;
         axisZMax: number;
@@ -1223,7 +1222,7 @@ declare namespace MarbleRunSimulatorCore {
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+        static GenerateTemplate(mirror: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         private _exitLeft;
