@@ -1967,6 +1967,9 @@ namespace MarbleRunSimulatorCore {
                     if (prop.d === 4) {
                         prop.i += 7;
                     }
+                    if (prop.d === 5) {
+                        prop.i += 10;
+                    }
 
                     if (prop.mirrorZ) {
                         prop.k -= prop.h;
@@ -2004,7 +2007,20 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "loop") {
                 prop.l = prop.l * 3;
+                prop.d = (prop.d - 1) * 3;
                 prop.k -= 4;
+                if (prop.mirrorX) {
+
+                }
+                else {
+                    prop.i--;
+                    if (prop.mirrorZ) {
+    
+                    }
+                    else {
+                        prop.d = - prop.d;
+                    }
+                }
             }
             if (baseName === "split") {
                 prop.k -= 1;

@@ -1307,7 +1307,7 @@ namespace MarbleRunSimulatorCore {
 
         public updateTargetCoordinates(dt: number): boolean {
             if (this.instantiated && isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
-                let f = Nabu.Easing.smoothNSec(1 / dt, 0.08);
+                let f = Nabu.Easing.smoothNSec(1 / dt, 0.1);
                 let tI = isFinite(this._targetI) ? this._targetI : this.i;
                 let tJ = isFinite(this._targetJ) ? this._targetJ : this.j;
                 let tK = isFinite(this._targetK) ? this._targetK : this.k;
