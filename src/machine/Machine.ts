@@ -2028,6 +2028,19 @@ namespace MarbleRunSimulatorCore {
                     prop.r = 2;
                 }
             }
+            if (baseName === "stairway") {
+                prop.l = prop.l * 3;
+                prop.h = prop.h - 2;
+            }
+            if (baseName === "screw") {
+                prop.l = prop.l * 3;
+                prop.k -= prop.h;
+
+                if (prop.mirrorX) {
+                    prop.r = 2;
+                    prop.i += prop.l - 3;
+                }
+            }
         }
 
         public deserializeV11(data: IMachineData): void {

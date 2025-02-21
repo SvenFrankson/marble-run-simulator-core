@@ -60,29 +60,20 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
 
             let partName = "stairway_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(partName));
 
             for (let i = this.colors.length; i < 4; i++) {
                 this.colors[i] = 0;
             }
 
-            let x = 1;
-            if (prop.mirrorX) {
-                x = -1;
-            }
-
             this.x0 = -tileWidth * 0.3;
-            this.x1 = tileWidth * 0.3 + (this.w - 1) * tileWidth;
+            this.x1 = tileWidth * 0.3 + (this.l - 3) * tileSize;
             this.boxesCount = Math.round((this.x1 - this.x0) / 0.02);
 
             this.stepW = (this.x1 - this.x0) / this.boxesCount;
-            this.y0 = -tileHeight * (this.h - 2 + 0.05) - 0.005;
-            this.y1 = tileHeight * 0.05 + 0.005;
-            if (prop.mirrorX) {
-                let yT = this.y0;
-                this.y0 = this.y1;
-                this.y1 = yT;
-            }
+            this.y0 = -tileHeight * (this.h + 0.05) - 0.005 + tileHeight * this.h;
+            this.y1 = tileHeight * 0.05 + 0.005 + tileHeight * this.h;
+            
             this.stepH = Math.abs((this.y1 - this.y0) / this.boxesCount);
             for (let i = 0; i < this.boxesCount; i++) {
                 let data = Stairway.MakeStairwayColliderVertexData(this.stepW, this.stepH * 2, 0.02, this.dH, 0.001);
@@ -92,9 +83,7 @@ namespace MarbleRunSimulatorCore {
                 this.boxesDisplayedMesh[i] = new BABYLON.Mesh("display-box_" + i);
                 box.isVisible = false;
                 data.applyToMesh(box);
-                if (this.mirrorX) {
-                    box.rotation.y = Math.PI;
-                }
+                
                 box.parent = this;
                 let fX = i / this.boxesCount;
                 box.position.x = (1 - fX) * this.x0 + fX * this.x1 + this.stepW * 0.5;
@@ -105,7 +94,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.vil = new BABYLON.Mesh("display-vil");
-            this.vil.position.y = -tileHeight * (this.h - 2 + 1.5);
+            this.vil.position.y = -tileHeight * (this.h + 1.5) + tileHeight * this.h;
             this.vil.parent = this;
 
             this.generateWires();
@@ -118,7 +107,7 @@ namespace MarbleRunSimulatorCore {
         protected async instantiateMachineSpecific(): Promise<void> {
             for (let i = 0; i < this.boxesCount; i++) {
                 let fY = (i + 0.5) / this.boxesCount;
-                let l = ((1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.5) - -tileHeight * (this.h - 2 + 1.5) + this.stepH - 0.002;
+                let l = ((1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.5) - -tileHeight * (this.h + 1.5) + this.stepH - 0.002 - tileHeight * this.h;
                 let vertexData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/stairway-bielle.babylon", 0);
                 vertexData = Mummu.CloneVertexData(vertexData);
                 let positions = vertexData.positions;
@@ -244,21 +233,21 @@ namespace MarbleRunSimulatorCore {
             this.vil.material = this.game.materials.getMaterial(this.getColor(3), this.machine.materialQ);
         }
 
-        public static GenerateTemplate(w: number, h: number, mirrorX: boolean) {
+        public static GenerateTemplate(l: number, h: number) {
             let template = new MachinePartTemplate();
 
             if (isNaN(h)) {
                 debugger;
             }
-            template.partName = "stairway_" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "stairway_" + l.toFixed(0) + "." + h.toFixed(0);
 
+            template.l = l;
             template.h = h;
-            template.l = w;
-            template.mirrorX = mirrorX;
+            template.minL = 3;
+            template.minH = 1;
 
-            template.xExtendable = true;
-            template.yExtendable = true;
-            template.xMirrorable = true;
+            template.lExtendableOnX = true;
+            template.hExtendableOnY = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -276,20 +265,18 @@ namespace MarbleRunSimulatorCore {
             nRight.normalize();
 
             template.trackTemplates[0] = new TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * (h - 2), 0), dir), new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.3, -tileHeight * (h - 2 + 0.05), 0), dir)];
+            template.trackTemplates[0].trackpoints = [
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), dir),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.3, - 0.001, 0), dir)];
 
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].trackpoints = [
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 1) * tileWidth + tileWidth * 0.3, tileHeight * 0.05 - 0.02, 0), Tools.V3Dir(0), Tools.V3Dir(-90)),
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 1) * tileWidth + tileWidth * 0.3, tileHeight * 0.05 - 0.003, 0), Tools.V3Dir(0)),
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 1) * tileWidth + tileWidth * 0.3 + 0.003, tileHeight * 0.05, 0), Tools.V3Dir(90)),
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 1) * tileWidth + tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 3) * tileSize + tileWidth * 0.3, tileHeight * h + 0.001 - 0.02, 0), Tools.V3Dir(0), Tools.V3Dir(-90)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 3) * tileSize + tileWidth * 0.3, tileHeight * h + 0.001 - 0.003, 0), Tools.V3Dir(0)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 3) * tileSize + tileWidth * 0.3 + 0.003, tileHeight * h + 0.001, 0), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3((template.l - 3) * tileSize + tileWidth * 0.5, tileHeight * h, 0), Tools.V3Dir(90)),
             ];
             template.trackTemplates[1].drawStartTip = true;
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
 
             template.initialize();
 
@@ -318,9 +305,6 @@ namespace MarbleRunSimulatorCore {
             super.update(dt);
             let dA = this.speed * dt * this.game.currentTimeFactor;
             let x = 1;
-            if (this.mirrorX) {
-                x = -1;
-            }
 
             this.a = this.a + dA;
             while (this.a > 2 * Math.PI) {

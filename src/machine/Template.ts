@@ -454,12 +454,12 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("stairway_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = Stairway.GenerateTemplate(w, h, mirrorX);
+                    data = Stairway.GenerateTemplate(w, h);
                 }
                 else if (partName.startsWith("screw_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = Screw.GenerateTemplate(w, h, mirrorX);
+                    data = Screw.GenerateTemplate(w, h);
                 }
                 else if (partName === "split") {
                     data = Split.GenerateTemplate(mirrorZ);

@@ -1,5 +1,6 @@
 namespace MarbleRunSimulatorCore {
-    export class Screw extends MachinePartWithOriginDestination {
+
+    export class Screw extends MachinePart {
         public rotor: BABYLON.Mesh;
         public screwWire: Wire;
         public x0: number = 0;
@@ -20,23 +21,15 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
 
             let partName = "screw_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(partName));
 
             let x = 1;
-            if (prop.mirrorX) {
-                x = -1;
-            }
 
             this.x0 = -tileWidth * 0.3;
-            this.x1 = tileWidth * 0.3 + (this.w - 1) * tileWidth;
+            this.x1 = tileWidth * 0.3 + (this.l - 3) * tileSize;
 
             this.y0 = -tileHeight * (this.h - 2 + 0.05) - 0.005;
             this.y1 = tileHeight * 0.05 + 0.005;
-            if (prop.mirrorX) {
-                let yT = this.y0;
-                this.y0 = this.y1;
-                this.y1 = yT;
-            }
 
             for (let i = this.colors.length; i < 5; i++) {
                 this.colors[i] = 0;
@@ -44,18 +37,12 @@ namespace MarbleRunSimulatorCore {
 
             let r = 0.014;
             let period = 0.022;
-            let p0 = new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * this.h, 0);
+            let p0 = new BABYLON.Vector3(-tileWidth * 0.5, 0, 0);
             p0.x += 0.03;
             p0.y -= 0.005;
-            let p1 = new BABYLON.Vector3(tileWidth * (this.w - 0.5), 0, -tileDepth * (this.d - 1));
+            let p1 = new BABYLON.Vector3(tileSize * this.l - tileWidth * 0.5, tileHeight * this.h, -tileDepth * (this.d - 1));
             p1.x -= 0.03;
             p1.y += 0.005;
-
-            if (this.mirrorX) {
-                let tmpP = p0.clone();
-                p0.x = p1.x;
-                p1.x = tmpP.x;
-            }
 
             this.dir = p1.subtract(p0);
             let l = this.dir.length();
@@ -68,7 +55,7 @@ namespace MarbleRunSimulatorCore {
             l = this.dir.length();
             this.dir.scaleInPlace(1 / l);
 
-            let n = Mummu.Rotate(this.dir, BABYLON.Axis.Z, this.mirrorX ? -Math.PI * 0.5 : Math.PI * 0.5);
+            let n = Mummu.Rotate(this.dir, BABYLON.Axis.Z, Math.PI * 0.5);
 
             let shieldWireR = new Wire(this);
             shieldWireR.colorIndex = 3;
@@ -85,7 +72,7 @@ namespace MarbleRunSimulatorCore {
             this.shieldConnector.rotationQuaternion = Mummu.QuaternionFromYZAxis(n, this.dir);
             this.shieldConnector.parent = this;
 
-            if (this.h / this.w > 4) {
+            if (this.h / this.l > 1) {
                 let shieldWireUpR = new Wire(this);
                 shieldWireUpR.colorIndex = 3;
                 shieldWireUpR.path = [p0.clone().addInPlaceFromFloats(0, 0, -0.0165).addInPlace(this.dir.scale(0.03)).addInPlace(n.scale(0.022)), p0.clone().addInPlaceFromFloats(0, 0, -0.0165).addInPlace(this.dir.scale(-0.033)).addInPlace(n.scale(0.022))];
@@ -156,43 +143,37 @@ namespace MarbleRunSimulatorCore {
             this.wheel.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
         }
 
-        public static GenerateTemplate(w: number, h: number, mirrorX: boolean) {
+        public static GenerateTemplate(l: number, h: number) {
             let template = new MachinePartTemplate();
 
             if (isNaN(h)) {
                 debugger;
             }
-            template.partName = "screw_" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "screw_" + l.toFixed(0) + "." + h.toFixed(0);
 
+            template.l = l;
             template.h = h;
-            template.l = w;
-            template.mirrorX = mirrorX;
 
-            template.xExtendable = true;
-            template.minL = 1;
-            template.yExtendable = true;
+            template.lExtendableOnX = true;
+            template.minL = 3;
+            template.hExtendableOnY = true;
             template.minH = 1;
-            template.xMirrorable = true;
 
-            let p0 = new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0);
+            let p0 = new BABYLON.Vector3(-tileWidth * 0.5, 0, 0);
             p0.x += 0.03;
             p0.y -= 0.005;
-            let p1 = new BABYLON.Vector3(tileWidth * (template.l - 0.5), 0, -tileDepth * (template.d - 1));
+            let p1 = new BABYLON.Vector3(tileSize * template.l - 0.5 * tileWidth, tileHeight * template.h, -tileDepth * (template.d - 1));
             p1.x -= 0.03;
             p1.y += 0.005;
             let dir = p1.subtract(p0).normalize();
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),
                 new TrackPoint(template.trackTemplates[0], p0, dir),
                 new TrackPoint(template.trackTemplates[0], p1, dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * (template.l - 0.5), 0, -tileDepth * (template.d - 1)), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * template.l - 0.5 * tileWidth, tileHeight * template.h, -tileDepth * (template.d - 1)), Tools.V3Dir(90)),
             ];
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
 
             template.initialize();
 
@@ -218,9 +199,6 @@ namespace MarbleRunSimulatorCore {
             super.update(dt);
             let dA = this.speed * dt * this.game.currentTimeFactor;
             let x = 1;
-            if (this.mirrorX) {
-                x = -1;
-            }
 
             this.a = this.a + dA;
             while (this.a > 2 * Math.PI) {
@@ -239,70 +217,6 @@ namespace MarbleRunSimulatorCore {
                 child.freezeWorldMatrix();
             });
             this.screwWire.recomputeAbsolutePath();
-        }
-
-        public recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Screw {
-            if (origin.i > dest.i) {
-                let tmp = origin;
-                origin = dest;
-                dest = tmp;
-            }
-            let i = Math.min(origin.i, dest.i);
-            let j = Math.min(origin.j, dest.j);
-            let w = Math.abs(dest.i - origin.i);
-            let h = Math.abs(dest.j - origin.j);
-            let mirrorX = false;
-            if (origin.j < dest.j) {
-                mirrorX = true;
-            }
-            if (!this.getIsNaNOrValidWHD(w, h)) {
-                return undefined;
-            }
-            return new Screw(machine, {
-                i: i,
-                j: j,
-                k: this.k,
-                l: w,
-                h: h,
-                c: this.colors,
-                mirrorX: mirrorX,
-            });
-        }
-
-        public getOrigin(): Nabu.IJK {
-            let i = this.i;
-
-            let j: number;
-            if (this.mirrorX) {
-                j = this.j;
-            } else {
-                j = this.j + this.h;
-            }
-
-            let k = this.k;
-            return {
-                i: i,
-                j: j,
-                k: k,
-            };
-        }
-
-        public getDestination(): Nabu.IJK {
-            let i = this.i + this.w;
-
-            let j: number;
-            if (this.mirrorX) {
-                j = this.j + this.h;
-            } else {
-                j = this.j;
-            }
-
-            let k = this.k;
-            return {
-                i: i,
-                j: j,
-                k: k,
-            };
         }
     }
 }

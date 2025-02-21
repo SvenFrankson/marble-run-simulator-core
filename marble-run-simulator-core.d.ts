@@ -1068,7 +1068,7 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class Screw extends MachinePartWithOriginDestination {
+    class Screw extends MachinePart {
         rotor: BABYLON.Mesh;
         screwWire: Wire;
         x0: number;
@@ -1084,7 +1084,7 @@ declare namespace MarbleRunSimulatorCore {
         wheel: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(w: number, h: number, mirrorX: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         length: number;
@@ -1092,9 +1092,6 @@ declare namespace MarbleRunSimulatorCore {
         speed: number;
         a: number;
         update(dt: number): void;
-        recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Screw;
-        getOrigin(): Nabu.IJK;
-        getDestination(): Nabu.IJK;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1247,7 +1244,7 @@ declare namespace MarbleRunSimulatorCore {
         static MakeStairwayColliderVertexData(width: number, height: number, depth: number, dH: number, radius?: number): BABYLON.VertexData;
         constructor(machine: Machine, prop: IMachinePartProp);
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(w: number, h: number, mirrorX: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         length: number;
