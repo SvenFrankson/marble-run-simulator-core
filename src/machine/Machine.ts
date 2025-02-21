@@ -2031,6 +2031,12 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "stairway") {
                 prop.l = prop.l * 3;
                 prop.h = prop.h - 2;
+                prop.k -= prop.h;
+
+                if (prop.mirrorX) {
+                    prop.r = 2;
+                    prop.i += prop.l - 3;
+                }
             }
             if (baseName === "screw") {
                 prop.l = prop.l * 3;

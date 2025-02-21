@@ -327,12 +327,13 @@ namespace MarbleRunSimulatorCore {
                     child.freezeWorldMatrix();
                 });
 
-                this.bielles[i].position.copyFrom(this.vil.absolutePosition);
+                this.bielles[i].position.copyFromFloats(0, 0, 0);
                 let fX = i / this.boxesCount;
                 this.bielles[i].position.x += (1 - fX) * this.x0 + fX * this.x1 + this.stepW * 0.5;
-                this.bielles[i].position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.5);
+                this.bielles[i].position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.5) - tileHeight * (this.h + 1.5) + tileHeight * this.h;
                 this.bielles[i].position.z += Math.sin(a) * (this.stepH * 0.5 + this.dH * 0.5);
-                let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].position).addInPlaceFromFloats(0, this.stepH - 0.002, 0);
+                BABYLON.Vector3.TransformCoordinatesToRef(this.bielles[i].position, this.getWorldMatrix(), this.bielles[i].position);
+                let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].absolutePosition).addInPlaceFromFloats(0, this.stepH - 0.002, 0);
                 this.bielles[i].rotationQuaternion = Mummu.QuaternionFromYZAxis(dir, BABYLON.Axis.Z);
             }
         }
