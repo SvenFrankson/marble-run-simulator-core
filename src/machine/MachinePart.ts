@@ -547,6 +547,10 @@ namespace MarbleRunSimulatorCore {
             this.refreshEncloseMeshAndAABB();
         }
 
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "PropToPartName_NotImplemented";
+        }
+
         public offsetPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public targetUpdatePivot: BABYLON.Vector3;
 

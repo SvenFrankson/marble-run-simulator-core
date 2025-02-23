@@ -4,9 +4,13 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
             
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName));
+            this.setTemplate(this.machine.templateManager.getTemplate(Curb.PropToPartName(prop)));
             this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
+            return partName;
         }
 
         public static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {

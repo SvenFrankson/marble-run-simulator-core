@@ -1326,7 +1326,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public lastDeserializedData: IMachineData;
-        public deserialize(data: IMachineData): void {
+        public deserialize(data: IMachineData, makeMiniature?: boolean): void {
             this.lastDeserializedData = data;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.isChallengeMachine = false;
@@ -1353,7 +1353,7 @@ namespace MarbleRunSimulatorCore {
                     return this.deserializeV910(data);
                 }
                 else if (version === 11) {
-                    return this.deserializeV11(data);
+                    return this.deserializeV11(data, makeMiniature);
                 }
             }
         }
@@ -2049,7 +2049,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public deserializeV11(data: IMachineData): void {
+        public deserializeV11(data: IMachineData, makeMiniature: boolean = false): void {
             let dataString = data.d;
             if (dataString) {
                 if (data.n) {
@@ -2062,6 +2062,8 @@ namespace MarbleRunSimulatorCore {
                 this.balls = [];
                 this.parts = [];
 
+                let lines: BABYLON.Vector3[][] = [];
+
                 let pt = 0;
                 let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
                 //console.log("ballCount = " + ballCount);
@@ -2071,11 +2073,16 @@ namespace MarbleRunSimulatorCore {
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
 
-                    let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
-                    this.balls.push(ball);
+                    if (makeMiniature) {
 
-                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
-                    ball.materialIndex = materialIndex;
+                    }
+                    else {
+                        let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
+                        this.balls.push(ball);
+    
+                        let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                        ball.materialIndex = materialIndex;
+                    }
                 }
                 
                 let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -2124,14 +2131,42 @@ namespace MarbleRunSimulatorCore {
                             c: colors
                         }
                         
-                        let track = this.trackFactory.createTrackBaseName(baseName, prop);
-                        if (track) {
-                            this.parts.push(track);
+                        if (makeMiniature) {
+                            let template = this.templateManager.getTemplateByProp(baseName, prop);
+                            if (template) {
+                                // Now draw into the miniature from the template.
+                                for (let t = 0; t < template.trackTemplates.length; t++) {
+                                    let trackTemplate = template.trackTemplates[t];
+                                    let drawnTrack: BABYLON.Vector3[] = [];
+                                    for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
+                                        let point = trackTemplate.trackpoints[p].position.clone();
+                                        Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
+                                        point.x += prop.i * tileSize;
+                                        point.y += prop.k * tileHeight;
+                                        point.z += prop.j * tileSize;
+                                        if (Mummu.IsFinite(point)) {
+                                            drawnTrack.push(point);
+                                        }
+                                    }
+                                    if (drawnTrack.length > 0) {
+                                        lines.push(drawnTrack);
+                                    }
+                                }
+                            }
+                            else {
+                                console.log("can't find template for " + baseName);
+                            }
                         }
                         else {
-                            console.warn("failed to createTrackBaseName");
-                            console.log(baseName);
-                            console.log(prop);
+                            let track = this.trackFactory.createTrackBaseName(baseName, prop);
+                            if (track) {
+                                this.parts.push(track);
+                            }
+                            else {
+                                console.warn("failed to createTrackBaseName");
+                                console.log(baseName);
+                                console.log(prop);
+                            }
                         }
                     }
                 }
@@ -2142,17 +2177,21 @@ namespace MarbleRunSimulatorCore {
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
 
-                    //console.log("ball xyz " + x + " " + y + " " + z);
-                    let decor = new Xylophone(this);
-                    decor.setPosition(new BABYLON.Vector3(x, y, z));
-                    this.decors.push(decor);
+                    if (makeMiniature) {
 
-                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
-                    decor.setN(n);
+                    }
+                    else {
+                        let decor = new Xylophone(this);
+                        decor.setPosition(new BABYLON.Vector3(x, y, z));
+                        this.decors.push(decor);
 
-                    if (data.v === 8) {
-                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
-                        decor.setFlip(f);
+                        let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                        decor.setN(n);
+
+                        if (data.v === 8) {
+                            let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+                            decor.setFlip(f);
+                        }
                     }
                 }
 
@@ -2169,6 +2208,73 @@ namespace MarbleRunSimulatorCore {
                     else {
                         this._roomIndex = 0;
                     }
+                }
+
+                if (makeMiniature) {
+                    let canvas = document.createElement("canvas");
+                    canvas.width = 256;
+                    canvas.height = 256;
+
+                    let context = canvas.getContext("2d");
+                    context.fillStyle = "#0000FF";
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+
+                    let minX = Infinity;
+                    let maxX = - Infinity;
+                    let minY = Infinity;
+                    let maxY = - Infinity;
+                    let minZ = Infinity;
+                    let maxZ = - Infinity;
+
+                    console.log(lines);
+
+                    for (let i = 0; i < lines.length; i++) {
+                        let line = lines[i];
+                        for (let j = 0; j < line.length; j++) {
+                            let p = line[j];
+                            if (Mummu.IsFinite(p)) {
+                                minX = Math.min(minX, p.x);
+                                maxX = Math.max(maxX, p.x);
+                                minY = Math.min(minY, p.y);
+                                maxY = Math.max(maxY, p.y);
+                                minZ = Math.min(minZ, p.z);
+                                maxZ = Math.max(maxZ, p.z);
+                            }
+                        }
+                    }
+
+                    console.log(minX + " " + maxX);
+                    let s = Math.max(maxX - minX, maxZ - minZ);
+                    let mX = 8;
+                    let mZ = 8;
+
+                    for (let i = 0; i < lines.length; i++) {
+                        let line = lines[i];
+                        context.lineWidth = 5;
+                        context.strokeStyle = "white";
+                        context.beginPath();
+                        let p0 = line[0];
+                        let x = Math.floor((p0.x - minX) / s * 240 + mX);
+                        let y = Math.floor((p0.z - minZ) / s * 240 + mZ);
+                        console.log("p0 " + x + " " + y);
+                        context.moveTo(x, y);
+                        for (let j = 1; j < line.length; j++) {
+                            let p = line[j];
+                            let x = Math.floor((p.x - minX) / s * 240 + mX);
+                            let y = Math.floor((p.z - minZ) / s * 240 + mZ);
+                            console.log("p " + x + " " + y);
+                            context.lineTo(x, y);
+                        }
+                        context.stroke();
+                    }
+
+                    var tmpLink = document.createElement( 'a' );
+                    tmpLink.download = "test.png";
+                    tmpLink.href = canvas.toDataURL();  
+                    
+                    document.body.appendChild( tmpLink );
+                    tmpLink.click(); 
+                    document.body.removeChild( tmpLink );
                 }
             }
         }

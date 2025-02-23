@@ -376,14 +376,14 @@ declare namespace MarbleRunSimulatorCore {
         serializeV910(version: number): IMachineData;
         serializeV11(): IMachineData;
         lastDeserializedData: IMachineData;
-        deserialize(data: IMachineData): void;
+        deserialize(data: IMachineData, makeMiniature?: boolean): void;
         deserializeV1(data: IMachineData): void;
         deserializeV2(data: IMachineData): void;
         deserializeV3456(data: IMachineData): void;
         deserializeV78(data: IMachineData): void;
         deserializeV910(data: IMachineData): void;
         deserializeAnte11Fix(baseName: string, prop: IMachinePartProp): void;
-        deserializeV11(data: IMachineData): void;
+        deserializeV11(data: IMachineData, makeMiniature?: boolean): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateShadow: boolean;
@@ -561,6 +561,7 @@ declare namespace MarbleRunSimulatorCore {
         setTemplate(template: MachinePartTemplate): void;
         sleepersMeshProp: ISleeperMeshProps;
         constructor(machine: Machine, prop: IMachinePartProp, isPlaced?: boolean);
+        static PropToPartName(prop: IMachinePartProp): string;
         offsetPosition: BABYLON.Vector3;
         targetUpdatePivot: BABYLON.Vector3;
         private _i;
@@ -797,6 +798,7 @@ declare namespace MarbleRunSimulatorCore {
         private _dictionary;
         constructor(machine: Machine);
         getTemplate(partName: string, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        getTemplateByProp(baseName: string, prop: IMachinePartProp): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -927,6 +929,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Curb extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }
@@ -1024,6 +1027,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class Ramp extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(w: number, h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
     }
@@ -1031,6 +1035,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class RampV2 extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }
@@ -1292,6 +1297,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class UTurn extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }

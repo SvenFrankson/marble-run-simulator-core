@@ -528,5 +528,119 @@ namespace MarbleRunSimulatorCore {
 
             return data;
         }
+
+        public getTemplateByProp(baseName: string, prop: IMachinePartProp): MachinePartTemplate {
+            let partName: string = "";
+
+            if (baseName === "curb") {
+                partName = Curb.PropToPartName(prop);
+            }
+            else if (baseName === "uturn") {
+                partName = UTurn.PropToPartName(prop);
+            }
+            else if (baseName === "pipeuturn") {
+                partName = UTurn.PropToPartName(prop);
+            }
+            else if (baseName === "wooduturn") {
+                partName = UTurn.PropToPartName(prop);
+            }
+            else if (baseName === "wall") {
+                partName = Wall.PropToPartName(prop);
+            }
+            else if (baseName === "uturnshar") {
+                partName = UTurnSharp.PropToPartName(prop);
+            }
+            else if (baseName === "ramp") {
+                partName = Ramp.PropToPartName(prop);
+            }
+            else if (baseName === "rampv2") {
+                partName = RampV2.PropToPartName(prop);
+            }
+            else if (baseName === "piperamp") {
+                partName = Ramp.PropToPartName(prop);
+            }
+            else if (baseName === "woodramp") {
+                partName = Ramp.PropToPartName(prop);
+            }
+            else if (baseName === "wave") {
+                partName = Wave.PropToPartName(prop);
+            }
+            else if (baseName === "snake") {
+                partName = Snake.PropToPartName(prop);
+            }
+            else if (baseName === "elevator") {
+                partName = Elevator.PropToPartName(prop);
+            }
+            else if (baseName === "steamelevator") {
+                partName = SteamElevator.PropToPartName(prop);
+            }
+            else if (baseName === "shooter") {
+                partName = Shooter.PropToPartName(prop);
+            }
+            else if (baseName === "stairway") {
+                partName = Stairway.PropToPartName(prop);
+            }
+            else if (baseName === "screw") {
+                partName = Screw.PropToPartName(prop);
+            }
+            else if (baseName === "split") {
+                partName = Split.PropToPartName(prop);
+            }
+            else if (baseName === "forwardSplit") {
+                partName = ForwardSplit.PropToPartName(prop);
+            }
+            else if (baseName === "sort") {
+                partName = Sort.PropToPartName(prop);
+            }
+            else if (baseName === "controler") {
+                partName = Controler.PropToPartName(prop);
+            }
+            else if (baseName === "spawner") {
+                partName = Spawner.PropToPartName(prop);
+            }
+            else if (baseName === "flatjoin") {
+                partName = FlatJoin.PropToPartName(prop);
+            }
+            else if (baseName === "join") {
+                partName = Join.PropToPartName(prop);
+            }
+            else if (baseName.startsWith("loop_")) {
+                partName = Loop.PropToPartName(prop);
+            }
+            else if (baseName.startsWith("spiral_")) {
+                partName = Spiral.PropToPartName(prop);
+            }
+            else if (baseName.startsWith("spiralUTurn_")) {
+                partName = SpiralUTurn.PropToPartName(prop);
+            }
+            else if (baseName === "quarter") {
+                partName = QuarterNote.PropToPartName(prop);
+            }
+            else if (baseName === "double") {
+                partName = DoubleNote.PropToPartName(prop);
+            }
+            else if (baseName === "start") {
+                partName = Start.PropToPartName(prop);
+            }
+            else if (baseName === "end") {
+                partName = End.PropToPartName(prop);
+            }
+            else if (baseName.startsWith("jumper_")) {
+                partName = Jumper.PropToPartName(prop);
+            }
+            else if (baseName === "gravitywell") {
+                partName = GravityWell.PropToPartName(prop);
+            }
+            else if (baseName === "screen") {
+                partName = Screen.PropToPartName(prop);
+            }
+            else if (baseName === "speeder") {
+                partName = Speeder.PropToPartName(prop);
+            }
+
+            if (partName) {
+                return this.getTemplate(partName, prop.mirrorX, prop.mirrorZ);
+            }
+        }
     }
 }
