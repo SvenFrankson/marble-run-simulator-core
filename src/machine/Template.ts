@@ -395,7 +395,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName.startsWith("uturnsharp")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
-                    data = UTurnSharp.GenerateTemplate(h, mirrorX);
+                    data = UTurnSharp.GenerateTemplate(h);
                 }
                 else if (partName.startsWith("ramp_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
@@ -410,7 +410,8 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("rampv2_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = RampV2.GenerateTemplate(l, h, false, false);
+                    let d = parseInt(partName.split("_")[1].split(".")[2]);
+                    data = RampV2.GenerateTemplate(l, h, d, false, false);
                 }
                 else if (partName.startsWith("piperamp_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);

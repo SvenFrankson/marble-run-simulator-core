@@ -9,20 +9,24 @@ namespace MarbleRunSimulatorCore {
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
-            return (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "rampv2_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            return (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "rampv2_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
         }
 
-        public static GenerateTemplate(l: number, h: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(l: number, h: number, d: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "rampv2_" + l.toFixed(0) + "." + h.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "rampv2_" + l.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
 
             template.l = l;
             template.h = h;
+            template.d = d;
             template.lExtendableOnX = true;
             template.hExtendableOnY = true;
+            template.dExtendableOnZ = true;
             template.minH = -32;
             template.maxH = 32;
+            template.minD = -32;
+            template.maxD = 32;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -35,7 +39,7 @@ namespace MarbleRunSimulatorCore {
 
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, 0), dir),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * template.l - tileSize * 0.5, tileSize * template.h, 0), dir)
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * template.l - tileSize * 0.5, tileSize * template.h, tileSize * template.d), dir)
             ];
 
             template.maxAngle = Math.PI / 4 / 2 * template.s;

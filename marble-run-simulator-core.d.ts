@@ -386,6 +386,7 @@ declare namespace MarbleRunSimulatorCore {
         deserializeV11(data: IMachineData, makeMiniature?: boolean): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
+        requestUpdateBaseMesh: boolean;
         requestUpdateShadow: boolean;
         updateShadow(): void;
     }
@@ -595,8 +596,9 @@ declare namespace MarbleRunSimulatorCore {
         get partVisilibityMode(): PartVisibilityMode;
         set partVisibilityMode(v: PartVisibilityMode);
         private _selected;
+        private _multiSelected;
         get selected(): boolean;
-        select(): void;
+        select(_multiSelected?: boolean): void;
         unselect(): void;
         private _hovered;
         hover(): void;
@@ -618,6 +620,7 @@ declare namespace MarbleRunSimulatorCore {
         refreshEncloseMeshAndAABB(): void;
         dispose(): void;
         generateWires(): void;
+        private _lastDist;
         updateTargetCoordinates(dt: number): boolean;
         update(dt: number): void;
         rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void;
@@ -1036,7 +1039,7 @@ declare namespace MarbleRunSimulatorCore {
     class RampV2 extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(l: number, h: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number, d: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1304,7 +1307,8 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class UTurnSharp extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(h: number, mirrorX?: boolean): MachinePartTemplate;
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(h: number): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

@@ -410,6 +410,9 @@ namespace MarbleRunSimulatorCore {
             if (!this.instantiated) {
                 return;
             }
+            if (this.requestUpdateBaseMesh) {
+                this.generateBaseMesh();
+            }
             if (this.requestUpdateShadow) {
                 this.updateShadow();
             }
@@ -418,7 +421,7 @@ namespace MarbleRunSimulatorCore {
             let dt = this.game.scene.deltaTime / 1000;
             if (isFinite(dt)) {
                 for (let i = 0; i < this.parts.length; i++) {
-                    this.updatingMachinePartCoordinates = this.updatingMachinePartCoordinates || this.parts[i].updateTargetCoordinates(dt);
+                    this.updatingMachinePartCoordinates = this.parts[i].updateTargetCoordinates(dt) || this.updatingMachinePartCoordinates;
                 }
             }
 
@@ -805,6 +808,7 @@ namespace MarbleRunSimulatorCore {
             this.game.spotLight.direction = dir;
 
             this.ready = true;
+            this.requestUpdateBaseMesh = false;
         }
 
         public regenerateBaseAxis(): void {
@@ -2138,8 +2142,21 @@ namespace MarbleRunSimulatorCore {
                                 for (let t = 0; t < template.trackTemplates.length; t++) {
                                     let trackTemplate = template.trackTemplates[t];
                                     let drawnTrack: BABYLON.Vector3[] = [];
+                                    /*
                                     for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
                                         let point = trackTemplate.trackpoints[p].position.clone();
+                                        Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
+                                        point.x += prop.i * tileSize;
+                                        point.y += prop.k * tileHeight;
+                                        point.z += prop.j * tileSize;
+                                        if (Mummu.IsFinite(point)) {
+                                            drawnTrack.push(point);
+                                        }
+                                    }
+                                    */
+                                       
+                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
+                                        let point = trackTemplate.interpolatedPoints[p].clone();
                                         Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
                                         point.x += prop.i * tileSize;
                                         point.y += prop.k * tileHeight;
@@ -2211,9 +2228,13 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 if (makeMiniature) {
+                    let picSize = 512;
+                    let picMargin = picSize / 32;
+                    let picSizeNoMargin = picSize - 2 * picMargin;
+                    let trackLineWidth: number = 3;
                     let canvas = document.createElement("canvas");
-                    canvas.width = 256;
-                    canvas.height = 256;
+                    canvas.width = picSize;
+                    canvas.height = picSize;
 
                     let context = canvas.getContext("2d");
                     context.fillStyle = "#0000FF";
@@ -2243,28 +2264,31 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
 
-                    console.log(minX + " " + maxX);
+                    //console.log(minX + " " + maxX);
                     let s = Math.max(maxX - minX, maxZ - minZ);
-                    let mX = 8;
-                    let mZ = 8;
+                    let mX = picMargin;
+                    let mZ = picMargin;
 
                     for (let i = 0; i < lines.length; i++) {
                         let line = lines[i];
-                        context.lineWidth = 5;
+                        context.lineWidth = 4 * trackLineWidth;
                         context.strokeStyle = "white";
                         context.beginPath();
                         let p0 = line[0];
-                        let x = Math.floor((p0.x - minX) / s * 240 + mX);
-                        let y = Math.floor((p0.z - minZ) / s * 240 + mZ);
-                        console.log("p0 " + x + " " + y);
+                        let x = (p0.x - minX) / s * picSizeNoMargin + mX;
+                        let y = (p0.z - minZ) / s * picSizeNoMargin + mZ;
+                        //console.log("p0 " + x + " " + y);
                         context.moveTo(x, y);
                         for (let j = 1; j < line.length; j++) {
                             let p = line[j];
-                            let x = Math.floor((p.x - minX) / s * 240 + mX);
-                            let y = Math.floor((p.z - minZ) / s * 240 + mZ);
-                            console.log("p " + x + " " + y);
+                            let x = (p.x - minX) / s * picSizeNoMargin + mX;
+                            let y = (p.z - minZ) / s * picSizeNoMargin + mZ;
+                            //console.log("p " + x + " " + y);
                             context.lineTo(x, y);
                         }
+                        context.stroke();
+                        context.lineWidth = 2 * trackLineWidth;
+                        context.strokeStyle = "#0000FF";
                         context.stroke();
                     }
 
@@ -2305,6 +2329,7 @@ namespace MarbleRunSimulatorCore {
             return encloseEnd;
         }
 
+        public requestUpdateBaseMesh: boolean = false;
         public requestUpdateShadow: boolean = false;
         public updateShadow(): void {
             if (this.game.shadowGenerator) {

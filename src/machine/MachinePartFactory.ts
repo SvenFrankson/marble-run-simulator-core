@@ -103,8 +103,10 @@ namespace MarbleRunSimulatorCore {
                 if (argStr) {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
+                    let d = parseInt(argStr.split(".")[2]);
                     prop.l = w;
                     prop.h = h;
+                    prop.d = d;
                 }
                 return new RampV2(this.machine, prop);
             }

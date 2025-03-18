@@ -40,19 +40,19 @@ namespace MarbleRunSimulatorCore {
                 new BABYLON.Mesh("pixel-3")
             ]
             this.lock0 = new BABYLON.Mesh("lock-0");
-            this.lock0.position.copyFromFloats(0.0015, -0.009, 0.0115);
+            this.lock0.position.copyFromFloats(0.0015, -0.009 * 1.25, 0.0115 * 1.25);
             this.lock0.parent = this.pixels[0];
             this.lock2 = new BABYLON.Mesh("lock-1");
-            this.lock2.position.copyFromFloats(0.0015, -0.009, - 0.0115);
+            this.lock2.position.copyFromFloats(0.0015, -0.009 * 1.25, - 0.0115 * 1.25);
             this.lock2.parent = this.pixels[2];
             this.pixels[0].parent = this.container;
             this.pixels[0].position.copyFromFloats(tileWidth * 0.5 - 0.02, 0, - tileDepth / 4);
             this.pixels[1].parent = this.container;
             this.pixels[1].position.copyFromFloats(tileWidth * 0.5 - 0.02, 0, tileDepth / 4);
             this.pixels[2].parent = this.container;
-            this.pixels[2].position.copyFromFloats(tileWidth * 0.5 - 0.02, - tileHeight, tileDepth / 4);
+            this.pixels[2].position.copyFromFloats(tileWidth * 0.5 - 0.02, - tileHeight * 1.5, tileDepth / 4);
             this.pixels[3].parent = this.container;
-            this.pixels[3].position.copyFromFloats(tileWidth * 0.5 - 0.02, - tileHeight, - tileDepth / 4);
+            this.pixels[3].position.copyFromFloats(tileWidth * 0.5 - 0.02, - tileHeight * 1.5, - tileDepth / 4);
 
             for (let i = 0; i < 4; i++) {
                 this.pixelPictures[i] = BABYLON.MeshBuilder.CreatePlane("pixel-pic", { width: 0.025, height: 0.026 });
@@ -218,7 +218,6 @@ namespace MarbleRunSimulatorCore {
                     if (f < 1) {
                         if (easing) {
                             f = easing(f);
-                            console.log((performance.now() - t0).toFixed(0) + "    " + f.toFixed(4));
                         }
                         for (let i = 0; i < 4; i++) {
                             if (i === 2 && tingle2Case) {

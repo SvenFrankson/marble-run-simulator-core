@@ -6,25 +6,29 @@ namespace MarbleRunSimulatorCore {
             1,
             1,
             3,
-            1.03,
-            1.27,
-            1.46,
-            1.64,
-            1.80,
-            1.94,
-            2.08,
-            2.21,
-            2.33,
-            2.44,
-            2.55,
-            2.66,
-            2.76,
-            2.86,
-            2.955,
-            3.045,
-            3.135,
-            3.225,
-            3.305,
+
+            0.955,
+            1.166,
+            1.35,
+            1.509,
+            1.651,
+
+            1.785,
+            1.907,
+            2.022,
+            2.132,
+            2.240,
+
+            2.340,
+            2.433,
+            2.527,
+            2.616,
+            2.701,
+
+            2.786,
+            2.867,
+            2.948,
+            3.025,
         ];
         public velocityKick: number = 1;
 
@@ -304,7 +308,7 @@ namespace MarbleRunSimulatorCore {
             Mummu.DrawDebugPoint(center, 200, BABYLON.Color3.Green(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
-                if (ball.velocity.length() < 0.02 && Math.abs(ball.velocity.x) < 0.001) {
+                if (ball.velocity.length() < 0.02) {
                     if (BABYLON.Vector3.DistanceSquared(center, ball.position) < 0.005 * 0.005) {
                         return ball;
                     }

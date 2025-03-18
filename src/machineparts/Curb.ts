@@ -20,8 +20,10 @@ namespace MarbleRunSimulatorCore {
 
             template.l = l;
             template.h = h;
+            template.s = s;
             template.lExtendableOnXZ = true;
             template.hExtendableOnY = true;
+            template.sExtendable = true;
             template.minH = -32;
             template.maxH = 32;
 

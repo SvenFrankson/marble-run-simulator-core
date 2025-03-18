@@ -158,15 +158,18 @@ namespace MarbleRunSimulatorCore {
                         selectorMesh.material = this.machinePart.game.materials.selectorFullLitLightBlueMaterial;
                     }
                 }
-
+ 
                 if (this._hovered) {
+                    selectorMesh.isVisible = true;
                     selectorMesh.visibility = 1;
                     selectorMesh.outlineColor.copyFromFloats(1, 1, 1);
                 }
                 else if (this.machinePart.selected) {
+                    selectorMesh.isVisible = true;
                     selectorMesh.visibility = 1;
                 }
                 else {
+                    selectorMesh.isVisible = false;
                     selectorMesh.visibility = 0;
                 }
             }
@@ -296,11 +299,9 @@ namespace MarbleRunSimulatorCore {
                 let thisEndpoint = this.endPoints[i];
                 for (let j = 0; j < other.endPoints.length; j++) {
                     let otherEndpoint = other.endPoints[j];
-                    if (thisEndpoint.leftSide != otherEndpoint.leftSide) {
-                        if (BABYLON.Vector3.Distance(thisEndpoint.absolutePosition, otherEndpoint.absolutePosition) < 0.001) {
-                            thisEndpoint.disconnect();
-                            thisEndpoint.connectTo(otherEndpoint);
-                        }
+                    if (BABYLON.Vector3.Distance(thisEndpoint.absolutePosition, otherEndpoint.absolutePosition) < 0.002) {
+                        thisEndpoint.disconnect();
+                        thisEndpoint.connectTo(otherEndpoint);
                     }
                 }
             }
@@ -586,6 +587,7 @@ namespace MarbleRunSimulatorCore {
         }
         public setTargetI(v: number): void {
             this._targetI = v;
+            this._lastDist = Infinity;
         }
 
         private _j: number = 0;
@@ -620,6 +622,7 @@ namespace MarbleRunSimulatorCore {
         }
         public setTargetJ(v: number): void {
             this._targetJ = v;
+            this._lastDist = Infinity;
         }
 
         private _k: number = 0;
@@ -661,6 +664,7 @@ namespace MarbleRunSimulatorCore {
         }
         public setTargetK(v: number): void {
             this._targetK = v;
+            this._lastDist = Infinity;
         }
 
         private _r: number = 0;
@@ -711,6 +715,7 @@ namespace MarbleRunSimulatorCore {
                 v -= 4;
             }
             this._targetR = v;
+            this._lastDist = Infinity;
         }
 
         public getAbsoluteCoordinatesPosition(): BABYLON.Vector3 {
@@ -753,16 +758,20 @@ namespace MarbleRunSimulatorCore {
         }
 
         private _selected: boolean = false;
+        private _multiSelected: boolean = false;
         public get selected(): boolean {
             return this._selected;
         }
-        public select(): void {
+        public select(_multiSelected?: boolean): void {
             this._selected = true;
+            this._multiSelected = _multiSelected;
+
             this.updateSelectorMeshVisibility();
         }
 
         public unselect(): void {
             this._selected = false;
+            this._multiSelected = false;
             this.updateSelectorMeshVisibility();
         }
 
@@ -800,7 +809,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (this.gridRectMesh) {
-                if (this._selected) {
+                if (this._selected && !this._multiSelected) {
                     this.gridRectMesh.isVisible = true;
                     this._scene.onBeforeRenderObservable.add(this._alignShadow);
                 }
@@ -1269,6 +1278,8 @@ namespace MarbleRunSimulatorCore {
 
             this.AABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
             this.AABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
+
+            this.machine.requestUpdateBaseMesh = true;
         }
 
         public dispose(): void {
@@ -1309,6 +1320,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        private _lastDist = Infinity;
         public updateTargetCoordinates(dt: number): boolean {
             if (this.instantiated && isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
                 let f = Nabu.Easing.smoothNSec(1 / dt, 0.1);
@@ -1324,8 +1336,8 @@ namespace MarbleRunSimulatorCore {
                 )
                 let targetRotationY = - tR * Math.PI * 0.5;
 
-                let dist = BABYLON.Vector3.Distance(this.position, targetPosition);
-                if (dist < 0.0001) {
+                let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Nabu.AngularDistance(this.rotation.y, targetRotationY);
+                if (dist < 0.0001 || dist > this._lastDist) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
                     this._i = tI;
@@ -1341,7 +1353,7 @@ namespace MarbleRunSimulatorCore {
                     this.instantiate(true).then(() => {
                         this.refreshEncloseMeshAndAABB();
                         this.updateSelectorMeshVisibility();
-                        this.machine.generateBaseMesh();
+                        this.machine.requestUpdateBaseMesh = true;
                         this.machine.requestUpdateShadow = true;
                     })
                 }
@@ -1373,6 +1385,7 @@ namespace MarbleRunSimulatorCore {
                     this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
                 }
 
+                this._lastDist = dist;
                 this.freezeWorldMatrix();
                 this.getChildMeshes().forEach((m) => {
                     m.freezeWorldMatrix();
