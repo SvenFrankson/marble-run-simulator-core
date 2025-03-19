@@ -427,11 +427,6 @@ namespace MarbleRunSimulatorCore {
                                     reactionsCount++;
     
                                     this.surface = Surface.Rail;
-    
-                                    if (part instanceof Elevator) {
-                                        this.position.z = part.absolutePosition.z;
-                                        this.velocity.z = 0;
-                                    }
                                 }
                             });
                             part.tracks.forEach(track => {
