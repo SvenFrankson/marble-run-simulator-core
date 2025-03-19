@@ -1023,6 +1023,13 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class MultiJoin extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(l: number, mirrorX: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     abstract class MachinePartWithOriginDestination extends MachinePart {
         abstract recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): MachinePartWithOriginDestination;
         getOrigin(): Nabu.IJK;

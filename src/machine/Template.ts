@@ -483,6 +483,10 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "join") {
                     data = Join.GenerateTemplate(mirrorX);
                 }
+                else if (partName.startsWith("multiJoin_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = MultiJoin.GenerateTemplate(l, mirrorX);
+                }
                 else if (partName.startsWith("loop_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let d = parseInt(partName.split("_")[1].split(".")[1]);

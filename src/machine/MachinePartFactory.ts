@@ -34,6 +34,7 @@ namespace MarbleRunSimulatorCore {
         "uturnv2_0.2",
         "curb_2.0",
         "rampv2_1.1.1",
+        "multiJoin_1",
     ];
 
     export interface IMachinePartProp {
@@ -306,6 +307,14 @@ namespace MarbleRunSimulatorCore {
             if (partName === "flatjoin") {
                 return new FlatJoin(this.machine, prop);
             }
+            if (partName === "multiJoin" || partName.startsWith("multiJoin_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    prop.l = l;
+                }
+                return new MultiJoin(this.machine, prop);
+            }
             if (partName === "split") {
                 return new Split(this.machine, prop);
             }
@@ -449,6 +458,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "join") {
                 return new Join(this.machine, prop);
+            }
+            if (baseName === "multiJoin") {
+                return new MultiJoin(this.machine, prop);
             }
             if (baseName === "flatjoin") {
                 return new FlatJoin(this.machine, prop);

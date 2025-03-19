@@ -374,10 +374,6 @@ var MarbleRunSimulatorCore;
                                     reactions.addInPlace(reaction);
                                     reactionsCount++;
                                     this.surface = Surface.Rail;
-                                    if (part instanceof MarbleRunSimulatorCore.Elevator) {
-                                        this.position.z = part.absolutePosition.z;
-                                        this.velocity.z = 0;
-                                    }
                                 }
                             });
                             part.tracks.forEach(track => {
@@ -4944,6 +4940,7 @@ var MarbleRunSimulatorCore;
         "uturnv2_0.2",
         "curb_2.0",
         "rampv2_1.1.1",
+        "multiJoin_1",
     ];
     class MachinePartFactory {
         constructor(machine) {
@@ -5194,6 +5191,14 @@ var MarbleRunSimulatorCore;
             if (partName === "flatjoin") {
                 return new MarbleRunSimulatorCore.FlatJoin(this.machine, prop);
             }
+            if (partName === "multiJoin" || partName.startsWith("multiJoin_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    prop.l = l;
+                }
+                return new MarbleRunSimulatorCore.MultiJoin(this.machine, prop);
+            }
             if (partName === "split") {
                 return new MarbleRunSimulatorCore.Split(this.machine, prop);
             }
@@ -5335,6 +5340,9 @@ var MarbleRunSimulatorCore;
             }
             if (baseName === "join") {
                 return new MarbleRunSimulatorCore.Join(this.machine, prop);
+            }
+            if (baseName === "multiJoin") {
+                return new MarbleRunSimulatorCore.MultiJoin(this.machine, prop);
             }
             if (baseName === "flatjoin") {
                 return new MarbleRunSimulatorCore.FlatJoin(this.machine, prop);
@@ -6434,6 +6442,10 @@ var MarbleRunSimulatorCore;
                 }
                 else if (partName === "join") {
                     data = MarbleRunSimulatorCore.Join.GenerateTemplate(mirrorX);
+                }
+                else if (partName.startsWith("multiJoin_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = MarbleRunSimulatorCore.MultiJoin.GenerateTemplate(l, mirrorX);
                 }
                 else if (partName.startsWith("loop_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
@@ -8429,6 +8441,67 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.Loop = Loop;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+/// <reference path="../machine/MachinePart.ts"/>
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    class MultiJoin extends MarbleRunSimulatorCore.MachinePart {
+        constructor(machine, prop) {
+            super(machine, prop);
+            this.setTemplate(this.machine.templateManager.getTemplate(MultiJoin.PropToPartName(prop)));
+            this.generateWires();
+        }
+        static PropToPartName(prop) {
+            return "multiJoin_" + prop.l.toFixed(0);
+        }
+        static GenerateTemplate(l, mirrorX) {
+            let template = new MarbleRunSimulatorCore.MachinePartTemplate();
+            template.partName = "multiJoin_" + l.toFixed(0);
+            template.l = l;
+            template.lExtendableOnX = true;
+            template.mirrorX = mirrorX;
+            let xLeft = -MarbleRunSimulatorCore.tileSize * 1.5;
+            let xRight = MarbleRunSimulatorCore.tileSize * (l + 2.5) - MarbleRunSimulatorCore.tileSize * 0.5;
+            let trackLength = xRight - xLeft;
+            template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+            template.trackTemplates[0].trackpoints = [
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xLeft, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))
+            ];
+            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xRight, MarbleRunSimulatorCore.tileHeight, 0), MarbleRunSimulatorCore.Tools.V3Dir(90 - Math.atan(MarbleRunSimulatorCore.tileHeight / (trackLength / 3)) / Math.PI * 180)));
+            template.trackTemplates[0].drawEndTip = true;
+            template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
+            template.trackTemplates[1].trackpoints = [
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(xLeft, 0 + 0.01, -0.01), MarbleRunSimulatorCore.Tools.V3Dir(90), new BABYLON.Vector3(0, 0, 1))
+            ];
+            template.trackTemplates[1].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(xRight, MarbleRunSimulatorCore.tileHeight + 0.01, -0.01), MarbleRunSimulatorCore.Tools.V3Dir(90 - Math.atan(MarbleRunSimulatorCore.tileHeight / (trackLength / 3)) / Math.PI * 180), new BABYLON.Vector3(0, 0, 1)));
+            template.trackTemplates[1].drawStartTip = true;
+            template.trackTemplates[1].drawEndTip = true;
+            let p0 = template.trackTemplates[0].trackpoints[0].position;
+            let p1 = template.trackTemplates[0].trackpoints[1].position;
+            let dist = BABYLON.Vector3.Distance(p0, p1);
+            let t0 = template.trackTemplates[0].trackpoints[0].dir.scale(dist);
+            let t1 = template.trackTemplates[0].trackpoints[1].dir.scale(dist);
+            for (let i = 0; i < l; i++) {
+                template.trackTemplates[2 + i] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                let x = MarbleRunSimulatorCore.tileSize + i * MarbleRunSimulatorCore.tileSize;
+                let z = MarbleRunSimulatorCore.tileSize * 2.5;
+                let f = (x - xLeft) / (trackLength);
+                let pos = BABYLON.Vector3.Hermite(p0, t0, p1, t1, f);
+                let tmpPoint = new BABYLON.Vector3(x, MarbleRunSimulatorCore.tileHeight, z * 0.3 + 0.009 * 0.7);
+                let exitPoint = new BABYLON.Vector3(x, pos.y + 0.004, 0.009);
+                template.trackTemplates[2 + i].trackpoints = [
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[2 + i], new BABYLON.Vector3(x, MarbleRunSimulatorCore.tileHeight, z), new BABYLON.Vector3(0, 0, -1)),
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[2 + i], exitPoint, exitPoint.subtract(tmpPoint).normalize())
+                ];
+            }
+            if (mirrorX) {
+                template.mirrorXTrackPointsInPlace();
+            }
+            template.initialize();
+            return template;
+        }
+    }
+    MarbleRunSimulatorCore.MultiJoin = MultiJoin;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
