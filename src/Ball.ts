@@ -508,8 +508,14 @@ namespace MarbleRunSimulatorCore {
                                         reactions.addInPlace(reaction);
                                         reactionsCount++;
     
-                                        this.position.z = box.absolutePosition.z;
-                                        this.velocity.z = 0;
+                                        if (part.r % 2 === 0) {
+                                            this.position.z = box.absolutePosition.z;
+                                            this.velocity.z = 0;
+                                        }
+                                        else {
+                                            this.position.x = box.absolutePosition.x;
+                                            this.velocity.x = 0;
+                                        }
     
                                         this.bumpSurfaceIsRail = false;
                                     }

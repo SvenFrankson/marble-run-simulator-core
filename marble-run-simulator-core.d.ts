@@ -732,6 +732,7 @@ declare namespace MarbleRunSimulatorCore {
         angles: number[];
         drawStartTip: boolean;
         drawEndTip: boolean;
+        forcedAngle: number;
         preferedStartBank: number;
         preferedEndBank: number;
         cutOutSleeper: (n: number) => boolean;

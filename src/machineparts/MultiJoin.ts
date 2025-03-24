@@ -23,7 +23,7 @@ namespace MarbleRunSimulatorCore {
             template.mirrorX = mirrorX;
 
             let xLeft = - tileSize * 1.5;
-            let xRight = tileSize * (l + 2.5) - tileSize * 0.5;
+            let xRight = tileSize * l + 0.01;
             let trackLength = xRight - xLeft;
 
             template.trackTemplates[0] = new TrackTemplate(template);
@@ -37,8 +37,8 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].trackpoints.push(
                 new TrackPoint(
                     template.trackTemplates[0],
-                    new BABYLON.Vector3(xRight, tileHeight, 0),
-                    Tools.V3Dir(90 - Math.atan(tileHeight / (trackLength / 3)) / Math.PI * 180)
+                    new BABYLON.Vector3(xRight, 0.7 * tileHeight, 0),
+                    Tools.V3Dir(90 - Math.atan(tileHeight / (trackLength / 2)) / Math.PI * 180)
                 )
             );
             template.trackTemplates[0].drawEndTip = true;
@@ -55,13 +55,17 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[1].trackpoints.push(
                 new TrackPoint(
                     template.trackTemplates[1],
-                    new BABYLON.Vector3(xRight, tileHeight + 0.01, - 0.01),
-                    Tools.V3Dir(90 - Math.atan(tileHeight / (trackLength / 3)) / Math.PI * 180),
+                    new BABYLON.Vector3(xRight, 0.7 * tileHeight + 0.01, - 0.01),
+                    Tools.V3Dir(90 - Math.atan(tileHeight / (trackLength / 2)) / Math.PI * 180),
                     new BABYLON.Vector3(0, 0, 1)
                 )
             );
             template.trackTemplates[1].drawStartTip = true;
             template.trackTemplates[1].drawEndTip = true;
+            template.trackTemplates[1].forcedAngle = 0;
+            template.trackTemplates[1].onNormalEvaluated = (n) => {
+                n.copyFromFloats(0, 0, 1);
+            }
 
             let p0 = template.trackTemplates[0].trackpoints[0].position;
             let p1 = template.trackTemplates[0].trackpoints[1].position;

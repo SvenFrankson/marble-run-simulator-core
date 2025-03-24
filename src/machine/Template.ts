@@ -23,6 +23,7 @@ namespace MarbleRunSimulatorCore {
         public drawStartTip: boolean = false;
         public drawEndTip: boolean = false;
 
+        public forcedAngle: number;
         public preferedStartBank: number = 0;
         public preferedEndBank: number = 0;
         public cutOutSleeper: (n: number) => boolean;
@@ -160,54 +161,59 @@ namespace MarbleRunSimulatorCore {
                 this.interpolatedNormals[i] = BABYLON.Vector3.Lerp(normalsForward[i], normalsBackward[i], f).normalize();
             }
 
-            let maxR = 0;
             this.angles = new Array<number>(N);
-            this.angles.fill(0);
-            let lastSign = 0;
-            for (let i = 1; i < N - 1; i++) {
-                let n = this.interpolatedNormals[i];
-
-                let prevPoint = this.interpolatedPoints[i - 1];
-                let point = this.interpolatedPoints[i];
-                let nextPoint = this.interpolatedPoints[i + 1];
-
-                let dirPrev: BABYLON.Vector3 = point.subtract(prevPoint);
-                let dPrev: number = dirPrev.length();
-
-                let dirNext: BABYLON.Vector3 = nextPoint.subtract(point);
-                let dNext: number = dirNext.length();
-
-                let a = Mummu.AngleFromToAround(dirPrev.scale(-1), dirNext, n);
-                if (Math.abs(a) < Math.PI * 0.9999999) {
-                    let sign = Math.sign(a);
-                    lastSign += sign / 10;
-                    lastSign = Nabu.MinMax(lastSign, -1, 1);
-
-                    let rPrev = Math.tan(Math.abs(a) / 2) * (dPrev * 0.5);
-                    let rNext = Math.tan(Math.abs(a) / 2) * (dNext * 0.5);
-                    let r = (rPrev + rNext) * 0.5;
-                    maxR = Math.max(r, maxR);
-
-                    let f = this.partTemplate.minTurnRadius / r;
-                    f = Math.max(Math.min(f, 1), 0);
-                    this.angles[i] = Math.max(this.partTemplate.maxAngle * f, this.partTemplate.defaultAngle) * sign;
-
-                    if (Math.abs(lastSign) >= 1) {
-                        if (i > 0 && this.angles[i - 1] === undefined) {
-                            for (let ii = i; ii >= 0; ii--) {
-                                if (this.angles[ii] === undefined) {
-                                    this.angles[ii] = this.partTemplate.defaultAngle * lastSign;
+            if (isFinite(this.forcedAngle)) {
+                this.angles.fill(this.forcedAngle);
+            }
+            else {
+                this.angles.fill(0);
+                let maxR = 0;
+                let lastSign = 0;
+                for (let i = 1; i < N - 1; i++) {
+                    let n = this.interpolatedNormals[i];
+    
+                    let prevPoint = this.interpolatedPoints[i - 1];
+                    let point = this.interpolatedPoints[i];
+                    let nextPoint = this.interpolatedPoints[i + 1];
+    
+                    let dirPrev: BABYLON.Vector3 = point.subtract(prevPoint);
+                    let dPrev: number = dirPrev.length();
+    
+                    let dirNext: BABYLON.Vector3 = nextPoint.subtract(point);
+                    let dNext: number = dirNext.length();
+    
+                    let a = Mummu.AngleFromToAround(dirPrev.scale(-1), dirNext, n);
+                    if (Math.abs(a) < Math.PI * 0.9999999) {
+                        let sign = Math.sign(a);
+                        lastSign += sign / 10;
+                        lastSign = Nabu.MinMax(lastSign, -1, 1);
+    
+                        let rPrev = Math.tan(Math.abs(a) / 2) * (dPrev * 0.5);
+                        let rNext = Math.tan(Math.abs(a) / 2) * (dNext * 0.5);
+                        let r = (rPrev + rNext) * 0.5;
+                        maxR = Math.max(r, maxR);
+    
+                        let f = this.partTemplate.minTurnRadius / r;
+                        f = Math.max(Math.min(f, 1), 0);
+                        this.angles[i] = Math.max(this.partTemplate.maxAngle * f, this.partTemplate.defaultAngle) * sign;
+    
+                        if (Math.abs(lastSign) >= 1) {
+                            if (i > 0 && this.angles[i - 1] === undefined) {
+                                for (let ii = i; ii >= 0; ii--) {
+                                    if (this.angles[ii] === undefined) {
+                                        this.angles[ii] = this.partTemplate.defaultAngle * lastSign;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                else {
-                    if (Math.abs(lastSign) >= 1) {
-                        this.angles[i] = this.partTemplate.defaultAngle * lastSign;
-                    }
                     else {
-                        this.angles[i] = undefined;
+                        if (Math.abs(lastSign) >= 1) {
+                            this.angles[i] = this.partTemplate.defaultAngle * lastSign;
+                        }
+                        else {
+                            this.angles[i] = undefined;
+                        }
                     }
                 }
             }

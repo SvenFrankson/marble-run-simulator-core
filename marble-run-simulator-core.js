@@ -450,8 +450,14 @@ var MarbleRunSimulatorCore;
                                         let reaction = col.normal.scale(col.depth * 1000 * this.velocity.length()); // 1000 is a magic number.
                                         reactions.addInPlace(reaction);
                                         reactionsCount++;
-                                        this.position.z = box.absolutePosition.z;
-                                        this.velocity.z = 0;
+                                        if (part.r % 2 === 0) {
+                                            this.position.z = box.absolutePosition.z;
+                                            this.velocity.z = 0;
+                                        }
+                                        else {
+                                            this.position.x = box.absolutePosition.x;
+                                            this.velocity.x = 0;
+                                        }
                                         this.bumpSurfaceIsRail = false;
                                     }
                                 });
@@ -6146,47 +6152,52 @@ var MarbleRunSimulatorCore;
                 let f = i / (N - 1);
                 this.interpolatedNormals[i] = BABYLON.Vector3.Lerp(normalsForward[i], normalsBackward[i], f).normalize();
             }
-            let maxR = 0;
             this.angles = new Array(N);
-            this.angles.fill(0);
-            let lastSign = 0;
-            for (let i = 1; i < N - 1; i++) {
-                let n = this.interpolatedNormals[i];
-                let prevPoint = this.interpolatedPoints[i - 1];
-                let point = this.interpolatedPoints[i];
-                let nextPoint = this.interpolatedPoints[i + 1];
-                let dirPrev = point.subtract(prevPoint);
-                let dPrev = dirPrev.length();
-                let dirNext = nextPoint.subtract(point);
-                let dNext = dirNext.length();
-                let a = Mummu.AngleFromToAround(dirPrev.scale(-1), dirNext, n);
-                if (Math.abs(a) < Math.PI * 0.9999999) {
-                    let sign = Math.sign(a);
-                    lastSign += sign / 10;
-                    lastSign = Nabu.MinMax(lastSign, -1, 1);
-                    let rPrev = Math.tan(Math.abs(a) / 2) * (dPrev * 0.5);
-                    let rNext = Math.tan(Math.abs(a) / 2) * (dNext * 0.5);
-                    let r = (rPrev + rNext) * 0.5;
-                    maxR = Math.max(r, maxR);
-                    let f = this.partTemplate.minTurnRadius / r;
-                    f = Math.max(Math.min(f, 1), 0);
-                    this.angles[i] = Math.max(this.partTemplate.maxAngle * f, this.partTemplate.defaultAngle) * sign;
-                    if (Math.abs(lastSign) >= 1) {
-                        if (i > 0 && this.angles[i - 1] === undefined) {
-                            for (let ii = i; ii >= 0; ii--) {
-                                if (this.angles[ii] === undefined) {
-                                    this.angles[ii] = this.partTemplate.defaultAngle * lastSign;
+            if (isFinite(this.forcedAngle)) {
+                this.angles.fill(this.forcedAngle);
+            }
+            else {
+                this.angles.fill(0);
+                let maxR = 0;
+                let lastSign = 0;
+                for (let i = 1; i < N - 1; i++) {
+                    let n = this.interpolatedNormals[i];
+                    let prevPoint = this.interpolatedPoints[i - 1];
+                    let point = this.interpolatedPoints[i];
+                    let nextPoint = this.interpolatedPoints[i + 1];
+                    let dirPrev = point.subtract(prevPoint);
+                    let dPrev = dirPrev.length();
+                    let dirNext = nextPoint.subtract(point);
+                    let dNext = dirNext.length();
+                    let a = Mummu.AngleFromToAround(dirPrev.scale(-1), dirNext, n);
+                    if (Math.abs(a) < Math.PI * 0.9999999) {
+                        let sign = Math.sign(a);
+                        lastSign += sign / 10;
+                        lastSign = Nabu.MinMax(lastSign, -1, 1);
+                        let rPrev = Math.tan(Math.abs(a) / 2) * (dPrev * 0.5);
+                        let rNext = Math.tan(Math.abs(a) / 2) * (dNext * 0.5);
+                        let r = (rPrev + rNext) * 0.5;
+                        maxR = Math.max(r, maxR);
+                        let f = this.partTemplate.minTurnRadius / r;
+                        f = Math.max(Math.min(f, 1), 0);
+                        this.angles[i] = Math.max(this.partTemplate.maxAngle * f, this.partTemplate.defaultAngle) * sign;
+                        if (Math.abs(lastSign) >= 1) {
+                            if (i > 0 && this.angles[i - 1] === undefined) {
+                                for (let ii = i; ii >= 0; ii--) {
+                                    if (this.angles[ii] === undefined) {
+                                        this.angles[ii] = this.partTemplate.defaultAngle * lastSign;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                else {
-                    if (Math.abs(lastSign) >= 1) {
-                        this.angles[i] = this.partTemplate.defaultAngle * lastSign;
-                    }
                     else {
-                        this.angles[i] = undefined;
+                        if (Math.abs(lastSign) >= 1) {
+                            this.angles[i] = this.partTemplate.defaultAngle * lastSign;
+                        }
+                        else {
+                            this.angles[i] = undefined;
+                        }
                     }
                 }
             }
@@ -8461,21 +8472,25 @@ var MarbleRunSimulatorCore;
             template.lExtendableOnX = true;
             template.mirrorX = mirrorX;
             let xLeft = -MarbleRunSimulatorCore.tileSize * 1.5;
-            let xRight = MarbleRunSimulatorCore.tileSize * (l + 2.5) - MarbleRunSimulatorCore.tileSize * 0.5;
+            let xRight = MarbleRunSimulatorCore.tileSize * l + 0.01;
             let trackLength = xRight - xLeft;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xLeft, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))
             ];
-            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xRight, MarbleRunSimulatorCore.tileHeight, 0), MarbleRunSimulatorCore.Tools.V3Dir(90 - Math.atan(MarbleRunSimulatorCore.tileHeight / (trackLength / 3)) / Math.PI * 180)));
+            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xRight, 0.7 * MarbleRunSimulatorCore.tileHeight, 0), MarbleRunSimulatorCore.Tools.V3Dir(90 - Math.atan(MarbleRunSimulatorCore.tileHeight / (trackLength / 2)) / Math.PI * 180)));
             template.trackTemplates[0].drawEndTip = true;
             template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[1].trackpoints = [
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(xLeft, 0 + 0.01, -0.01), MarbleRunSimulatorCore.Tools.V3Dir(90), new BABYLON.Vector3(0, 0, 1))
             ];
-            template.trackTemplates[1].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(xRight, MarbleRunSimulatorCore.tileHeight + 0.01, -0.01), MarbleRunSimulatorCore.Tools.V3Dir(90 - Math.atan(MarbleRunSimulatorCore.tileHeight / (trackLength / 3)) / Math.PI * 180), new BABYLON.Vector3(0, 0, 1)));
+            template.trackTemplates[1].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(xRight, 0.7 * MarbleRunSimulatorCore.tileHeight + 0.01, -0.01), MarbleRunSimulatorCore.Tools.V3Dir(90 - Math.atan(MarbleRunSimulatorCore.tileHeight / (trackLength / 2)) / Math.PI * 180), new BABYLON.Vector3(0, 0, 1)));
             template.trackTemplates[1].drawStartTip = true;
             template.trackTemplates[1].drawEndTip = true;
+            template.trackTemplates[1].forcedAngle = 0;
+            template.trackTemplates[1].onNormalEvaluated = (n) => {
+                n.copyFromFloats(0, 0, 1);
+            };
             let p0 = template.trackTemplates[0].trackpoints[0].position;
             let p1 = template.trackTemplates[0].trackpoints[1].position;
             let dist = BABYLON.Vector3.Distance(p0, p1);
