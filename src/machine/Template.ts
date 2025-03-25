@@ -303,9 +303,11 @@ namespace MarbleRunSimulatorCore {
 
         public xExtendable: boolean = false;
         public yExtendable: boolean = false;
+        public downwardYExtendable: boolean = false;
         public zExtendable: boolean = false;
         public nExtendable: boolean = false;
         public sExtendable: boolean = false;
+        public minLAbsolute: number = 0;
         public minL: number = 1;
         public maxL: number = 35;
         public minH: number = 0;
@@ -500,14 +502,14 @@ namespace MarbleRunSimulatorCore {
                     data = Loop.GenerateTemplate(l, d, n);
                 }
                 else if (partName.startsWith("spiral_")) {
-                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = Spiral.GenerateTemplate(w, h, mirrorX, mirrorZ);
+                    data = Spiral.GenerateTemplate(l, h, mirrorX, mirrorZ);
                 }
                 else if (partName.startsWith("spiralUTurn_")) {
-                    let w = parseInt(partName.split("_")[1].split(".")[0]);
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = SpiralUTurn.GenerateTemplate(w, h, mirrorX, mirrorZ);
+                    data = SpiralUTurn.GenerateTemplate(l, h);
                 }
                 else if (partName === "quarter") {
                     data = QuarterNote.GenerateTemplate(mirrorX);

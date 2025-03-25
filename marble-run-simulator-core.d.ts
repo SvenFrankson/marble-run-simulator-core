@@ -537,11 +537,13 @@ declare namespace MarbleRunSimulatorCore {
         get extendable(): boolean;
         get xExtendable(): boolean;
         get yExtendable(): boolean;
+        get downwardYExtendable(): boolean;
         get zExtendable(): boolean;
         get nExtendable(): boolean;
         get sExtendable(): boolean;
         get minL(): number;
         get maxL(): number;
+        get minLAbsolute(): number;
         get minW(): number;
         get maxW(): number;
         get minH(): number;
@@ -771,9 +773,11 @@ declare namespace MarbleRunSimulatorCore {
         dExtendableOnZ: boolean;
         xExtendable: boolean;
         yExtendable: boolean;
+        downwardYExtendable: boolean;
         zExtendable: boolean;
         nExtendable: boolean;
         sExtendable: boolean;
+        minLAbsolute: number;
         minL: number;
         maxL: number;
         minH: number;
@@ -1216,13 +1220,15 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Spiral extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(w: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {
     class SpiralUTurn extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
-        static GenerateTemplate(h: number, d: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

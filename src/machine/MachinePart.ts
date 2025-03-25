@@ -430,6 +430,9 @@ namespace MarbleRunSimulatorCore {
         public get yExtendable(): boolean {
             return this.template.yExtendable;
         }
+        public get downwardYExtendable(): boolean {
+            return this.template.downwardYExtendable;
+        }
         public get zExtendable(): boolean {
             return this.template.zExtendable;
         }
@@ -444,6 +447,9 @@ namespace MarbleRunSimulatorCore {
         }
         public get maxL(): number {
             return this.template.maxL;
+        }
+        public get minLAbsolute(): number {
+            return this.template.minLAbsolute;
         }
         public get minW(): number {
             return this.template.minL;
