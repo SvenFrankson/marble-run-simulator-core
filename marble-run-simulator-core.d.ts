@@ -443,6 +443,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class MachinePartEndpoint {
         localPosition: BABYLON.Vector3;
+        localR: number;
         machinePart: MachinePart;
         connectedEndPoint: MachinePartEndpoint;
         i: number;
@@ -451,7 +452,7 @@ declare namespace MarbleRunSimulatorCore {
         index: number;
         selectorMeshDisplay: BABYLON.Mesh;
         helperMesh: BABYLON.Mesh;
-        constructor(localPosition: BABYLON.Vector3, machinePart: MachinePart);
+        constructor(localPosition: BABYLON.Vector3, localR: number, machinePart: MachinePart);
         get leftSide(): boolean;
         get upperSide(): boolean;
         get farSide(): boolean;
@@ -459,6 +460,7 @@ declare namespace MarbleRunSimulatorCore {
         isIJK(worldIJK: Nabu.IJK): boolean;
         private _absolutePosition;
         get absolutePosition(): BABYLON.Vector3;
+        get absoluteR(): number;
         connectTo(endPoint: MachinePartEndpoint): void;
         disconnect(): void;
         private _hovered;
@@ -592,6 +594,7 @@ declare namespace MarbleRunSimulatorCore {
         setR(v: number, doNotCheckGridLimits?: boolean): void;
         get targetR(): number;
         setTargetR(v: number): void;
+        static DirectionToRValue(dir: BABYLON.Vector3): number;
         getAbsoluteCoordinatesPosition(): BABYLON.Vector3;
         setIsVisible(isVisible: boolean): void;
         private _partVisibilityMode;
@@ -797,6 +800,7 @@ declare namespace MarbleRunSimulatorCore {
         getDepthForWidth: (d: number) => number;
         trackTemplates: TrackTemplate[];
         endPoints: BABYLON.Vector3[];
+        endPointDirections: BABYLON.Vector3[];
         mirrorXTrackPointsInPlace(): void;
         mirrorZTrackPointsInPlace(): void;
         initialize(): void;

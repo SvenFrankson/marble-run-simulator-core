@@ -244,6 +244,8 @@ namespace MarbleRunSimulatorCore {
                 template.trackTemplates[0].drawEndTip = true;
             }
 
+            template.maxAngle = 0;
+            template.trackTemplates[0].preferedStartBank = 0;
             template.initialize();
 
             return template;
@@ -283,7 +285,6 @@ namespace MarbleRunSimulatorCore {
                 0
             );
             BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
-            Mummu.DrawDebugPoint(center, 2, BABYLON.Color3.Red(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (Math.abs(ball.position.y - center.y) < tileHeight) {
@@ -305,7 +306,6 @@ namespace MarbleRunSimulatorCore {
                 0
             );
             BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
-            Mummu.DrawDebugPoint(center, 200, BABYLON.Color3.Green(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (ball.velocity.length() < 0.02) {

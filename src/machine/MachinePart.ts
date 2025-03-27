@@ -85,6 +85,7 @@ namespace MarbleRunSimulatorCore {
 
         constructor(
             public localPosition: BABYLON.Vector3,
+            public localR: number,
             public machinePart: MachinePart
         ) {
             this.i = Math.round((localPosition.x + tileSize * 0.5) / tileSize);
@@ -116,6 +117,10 @@ namespace MarbleRunSimulatorCore {
         public get absolutePosition(): BABYLON.Vector3 {
             BABYLON.Vector3.TransformCoordinatesToRef(this.localPosition, this.machinePart.getWorldMatrix(), this._absolutePosition);
             return this._absolutePosition;
+        }
+
+        public get absoluteR(): number {
+            return (this.machinePart.r + this.localR) % 4;
         }
 
         public connectTo(endPoint: MachinePartEndpoint) {
@@ -512,7 +517,7 @@ namespace MarbleRunSimulatorCore {
             this._template = template;
             this.endPoints = [];
             for (let i = 0; i < this._template.endPoints.length; i++) {
-                this.endPoints[i] = new MachinePartEndpoint(this._template.endPoints[i], this);
+                this.endPoints[i] = new MachinePartEndpoint(this._template.endPoints[i], MachinePart.DirectionToRValue(this._template.endPointDirections[i]), this);
                 this.endPoints[i].index = i;
             }
         }
@@ -722,6 +727,10 @@ namespace MarbleRunSimulatorCore {
             }
             this._targetR = v;
             this._lastDist = Infinity;
+        }
+        public static DirectionToRValue(dir: BABYLON.Vector3): number {
+            let a = - Mummu.AngleFromToAround(BABYLON.Axis.X, dir, BABYLON.Axis.Y) / (Math.PI * 0.5);
+            return Math.round(a + 4) % 4;
         }
 
         public getAbsoluteCoordinatesPosition(): BABYLON.Vector3 {

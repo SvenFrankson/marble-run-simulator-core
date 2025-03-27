@@ -3678,8 +3678,9 @@ var MarbleRunSimulatorCore;
     }
     MarbleRunSimulatorCore.EndpointSelectorMesh = EndpointSelectorMesh;
     class MachinePartEndpoint {
-        constructor(localPosition, machinePart) {
+        constructor(localPosition, localR, machinePart) {
             this.localPosition = localPosition;
+            this.localR = localR;
             this.machinePart = machinePart;
             this.i = 0;
             this.j = 0;
@@ -3709,6 +3710,9 @@ var MarbleRunSimulatorCore;
         get absolutePosition() {
             BABYLON.Vector3.TransformCoordinatesToRef(this.localPosition, this.machinePart.getWorldMatrix(), this._absolutePosition);
             return this._absolutePosition;
+        }
+        get absoluteR() {
+            return (this.machinePart.r + this.localR) % 4;
         }
         connectTo(endPoint) {
             this.connectedEndPoint = endPoint;
@@ -4176,7 +4180,7 @@ var MarbleRunSimulatorCore;
             this._template = template;
             this.endPoints = [];
             for (let i = 0; i < this._template.endPoints.length; i++) {
-                this.endPoints[i] = new MachinePartEndpoint(this._template.endPoints[i], this);
+                this.endPoints[i] = new MachinePartEndpoint(this._template.endPoints[i], MachinePart.DirectionToRValue(this._template.endPointDirections[i]), this);
                 this.endPoints[i].index = i;
             }
         }
@@ -4332,6 +4336,10 @@ var MarbleRunSimulatorCore;
             }
             this._targetR = v;
             this._lastDist = Infinity;
+        }
+        static DirectionToRValue(dir) {
+            let a = -Mummu.AngleFromToAround(BABYLON.Axis.X, dir, BABYLON.Axis.Y) / (Math.PI * 0.5);
+            return Math.round(a + 4) % 4;
         }
         getAbsoluteCoordinatesPosition() {
             return new BABYLON.Vector3(this.i * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x, this.k * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y, this.j * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z);
@@ -5190,10 +5198,10 @@ var MarbleRunSimulatorCore;
             if (partName === "spiralUTurn" || partName.startsWith("spiralUTurn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let h = parseInt(argStr.split(".")[0]);
-                    let d = parseInt(argStr.split(".")[1]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
                     prop.h = h;
-                    prop.d = d;
                 }
                 return new MarbleRunSimulatorCore.SpiralUTurn(this.machine, prop);
             }
@@ -6081,10 +6089,12 @@ var MarbleRunSimulatorCore;
                 let start = this.trackpoints[0].position;
                 if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(start)) {
                     this.partTemplate.endPoints.push(start.clone());
+                    this.partTemplate.endPointDirections.push(this.trackpoints[0].dir.scale(-1));
                 }
                 let end = this.trackpoints[this.trackpoints.length - 1].position;
                 if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(end)) {
                     this.partTemplate.endPoints.push(end.clone());
+                    this.partTemplate.endPointDirections.push(this.trackpoints[this.trackpoints.length - 1].dir);
                 }
             }
             for (let i = 1; i < this.trackpoints.length - 1; i++) {
@@ -6302,6 +6312,7 @@ var MarbleRunSimulatorCore;
             this.hasOriginDestinationHandles = false;
             this.trackTemplates = [];
             this.endPoints = [];
+            this.endPointDirections = [];
         }
         mirrorXTrackPointsInPlace() {
             for (let i = 0; i < this.trackTemplates.length; i++) {
@@ -9483,6 +9494,8 @@ var MarbleRunSimulatorCore;
                 ];
                 template.trackTemplates[0].drawEndTip = true;
             }
+            template.maxAngle = 0;
+            template.trackTemplates[0].preferedStartBank = 0;
             template.initialize();
             return template;
         }
@@ -9500,7 +9513,6 @@ var MarbleRunSimulatorCore;
         getBallReady() {
             let center = new BABYLON.Vector3(this.kicker.position.x, MarbleRunSimulatorCore.tileHeight * 3, 0);
             BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
-            Mummu.DrawDebugPoint(center, 2, BABYLON.Color3.Red(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (Math.abs(ball.position.y - center.y) < MarbleRunSimulatorCore.tileHeight) {
@@ -9517,7 +9529,6 @@ var MarbleRunSimulatorCore;
         getBallArmed() {
             let center = new BABYLON.Vector3(this.kicker.position.x, MarbleRunSimulatorCore.tileHeight * 3, 0);
             BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
-            Mummu.DrawDebugPoint(center, 200, BABYLON.Color3.Green(), 0.05);
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
                 if (ball.velocity.length() < 0.02) {

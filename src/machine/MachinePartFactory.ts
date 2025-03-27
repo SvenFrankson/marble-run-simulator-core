@@ -294,10 +294,10 @@ namespace MarbleRunSimulatorCore {
             if (partName === "spiralUTurn" || partName.startsWith("spiralUTurn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let h = parseInt(argStr.split(".")[0]);
-                    let d = parseInt(argStr.split(".")[1]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
                     prop.h = h;
-                    prop.d = d;
                 }
                 return new SpiralUTurn(this.machine, prop);
             }
