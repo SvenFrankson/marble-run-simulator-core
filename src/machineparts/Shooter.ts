@@ -60,8 +60,7 @@ namespace MarbleRunSimulatorCore {
                 prop.n = 0;
             }
 
-            let partName = "shooter_" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName));
+            this.setTemplate(this.machine.templateManager.getTemplate(Shooter.PropToPartName(prop)));
 
             for (let i = this.colors.length; i < 5; i++) {
                 this.colors[i] = 0;
@@ -132,6 +131,11 @@ namespace MarbleRunSimulatorCore {
                 false,
                 Nabu.Easing.easeOutElastic
             );
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = "shooter_" + prop.h.toFixed(0) + "." + prop.n.toFixed(0);
+            return partName;
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {

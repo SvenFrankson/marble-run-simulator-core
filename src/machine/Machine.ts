@@ -2077,6 +2077,7 @@ namespace MarbleRunSimulatorCore {
                     let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                     let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
 
+                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                     if (makeMiniature) {
 
                     }
@@ -2084,13 +2085,12 @@ namespace MarbleRunSimulatorCore {
                         let ball = new Ball(new BABYLON.Vector3(x, y, z), this);
                         this.balls.push(ball);
     
-                        let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                         ball.materialIndex = materialIndex;
                     }
                 }
                 
                 let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("partCount = " + partCount);
+                console.log("partCount = " + partCount);
 
                 for (let i = 0; i < partCount; i++) {
                     let index = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -2138,6 +2138,7 @@ namespace MarbleRunSimulatorCore {
                         if (makeMiniature) {
                             let template = this.templateManager.getTemplateByProp(baseName, prop);
                             if (template) {
+                                console.log("make miniature for " + baseName);
                                 // Now draw into the miniature from the template.
                                 for (let t = 0; t < template.trackTemplates.length; t++) {
                                     let trackTemplate = template.trackTemplates[t];
@@ -2161,8 +2162,14 @@ namespace MarbleRunSimulatorCore {
                                         point.x += prop.i * tileSize;
                                         point.y += prop.k * tileHeight;
                                         point.z += prop.j * tileSize;
+                                        if (Math.abs(point.x) > 1) {
+                                            debugger;
+                                        }
                                         if (Mummu.IsFinite(point)) {
                                             drawnTrack.push(point);
+                                        }
+                                        else {
+                                            console.log("miniature fail for " + baseName);
                                         }
                                     }
                                     if (drawnTrack.length > 0) {
@@ -2264,37 +2271,49 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
 
-                    //console.log(minX + " " + maxX);
+                    console.log("minmaxX " + minX + " " + maxX);
+                    console.log("minmaxZ " + minZ + " " + maxZ);
                     let s = Math.max(maxX - minX, maxZ - minZ);
                     let mX = picMargin;
                     let mZ = picMargin;
 
                     for (let i = 0; i < lines.length; i++) {
                         let line = lines[i];
-                        context.lineWidth = 4 * trackLineWidth;
+                        context.lineWidth = 1 * trackLineWidth;
                         context.strokeStyle = "white";
                         context.beginPath();
                         let p0 = line[0];
                         let x = (p0.x - minX) / s * picSizeNoMargin + mX;
-                        let y = (p0.z - minZ) / s * picSizeNoMargin + mZ;
+                        let y = (p0.z - minZ + 0.5 * p0.y) / s * picSizeNoMargin + mZ;
                         //console.log("p0 " + x + " " + y);
-                        context.moveTo(x, y);
+                        context.moveTo(x, picSize - y);
                         for (let j = 1; j < line.length; j++) {
                             let p = line[j];
                             let x = (p.x - minX) / s * picSizeNoMargin + mX;
-                            let y = (p.z - minZ) / s * picSizeNoMargin + mZ;
+                            let y = (p.z - minZ + 0.5 * p.y) / s * picSizeNoMargin + mZ;
                             //console.log("p " + x + " " + y);
-                            context.lineTo(x, y);
+                            context.lineTo(x, picSize - y);
                         }
                         context.stroke();
-                        context.lineWidth = 2 * trackLineWidth;
-                        context.strokeStyle = "#0000FF";
-                        context.stroke();
+                        //context.lineWidth = 2 * trackLineWidth;
+                        //context.strokeStyle = "#0000FF";
+                        //context.stroke();
                     }
 
                     var tmpLink = document.createElement( 'a' );
                     tmpLink.download = "test.png";
-                    tmpLink.href = canvas.toDataURL();  
+                    tmpLink.href = canvas.toDataURL();
+
+                    document.body.appendChild(canvas);
+                    canvas.style.position = "fixed";
+                    canvas.style.top = "0";
+                    canvas.style.left = "30%";
+                    canvas.style.width = "40%";
+                    canvas.style.zIndex = "100";
+
+                    setTimeout(() => {
+                        document.body.removeChild(canvas)
+                    }, 20000);
                     
                     document.body.appendChild( tmpLink );
                     tmpLink.click(); 

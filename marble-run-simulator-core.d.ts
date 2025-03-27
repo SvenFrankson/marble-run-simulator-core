@@ -1142,6 +1142,7 @@ declare namespace MarbleRunSimulatorCore {
         animateKickerArm: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
         animateKickerKick: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(h: number, n: number): MachinePartTemplate;
         dispose(): void;
@@ -1228,7 +1229,7 @@ declare namespace MarbleRunSimulatorCore {
     class Spiral extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(w: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

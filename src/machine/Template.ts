@@ -563,7 +563,7 @@ namespace MarbleRunSimulatorCore {
             else if (baseName === "wall") {
                 partName = Wall.PropToPartName(prop);
             }
-            else if (baseName === "uturnshar") {
+            else if (baseName === "uturnsharp") {
                 partName = UTurnSharp.PropToPartName(prop);
             }
             else if (baseName === "ramp") {
@@ -620,13 +620,13 @@ namespace MarbleRunSimulatorCore {
             else if (baseName === "join") {
                 partName = Join.PropToPartName(prop);
             }
-            else if (baseName.startsWith("loop_")) {
+            else if (baseName === "loop") {
                 partName = Loop.PropToPartName(prop);
             }
-            else if (baseName.startsWith("spiral_")) {
+            else if (baseName === "spiral") {
                 partName = Spiral.PropToPartName(prop);
             }
-            else if (baseName.startsWith("spiralUTurn_")) {
+            else if (baseName === "spiralUTurn") {
                 partName = SpiralUTurn.PropToPartName(prop);
             }
             else if (baseName === "quarter") {
@@ -641,7 +641,7 @@ namespace MarbleRunSimulatorCore {
             else if (baseName === "end") {
                 partName = End.PropToPartName(prop);
             }
-            else if (baseName.startsWith("jumper_")) {
+            else if (baseName === "jumper") {
                 partName = Jumper.PropToPartName(prop);
             }
             else if (baseName === "gravitywell") {

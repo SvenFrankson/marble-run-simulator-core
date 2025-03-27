@@ -15,12 +15,12 @@ namespace MarbleRunSimulatorCore {
             return "spiral_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
         }
 
-        public static GenerateTemplate(w: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate {
+        public static GenerateTemplate(l: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "spiral_" + w.toFixed(0) + "." + h.toFixed(0);
+            template.partName = "spiral_" + l.toFixed(0) + "." + h.toFixed(0);
 
-            template.l = w;
+            template.l = l;
             template.h = h;
             template.n = h;
             template.mirrorX = mirrorX;
