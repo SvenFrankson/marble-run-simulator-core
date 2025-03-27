@@ -460,7 +460,10 @@ declare namespace MarbleRunSimulatorCore {
         isIJK(worldIJK: Nabu.IJK): boolean;
         private _absolutePosition;
         get absolutePosition(): BABYLON.Vector3;
+        getRotatedI(r: number): number;
+        getRotatedJ(r: number): number;
         get absoluteR(): number;
+        get absoluteRAfterUpdate(): number;
         connectTo(endPoint: MachinePartEndpoint): void;
         disconnect(): void;
         private _hovered;

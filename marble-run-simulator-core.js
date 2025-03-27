@@ -3688,8 +3688,9 @@ var MarbleRunSimulatorCore;
             this.index = -1;
             this._absolutePosition = BABYLON.Vector3.Zero();
             this._hovered = false;
-            this.i = Math.round((localPosition.x + MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize);
-            this.j = Math.round((localPosition.z) / MarbleRunSimulatorCore.tileSize);
+            let dir = Mummu.Rotate(BABYLON.Axis.X, BABYLON.Axis.Y, -localR * Math.PI * 0.5);
+            this.i = Math.round((localPosition.x + dir.x * MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize);
+            this.j = Math.round((localPosition.z + dir.z * MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize);
             this.k = Math.round((localPosition.y) / MarbleRunSimulatorCore.tileHeight);
         }
         get leftSide() {
@@ -3711,8 +3712,39 @@ var MarbleRunSimulatorCore;
             BABYLON.Vector3.TransformCoordinatesToRef(this.localPosition, this.machinePart.getWorldMatrix(), this._absolutePosition);
             return this._absolutePosition;
         }
+        getRotatedI(r) {
+            if (r === 0) {
+                return this.i;
+            }
+            if (r === 1) {
+                return -this.j;
+            }
+            if (r === 2) {
+                return -this.i;
+            }
+            if (r === 3) {
+                return this.j;
+            }
+        }
+        getRotatedJ(r) {
+            if (r === 0) {
+                return this.j;
+            }
+            if (r === 1) {
+                return this.i;
+            }
+            if (r === 2) {
+                return -this.j;
+            }
+            if (r === 3) {
+                return -this.i;
+            }
+        }
         get absoluteR() {
             return (this.machinePart.r + this.localR) % 4;
+        }
+        get absoluteRAfterUpdate() {
+            return (this.machinePart.rAfterUpdate + this.localR) % 4;
         }
         connectTo(endPoint) {
             this.connectedEndPoint = endPoint;
@@ -6089,12 +6121,12 @@ var MarbleRunSimulatorCore;
                 let start = this.trackpoints[0].position;
                 if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(start)) {
                     this.partTemplate.endPoints.push(start.clone());
-                    this.partTemplate.endPointDirections.push(this.trackpoints[0].dir.scale(-1));
+                    this.partTemplate.endPointDirections.push(this.trackpoints[0].dir);
                 }
                 let end = this.trackpoints[this.trackpoints.length - 1].position;
                 if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(end)) {
                     this.partTemplate.endPoints.push(end.clone());
-                    this.partTemplate.endPointDirections.push(this.trackpoints[this.trackpoints.length - 1].dir);
+                    this.partTemplate.endPointDirections.push(this.trackpoints[this.trackpoints.length - 1].dir.scale(-1));
                 }
             }
             for (let i = 1; i < this.trackpoints.length - 1; i++) {

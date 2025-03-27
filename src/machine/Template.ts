@@ -76,12 +76,12 @@ namespace MarbleRunSimulatorCore {
                 let start = this.trackpoints[0].position;
                 if (Tools.IsWorldPosAConnexion(start)) {
                     this.partTemplate.endPoints.push(start.clone());
-                    this.partTemplate.endPointDirections.push(this.trackpoints[0].dir.scale(-1));
+                    this.partTemplate.endPointDirections.push(this.trackpoints[0].dir);
                 }
                 let end = this.trackpoints[this.trackpoints.length - 1].position;
                 if (Tools.IsWorldPosAConnexion(end)) {
                     this.partTemplate.endPoints.push(end.clone());
-                    this.partTemplate.endPointDirections.push(this.trackpoints[this.trackpoints.length - 1].dir);
+                    this.partTemplate.endPointDirections.push(this.trackpoints[this.trackpoints.length - 1].dir.scale(-1));
                 }
             }
             for (let i = 1; i < this.trackpoints.length - 1; i++) {

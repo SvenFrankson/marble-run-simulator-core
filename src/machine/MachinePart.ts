@@ -88,8 +88,9 @@ namespace MarbleRunSimulatorCore {
             public localR: number,
             public machinePart: MachinePart
         ) {
-            this.i = Math.round((localPosition.x + tileSize * 0.5) / tileSize);
-            this.j = Math.round((localPosition.z) / tileSize);
+            let dir = Mummu.Rotate(BABYLON.Axis.X, BABYLON.Axis.Y, - localR * Math.PI * 0.5);
+            this.i = Math.round((localPosition.x + dir.x * tileSize * 0.5) / tileSize);
+            this.j = Math.round((localPosition.z + dir.z * tileSize * 0.5) / tileSize);
             this.k = Math.round((localPosition.y) / tileHeight);
         }
 
@@ -119,8 +120,42 @@ namespace MarbleRunSimulatorCore {
             return this._absolutePosition;
         }
 
+        public getRotatedI(r: number): number {
+            if (r === 0) {
+                return this.i;
+            }
+            if (r === 1) {
+                return - this.j;
+            }
+            if (r === 2) {
+                return - this.i;
+            }
+            if (r === 3) {
+                return this.j;
+            }
+        }
+
+        public getRotatedJ(r: number): number {
+            if (r === 0) {
+                return this.j;
+            }
+            if (r === 1) {
+                return this.i;
+            }
+            if (r === 2) {
+                return - this.j;
+            }
+            if (r === 3) {
+                return - this.i;
+            }
+        }
+
         public get absoluteR(): number {
             return (this.machinePart.r + this.localR) % 4;
+        }
+
+        public get absoluteRAfterUpdate(): number {
+            return (this.machinePart.rAfterUpdate + this.localR) % 4;
         }
 
         public connectTo(endPoint: MachinePartEndpoint) {
