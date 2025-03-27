@@ -15,7 +15,7 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
 
             let partName = "split";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
+            this.setTemplate(this.machine.templateManager.getTemplate(Split.PropToPartName(prop)));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -126,6 +126,10 @@ namespace MarbleRunSimulatorCore {
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "split";
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {

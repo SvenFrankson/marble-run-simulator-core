@@ -2236,9 +2236,8 @@ namespace MarbleRunSimulatorCore {
 
                 if (makeMiniature) {
                     let picSize = 512;
-                    let picMargin = picSize / 32;
+                    let picMargin = picSize / 20;
                     let picSizeNoMargin = picSize - 2 * picMargin;
-                    let trackLineWidth: number = 3;
                     let canvas = document.createElement("canvas");
                     canvas.width = picSize;
                     canvas.height = picSize;
@@ -2247,57 +2246,72 @@ namespace MarbleRunSimulatorCore {
                     context.fillStyle = "#0000FF";
                     context.fillRect(0, 0, canvas.width, canvas.height);
 
-                    let minX = Infinity;
-                    let maxX = - Infinity;
-                    let minY = Infinity;
-                    let maxY = - Infinity;
-                    let minZ = Infinity;
-                    let maxZ = - Infinity;
-
                     console.log(lines);
+
+                    let xProjAxis = new BABYLON.Vector2(Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
+                    let yProjAxis = new BABYLON.Vector2(0, 1);
+                    let zProjAxis = new BABYLON.Vector2(- Math.cos(Math.PI / 6), 0.8 * Math.sin(Math.PI / 6));
+
+                    let vToX = (v: BABYLON.Vector3) => {
+                        let x = xProjAxis.x * v.x + yProjAxis.x * v.y + zProjAxis.x * v.z;
+                        return x;
+                    }
+                    let vToY = (v: BABYLON.Vector3) => {
+                        let y = xProjAxis.y * v.x + yProjAxis.y * v.y + zProjAxis.y * v.z;
+                        return y;
+                    }
+
+
+                    let absPixelXMin = Infinity;
+                    let absPixelXMax = - Infinity;
+                    let absPixelYMin = Infinity;
+                    let absPixelYMax = - Infinity;
 
                     for (let i = 0; i < lines.length; i++) {
                         let line = lines[i];
                         for (let j = 0; j < line.length; j++) {
                             let p = line[j];
                             if (Mummu.IsFinite(p)) {
-                                minX = Math.min(minX, p.x);
-                                maxX = Math.max(maxX, p.x);
-                                minY = Math.min(minY, p.y);
-                                maxY = Math.max(maxY, p.y);
-                                minZ = Math.min(minZ, p.z);
-                                maxZ = Math.max(maxZ, p.z);
+                                let abstractPixelX = vToX(p);
+                                let abstractPixelY = vToY(p);
+                                absPixelXMin = Math.min(absPixelXMin, abstractPixelX);
+                                absPixelXMax = Math.max(absPixelXMax, abstractPixelX);
+                                absPixelYMin = Math.min(absPixelYMin, abstractPixelY);
+                                absPixelYMax = Math.max(absPixelYMax, abstractPixelY);
                             }
                         }
                     }
 
-                    console.log("minmaxX " + minX + " " + maxX);
-                    console.log("minmaxZ " + minZ + " " + maxZ);
-                    let s = Math.max(maxX - minX, maxZ - minZ);
-                    let mX = picMargin;
-                    let mZ = picMargin;
+                    let w = absPixelXMax - absPixelXMin;
+                    let h = absPixelYMax - absPixelYMin;
+                    let s = Math.max(w, h);
+                    let mx = picMargin;
+                    let my = picMargin;
+                    if (w > h) {
+                        my = (picSize - h / s * picSizeNoMargin) * 0.5;
+                    }
+                    else if (h > w) {
+                        my = (picSize - w / s * picSizeNoMargin) * 0.5;
+                    }
 
                     for (let i = 0; i < lines.length; i++) {
                         let line = lines[i];
-                        context.lineWidth = 1 * trackLineWidth;
+                        context.lineWidth = 1;
                         context.strokeStyle = "white";
                         context.beginPath();
                         let p0 = line[0];
-                        let x = (p0.x - minX) / s * picSizeNoMargin + mX;
-                        let y = (p0.z - minZ + 0.5 * p0.y) / s * picSizeNoMargin + mZ;
+                        let x = (vToX(p0) - absPixelXMin) / s * picSizeNoMargin + mx;
+                        let y = (vToY(p0) - absPixelYMin) / s * picSizeNoMargin + my;
                         //console.log("p0 " + x + " " + y);
-                        context.moveTo(x, picSize - y);
+                        context.moveTo(x - 2, picSize - y - 2);
                         for (let j = 1; j < line.length; j++) {
                             let p = line[j];
-                            let x = (p.x - minX) / s * picSizeNoMargin + mX;
-                            let y = (p.z - minZ + 0.5 * p.y) / s * picSizeNoMargin + mZ;
+                            let x = (vToX(p) - absPixelXMin) / s * picSizeNoMargin + mx;
+                            let y = (vToY(p) - absPixelYMin) / s * picSizeNoMargin + my;
                             //console.log("p " + x + " " + y);
-                            context.lineTo(x, picSize - y);
+                            context.lineTo(x - 2, picSize - y - 2);
                         }
                         context.stroke();
-                        //context.lineWidth = 2 * trackLineWidth;
-                        //context.strokeStyle = "#0000FF";
-                        //context.stroke();
                     }
 
                     var tmpLink = document.createElement( 'a' );
@@ -2307,13 +2321,13 @@ namespace MarbleRunSimulatorCore {
                     document.body.appendChild(canvas);
                     canvas.style.position = "fixed";
                     canvas.style.top = "0";
-                    canvas.style.left = "30%";
-                    canvas.style.width = "40%";
+                    canvas.style.left = "40%";
+                    canvas.style.width = "20%";
                     canvas.style.zIndex = "100";
 
                     setTimeout(() => {
                         document.body.removeChild(canvas)
-                    }, 20000);
+                    }, 60000);
                     
                     document.body.appendChild( tmpLink );
                     tmpLink.click(); 

@@ -1248,6 +1248,7 @@ declare namespace MarbleRunSimulatorCore {
         clicSound: BABYLON.Sound;
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirror: boolean): MachinePartTemplate;
         dispose(): void;
