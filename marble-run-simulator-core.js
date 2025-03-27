@@ -4794,7 +4794,7 @@ var MarbleRunSimulatorCore;
                 let tR = isFinite(this._targetR) ? this._targetR : this.r;
                 let targetPosition = new BABYLON.Vector3(tI * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x, tK * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y, tJ * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z);
                 let targetRotationY = -tR * Math.PI * 0.5;
-                let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Nabu.AngularDistance(this.rotation.y, targetRotationY);
+                let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
                 if (dist < 0.0001 || dist > this._lastDist) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
