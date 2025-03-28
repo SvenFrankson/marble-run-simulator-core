@@ -620,6 +620,9 @@ namespace MarbleRunSimulatorCore {
             else if (baseName === "join") {
                 partName = Join.PropToPartName(prop);
             }
+            else if (baseName === "multiJoin") {
+                partName = MultiJoin.PropToPartName(prop);
+            }
             else if (baseName === "loop") {
                 partName = Loop.PropToPartName(prop);
             }

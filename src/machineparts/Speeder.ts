@@ -10,8 +10,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "speeder";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Speeder.PropToPartName(prop)));
             this.generateWires();
 
             this.base = new BABYLON.Mesh("base");
@@ -33,6 +32,10 @@ namespace MarbleRunSimulatorCore {
 
             this.rubber1 = new BABYLON.Mesh("rubber1");
             this.rubber1.parent = this.wheel1;
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "speeder";
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {

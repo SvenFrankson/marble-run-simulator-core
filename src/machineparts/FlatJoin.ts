@@ -3,14 +3,17 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "flatjoin";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(FlatJoin.PropToPartName(prop), prop.mirrorX));
 
             for (let i = this.colors.length; i < 3; i++) {
                 this.colors[i] = 0;
             }
 
             this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "flatjoin";
         }
 
         public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {

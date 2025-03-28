@@ -3,9 +3,13 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "wave_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
+            this.setTemplate(this.machine.templateManager.getTemplate(Wave.PropToPartName(prop)));
             this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = "wave_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            return partName;
         }
 
         public static GenerateTemplate(w: number = 1, h: number = 1, d: number = 1, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {

@@ -2066,7 +2066,7 @@ namespace MarbleRunSimulatorCore {
                 this.balls = [];
                 this.parts = [];
 
-                let lines: BABYLON.Vector3[][] = [];
+                let lines: { points: BABYLON.Vector3[], dist: number }[] = [];
 
                 let pt = 0;
                 let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -2138,11 +2138,13 @@ namespace MarbleRunSimulatorCore {
                         if (makeMiniature) {
                             let template = this.templateManager.getTemplateByProp(baseName, prop);
                             if (template) {
-                                console.log("make miniature for " + baseName);
                                 // Now draw into the miniature from the template.
                                 for (let t = 0; t < template.trackTemplates.length; t++) {
                                     let trackTemplate = template.trackTemplates[t];
-                                    let drawnTrack: BABYLON.Vector3[] = [];
+                                    let drawnTrack: { points: BABYLON.Vector3[], dist: number } = {
+                                        points: [],
+                                        dist: Infinity
+                                    }
                                     /*
                                     for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
                                         let point = trackTemplate.trackpoints[p].position.clone();
@@ -2153,26 +2155,29 @@ namespace MarbleRunSimulatorCore {
                                         if (Mummu.IsFinite(point)) {
                                             drawnTrack.push(point);
                                         }
-                                    }
-                                    */
-                                       
-                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
-                                        let point = trackTemplate.interpolatedPoints[p].clone();
-                                        Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
-                                        point.x += prop.i * tileSize;
-                                        point.y += prop.k * tileHeight;
-                                        point.z += prop.j * tileSize;
-                                        if (Math.abs(point.x) > 1) {
-                                            debugger;
-                                        }
-                                        if (Mummu.IsFinite(point)) {
-                                            drawnTrack.push(point);
-                                        }
                                         else {
                                             console.log("miniature fail for " + baseName);
                                         }
                                     }
-                                    if (drawnTrack.length > 0) {
+                                    */
+                                       
+                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
+                                        if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
+                                            let point = trackTemplate.interpolatedPoints[p].clone();
+                                            Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
+                                            point.x += prop.i * tileSize;
+                                            point.y += prop.k * tileHeight;
+                                            point.z += prop.j * tileSize;
+                                            drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - point.y);
+                                            if (Mummu.IsFinite(point)) {
+                                                drawnTrack.points.push(point);
+                                            }
+                                            else {
+                                                console.log("miniature fail for " + baseName);
+                                            }
+                                        }
+                                    }
+                                    if (drawnTrack.points.length > 0) {
                                         lines.push(drawnTrack);
                                     }
                                 }
@@ -2243,7 +2248,7 @@ namespace MarbleRunSimulatorCore {
                     canvas.height = picSize;
 
                     let context = canvas.getContext("2d");
-                    context.fillStyle = "#0000FF";
+                    context.fillStyle = "#103c6f";
                     context.fillRect(0, 0, canvas.width, canvas.height);
 
                     console.log(lines);
@@ -2266,9 +2271,12 @@ namespace MarbleRunSimulatorCore {
                     let absPixelXMax = - Infinity;
                     let absPixelYMin = Infinity;
                     let absPixelYMax = - Infinity;
+                    let maxHeight = 0;
+
+                    lines.sort((a, b) => { return b.dist - a.dist; });
 
                     for (let i = 0; i < lines.length; i++) {
-                        let line = lines[i];
+                        let line = lines[i].points;
                         for (let j = 0; j < line.length; j++) {
                             let p = line[j];
                             if (Mummu.IsFinite(p)) {
@@ -2278,6 +2286,7 @@ namespace MarbleRunSimulatorCore {
                                 absPixelXMax = Math.max(absPixelXMax, abstractPixelX);
                                 absPixelYMin = Math.min(absPixelYMin, abstractPixelY);
                                 absPixelYMax = Math.max(absPixelYMax, abstractPixelY);
+                                maxHeight = Math.max(maxHeight, p.y);
                             }
                         }
                     }
@@ -2291,17 +2300,18 @@ namespace MarbleRunSimulatorCore {
                         my = (picSize - h / s * picSizeNoMargin) * 0.5;
                     }
                     else if (h > w) {
-                        my = (picSize - w / s * picSizeNoMargin) * 0.5;
+                        mx = (picSize - w / s * picSizeNoMargin) * 0.5;
                     }
 
                     for (let i = 0; i < lines.length; i++) {
-                        let line = lines[i];
-                        context.lineWidth = 1;
-                        context.strokeStyle = "white";
+                        let line = lines[i].points;
+                        context.lineWidth = 9;
+                        let normalizedH = 0;
                         context.beginPath();
                         let p0 = line[0];
                         let x = (vToX(p0) - absPixelXMin) / s * picSizeNoMargin + mx;
                         let y = (vToY(p0) - absPixelYMin) / s * picSizeNoMargin + my;
+                        normalizedH = p0.y;
                         //console.log("p0 " + x + " " + y);
                         context.moveTo(x - 2, picSize - y - 2);
                         for (let j = 1; j < line.length; j++) {
@@ -2311,6 +2321,14 @@ namespace MarbleRunSimulatorCore {
                             //console.log("p " + x + " " + y);
                             context.lineTo(x - 2, picSize - y - 2);
                         }
+                        normalizedH = normalizedH / maxHeight * 3;
+                        normalizedH = normalizedH - Math.floor(normalizedH);
+                        let c = Math.floor((normalizedH * 0.5 + 0.5) * 256);
+                        context.strokeStyle = "#" + c.toString(16).padStart(2, "0") + c.toString(16).padStart(2, "0") + c.toString(16).padStart(2, "0");
+                        context.stroke();
+                        
+                        context.lineWidth = 5;
+                        context.strokeStyle = "#103c6f";
                         context.stroke();
                     }
 
@@ -2320,7 +2338,7 @@ namespace MarbleRunSimulatorCore {
 
                     document.body.appendChild(canvas);
                     canvas.style.position = "fixed";
-                    canvas.style.top = "0";
+                    canvas.style.top = "20%";
                     canvas.style.left = "40%";
                     canvas.style.width = "20%";
                     canvas.style.zIndex = "100";

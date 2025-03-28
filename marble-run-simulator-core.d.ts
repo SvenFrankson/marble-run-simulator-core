@@ -957,6 +957,7 @@ declare namespace MarbleRunSimulatorCore {
         wheels: BABYLON.Mesh[];
         cable: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(h: number): MachinePartTemplate;
         dispose(): void;
@@ -983,6 +984,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class FlatJoin extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
     }
 }
@@ -1031,6 +1033,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Loop extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, d: number, n: number): MachinePartTemplate;
     }
 }
@@ -1219,6 +1222,7 @@ declare namespace MarbleRunSimulatorCore {
         rubber0: BABYLON.Mesh;
         rubber1: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
         private _rotationSpeed;
@@ -1288,6 +1292,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Start extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
     }
 }
@@ -1352,6 +1357,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Wave extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(w?: number, h?: number, d?: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Wave;
     }

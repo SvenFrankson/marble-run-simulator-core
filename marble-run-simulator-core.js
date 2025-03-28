@@ -3369,11 +3369,13 @@ var MarbleRunSimulatorCore;
                         if (makeMiniature) {
                             let template = this.templateManager.getTemplateByProp(baseName, prop);
                             if (template) {
-                                console.log("make miniature for " + baseName);
                                 // Now draw into the miniature from the template.
                                 for (let t = 0; t < template.trackTemplates.length; t++) {
                                     let trackTemplate = template.trackTemplates[t];
-                                    let drawnTrack = [];
+                                    let drawnTrack = {
+                                        points: [],
+                                        dist: Infinity
+                                    };
                                     /*
                                     for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
                                         let point = trackTemplate.trackpoints[p].position.clone();
@@ -3384,25 +3386,28 @@ var MarbleRunSimulatorCore;
                                         if (Mummu.IsFinite(point)) {
                                             drawnTrack.push(point);
                                         }
-                                    }
-                                    */
-                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
-                                        let point = trackTemplate.interpolatedPoints[p].clone();
-                                        Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                        point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                        point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                        point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                        if (Math.abs(point.x) > 1) {
-                                            debugger;
-                                        }
-                                        if (Mummu.IsFinite(point)) {
-                                            drawnTrack.push(point);
-                                        }
                                         else {
                                             console.log("miniature fail for " + baseName);
                                         }
                                     }
-                                    if (drawnTrack.length > 0) {
+                                    */
+                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
+                                        if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
+                                            let point = trackTemplate.interpolatedPoints[p].clone();
+                                            Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
+                                            point.x += prop.i * MarbleRunSimulatorCore.tileSize;
+                                            point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
+                                            point.z += prop.j * MarbleRunSimulatorCore.tileSize;
+                                            drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - point.y);
+                                            if (Mummu.IsFinite(point)) {
+                                                drawnTrack.points.push(point);
+                                            }
+                                            else {
+                                                console.log("miniature fail for " + baseName);
+                                            }
+                                        }
+                                    }
+                                    if (drawnTrack.points.length > 0) {
                                         lines.push(drawnTrack);
                                     }
                                 }
@@ -3465,7 +3470,7 @@ var MarbleRunSimulatorCore;
                     canvas.width = picSize;
                     canvas.height = picSize;
                     let context = canvas.getContext("2d");
-                    context.fillStyle = "#0000FF";
+                    context.fillStyle = "#103c6f";
                     context.fillRect(0, 0, canvas.width, canvas.height);
                     console.log(lines);
                     let xProjAxis = new BABYLON.Vector2(Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
@@ -3483,8 +3488,10 @@ var MarbleRunSimulatorCore;
                     let absPixelXMax = -Infinity;
                     let absPixelYMin = Infinity;
                     let absPixelYMax = -Infinity;
+                    let maxHeight = 0;
+                    lines.sort((a, b) => { return b.dist - a.dist; });
                     for (let i = 0; i < lines.length; i++) {
-                        let line = lines[i];
+                        let line = lines[i].points;
                         for (let j = 0; j < line.length; j++) {
                             let p = line[j];
                             if (Mummu.IsFinite(p)) {
@@ -3494,6 +3501,7 @@ var MarbleRunSimulatorCore;
                                 absPixelXMax = Math.max(absPixelXMax, abstractPixelX);
                                 absPixelYMin = Math.min(absPixelYMin, abstractPixelY);
                                 absPixelYMax = Math.max(absPixelYMax, abstractPixelY);
+                                maxHeight = Math.max(maxHeight, p.y);
                             }
                         }
                     }
@@ -3506,16 +3514,17 @@ var MarbleRunSimulatorCore;
                         my = (picSize - h / s * picSizeNoMargin) * 0.5;
                     }
                     else if (h > w) {
-                        my = (picSize - w / s * picSizeNoMargin) * 0.5;
+                        mx = (picSize - w / s * picSizeNoMargin) * 0.5;
                     }
                     for (let i = 0; i < lines.length; i++) {
-                        let line = lines[i];
-                        context.lineWidth = 1;
-                        context.strokeStyle = "white";
+                        let line = lines[i].points;
+                        context.lineWidth = 9;
+                        let normalizedH = 0;
                         context.beginPath();
                         let p0 = line[0];
                         let x = (vToX(p0) - absPixelXMin) / s * picSizeNoMargin + mx;
                         let y = (vToY(p0) - absPixelYMin) / s * picSizeNoMargin + my;
+                        normalizedH = p0.y;
                         //console.log("p0 " + x + " " + y);
                         context.moveTo(x - 2, picSize - y - 2);
                         for (let j = 1; j < line.length; j++) {
@@ -3525,6 +3534,13 @@ var MarbleRunSimulatorCore;
                             //console.log("p " + x + " " + y);
                             context.lineTo(x - 2, picSize - y - 2);
                         }
+                        normalizedH = normalizedH / maxHeight * 3;
+                        normalizedH = normalizedH - Math.floor(normalizedH);
+                        let c = Math.floor((normalizedH * 0.5 + 0.5) * 256);
+                        context.strokeStyle = "#" + c.toString(16).padStart(2, "0") + c.toString(16).padStart(2, "0") + c.toString(16).padStart(2, "0");
+                        context.stroke();
+                        context.lineWidth = 5;
+                        context.strokeStyle = "#103c6f";
                         context.stroke();
                     }
                     var tmpLink = document.createElement('a');
@@ -3532,7 +3548,7 @@ var MarbleRunSimulatorCore;
                     tmpLink.href = canvas.toDataURL();
                     document.body.appendChild(canvas);
                     canvas.style.position = "fixed";
-                    canvas.style.top = "0";
+                    canvas.style.top = "20%";
                     canvas.style.left = "40%";
                     canvas.style.width = "20%";
                     canvas.style.zIndex = "100";
@@ -6656,6 +6672,9 @@ var MarbleRunSimulatorCore;
             else if (baseName === "join") {
                 partName = MarbleRunSimulatorCore.Join.PropToPartName(prop);
             }
+            else if (baseName === "multiJoin") {
+                partName = MarbleRunSimulatorCore.MultiJoin.PropToPartName(prop);
+            }
             else if (baseName === "loop") {
                 partName = MarbleRunSimulatorCore.Loop.PropToPartName(prop);
             }
@@ -7705,8 +7724,7 @@ var MarbleRunSimulatorCore;
             this.p = 0;
             this.chainLength = 0;
             this.speed = 0.04; // in m/s
-            let partName = "elevator_" + prop.h.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName));
+            this.setTemplate(this.machine.templateManager.getTemplate(Elevator.PropToPartName(prop)));
             for (let i = this.colors.length; i < 4; i++) {
                 this.colors[i] = 0;
             }
@@ -7795,6 +7813,10 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+        static PropToPartName(prop) {
+            let partName = "elevator_" + prop.h.toFixed(0);
+            return partName;
         }
         async instantiateMachineSpecific() {
             this.cable.material = this.game.materials.cableMaterial;
@@ -7991,12 +8013,14 @@ var MarbleRunSimulatorCore;
     class FlatJoin extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "flatjoin";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(FlatJoin.PropToPartName(prop), prop.mirrorX));
             for (let i = this.colors.length; i < 3; i++) {
                 this.colors[i] = 0;
             }
             this.generateWires();
+        }
+        static PropToPartName(prop) {
+            return "flatjoin";
         }
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -8462,9 +8486,12 @@ var MarbleRunSimulatorCore;
                 prop.n = 1;
             }
             prop.n = Math.min(prop.n, 2 * Math.abs(prop.d));
-            let partName = "loop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
+            this.setTemplate(this.machine.templateManager.getTemplate(Loop.PropToPartName(prop)));
             this.generateWires();
+        }
+        static PropToPartName(prop) {
+            let partName = "loop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
+            return partName;
         }
         static GenerateTemplate(l, d, n) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -10372,8 +10399,7 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             this._rotationSpeed = 0;
-            let partName = "speeder";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Speeder.PropToPartName(prop)));
             this.generateWires();
             this.base = new BABYLON.Mesh("base");
             this.base.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
@@ -10390,6 +10416,9 @@ var MarbleRunSimulatorCore;
             this.rubber0.parent = this.wheel0;
             this.rubber1 = new BABYLON.Mesh("rubber1");
             this.rubber1.parent = this.wheel1;
+        }
+        static PropToPartName(prop) {
+            return "speeder";
         }
         async instantiateMachineSpecific() {
             let speederDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/speeder.babylon");
@@ -10609,7 +10638,6 @@ var MarbleRunSimulatorCore;
             };
             this._exitLeft = true;
             this._moving = false;
-            let partName = "split";
             this.setTemplate(this.machine.templateManager.getTemplate(Split.PropToPartName(prop)));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -11109,9 +11137,11 @@ var MarbleRunSimulatorCore;
     class Start extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "start";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Start.PropToPartName(prop)));
             this.generateWires();
+        }
+        static PropToPartName(prop) {
+            return "start";
         }
         static GenerateTemplate(mirrorX) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
@@ -11755,9 +11785,12 @@ var MarbleRunSimulatorCore;
     class Wave extends MarbleRunSimulatorCore.MachinePartWithOriginDestination {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "wave_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
+            this.setTemplate(this.machine.templateManager.getTemplate(Wave.PropToPartName(prop)));
             this.generateWires();
+        }
+        static PropToPartName(prop) {
+            let partName = "wave_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
+            return partName;
         }
         static GenerateTemplate(w = 1, h = 1, d = 1, mirrorX, mirrorZ) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();

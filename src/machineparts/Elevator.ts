@@ -11,8 +11,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "elevator_" + prop.h.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName));
+            this.setTemplate(this.machine.templateManager.getTemplate(Elevator.PropToPartName(prop)));
 
             for (let i = this.colors.length; i < 4; i++) {
                 this.colors[i] = 0;
@@ -115,6 +114,11 @@ namespace MarbleRunSimulatorCore {
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = "elevator_" + prop.h.toFixed(0);
+            return partName
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {
