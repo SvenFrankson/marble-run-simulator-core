@@ -211,6 +211,7 @@ namespace MarbleRunSimulatorCore {
             ];
             template.trackTemplates[3].drawStartTip = true;
             template.trackTemplates[3].drawEndTip = true;
+            template.trackTemplates[3].noMiniatureRender = true;
 
             template.initialize();
 

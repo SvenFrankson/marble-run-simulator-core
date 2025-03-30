@@ -41,6 +41,8 @@ namespace MarbleRunSimulatorCore {
         public AABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public AABBMax: BABYLON.Vector3 = BABYLON.Vector3.Zero();
 
+        public noMiniatureRender: boolean = false;
+
         constructor(public partTemplate: MachinePartTemplate) {}
 
         public mirrorXTrackPointsInPlace(): void {
@@ -332,6 +334,9 @@ namespace MarbleRunSimulatorCore {
 
         public endPoints: BABYLON.Vector3[] = [];
         public endPointDirections: BABYLON.Vector3[] = [];
+
+        public miniatureExtraLines: MiniatureTrack[] = [];
+        public miniatureShapes: MiniatureShape[] = [];
 
         public mirrorXTrackPointsInPlace(): void {
             for (let i = 0; i < this.trackTemplates.length; i++) {

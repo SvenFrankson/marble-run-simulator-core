@@ -21,8 +21,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "screen";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Screen.PropToPartName(prop)));
 
             for (let i = this.colors.length; i < 2; i++) {
                 this.colors[i] = 0;
@@ -135,6 +134,11 @@ namespace MarbleRunSimulatorCore {
                 false,
                 Nabu.Easing.easeOutSine
             );
+        }
+        
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "screen";
         }
 
         public engraine12Up = false;
@@ -310,6 +314,7 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].cutOutSleeper = () => { return true; };
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, yIn, 0), Tools.V3Dir(90), Tools.V3Dir(0))];
+            template.trackTemplates[0].noMiniatureRender = true;
 
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
@@ -362,6 +367,15 @@ namespace MarbleRunSimulatorCore {
             }
 
             template.initialize();
+
+            let shape = new MiniatureShape();
+            shape.points = [
+                new BABYLON.Vector3(tileSize * 0.5, tileSize * 0.6, - tileSize * 1.1),
+                new BABYLON.Vector3(tileSize * 0.5, - tileSize * 1.6, - tileSize * 1.1),
+                new BABYLON.Vector3(tileSize * 0.5, - tileSize * 1.6, tileSize * 1.1),
+                new BABYLON.Vector3(tileSize * 0.5, tileSize * 0.6, tileSize * 1.1)
+            ];
+            template.miniatureShapes = [shape];
 
             return template;
         }

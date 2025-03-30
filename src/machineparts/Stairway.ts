@@ -59,8 +59,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "stairway_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName));
+            this.setTemplate(this.machine.templateManager.getTemplate(Stairway.PropToPartName(prop)));
 
             for (let i = this.colors.length; i < 4; i++) {
                 this.colors[i] = 0;
@@ -102,6 +101,11 @@ namespace MarbleRunSimulatorCore {
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = "stairway_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            return partName;
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {
@@ -279,6 +283,23 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[1].drawStartTip = true;
 
             template.initialize();
+
+            let x0 = -tileWidth * 0.3;
+            let x1 = tileWidth * 0.3 + (l - 3) * tileSize;
+            let boxesCount = Math.round((x1 - x0) / 0.02);
+            let stepW = (x1 - x0) / boxesCount;
+            for (let i = 0; i < boxesCount; i++) {
+                let f = i / (boxesCount - 1);
+                let dx = x0 + stepW * (i + 0.5);
+                let shape = new MiniatureShape();
+                shape.points = [
+                    new BABYLON.Vector3(- stepW * 0.5 + dx, f * tileHeight * h, - stepW * 0.5),
+                    new BABYLON.Vector3(stepW * 0.5 + dx, f * tileHeight * h, - stepW * 0.5),
+                    new BABYLON.Vector3(stepW * 0.5 + dx, f * tileHeight * h, stepW * 0.5),
+                    new BABYLON.Vector3(- stepW * 0.5 + dx, f * tileHeight * h, stepW * 0.5)
+                ];
+                template.miniatureShapes.push(shape);
+            }
 
             return template;
         }

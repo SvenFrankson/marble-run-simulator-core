@@ -179,6 +179,17 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class MiniatureTrack {
+        points: BABYLON.Vector3[];
+        dist: number;
+    }
+    class MiniatureShape {
+        points: BABYLON.Vector3[];
+        dist: number;
+        static MakeNGon(c: BABYLON.Vector3, r: number, axis: BABYLON.Vector3, n: number): MiniatureShape;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class Tools {
@@ -753,6 +764,7 @@ declare namespace MarbleRunSimulatorCore {
         globalSlope: number;
         AABBMin: BABYLON.Vector3;
         AABBMax: BABYLON.Vector3;
+        noMiniatureRender: boolean;
         constructor(partTemplate: MachinePartTemplate);
         mirrorXTrackPointsInPlace(): void;
         mirrorZTrackPointsInPlace(): void;
@@ -804,6 +816,8 @@ declare namespace MarbleRunSimulatorCore {
         trackTemplates: TrackTemplate[];
         endPoints: BABYLON.Vector3[];
         endPointDirections: BABYLON.Vector3[];
+        miniatureExtraLines: MiniatureTrack[];
+        miniatureShapes: MiniatureShape[];
         mirrorXTrackPointsInPlace(): void;
         mirrorZTrackPointsInPlace(): void;
         initialize(): void;
@@ -1021,6 +1035,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Join extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
     }
 }
@@ -1082,6 +1097,7 @@ declare namespace MarbleRunSimulatorCore {
         cable: BABYLON.Mesh;
         turnLoopSound: BABYLON.Sound;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         engraine12Up: boolean;
         engraine12Down: boolean;
         tingle2(pixel2Value: boolean, duration: number): Promise<void>;
@@ -1278,6 +1294,7 @@ declare namespace MarbleRunSimulatorCore {
         dH: number;
         static MakeStairwayColliderVertexData(width: number, height: number, depth: number, dH: number, radius?: number): BABYLON.VertexData;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(l: number, h: number): MachinePartTemplate;
         dispose(): void;

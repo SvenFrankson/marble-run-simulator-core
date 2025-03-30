@@ -3,14 +3,17 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "join";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Join.PropToPartName(prop)));
 
             for (let i = this.colors.length; i < 3; i++) {
                 this.colors[i] = 0;
             }
 
             this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "join";
         }
 
         public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {
@@ -53,6 +56,7 @@ namespace MarbleRunSimulatorCore {
             ];
             template.trackTemplates[2].drawStartTip = true;
             template.trackTemplates[2].drawEndTip = true;
+            template.trackTemplates[2].noMiniatureRender = true;
 
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();

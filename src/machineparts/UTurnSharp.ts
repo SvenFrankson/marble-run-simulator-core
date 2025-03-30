@@ -94,6 +94,7 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[1].colorIndex = 0;
             template.trackTemplates[1].trackpoints = [new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(- tileWidth * 0.5, yTop, 0), Tools.V3Dir(90), Tools.V3Dir(0))];
             template.trackTemplates[1].drawEndTip = true;
+            template.trackTemplates[1].noMiniatureRender = true;
 
             for (let a = 0; a <= 4; a++) {
                 let f = a / 4;

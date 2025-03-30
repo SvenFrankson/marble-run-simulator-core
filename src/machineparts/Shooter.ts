@@ -252,6 +252,25 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].preferedStartBank = 0;
             template.initialize();
 
+            template.miniatureShapes.push(MiniatureShape.MakeNGon(
+                new BABYLON.Vector3(tileWidth * 0.4, 0.06, 0),
+                0.025,
+                BABYLON.Axis.Y,
+                16
+            ));
+            template.miniatureShapes.push(MiniatureShape.MakeNGon(
+                new BABYLON.Vector3(tileWidth * 0.4, 0.04, 0),
+                0.015,
+                BABYLON.Axis.Y,
+                16
+            ));
+            template.miniatureShapes.push(MiniatureShape.MakeNGon(
+                new BABYLON.Vector3(tileWidth * 0.4, 0.035, 0),
+                0.015,
+                BABYLON.Axis.Y,
+                16
+            ));
+
             return template;
         }
 

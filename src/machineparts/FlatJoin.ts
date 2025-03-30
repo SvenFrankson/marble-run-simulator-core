@@ -53,6 +53,7 @@ namespace MarbleRunSimulatorCore {
             ];
             template.trackTemplates[2].drawStartTip = true;
             template.trackTemplates[2].drawEndTip = true;
+            template.trackTemplates[2].noMiniatureRender = true;
 
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();

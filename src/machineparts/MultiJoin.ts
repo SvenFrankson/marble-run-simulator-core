@@ -66,6 +66,7 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[1].onNormalEvaluated = (n) => {
                 n.copyFromFloats(0, 0, 1);
             }
+            template.trackTemplates[1].noMiniatureRender = true;
 
             let p0 = template.trackTemplates[0].trackpoints[0].position;
             let p1 = template.trackTemplates[0].trackpoints[1].position;
