@@ -1588,8 +1588,9 @@ var MarbleRunSimulatorCore;
     function NToHex(n, l = 2) {
         return n.toString(36).padStart(l, "0").substring(0, l);
     }
-    var ballOffset = 23328; // it's 36 * 36 * 36 / 2
-    var partOffset = 648; // it's 36 * 36 / 2
+    MarbleRunSimulatorCore.NToHex = NToHex;
+    MarbleRunSimulatorCore.ballOffset = 23328; // it's 36 * 36 * 36 / 2
+    MarbleRunSimulatorCore.partOffset = 648; // it's 36 * 36 / 2
     let GraphicQuality;
     (function (GraphicQuality) {
         GraphicQuality[GraphicQuality["Proxy"] = 0] = "Proxy";
@@ -2317,391 +2318,7 @@ var MarbleRunSimulatorCore;
             return false;
         }
         serialize() {
-            return this.serializeV11();
-        }
-        serializeV1() {
-            let data = {
-                name: this.name,
-                author: this.author,
-                balls: [],
-                parts: [],
-            };
-            for (let i = 0; i < this.balls.length; i++) {
-                data.balls.push({
-                    x: this.balls[i].positionZero.x,
-                    y: this.balls[i].positionZero.y,
-                    z: this.balls[i].positionZero.z,
-                });
-            }
-            for (let i = 0; i < this.parts.length; i++) {
-                data.parts.push({
-                    name: this.parts[i].partName,
-                    i: this.parts[i].i,
-                    j: this.parts[i].j,
-                    k: this.parts[i].k,
-                    mirrorX: this.parts[i].mirrorX,
-                    mirrorZ: this.parts[i].mirrorZ,
-                    c: this.parts[i].colors,
-                });
-            }
-            return data;
-        }
-        serializeV2() {
-            let data = {
-                n: this.name,
-                a: this.author,
-                v: 2
-            };
-            let dataString = "";
-            // Add ball count
-            dataString += NToHex(this.balls.length, 2);
-            for (let i = 0; i < this.balls.length; i++) {
-                let ball = this.balls[i];
-                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
-                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
-                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
-                dataString += NToHex(x, 3);
-                dataString += NToHex(y, 3);
-                dataString += NToHex(z, 3);
-            }
-            // Add parts count
-            dataString += NToHex(this.parts.length, 2);
-            for (let i = 0; i < this.parts.length; i++) {
-                let partDataString = "";
-                let part = this.parts[i];
-                let baseName = part.partName.split("_")[0];
-                let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
-                    return name.startsWith(baseName);
-                });
-                if (index === -1) {
-                    console.error("Error, can't find part index.");
-                    debugger;
-                }
-                partDataString += NToHex(index, 2);
-                let pI = part.i + partOffset;
-                let pJ = part.j + partOffset;
-                let pK = part.k + partOffset;
-                partDataString += NToHex(pI, 2);
-                partDataString += NToHex(pJ, 2);
-                partDataString += NToHex(pK, 2);
-                partDataString += NToHex(part.w, 1);
-                partDataString += NToHex(part.h, 1);
-                partDataString += NToHex(part.d, 1);
-                partDataString += NToHex(part.n, 1);
-                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                partDataString += NToHex(m, 1);
-                let colourCount = part.colors.length;
-                partDataString += NToHex(colourCount, 1);
-                for (let j = 0; j < part.colors.length; j++) {
-                    let c = part.colors[j];
-                    partDataString += NToHex(c, 1);
-                }
-                //console.log("---------------------------");
-                //console.log("serialize");
-                //console.log(part);
-                //console.log("into");
-                //console.log(partDataString);
-                //console.log("---------------------------");
-                dataString += partDataString;
-            }
-            data.d = dataString;
-            return data;
-        }
-        serializeV3456(version) {
-            let data = {
-                n: this.name,
-                a: this.author,
-                v: version
-            };
-            let dataString = "";
-            // Add ball count
-            dataString += NToHex(this.balls.length, 2);
-            for (let i = 0; i < this.balls.length; i++) {
-                let ball = this.balls[i];
-                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
-                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
-                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
-                dataString += NToHex(x, 3);
-                dataString += NToHex(y, 3);
-                dataString += NToHex(z, 3);
-                if (version === 4 || version >= 6) {
-                    dataString += NToHex(ball.materialIndex, 2);
-                }
-            }
-            // Add parts count
-            dataString += NToHex(this.parts.length, 2);
-            for (let i = 0; i < this.parts.length; i++) {
-                let partDataString = "";
-                let part = this.parts[i];
-                let baseName = part.partName.split("_")[0];
-                let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
-                    return name.startsWith(baseName);
-                });
-                if (index === -1) {
-                    console.error("Error, can't find part index.");
-                    debugger;
-                }
-                partDataString += NToHex(index, 2);
-                let pI = part.i + partOffset;
-                let pJ = part.j + partOffset;
-                let pK = part.k + partOffset;
-                partDataString += NToHex(pI, 2);
-                partDataString += NToHex(pJ, 2);
-                partDataString += NToHex(pK, 2);
-                partDataString += NToHex(part.w, 1);
-                partDataString += NToHex(part.h, 1);
-                partDataString += NToHex(part.d, 1);
-                partDataString += NToHex(part.n, 1);
-                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                partDataString += NToHex(m, 1);
-                let colourCount = part.colors.length;
-                partDataString += NToHex(colourCount, 1);
-                for (let j = 0; j < part.colors.length; j++) {
-                    let c = part.colors[j];
-                    partDataString += NToHex(c, 1);
-                }
-                //console.log("---------------------------");
-                //console.log("serialize");
-                //console.log(part);
-                //console.log("into");
-                //console.log(partDataString);
-                //console.log("---------------------------");
-                dataString += partDataString;
-            }
-            data.d = dataString;
-            return data;
-        }
-        serializeV8() {
-            let data = {
-                n: this.name,
-                a: this.author,
-                v: 8
-            };
-            let dataString = "";
-            // Add ball count
-            dataString += NToHex(this.balls.length, 2);
-            for (let i = 0; i < this.balls.length; i++) {
-                let ball = this.balls[i];
-                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
-                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
-                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
-                dataString += NToHex(x, 3);
-                dataString += NToHex(y, 3);
-                dataString += NToHex(z, 3);
-                dataString += NToHex(ball.materialIndex, 2);
-            }
-            // Add parts count
-            dataString += NToHex(this.parts.length, 2);
-            for (let i = 0; i < this.parts.length; i++) {
-                let partDataString = "";
-                let part = this.parts[i];
-                let baseName = part.partName.split("_")[0];
-                let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
-                    return name.startsWith(baseName);
-                });
-                if (index === -1) {
-                    console.error("Error, can't find part index.");
-                    debugger;
-                }
-                partDataString += NToHex(index, 2);
-                let pI = part.i + partOffset;
-                let pJ = part.j + partOffset;
-                let pK = part.k + partOffset;
-                partDataString += NToHex(pI, 2);
-                partDataString += NToHex(pJ, 2);
-                partDataString += NToHex(pK, 2);
-                partDataString += NToHex(part.w, 1);
-                partDataString += NToHex(part.h, 1);
-                partDataString += NToHex(part.d, 1);
-                partDataString += NToHex(part.n, 1);
-                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                partDataString += NToHex(m, 1);
-                let colourCount = part.colors.length;
-                partDataString += NToHex(colourCount, 1);
-                for (let j = 0; j < part.colors.length; j++) {
-                    let c = part.colors[j];
-                    partDataString += NToHex(c, 1);
-                }
-                //console.log("---------------------------");
-                //console.log("serialize");
-                //console.log(part);
-                //console.log("into");
-                //console.log(partDataString);
-                //console.log("---------------------------");
-                dataString += partDataString;
-            }
-            dataString += NToHex(this.decors.length, 2);
-            for (let i = 0; i < this.decors.length; i++) {
-                let decor = this.decors[i];
-                let x = Math.round(decor.position.x * 1000) + ballOffset;
-                let y = Math.round(decor.position.y * 1000) + ballOffset;
-                let z = Math.round(decor.position.z * 1000) + ballOffset;
-                dataString += NToHex(x, 3);
-                dataString += NToHex(y, 3);
-                dataString += NToHex(z, 3);
-                dataString += NToHex(decor.n, 2);
-                dataString += NToHex(decor.flip ? 1 : 0, 1);
-            }
-            data.d = dataString;
-            return data;
-        }
-        serializeV910(version) {
-            let data = {
-                n: this.name,
-                a: this.author,
-                v: version,
-                r: this.roomIndex
-            };
-            let dataString = "";
-            // Add ball count
-            dataString += NToHex(this.balls.length, 2);
-            for (let i = 0; i < this.balls.length; i++) {
-                let ball = this.balls[i];
-                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
-                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
-                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
-                dataString += NToHex(x, 3);
-                dataString += NToHex(y, 3);
-                dataString += NToHex(z, 3);
-                dataString += NToHex(ball.materialIndex, 2);
-            }
-            // Add parts count
-            dataString += NToHex(this.parts.length, 2);
-            for (let i = 0; i < this.parts.length; i++) {
-                let partDataString = "";
-                let part = this.parts[i];
-                let baseName = part.partName.split("_")[0];
-                let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
-                    return name.startsWith(baseName);
-                });
-                if (index === -1) {
-                    console.error("Error, can't find part index.");
-                    debugger;
-                }
-                partDataString += NToHex(index, 2);
-                let pI = part.i + partOffset;
-                let pJ = part.j + partOffset;
-                let pK = part.k + partOffset;
-                partDataString += NToHex(pI, 2);
-                partDataString += NToHex(pJ, 2);
-                partDataString += NToHex(pK, 2);
-                partDataString += NToHex(part.w, 1);
-                partDataString += NToHex(part.h, 1);
-                partDataString += NToHex(part.d, 1);
-                partDataString += NToHex(part.n, 1);
-                partDataString += NToHex(part.s, 1);
-                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                partDataString += NToHex(m, 1);
-                let colourCount = part.colors.length;
-                partDataString += NToHex(colourCount, 1);
-                for (let j = 0; j < part.colors.length; j++) {
-                    let c = part.colors[j];
-                    partDataString += NToHex(c, 1);
-                }
-                //console.log("---------------------------");
-                //console.log("serialize");
-                //console.log(part);
-                //console.log("into");
-                //console.log(partDataString);
-                //console.log("---------------------------");
-                dataString += partDataString;
-            }
-            dataString += NToHex(this.decors.length, 2);
-            for (let i = 0; i < this.decors.length; i++) {
-                let decor = this.decors[i];
-                let x = Math.round(decor.position.x * 1000) + ballOffset;
-                let y = Math.round(decor.position.y * 1000) + ballOffset;
-                let z = Math.round(decor.position.z * 1000) + ballOffset;
-                dataString += NToHex(x, 3);
-                dataString += NToHex(y, 3);
-                dataString += NToHex(z, 3);
-                dataString += NToHex(decor.n, 2);
-                dataString += NToHex(decor.flip ? 1 : 0, 1);
-            }
-            data.d = dataString;
-            if (version === 10) {
-                data.sp = this.sleepersMeshProp;
-            }
-            return data;
-        }
-        serializeV11() {
-            let data = {
-                n: this.name,
-                a: this.author,
-                v: 11,
-                r: this.roomIndex
-            };
-            let dataString = "";
-            // Add ball count
-            dataString += NToHex(this.balls.length, 2);
-            for (let i = 0; i < this.balls.length; i++) {
-                let ball = this.balls[i];
-                let x = Math.round(ball.positionZero.x * 1000) + ballOffset;
-                let y = Math.round(ball.positionZero.y * 1000) + ballOffset;
-                let z = Math.round(ball.positionZero.z * 1000) + ballOffset;
-                dataString += NToHex(x, 3);
-                dataString += NToHex(y, 3);
-                dataString += NToHex(z, 3);
-                dataString += NToHex(ball.materialIndex, 2);
-            }
-            // Add parts count
-            dataString += NToHex(this.parts.length, 2);
-            for (let i = 0; i < this.parts.length; i++) {
-                let partDataString = "";
-                let part = this.parts[i];
-                let baseName = part.partName.split("_")[0];
-                let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
-                    return name.startsWith(baseName);
-                });
-                if (index === -1) {
-                    console.error("Error, can't find part index.");
-                    debugger;
-                }
-                partDataString += NToHex(index, 2);
-                let pI = part.i + partOffset;
-                let pJ = part.j + partOffset;
-                let pK = part.k + partOffset;
-                let pR = part.r;
-                partDataString += NToHex(pI, 2);
-                partDataString += NToHex(pJ, 2);
-                partDataString += NToHex(pK, 2);
-                partDataString += NToHex(pR, 1);
-                partDataString += NToHex(part.w + partOffset, 2);
-                partDataString += NToHex(part.h + partOffset, 2);
-                partDataString += NToHex(part.d + partOffset, 2);
-                partDataString += NToHex(part.n, 1);
-                partDataString += NToHex(part.s, 1);
-                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                partDataString += NToHex(m, 1);
-                let colourCount = part.colors.length;
-                partDataString += NToHex(colourCount, 1);
-                for (let j = 0; j < part.colors.length; j++) {
-                    let c = part.colors[j];
-                    partDataString += NToHex(c, 1);
-                }
-                //console.log("---------------------------");
-                //console.log("serialize");
-                //console.log(part);
-                //console.log("into");
-                //console.log(partDataString);
-                //console.log("---------------------------");
-                dataString += partDataString;
-            }
-            dataString += NToHex(this.decors.length, 2);
-            for (let i = 0; i < this.decors.length; i++) {
-                let decor = this.decors[i];
-                let x = Math.round(decor.position.x * 1000) + ballOffset;
-                let y = Math.round(decor.position.y * 1000) + ballOffset;
-                let z = Math.round(decor.position.z * 1000) + ballOffset;
-                dataString += NToHex(x, 3);
-                dataString += NToHex(y, 3);
-                dataString += NToHex(z, 3);
-                dataString += NToHex(decor.n, 2);
-                dataString += NToHex(decor.flip ? 1 : 0, 1);
-            }
-            data.d = dataString;
-            data.sp = this.sleepersMeshProp;
-            return data;
+            return MarbleRunSimulatorCore.SerializeV11(this);
         }
         deserialize(data, makeMiniature) {
             this.lastDeserializedData = data;
@@ -2714,990 +2331,22 @@ var MarbleRunSimulatorCore;
                 }
                 console.log("deserialize version " + version);
                 if (!isFinite(version) || version === 1) {
-                    return this.deserializeV1(data);
+                    return MarbleRunSimulatorCore.DeserializeV1(this, data);
                 }
                 else if (version === 2) {
-                    return this.deserializeV2(data);
+                    return MarbleRunSimulatorCore.DeserializeV2(this, data);
                 }
                 else if (version === 3 || version === 4 || version === 5 || version === 6) {
-                    return this.deserializeV3456(data);
+                    return MarbleRunSimulatorCore.DeserializeV3456(this, data);
                 }
                 else if (version === 7 || version === 8) {
-                    return this.deserializeV78(data);
+                    return MarbleRunSimulatorCore.DeserializeV78(this, data);
                 }
                 else if (version === 9 || version === 10) {
-                    return this.deserializeV910(data);
+                    return MarbleRunSimulatorCore.DeserializeV910(this, data);
                 }
                 else if (version === 11) {
-                    return this.deserializeV11(data, makeMiniature);
-                }
-            }
-        }
-        deserializeV1(data) {
-            if (data.name) {
-                this.name = data.name;
-            }
-            if (data.author) {
-                this.author = data.author;
-            }
-            this.balls = [];
-            this.parts = [];
-            for (let i = 0; i < data.balls.length; i++) {
-                let ballData = data.balls[i];
-                let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(ballData.x, ballData.y, isFinite(ballData.z) ? ballData.z : 0), this);
-                this.balls.push(ball);
-            }
-            for (let i = 0; i < data.parts.length; i++) {
-                let part = data.parts[i];
-                let prop = {
-                    i: part.i * 2,
-                    j: part.j,
-                    k: part.k,
-                    mirrorX: part.mirrorX,
-                    mirrorZ: part.mirrorZ,
-                };
-                if (typeof part.c === "number") {
-                    prop.c = [part.c];
-                }
-                else if (part.c) {
-                    prop.c = part.c;
-                }
-                let track = this.trackFactory.createTrack(part.name, prop);
-                if (track) {
-                    if (data.sleepers) {
-                        track.sleepersMeshProp = data.sleepers;
-                    }
-                    this.parts.push(track);
-                }
-            }
-        }
-        deserializeV2(data) {
-            let dataString = data.d;
-            if (dataString) {
-                if (data.n) {
-                    this.name = data.n;
-                }
-                if (data.a) {
-                    this.author = data.a;
-                }
-                this.balls = [];
-                this.parts = [];
-                let pt = 0;
-                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("ballCount = " + ballCount);
-                for (let i = 0; i < ballCount; i++) {
-                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
-                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
-                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
-                    let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
-                    this.balls.push(ball);
-                }
-                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("partCount = " + partCount);
-                for (let i = 0; i < partCount; i++) {
-                    /*
-                    partDataString += NToHex(index, 2);
-                    
-                    let pI = part.i + partOffset;
-                    let pJ = part.j + partOffset;
-                    let pK = part.k + partOffset;
-                    partDataString += NToHex(pI, 2);
-                    partDataString += NToHex(pJ, 2);
-                    partDataString += NToHex(pK, 2);
-
-                    partDataString += NToHex(part.w, 1);
-                    partDataString += NToHex(part.h, 1);
-                    partDataString += NToHex(part.d, 1);
-                    partDataString += NToHex(part.n, 1);
-                    let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                    partDataString += NToHex(m, 1);
-
-                    let colourCount = part.colors.length;
-                    partDataString += NToHex(colourCount, 1);
-                    for (let j = 0; j < part.colors.length; j++) {
-                        let c = part.colors[j];
-                        partDataString += NToHex(c, 1);
-                    }
-                    */
-                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
-                    //console.log("basename " + baseName);
-                    let pI = (parseInt(dataString.substring(pt, pt += 2), 36) - partOffset) * 2;
-                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
-                    let w = (parseInt(dataString.substring(pt, pt += 1), 36)) * 2;
-                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
-                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
-                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                    //console.log(colorCount);
-                    let colors = [];
-                    for (let ii = 0; ii < colorCount; ii++) {
-                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
-                    }
-                    let prop = {
-                        i: pI * 3,
-                        j: pJ,
-                        k: pK * 3,
-                        l: w,
-                        h: h,
-                        d: d,
-                        n: n,
-                        mirrorX: (mirror % 2) === 1,
-                        mirrorZ: mirror >= 2,
-                        c: colors
-                    };
-                    let track = this.trackFactory.createTrackBaseName(baseName, prop);
-                    if (track) {
-                        this.parts.push(track);
-                    }
-                }
-            }
-        }
-        deserializeV3456(data) {
-            let dataString = data.d;
-            if (dataString) {
-                if (data.n) {
-                    this.name = data.n;
-                }
-                if (data.a) {
-                    this.author = data.a;
-                }
-                if (data.r) {
-                    this._roomIndex = data.r;
-                }
-                else {
-                    this._roomIndex = 0;
-                }
-                this.balls = [];
-                this.parts = [];
-                let pt = 0;
-                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                for (let i = 0; i < ballCount; i++) {
-                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
-                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
-                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
-                    let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
-                    this.balls.push(ball);
-                    if (data.v === 4 || data.v >= 6) {
-                        let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
-                        ball.materialIndex = materialIndex;
-                    }
-                }
-                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                for (let i = 0; i < partCount; i++) {
-                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
-                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let correctedPI = pI * 3;
-                    let correctedPJ = -pK * 3;
-                    let correctedPK = -pJ;
-                    let w = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let colors = [];
-                    for (let ii = 0; ii < colorCount; ii++) {
-                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
-                    }
-                    if (data.v < 5) {
-                        if (baseName === "uturn") {
-                            if (d === 2) {
-                                if ((mirror % 2) === 1) {
-                                    pI++;
-                                }
-                            }
-                            if (d === 6 || d === 7) {
-                                if ((mirror % 2) === 1) {
-                                    pI--;
-                                }
-                            }
-                        }
-                    }
-                    let prop = {
-                        i: correctedPI,
-                        j: correctedPJ,
-                        k: correctedPK,
-                        l: w,
-                        h: h,
-                        d: d,
-                        n: n,
-                        mirrorX: (mirror % 2) === 1,
-                        mirrorZ: mirror >= 2,
-                        c: colors
-                    };
-                    this.deserializeAnte11Fix(baseName, prop);
-                    let track = this.trackFactory.createTrackBaseName(baseName, prop);
-                    if (track) {
-                        this.parts.push(track);
-                    }
-                    else {
-                        console.warn("failed to createTrackBaseName");
-                        console.log(baseName);
-                        console.log(prop);
-                    }
-                }
-                let minK = Infinity;
-                for (let i = 0; i < this.parts.length; i++) {
-                    let part = this.parts[i];
-                    minK = Math.min(minK, part.k);
-                }
-                if (isFinite(minK) && minK != 0) {
-                    for (let i = 0; i < this.parts.length; i++) {
-                        let part = this.parts[i];
-                        part.setK(part.k - minK, true);
-                    }
-                    for (let i = 0; i < this.balls.length; i++) {
-                        let ball = this.balls[i];
-                        ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * MarbleRunSimulatorCore.tileHeight, 0)));
-                    }
-                }
-            }
-        }
-        deserializeV78(data) {
-            let dataString = data.d;
-            if (dataString) {
-                if (data.n) {
-                    this.name = data.n;
-                }
-                if (data.a) {
-                    this.author = data.a;
-                }
-                if (data.r) {
-                    this._roomIndex = data.r;
-                }
-                else {
-                    this._roomIndex = 0;
-                }
-                this.balls = [];
-                this.parts = [];
-                let pt = 0;
-                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("ballCount = " + ballCount);
-                for (let i = 0; i < ballCount; i++) {
-                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
-                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
-                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
-                    let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
-                    this.balls.push(ball);
-                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
-                    ball.materialIndex = materialIndex;
-                }
-                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("partCount = " + partCount);
-                for (let i = 0; i < partCount; i++) {
-                    /*
-                    partDataString += NToHex(index, 2);
-                    
-                    let pI = part.i + partOffset;
-                    let pJ = part.j + partOffset;
-                    let pK = part.k + partOffset;
-                    partDataString += NToHex(pI, 2);
-                    partDataString += NToHex(pJ, 2);
-                    partDataString += NToHex(pK, 2);
-
-                    partDataString += NToHex(part.w, 1);
-                    partDataString += NToHex(part.h, 1);
-                    partDataString += NToHex(part.d, 1);
-                    partDataString += NToHex(part.n, 1);
-                    let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                    partDataString += NToHex(m, 1);
-
-                    let colourCount = part.colors.length;
-                    partDataString += NToHex(colourCount, 1);
-                    for (let j = 0; j < part.colors.length; j++) {
-                        let c = part.colors[j];
-                        partDataString += NToHex(c, 1);
-                    }
-                    */
-                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
-                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                    let correctedPI = pI * 3;
-                    let correctedPJ = -pK * 3;
-                    let correctedPK = -pJ;
-                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
-                    let w = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
-                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
-                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
-                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                    //console.log(colorCount);
-                    let colors = [];
-                    for (let ii = 0; ii < colorCount; ii++) {
-                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
-                    }
-                    let prop = {
-                        i: correctedPI,
-                        j: correctedPJ,
-                        k: correctedPK,
-                        l: w,
-                        h: h,
-                        d: d,
-                        n: n,
-                        mirrorX: (mirror % 2) === 1,
-                        mirrorZ: mirror >= 2,
-                        c: colors
-                    };
-                    this.deserializeAnte11Fix(baseName, prop);
-                    let track = this.trackFactory.createTrackBaseName(baseName, prop);
-                    if (track) {
-                        this.parts.push(track);
-                    }
-                    else {
-                        console.warn("failed to createTrackBaseName");
-                        console.log(baseName);
-                        console.log(prop);
-                    }
-                }
-                let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                for (let i = 0; i < decorCount; i++) {
-                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    //console.log("ball xyz " + x + " " + y + " " + z);
-                    let decor = new MarbleRunSimulatorCore.Xylophone(this);
-                    decor.setPosition(new BABYLON.Vector3(x, y, z));
-                    this.decors.push(decor);
-                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
-                    decor.setN(n);
-                    if (data.v === 8) {
-                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
-                        decor.setFlip(f);
-                    }
-                }
-                let minK = Infinity;
-                for (let i = 0; i < this.parts.length; i++) {
-                    let part = this.parts[i];
-                    minK = Math.min(minK, part.k - 1);
-                }
-                if (isFinite(minK) && minK != 0) {
-                    for (let i = 0; i < this.parts.length; i++) {
-                        let part = this.parts[i];
-                        part.setK(part.k - minK);
-                    }
-                    for (let i = 0; i < this.balls.length; i++) {
-                        let ball = this.balls[i];
-                        ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * MarbleRunSimulatorCore.tileHeight, 0)));
-                    }
-                }
-            }
-        }
-        deserializeV910(data) {
-            let dataString = data.d;
-            if (dataString) {
-                if (data.n) {
-                    this.name = data.n;
-                }
-                if (data.a) {
-                    this.author = data.a;
-                }
-                if (data.v === 10) {
-                    if (data.sp) {
-                        this.sleepersMeshProp = data.sp;
-                    }
-                }
-                this.balls = [];
-                this.parts = [];
-                let pt = 0;
-                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("ballCount = " + ballCount);
-                for (let i = 0; i < ballCount; i++) {
-                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
-                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
-                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
-                    let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
-                    this.balls.push(ball);
-                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
-                    ball.materialIndex = materialIndex;
-                }
-                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("partCount = " + partCount);
-                for (let i = 0; i < partCount; i++) {
-                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    if (index >= 0 && index < MarbleRunSimulatorCore.TrackNames.length) {
-                        let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
-                        let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let correctedPI = pI * 3;
-                        let correctedPJ = -pK * 3;
-                        let correctedPK = -pJ;
-                        //console.log("part ijk " + pI + " " + pJ + " " + pK);
-                        let w = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let h = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let d = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let n = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let s = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
-                        //console.log("part whdn " + w + " " + h + " " + d + " " + n);
-                        let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                        //console.log(colorCount);
-                        let colors = [];
-                        for (let ii = 0; ii < colorCount; ii++) {
-                            colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
-                        }
-                        if (baseName === "spiralUTurn") {
-                            if ((mirror % 2) === 1) {
-                                if (d >= 3) {
-                                    correctedPI -= 3;
-                                }
-                            }
-                        }
-                        let prop = {
-                            i: correctedPI,
-                            j: correctedPJ,
-                            k: correctedPK,
-                            l: w,
-                            h: h,
-                            d: d,
-                            n: n,
-                            s: s,
-                            mirrorX: (mirror % 2) === 1,
-                            mirrorZ: mirror >= 2,
-                            c: colors
-                        };
-                        this.deserializeAnte11Fix(baseName, prop);
-                        let track = this.trackFactory.createTrackBaseName(baseName, prop);
-                        if (track) {
-                            this.parts.push(track);
-                        }
-                        else {
-                            console.warn("failed to createTrackBaseName");
-                            console.log(baseName);
-                            console.log(prop);
-                        }
-                    }
-                }
-                let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                for (let i = 0; i < decorCount; i++) {
-                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    //console.log("ball xyz " + x + " " + y + " " + z);
-                    let decor = new MarbleRunSimulatorCore.Xylophone(this);
-                    decor.setPosition(new BABYLON.Vector3(x, y, z));
-                    this.decors.push(decor);
-                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
-                    decor.setN(n);
-                    if (data.v === 8) {
-                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
-                        decor.setFlip(f);
-                    }
-                }
-                let minK = Infinity;
-                for (let i = 0; i < this.parts.length; i++) {
-                    let part = this.parts[i];
-                    minK = Math.min(minK, part.k);
-                }
-                if (isFinite(minK) && minK != 0) {
-                    for (let i = 0; i < this.parts.length; i++) {
-                        let part = this.parts[i];
-                        part.setK(part.k - minK);
-                    }
-                    for (let i = 0; i < this.balls.length; i++) {
-                        let ball = this.balls[i];
-                        ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * MarbleRunSimulatorCore.tileHeight, 0)));
-                    }
-                }
-                if (data.r) {
-                    this._roomIndex = data.r;
-                }
-                else {
-                    if (partCount % 2 === 0) {
-                        this._roomIndex = 0;
-                    }
-                    else if (partCount % 2 === 1) {
-                        this._roomIndex = 9;
-                    }
-                    else {
-                        this._roomIndex = 0;
-                    }
-                }
-            }
-        }
-        deserializeAnte11Fix(baseName, prop) {
-            if (baseName === "shooter") {
-                prop.k -= prop.h + 1;
-                if (prop.mirrorX) {
-                    prop.r = 2;
-                }
-            }
-            if (baseName === "elevator") {
-                prop.k -= prop.h + 1;
-                if (prop.mirrorX) {
-                    prop.i += 3;
-                    prop.r = 2;
-                }
-            }
-            if (baseName === "uturn") {
-                let newL = (prop.d - 1) * 3;
-                if (prop.mirrorX) {
-                    if (prop.d === 2) {
-                        prop.i += 1;
-                    }
-                    if (prop.d === 3) {
-                        prop.i += 4;
-                    }
-                    if (prop.d === 4) {
-                        prop.i += 7;
-                    }
-                    if (prop.d === 5) {
-                        prop.i += 10;
-                    }
-                    if (prop.mirrorZ) {
-                        prop.k -= prop.h;
-                    }
-                    else {
-                        prop.h = -prop.h;
-                    }
-                    prop.r = 2;
-                }
-                else {
-                    prop.i--;
-                    prop.j -= newL;
-                    if (prop.mirrorZ) {
-                        prop.h = -prop.h;
-                    }
-                    else {
-                        prop.k -= prop.h;
-                    }
-                }
-                prop.l = newL;
-            }
-            if (baseName === "wall") {
-                let newL = (prop.d - 1) * 3;
-                if (prop.mirrorX) {
-                    prop.i += 4;
-                    prop.r = 2;
-                }
-                else {
-                    prop.i--;
-                    prop.j -= newL;
-                }
-                prop.k -= prop.h;
-                prop.l = newL;
-            }
-            if (baseName === "loop") {
-                prop.l = prop.l * 3;
-                prop.d = (prop.d - 1) * 3;
-                prop.k -= 4;
-                if (prop.mirrorX) {
-                }
-                else {
-                    prop.i--;
-                    if (prop.mirrorZ) {
-                    }
-                    else {
-                        prop.d = -prop.d;
-                    }
-                }
-            }
-            if (baseName === "split") {
-                prop.k -= 1;
-                if (prop.mirrorX) {
-                    prop.r = 2;
-                }
-            }
-            if (baseName === "stairway") {
-                prop.l = prop.l * 3;
-                prop.h = prop.h - 2;
-                prop.k -= prop.h;
-                if (prop.mirrorX) {
-                    prop.r = 2;
-                    prop.i += prop.l - 3;
-                }
-            }
-            if (baseName === "screw") {
-                prop.l = prop.l * 3;
-                prop.k -= prop.h;
-                if (prop.mirrorX) {
-                    prop.r = 2;
-                    prop.i += prop.l - 3;
-                }
-            }
-        }
-        deserializeV11(data, makeMiniature = false) {
-            let dataString = data.d;
-            if (dataString) {
-                if (data.n) {
-                    this.name = data.n;
-                }
-                if (data.a) {
-                    this.author = data.a;
-                }
-                this.balls = [];
-                this.parts = [];
-                let lines = [];
-                let pt = 0;
-                let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                //console.log("ballCount = " + ballCount);
-                for (let i = 0; i < ballCount; i++) {
-                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
-                    if (makeMiniature) {
-                    }
-                    else {
-                        let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), this);
-                        this.balls.push(ball);
-                        ball.materialIndex = materialIndex;
-                    }
-                }
-                let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                console.log("partCount = " + partCount);
-                for (let i = 0; i < partCount; i++) {
-                    let index = parseInt(dataString.substring(pt, pt += 2), 36);
-                    if (index >= 0 && index < MarbleRunSimulatorCore.TrackNames.length) {
-                        let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
-                        let pI = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let pR = parseInt(dataString.substring(pt, pt += 1), 36);
-                        //console.log("part ijk " + pI + " " + pJ + " " + pK);
-                        let l = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let h = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let d = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
-                        let n = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let s = parseInt(dataString.substring(pt, pt += 1), 36);
-                        let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
-                        //console.log("part whdn " + w + " " + h + " " + d + " " + n);
-                        let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
-                        //console.log(colorCount);
-                        let colors = [];
-                        for (let ii = 0; ii < colorCount; ii++) {
-                            colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
-                        }
-                        let prop = {
-                            i: pI,
-                            j: pJ,
-                            k: pK,
-                            r: pR,
-                            l: l,
-                            h: h,
-                            d: d,
-                            n: n,
-                            s: s,
-                            mirrorX: (mirror % 2) === 1,
-                            mirrorZ: mirror >= 2,
-                            c: colors
-                        };
-                        if (makeMiniature) {
-                            let template = this.templateManager.getTemplateByProp(baseName, prop);
-                            if (template) {
-                                // Now draw into the miniature from the template.
-                                for (let t = 0; t < template.trackTemplates.length; t++) {
-                                    let trackTemplate = template.trackTemplates[t];
-                                    let drawnTrack = new MarbleRunSimulatorCore.MiniatureTrack();
-                                    /*
-                                    for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
-                                        let point = trackTemplate.trackpoints[p].position.clone();
-                                        Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
-                                        point.x += prop.i * tileSize;
-                                        point.y += prop.k * tileHeight;
-                                        point.z += prop.j * tileSize;
-                                        if (Mummu.IsFinite(point)) {
-                                            drawnTrack.push(point);
-                                        }
-                                        else {
-                                            console.log("miniature fail for " + baseName);
-                                        }
-                                    }
-                                    */
-                                    if (!trackTemplate.noMiniatureRender) {
-                                        for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
-                                            if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
-                                                let point = trackTemplate.interpolatedPoints[p].clone();
-                                                Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                                point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                                point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                                point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                                drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - 0.5 * point.y);
-                                                if (Mummu.IsFinite(point)) {
-                                                    drawnTrack.points.push(point);
-                                                }
-                                                else {
-                                                    console.log("miniature fail for " + baseName);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (drawnTrack.points.length > 0) {
-                                        lines.push(drawnTrack);
-                                    }
-                                }
-                                for (let j = 0; j < template.miniatureShapes.length; j++) {
-                                    let shape = template.miniatureShapes[j];
-                                    let drawnShape = new MarbleRunSimulatorCore.MiniatureShape();
-                                    for (let i = 0; i < shape.points.length; i++) {
-                                        let point = shape.points[i].clone();
-                                        Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                        point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                        point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                        point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                        drawnShape.dist = Math.min(drawnShape.dist, point.x + point.z - 0.5 * point.y);
-                                        if (Mummu.IsFinite(point)) {
-                                            drawnShape.points.push(point);
-                                        }
-                                    }
-                                    if (drawnShape.points.length > 0) {
-                                        lines.push(drawnShape);
-                                    }
-                                }
-                            }
-                            else {
-                                console.log("can't find template for " + baseName);
-                            }
-                        }
-                        else {
-                            let track = this.trackFactory.createTrackBaseName(baseName, prop);
-                            if (track) {
-                                this.parts.push(track);
-                            }
-                            else {
-                                console.warn("failed to createTrackBaseName");
-                                console.log(baseName);
-                                console.log(prop);
-                            }
-                        }
-                    }
-                }
-                let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
-                for (let i = 0; i < decorCount; i++) {
-                    let x = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
-                    if (makeMiniature) {
-                    }
-                    else {
-                        let decor = new MarbleRunSimulatorCore.Xylophone(this);
-                        decor.setPosition(new BABYLON.Vector3(x, y, z));
-                        this.decors.push(decor);
-                        let n = parseInt(dataString.substring(pt, pt += 2), 36);
-                        decor.setN(n);
-                        if (data.v === 8) {
-                            let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
-                            decor.setFlip(f);
-                        }
-                    }
-                }
-                if (data.r) {
-                    this._roomIndex = data.r;
-                }
-                else {
-                    if (partCount % 2 === 0) {
-                        this._roomIndex = 0;
-                    }
-                    else if (partCount % 2 === 1) {
-                        this._roomIndex = 9;
-                    }
-                    else {
-                        this._roomIndex = 0;
-                    }
-                }
-                if (makeMiniature) {
-                    let picSize = 512;
-                    let picMargin = picSize / 20;
-                    let picSizeNoMargin = picSize - 2 * picMargin;
-                    let lineWidth = 2;
-                    let canvas = document.createElement("canvas");
-                    canvas.width = picSize;
-                    canvas.height = picSize;
-                    let backGroundColor = BABYLON.Color3.FromHexString("#103c6f");
-                    let backGroundColorHex = backGroundColor.toHexString();
-                    let context = canvas.getContext("2d");
-                    context.fillStyle = backGroundColorHex;
-                    context.fillRect(0, 0, canvas.width, canvas.height);
-                    let xProjAxis = new BABYLON.Vector2(Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
-                    let yProjAxis = new BABYLON.Vector2(0, 1);
-                    let zProjAxis = new BABYLON.Vector2(-Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
-                    let vToX = (v) => {
-                        let x = xProjAxis.x * v.x + yProjAxis.x * v.y + zProjAxis.x * v.z;
-                        return x;
-                    };
-                    let vToY = (v) => {
-                        let y = xProjAxis.y * v.x + yProjAxis.y * v.y + zProjAxis.y * v.z;
-                        return y;
-                    };
-                    let aabbMin = new BABYLON.Vector3(Infinity, Infinity, Infinity);
-                    let aabbMax = new BABYLON.Vector3(-Infinity, -Infinity, -Infinity);
-                    let abstractPixelXMin = Infinity;
-                    let abstractPixelXMax = -Infinity;
-                    let abstractPixelYMin = Infinity;
-                    let abstractPixelYMax = -Infinity;
-                    lines.sort((a, b) => { return b.dist - a.dist; });
-                    for (let i = 0; i < lines.length; i++) {
-                        let line = lines[i].points;
-                        for (let j = 0; j < line.length; j++) {
-                            let p = line[j];
-                            if (Mummu.IsFinite(p)) {
-                                let abstractPixelX = vToX(p);
-                                let abstractPixelY = vToY(p);
-                                abstractPixelXMin = Math.min(abstractPixelXMin, abstractPixelX);
-                                abstractPixelXMax = Math.max(abstractPixelXMax, abstractPixelX);
-                                abstractPixelYMin = Math.min(abstractPixelYMin, abstractPixelY);
-                                abstractPixelYMax = Math.max(abstractPixelYMax, abstractPixelY);
-                                aabbMin = BABYLON.Vector3.Minimize(aabbMin, p);
-                                aabbMax = BABYLON.Vector3.Maximize(aabbMax, p);
-                            }
-                        }
-                    }
-                    let w = abstractPixelXMax - abstractPixelXMin;
-                    let h = abstractPixelYMax - abstractPixelYMin;
-                    let s = Math.max(w, h);
-                    let mx = picMargin;
-                    let my = picMargin;
-                    if (w > h) {
-                        my = (picSize - h / s * picSizeNoMargin) * 0.5;
-                    }
-                    else if (h > w) {
-                        mx = (picSize - w / s * picSizeNoMargin) * 0.5;
-                    }
-                    let framePoints = [
-                        new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMin.z - 0.01),
-                        new BABYLON.Vector3(aabbMax.x + 0.01, aabbMin.y, aabbMin.z - 0.01),
-                        new BABYLON.Vector3(aabbMax.x + 0.01, aabbMin.y, aabbMax.z + 0.01),
-                        new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMax.z + 0.01)
-                    ];
-                    let cFrameLine = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.5);
-                    context.beginPath();
-                    let p0 = framePoints[0];
-                    let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-                    let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                    context.moveTo(x - 2, picSize - y - 2);
-                    for (let j = 1; j < framePoints.length; j++) {
-                        let p = framePoints[j];
-                        let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-                        let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                        context.lineTo(x - 2, picSize - y - 2);
-                    }
-                    context.closePath();
-                    context.strokeStyle = cFrameLine.toHexString();
-                    context.lineWidth = 1;
-                    context.stroke();
-                    let cFrameBackground = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.05);
-                    context.fillStyle = cFrameBackground.toHexString();
-                    context.fill();
-                    let dist01 = BABYLON.Vector3.Distance(framePoints[0], framePoints[1]);
-                    let dist03 = BABYLON.Vector3.Distance(framePoints[0], framePoints[3]);
-                    let count01 = 10;
-                    let count03 = 10;
-                    if (dist01 > dist03) {
-                        count03 = Math.round(dist03 / (dist01 / count01));
-                    }
-                    if (dist03 > dist01) {
-                        count01 = Math.round(dist01 / (dist03 / count03));
-                    }
-                    for (let i = 1; i < count01; i++) {
-                        let f = i / count01;
-                        let p0 = BABYLON.Vector3.Lerp(framePoints[0], framePoints[1], f);
-                        let p1 = BABYLON.Vector3.Lerp(framePoints[3], framePoints[2], f);
-                        context.beginPath();
-                        let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-                        let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                        context.moveTo(x - 2, picSize - y - 2);
-                        x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-                        y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                        context.lineTo(x - 2, picSize - y - 2);
-                        context.strokeStyle = cFrameLine.toHexString();
-                        context.lineWidth = 1;
-                        context.stroke();
-                    }
-                    for (let i = 1; i < count03; i++) {
-                        let f = i / count03;
-                        let p0 = BABYLON.Vector3.Lerp(framePoints[0], framePoints[3], f);
-                        let p1 = BABYLON.Vector3.Lerp(framePoints[1], framePoints[2], f);
-                        context.beginPath();
-                        let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-                        let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                        context.moveTo(x - 2, picSize - y - 2);
-                        x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-                        y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                        context.lineTo(x - 2, picSize - y - 2);
-                        context.strokeStyle = cFrameLine.toHexString();
-                        context.lineWidth = 1;
-                        context.stroke();
-                    }
-                    for (let i = 0; i < lines.length; i++) {
-                        let line = lines[i];
-                        context.lineWidth = 5 * lineWidth;
-                        let normalizedH = 0;
-                        context.beginPath();
-                        let p0 = line.points[0];
-                        let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-                        let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                        normalizedH = p0.y;
-                        //console.log("p0 " + x + " " + y);
-                        context.moveTo(x - 2, picSize - y - 2);
-                        for (let j = 1; j < line.points.length; j++) {
-                            let p = line.points[j];
-                            let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-                            let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                            normalizedH += p.y;
-                            //console.log("p " + x + " " + y);
-                            context.lineTo(x - 2, picSize - y - 2);
-                        }
-                        normalizedH = normalizedH / line.points.length;
-                        normalizedH = normalizedH / aabbMax.y;
-                        let f = normalizedH * 0.8 + 0.2;
-                        if (line instanceof MarbleRunSimulatorCore.MiniatureTrack) {
-                            let c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), f);
-                            context.strokeStyle = c.toHexString();
-                            context.stroke();
-                            context.lineWidth = 3 * lineWidth;
-                            context.strokeStyle = backGroundColorHex;
-                            context.stroke();
-                        }
-                        else if (line instanceof MarbleRunSimulatorCore.MiniatureShape) {
-                            let c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 1);
-                            context.closePath();
-                            context.strokeStyle = c.toHexString();
-                            context.lineWidth = lineWidth;
-                            context.stroke();
-                            c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.7 * f);
-                            context.fillStyle = c.toHexString();
-                            context.fill();
-                        }
-                    }
-                    var tmpLink = document.createElement('a');
-                    tmpLink.download = "test.png";
-                    tmpLink.href = canvas.toDataURL();
-                    document.body.appendChild(canvas);
-                    canvas.style.position = "fixed";
-                    canvas.style.top = "20%";
-                    canvas.style.left = "40%";
-                    canvas.style.width = "20%";
-                    canvas.style.zIndex = "100";
-                    setTimeout(() => {
-                        document.body.removeChild(canvas);
-                    }, 1000);
-                    document.body.appendChild(tmpLink);
-                    tmpLink.click();
-                    document.body.removeChild(tmpLink);
+                    return MarbleRunSimulatorCore.DeserializeV11(this, data, makeMiniature);
                 }
             }
         }
@@ -7267,6 +5916,1389 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.WoodTrackMeshBuilder = WoodTrackMeshBuilder;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    function SerializeV1(machine) {
+        let data = {
+            name: machine.name,
+            author: machine.author,
+            balls: [],
+            parts: [],
+        };
+        for (let i = 0; i < machine.balls.length; i++) {
+            data.balls.push({
+                x: machine.balls[i].positionZero.x,
+                y: machine.balls[i].positionZero.y,
+                z: machine.balls[i].positionZero.z,
+            });
+        }
+        for (let i = 0; i < machine.parts.length; i++) {
+            data.parts.push({
+                name: machine.parts[i].partName,
+                i: machine.parts[i].i,
+                j: machine.parts[i].j,
+                k: machine.parts[i].k,
+                mirrorX: machine.parts[i].mirrorX,
+                mirrorZ: machine.parts[i].mirrorZ,
+                c: machine.parts[i].colors,
+            });
+        }
+        return data;
+    }
+    MarbleRunSimulatorCore.SerializeV1 = SerializeV1;
+    function DeserializeV1(machine, data) {
+        if (data.name) {
+            machine.name = data.name;
+        }
+        if (data.author) {
+            machine.author = data.author;
+        }
+        machine.balls = [];
+        machine.parts = [];
+        for (let i = 0; i < data.balls.length; i++) {
+            let ballData = data.balls[i];
+            let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(ballData.x, ballData.y, isFinite(ballData.z) ? ballData.z : 0), machine);
+            machine.balls.push(ball);
+        }
+        for (let i = 0; i < data.parts.length; i++) {
+            let part = data.parts[i];
+            let prop = {
+                i: part.i * 2,
+                j: part.j,
+                k: part.k,
+                mirrorX: part.mirrorX,
+                mirrorZ: part.mirrorZ,
+            };
+            if (typeof part.c === "number") {
+                prop.c = [part.c];
+            }
+            else if (part.c) {
+                prop.c = part.c;
+            }
+            let track = machine.trackFactory.createTrack(part.name, prop);
+            if (track) {
+                if (data.sleepers) {
+                    track.sleepersMeshProp = data.sleepers;
+                }
+                machine.parts.push(track);
+            }
+        }
+    }
+    MarbleRunSimulatorCore.DeserializeV1 = DeserializeV1;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    function SerializeV11(machine) {
+        let data = {
+            n: machine.name,
+            a: machine.author,
+            v: 11,
+            r: machine.roomIndex
+        };
+        let dataString = "";
+        // Add ball count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.balls.length, 2);
+        for (let i = 0; i < machine.balls.length; i++) {
+            let ball = machine.balls[i];
+            let x = Math.round(ball.positionZero.x * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let y = Math.round(ball.positionZero.y * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let z = Math.round(ball.positionZero.z * 1000) + MarbleRunSimulatorCore.ballOffset;
+            dataString += MarbleRunSimulatorCore.NToHex(x, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(y, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(z, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(ball.materialIndex, 2);
+        }
+        // Add parts count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.parts.length, 2);
+        for (let i = 0; i < machine.parts.length; i++) {
+            let partDataString = "";
+            let part = machine.parts[i];
+            let baseName = part.partName.split("_")[0];
+            let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
+                return name.startsWith(baseName);
+            });
+            if (index === -1) {
+                console.error("Error, can't find part index.");
+                debugger;
+            }
+            partDataString += MarbleRunSimulatorCore.NToHex(index, 2);
+            let pI = part.i + MarbleRunSimulatorCore.partOffset;
+            let pJ = part.j + MarbleRunSimulatorCore.partOffset;
+            let pK = part.k + MarbleRunSimulatorCore.partOffset;
+            let pR = part.r;
+            partDataString += MarbleRunSimulatorCore.NToHex(pI, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pJ, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pK, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pR, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.w + MarbleRunSimulatorCore.partOffset, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.h + MarbleRunSimulatorCore.partOffset, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.d + MarbleRunSimulatorCore.partOffset, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.n, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.s, 1);
+            let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+            partDataString += MarbleRunSimulatorCore.NToHex(m, 1);
+            let colourCount = part.colors.length;
+            partDataString += MarbleRunSimulatorCore.NToHex(colourCount, 1);
+            for (let j = 0; j < part.colors.length; j++) {
+                let c = part.colors[j];
+                partDataString += MarbleRunSimulatorCore.NToHex(c, 1);
+            }
+            //console.log("---------------------------");
+            //console.log("serialize");
+            //console.log(part);
+            //console.log("into");
+            //console.log(partDataString);
+            //console.log("---------------------------");
+            dataString += partDataString;
+        }
+        dataString += MarbleRunSimulatorCore.NToHex(machine.decors.length, 2);
+        for (let i = 0; i < machine.decors.length; i++) {
+            let decor = machine.decors[i];
+            let x = Math.round(decor.position.x * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let y = Math.round(decor.position.y * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let z = Math.round(decor.position.z * 1000) + MarbleRunSimulatorCore.ballOffset;
+            dataString += MarbleRunSimulatorCore.NToHex(x, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(y, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(z, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(decor.n, 2);
+            dataString += MarbleRunSimulatorCore.NToHex(decor.flip ? 1 : 0, 1);
+        }
+        data.d = dataString;
+        data.sp = machine.sleepersMeshProp;
+        return data;
+    }
+    MarbleRunSimulatorCore.SerializeV11 = SerializeV11;
+    function DeserializeAnte11Fix(baseName, prop) {
+        if (baseName === "shooter") {
+            prop.k -= prop.h + 1;
+            if (prop.mirrorX) {
+                prop.r = 2;
+            }
+        }
+        if (baseName === "elevator") {
+            prop.k -= prop.h + 1;
+            if (prop.mirrorX) {
+                prop.i += 3;
+                prop.r = 2;
+            }
+        }
+        if (baseName === "uturn") {
+            let newL = (prop.d - 1) * 3;
+            if (prop.mirrorX) {
+                if (prop.d === 2) {
+                    prop.i += 1;
+                }
+                if (prop.d === 3) {
+                    prop.i += 4;
+                }
+                if (prop.d === 4) {
+                    prop.i += 7;
+                }
+                if (prop.d === 5) {
+                    prop.i += 10;
+                }
+                if (prop.mirrorZ) {
+                    prop.k -= prop.h;
+                }
+                else {
+                    prop.h = -prop.h;
+                }
+                prop.r = 2;
+            }
+            else {
+                prop.i--;
+                prop.j -= newL;
+                if (prop.mirrorZ) {
+                    prop.h = -prop.h;
+                }
+                else {
+                    prop.k -= prop.h;
+                }
+            }
+            prop.l = newL;
+        }
+        if (baseName === "wall") {
+            let newL = (prop.d - 1) * 3;
+            if (prop.mirrorX) {
+                prop.i += 4;
+                prop.r = 2;
+            }
+            else {
+                prop.i--;
+                prop.j -= newL;
+            }
+            prop.k -= prop.h;
+            prop.l = newL;
+        }
+        if (baseName === "loop") {
+            prop.l = prop.l * 3;
+            prop.d = (prop.d - 1) * 3;
+            prop.k -= 4;
+            if (prop.mirrorX) {
+            }
+            else {
+                prop.i--;
+                if (prop.mirrorZ) {
+                }
+                else {
+                    prop.d = -prop.d;
+                }
+            }
+        }
+        if (baseName === "split") {
+            prop.k -= 1;
+            if (prop.mirrorX) {
+                prop.r = 2;
+            }
+        }
+        if (baseName === "stairway") {
+            prop.l = prop.l * 3;
+            prop.h = prop.h - 2;
+            prop.k -= prop.h;
+            if (prop.mirrorX) {
+                prop.r = 2;
+                prop.i += prop.l - 3;
+            }
+        }
+        if (baseName === "screw") {
+            prop.l = prop.l * 3;
+            prop.k -= prop.h;
+            if (prop.mirrorX) {
+                prop.r = 2;
+                prop.i += prop.l - 3;
+            }
+        }
+    }
+    MarbleRunSimulatorCore.DeserializeAnte11Fix = DeserializeAnte11Fix;
+    function DeserializeV11(machine, data, makeMiniature = false) {
+        let dataString = data.d;
+        if (dataString) {
+            if (data.n) {
+                machine.name = data.n;
+            }
+            if (data.a) {
+                machine.author = data.a;
+            }
+            machine.balls = [];
+            machine.parts = [];
+            let lines = [];
+            let pt = 0;
+            let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            //console.log("ballCount = " + ballCount);
+            for (let i = 0; i < ballCount; i++) {
+                let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                if (makeMiniature) {
+                }
+                else {
+                    let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
+                    machine.balls.push(ball);
+                    ball.materialIndex = materialIndex;
+                }
+            }
+            let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            console.log("partCount = " + partCount);
+            for (let i = 0; i < partCount; i++) {
+                let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                if (index >= 0 && index < MarbleRunSimulatorCore.TrackNames.length) {
+                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
+                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let pR = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
+                    let l = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let h = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let d = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let s = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log(colorCount);
+                    let colors = [];
+                    for (let ii = 0; ii < colorCount; ii++) {
+                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                    }
+                    let prop = {
+                        i: pI,
+                        j: pJ,
+                        k: pK,
+                        r: pR,
+                        l: l,
+                        h: h,
+                        d: d,
+                        n: n,
+                        s: s,
+                        mirrorX: (mirror % 2) === 1,
+                        mirrorZ: mirror >= 2,
+                        c: colors
+                    };
+                    if (makeMiniature) {
+                        let template = machine.templateManager.getTemplateByProp(baseName, prop);
+                        if (template) {
+                            // Now draw into the miniature from the template.
+                            for (let t = 0; t < template.trackTemplates.length; t++) {
+                                let trackTemplate = template.trackTemplates[t];
+                                let drawnTrack = new MarbleRunSimulatorCore.MiniatureTrack();
+                                /*
+                                for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
+                                    let point = trackTemplate.trackpoints[p].position.clone();
+                                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
+                                    point.x += prop.i * tileSize;
+                                    point.y += prop.k * tileHeight;
+                                    point.z += prop.j * tileSize;
+                                    if (Mummu.IsFinite(point)) {
+                                        drawnTrack.push(point);
+                                    }
+                                    else {
+                                        console.log("miniature fail for " + baseName);
+                                    }
+                                }
+                                */
+                                if (!trackTemplate.noMiniatureRender) {
+                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
+                                        if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
+                                            let point = trackTemplate.interpolatedPoints[p].clone();
+                                            Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
+                                            point.x += prop.i * MarbleRunSimulatorCore.tileSize;
+                                            point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
+                                            point.z += prop.j * MarbleRunSimulatorCore.tileSize;
+                                            drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - 0.5 * point.y);
+                                            if (Mummu.IsFinite(point)) {
+                                                drawnTrack.points.push(point);
+                                            }
+                                            else {
+                                                console.log("miniature fail for " + baseName);
+                                            }
+                                        }
+                                    }
+                                }
+                                if (drawnTrack.points.length > 0) {
+                                    lines.push(drawnTrack);
+                                }
+                            }
+                            for (let j = 0; j < template.miniatureShapes.length; j++) {
+                                let shape = template.miniatureShapes[j];
+                                let drawnShape = new MarbleRunSimulatorCore.MiniatureShape();
+                                for (let i = 0; i < shape.points.length; i++) {
+                                    let point = shape.points[i].clone();
+                                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
+                                    point.x += prop.i * MarbleRunSimulatorCore.tileSize;
+                                    point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
+                                    point.z += prop.j * MarbleRunSimulatorCore.tileSize;
+                                    drawnShape.dist = Math.min(drawnShape.dist, point.x + point.z - 0.5 * point.y);
+                                    if (Mummu.IsFinite(point)) {
+                                        drawnShape.points.push(point);
+                                    }
+                                }
+                                if (drawnShape.points.length > 0) {
+                                    lines.push(drawnShape);
+                                }
+                            }
+                        }
+                        else {
+                            console.log("can't find template for " + baseName);
+                        }
+                    }
+                    else {
+                        let track = machine.trackFactory.createTrackBaseName(baseName, prop);
+                        if (track) {
+                            machine.parts.push(track);
+                        }
+                        else {
+                            console.warn("failed to createTrackBaseName");
+                            console.log(baseName);
+                            console.log(prop);
+                        }
+                    }
+                }
+            }
+            let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            for (let i = 0; i < decorCount; i++) {
+                let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                if (makeMiniature) {
+                }
+                else {
+                    let decor = new MarbleRunSimulatorCore.Xylophone(machine);
+                    decor.setPosition(new BABYLON.Vector3(x, y, z));
+                    machine.decors.push(decor);
+                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                    decor.setN(n);
+                    if (data.v === 8) {
+                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+                        decor.setFlip(f);
+                    }
+                }
+            }
+            if (data.r) {
+                machine._roomIndex = data.r;
+            }
+            else {
+                if (partCount % 2 === 0) {
+                    machine._roomIndex = 0;
+                }
+                else if (partCount % 2 === 1) {
+                    machine._roomIndex = 9;
+                }
+                else {
+                    machine._roomIndex = 0;
+                }
+            }
+            if (makeMiniature) {
+                let picSize = 512;
+                let picMargin = picSize / 20;
+                let picSizeNoMargin = picSize - 2 * picMargin;
+                let lineWidth = 2;
+                let canvas = document.createElement("canvas");
+                canvas.width = picSize;
+                canvas.height = picSize;
+                let backGroundColor = BABYLON.Color3.FromHexString("#103c6f");
+                let backGroundColorHex = backGroundColor.toHexString();
+                let context = canvas.getContext("2d");
+                context.fillStyle = backGroundColorHex;
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                let xProjAxis = new BABYLON.Vector2(Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
+                let yProjAxis = new BABYLON.Vector2(0, 1);
+                let zProjAxis = new BABYLON.Vector2(-Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
+                let vToX = (v) => {
+                    let x = xProjAxis.x * v.x + yProjAxis.x * v.y + zProjAxis.x * v.z;
+                    return x;
+                };
+                let vToY = (v) => {
+                    let y = xProjAxis.y * v.x + yProjAxis.y * v.y + zProjAxis.y * v.z;
+                    return y;
+                };
+                let aabbMin = new BABYLON.Vector3(Infinity, Infinity, Infinity);
+                let aabbMax = new BABYLON.Vector3(-Infinity, -Infinity, -Infinity);
+                let abstractPixelXMin = Infinity;
+                let abstractPixelXMax = -Infinity;
+                let abstractPixelYMin = Infinity;
+                let abstractPixelYMax = -Infinity;
+                lines.sort((a, b) => { return b.dist - a.dist; });
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].points;
+                    for (let j = 0; j < line.length; j++) {
+                        let p = line[j];
+                        if (Mummu.IsFinite(p)) {
+                            let abstractPixelX = vToX(p);
+                            let abstractPixelY = vToY(p);
+                            abstractPixelXMin = Math.min(abstractPixelXMin, abstractPixelX);
+                            abstractPixelXMax = Math.max(abstractPixelXMax, abstractPixelX);
+                            abstractPixelYMin = Math.min(abstractPixelYMin, abstractPixelY);
+                            abstractPixelYMax = Math.max(abstractPixelYMax, abstractPixelY);
+                            aabbMin = BABYLON.Vector3.Minimize(aabbMin, p);
+                            aabbMax = BABYLON.Vector3.Maximize(aabbMax, p);
+                        }
+                    }
+                }
+                let w = abstractPixelXMax - abstractPixelXMin;
+                let h = abstractPixelYMax - abstractPixelYMin;
+                let s = Math.max(w, h);
+                let mx = picMargin;
+                let my = picMargin;
+                if (w > h) {
+                    my = (picSize - h / s * picSizeNoMargin) * 0.5;
+                }
+                else if (h > w) {
+                    mx = (picSize - w / s * picSizeNoMargin) * 0.5;
+                }
+                let framePoints = [
+                    new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMin.z - 0.01),
+                    new BABYLON.Vector3(aabbMax.x + 0.01, aabbMin.y, aabbMin.z - 0.01),
+                    new BABYLON.Vector3(aabbMax.x + 0.01, aabbMin.y, aabbMax.z + 0.01),
+                    new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMax.z + 0.01)
+                ];
+                let cFrameLine = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.5);
+                context.beginPath();
+                let p0 = framePoints[0];
+                let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                context.moveTo(x - 2, picSize - y - 2);
+                for (let j = 1; j < framePoints.length; j++) {
+                    let p = framePoints[j];
+                    let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                    let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                    context.lineTo(x - 2, picSize - y - 2);
+                }
+                context.closePath();
+                context.strokeStyle = cFrameLine.toHexString();
+                context.lineWidth = 1;
+                context.stroke();
+                let cFrameBackground = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.05);
+                context.fillStyle = cFrameBackground.toHexString();
+                context.fill();
+                let dist01 = BABYLON.Vector3.Distance(framePoints[0], framePoints[1]);
+                let dist03 = BABYLON.Vector3.Distance(framePoints[0], framePoints[3]);
+                let count01 = 10;
+                let count03 = 10;
+                if (dist01 > dist03) {
+                    count03 = Math.round(dist03 / (dist01 / count01));
+                }
+                if (dist03 > dist01) {
+                    count01 = Math.round(dist01 / (dist03 / count03));
+                }
+                for (let i = 1; i < count01; i++) {
+                    let f = i / count01;
+                    let p0 = BABYLON.Vector3.Lerp(framePoints[0], framePoints[1], f);
+                    let p1 = BABYLON.Vector3.Lerp(framePoints[3], framePoints[2], f);
+                    context.beginPath();
+                    let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                    let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                    context.moveTo(x - 2, picSize - y - 2);
+                    x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                    y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                    context.lineTo(x - 2, picSize - y - 2);
+                    context.strokeStyle = cFrameLine.toHexString();
+                    context.lineWidth = 1;
+                    context.stroke();
+                }
+                for (let i = 1; i < count03; i++) {
+                    let f = i / count03;
+                    let p0 = BABYLON.Vector3.Lerp(framePoints[0], framePoints[3], f);
+                    let p1 = BABYLON.Vector3.Lerp(framePoints[1], framePoints[2], f);
+                    context.beginPath();
+                    let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                    let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                    context.moveTo(x - 2, picSize - y - 2);
+                    x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                    y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                    context.lineTo(x - 2, picSize - y - 2);
+                    context.strokeStyle = cFrameLine.toHexString();
+                    context.lineWidth = 1;
+                    context.stroke();
+                }
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    context.lineWidth = 5 * lineWidth;
+                    let normalizedH = 0;
+                    context.beginPath();
+                    let p0 = line.points[0];
+                    let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                    let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                    normalizedH = p0.y;
+                    //console.log("p0 " + x + " " + y);
+                    context.moveTo(x - 2, picSize - y - 2);
+                    for (let j = 1; j < line.points.length; j++) {
+                        let p = line.points[j];
+                        let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                        let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                        normalizedH += p.y;
+                        //console.log("p " + x + " " + y);
+                        context.lineTo(x - 2, picSize - y - 2);
+                    }
+                    normalizedH = normalizedH / line.points.length;
+                    normalizedH = normalizedH / aabbMax.y;
+                    let f = normalizedH * 0.8 + 0.2;
+                    if (line instanceof MarbleRunSimulatorCore.MiniatureTrack) {
+                        let c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), f);
+                        context.strokeStyle = c.toHexString();
+                        context.stroke();
+                        context.lineWidth = 3 * lineWidth;
+                        context.strokeStyle = backGroundColorHex;
+                        context.stroke();
+                    }
+                    else if (line instanceof MarbleRunSimulatorCore.MiniatureShape) {
+                        let c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 1);
+                        context.closePath();
+                        context.strokeStyle = c.toHexString();
+                        context.lineWidth = lineWidth;
+                        context.stroke();
+                        c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.7 * f);
+                        context.fillStyle = c.toHexString();
+                        context.fill();
+                    }
+                }
+                var tmpLink = document.createElement('a');
+                tmpLink.download = "test.png";
+                tmpLink.href = canvas.toDataURL();
+                document.body.appendChild(canvas);
+                canvas.style.position = "fixed";
+                canvas.style.top = "20%";
+                canvas.style.left = "40%";
+                canvas.style.width = "20%";
+                canvas.style.zIndex = "100";
+                setTimeout(() => {
+                    document.body.removeChild(canvas);
+                }, 1000);
+                document.body.appendChild(tmpLink);
+                tmpLink.click();
+                document.body.removeChild(tmpLink);
+            }
+        }
+    }
+    MarbleRunSimulatorCore.DeserializeV11 = DeserializeV11;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    function SerializeV2(machine) {
+        let data = {
+            n: machine.name,
+            a: machine.author,
+            v: 2
+        };
+        let dataString = "";
+        // Add ball count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.balls.length, 2);
+        for (let i = 0; i < machine.balls.length; i++) {
+            let ball = machine.balls[i];
+            let x = Math.round(ball.positionZero.x * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let y = Math.round(ball.positionZero.y * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let z = Math.round(ball.positionZero.z * 1000) + MarbleRunSimulatorCore.ballOffset;
+            dataString += MarbleRunSimulatorCore.NToHex(x, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(y, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(z, 3);
+        }
+        // Add parts count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.parts.length, 2);
+        for (let i = 0; i < machine.parts.length; i++) {
+            let partDataString = "";
+            let part = machine.parts[i];
+            let baseName = part.partName.split("_")[0];
+            let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
+                return name.startsWith(baseName);
+            });
+            if (index === -1) {
+                console.error("Error, can't find part index.");
+                debugger;
+            }
+            partDataString += MarbleRunSimulatorCore.NToHex(index, 2);
+            let pI = part.i + MarbleRunSimulatorCore.partOffset;
+            let pJ = part.j + MarbleRunSimulatorCore.partOffset;
+            let pK = part.k + MarbleRunSimulatorCore.partOffset;
+            partDataString += MarbleRunSimulatorCore.NToHex(pI, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pJ, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pK, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.w, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.h, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.d, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.n, 1);
+            let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+            partDataString += MarbleRunSimulatorCore.NToHex(m, 1);
+            let colourCount = part.colors.length;
+            partDataString += MarbleRunSimulatorCore.NToHex(colourCount, 1);
+            for (let j = 0; j < part.colors.length; j++) {
+                let c = part.colors[j];
+                partDataString += MarbleRunSimulatorCore.NToHex(c, 1);
+            }
+            //console.log("---------------------------");
+            //console.log("serialize");
+            //console.log(part);
+            //console.log("into");
+            //console.log(partDataString);
+            //console.log("---------------------------");
+            dataString += partDataString;
+        }
+        data.d = dataString;
+        return data;
+    }
+    MarbleRunSimulatorCore.SerializeV2 = SerializeV2;
+    function DeserializeV2(machine, data) {
+        let dataString = data.d;
+        if (dataString) {
+            if (data.n) {
+                machine.name = data.n;
+            }
+            if (data.a) {
+                machine.author = data.a;
+            }
+            machine.balls = [];
+            machine.parts = [];
+            let pt = 0;
+            let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            //console.log("ballCount = " + ballCount);
+            for (let i = 0; i < ballCount; i++) {
+                let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
+                let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
+                let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
+                let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
+                machine.balls.push(ball);
+            }
+            let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            //console.log("partCount = " + partCount);
+            for (let i = 0; i < partCount; i++) {
+                /*
+                partDataString += NToHex(index, 2);
+                
+                let pI = part.i + partOffset;
+                let pJ = part.j + partOffset;
+                let pK = part.k + partOffset;
+                partDataString += NToHex(pI, 2);
+                partDataString += NToHex(pJ, 2);
+                partDataString += NToHex(pK, 2);
+
+                partDataString += NToHex(part.w, 1);
+                partDataString += NToHex(part.h, 1);
+                partDataString += NToHex(part.d, 1);
+                partDataString += NToHex(part.n, 1);
+                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                partDataString += NToHex(m, 1);
+
+                let colourCount = part.colors.length;
+                partDataString += NToHex(colourCount, 1);
+                for (let j = 0; j < part.colors.length; j++) {
+                    let c = part.colors[j];
+                    partDataString += NToHex(c, 1);
+                }
+                */
+                let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
+                //console.log("basename " + baseName);
+                let pI = (parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset) * 2;
+                let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                let pK = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                //console.log("part ijk " + pI + " " + pJ + " " + pK);
+                let w = (parseInt(dataString.substring(pt, pt += 1), 36)) * 2;
+                let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+                //console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                //console.log(colorCount);
+                let colors = [];
+                for (let ii = 0; ii < colorCount; ii++) {
+                    colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                }
+                let prop = {
+                    i: pI * 3,
+                    j: pJ,
+                    k: pK * 3,
+                    l: w,
+                    h: h,
+                    d: d,
+                    n: n,
+                    mirrorX: (mirror % 2) === 1,
+                    mirrorZ: mirror >= 2,
+                    c: colors
+                };
+                let track = machine.trackFactory.createTrackBaseName(baseName, prop);
+                if (track) {
+                    machine.parts.push(track);
+                }
+            }
+        }
+    }
+    MarbleRunSimulatorCore.DeserializeV2 = DeserializeV2;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    function SerializeV3456(machine, version) {
+        let data = {
+            n: machine.name,
+            a: machine.author,
+            v: version
+        };
+        let dataString = "";
+        // Add ball count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.balls.length, 2);
+        for (let i = 0; i < machine.balls.length; i++) {
+            let ball = machine.balls[i];
+            let x = Math.round(ball.positionZero.x * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let y = Math.round(ball.positionZero.y * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let z = Math.round(ball.positionZero.z * 1000) + MarbleRunSimulatorCore.ballOffset;
+            dataString += MarbleRunSimulatorCore.NToHex(x, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(y, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(z, 3);
+            if (version === 4 || version >= 6) {
+                dataString += MarbleRunSimulatorCore.NToHex(ball.materialIndex, 2);
+            }
+        }
+        // Add parts count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.parts.length, 2);
+        for (let i = 0; i < machine.parts.length; i++) {
+            let partDataString = "";
+            let part = machine.parts[i];
+            let baseName = part.partName.split("_")[0];
+            let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
+                return name.startsWith(baseName);
+            });
+            if (index === -1) {
+                console.error("Error, can't find part index.");
+                debugger;
+            }
+            partDataString += MarbleRunSimulatorCore.NToHex(index, 2);
+            let pI = part.i + MarbleRunSimulatorCore.partOffset;
+            let pJ = part.j + MarbleRunSimulatorCore.partOffset;
+            let pK = part.k + MarbleRunSimulatorCore.partOffset;
+            partDataString += MarbleRunSimulatorCore.NToHex(pI, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pJ, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pK, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.w, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.h, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.d, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.n, 1);
+            let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+            partDataString += MarbleRunSimulatorCore.NToHex(m, 1);
+            let colourCount = part.colors.length;
+            partDataString += MarbleRunSimulatorCore.NToHex(colourCount, 1);
+            for (let j = 0; j < part.colors.length; j++) {
+                let c = part.colors[j];
+                partDataString += MarbleRunSimulatorCore.NToHex(c, 1);
+            }
+            //console.log("---------------------------");
+            //console.log("serialize");
+            //console.log(part);
+            //console.log("into");
+            //console.log(partDataString);
+            //console.log("---------------------------");
+            dataString += partDataString;
+        }
+        data.d = dataString;
+        return data;
+    }
+    MarbleRunSimulatorCore.SerializeV3456 = SerializeV3456;
+    function DeserializeV3456(machine, data) {
+        let dataString = data.d;
+        if (dataString) {
+            if (data.n) {
+                machine.name = data.n;
+            }
+            if (data.a) {
+                machine.author = data.a;
+            }
+            if (data.r) {
+                machine._roomIndex = data.r;
+            }
+            else {
+                machine._roomIndex = 0;
+            }
+            machine.balls = [];
+            machine.parts = [];
+            let pt = 0;
+            let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            for (let i = 0; i < ballCount; i++) {
+                let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
+                let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
+                let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
+                let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
+                machine.balls.push(ball);
+                if (data.v === 4 || data.v >= 6) {
+                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                    ball.materialIndex = materialIndex;
+                }
+            }
+            let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            for (let i = 0; i < partCount; i++) {
+                let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
+                let pI = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                let pK = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                let correctedPI = pI * 3;
+                let correctedPJ = -pK * 3;
+                let correctedPK = -pJ;
+                let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+                let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                let colors = [];
+                for (let ii = 0; ii < colorCount; ii++) {
+                    colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                }
+                if (data.v < 5) {
+                    if (baseName === "uturn") {
+                        if (d === 2) {
+                            if ((mirror % 2) === 1) {
+                                pI++;
+                            }
+                        }
+                        if (d === 6 || d === 7) {
+                            if ((mirror % 2) === 1) {
+                                pI--;
+                            }
+                        }
+                    }
+                }
+                let prop = {
+                    i: correctedPI,
+                    j: correctedPJ,
+                    k: correctedPK,
+                    l: w,
+                    h: h,
+                    d: d,
+                    n: n,
+                    mirrorX: (mirror % 2) === 1,
+                    mirrorZ: mirror >= 2,
+                    c: colors
+                };
+                MarbleRunSimulatorCore.DeserializeAnte11Fix(baseName, prop);
+                let track = machine.trackFactory.createTrackBaseName(baseName, prop);
+                if (track) {
+                    machine.parts.push(track);
+                }
+                else {
+                    console.warn("failed to createTrackBaseName");
+                    console.log(baseName);
+                    console.log(prop);
+                }
+            }
+            let minK = Infinity;
+            for (let i = 0; i < machine.parts.length; i++) {
+                let part = machine.parts[i];
+                minK = Math.min(minK, part.k);
+            }
+            if (isFinite(minK) && minK != 0) {
+                for (let i = 0; i < machine.parts.length; i++) {
+                    let part = machine.parts[i];
+                    part.setK(part.k - minK, true);
+                }
+                for (let i = 0; i < machine.balls.length; i++) {
+                    let ball = machine.balls[i];
+                    ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * MarbleRunSimulatorCore.tileHeight, 0)));
+                }
+            }
+        }
+    }
+    MarbleRunSimulatorCore.DeserializeV3456 = DeserializeV3456;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    function SerializeV8(machine) {
+        let data = {
+            n: machine.name,
+            a: machine.author,
+            v: 8
+        };
+        let dataString = "";
+        // Add ball count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.balls.length, 2);
+        for (let i = 0; i < machine.balls.length; i++) {
+            let ball = machine.balls[i];
+            let x = Math.round(ball.positionZero.x * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let y = Math.round(ball.positionZero.y * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let z = Math.round(ball.positionZero.z * 1000) + MarbleRunSimulatorCore.ballOffset;
+            dataString += MarbleRunSimulatorCore.NToHex(x, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(y, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(z, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(ball.materialIndex, 2);
+        }
+        // Add parts count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.parts.length, 2);
+        for (let i = 0; i < machine.parts.length; i++) {
+            let partDataString = "";
+            let part = machine.parts[i];
+            let baseName = part.partName.split("_")[0];
+            let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
+                return name.startsWith(baseName);
+            });
+            if (index === -1) {
+                console.error("Error, can't find part index.");
+                debugger;
+            }
+            partDataString += MarbleRunSimulatorCore.NToHex(index, 2);
+            let pI = part.i + MarbleRunSimulatorCore.partOffset;
+            let pJ = part.j + MarbleRunSimulatorCore.partOffset;
+            let pK = part.k + MarbleRunSimulatorCore.partOffset;
+            partDataString += MarbleRunSimulatorCore.NToHex(pI, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pJ, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pK, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.w, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.h, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.d, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.n, 1);
+            let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+            partDataString += MarbleRunSimulatorCore.NToHex(m, 1);
+            let colourCount = part.colors.length;
+            partDataString += MarbleRunSimulatorCore.NToHex(colourCount, 1);
+            for (let j = 0; j < part.colors.length; j++) {
+                let c = part.colors[j];
+                partDataString += MarbleRunSimulatorCore.NToHex(c, 1);
+            }
+            //console.log("---------------------------");
+            //console.log("serialize");
+            //console.log(part);
+            //console.log("into");
+            //console.log(partDataString);
+            //console.log("---------------------------");
+            dataString += partDataString;
+        }
+        dataString += MarbleRunSimulatorCore.NToHex(machine.decors.length, 2);
+        for (let i = 0; i < machine.decors.length; i++) {
+            let decor = machine.decors[i];
+            let x = Math.round(decor.position.x * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let y = Math.round(decor.position.y * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let z = Math.round(decor.position.z * 1000) + MarbleRunSimulatorCore.ballOffset;
+            dataString += MarbleRunSimulatorCore.NToHex(x, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(y, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(z, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(decor.n, 2);
+            dataString += MarbleRunSimulatorCore.NToHex(decor.flip ? 1 : 0, 1);
+        }
+        data.d = dataString;
+        return data;
+    }
+    MarbleRunSimulatorCore.SerializeV8 = SerializeV8;
+    function DeserializeV78(machine, data) {
+        let dataString = data.d;
+        if (dataString) {
+            if (data.n) {
+                machine.name = data.n;
+            }
+            if (data.a) {
+                machine.author = data.a;
+            }
+            if (data.r) {
+                machine._roomIndex = data.r;
+            }
+            else {
+                machine._roomIndex = 0;
+            }
+            machine.balls = [];
+            machine.parts = [];
+            let pt = 0;
+            let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            //console.log("ballCount = " + ballCount);
+            for (let i = 0; i < ballCount; i++) {
+                let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
+                let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
+                let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
+                let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
+                machine.balls.push(ball);
+                let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                ball.materialIndex = materialIndex;
+            }
+            let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            //console.log("partCount = " + partCount);
+            for (let i = 0; i < partCount; i++) {
+                /*
+                partDataString += NToHex(index, 2);
+                
+                let pI = part.i + partOffset;
+                let pJ = part.j + partOffset;
+                let pK = part.k + partOffset;
+                partDataString += NToHex(pI, 2);
+                partDataString += NToHex(pJ, 2);
+                partDataString += NToHex(pK, 2);
+
+                partDataString += NToHex(part.w, 1);
+                partDataString += NToHex(part.h, 1);
+                partDataString += NToHex(part.d, 1);
+                partDataString += NToHex(part.n, 1);
+                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+                partDataString += NToHex(m, 1);
+
+                let colourCount = part.colors.length;
+                partDataString += NToHex(colourCount, 1);
+                for (let j = 0; j < part.colors.length; j++) {
+                    let c = part.colors[j];
+                    partDataString += NToHex(c, 1);
+                }
+                */
+                let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
+                let pI = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                let pK = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                let correctedPI = pI * 3;
+                let correctedPJ = -pK * 3;
+                let correctedPK = -pJ;
+                //console.log("part ijk " + pI + " " + pJ + " " + pK);
+                let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+                //console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                //console.log(colorCount);
+                let colors = [];
+                for (let ii = 0; ii < colorCount; ii++) {
+                    colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                }
+                let prop = {
+                    i: correctedPI,
+                    j: correctedPJ,
+                    k: correctedPK,
+                    l: w,
+                    h: h,
+                    d: d,
+                    n: n,
+                    mirrorX: (mirror % 2) === 1,
+                    mirrorZ: mirror >= 2,
+                    c: colors
+                };
+                MarbleRunSimulatorCore.DeserializeAnte11Fix(baseName, prop);
+                let track = machine.trackFactory.createTrackBaseName(baseName, prop);
+                if (track) {
+                    machine.parts.push(track);
+                }
+                else {
+                    console.warn("failed to createTrackBaseName");
+                    console.log(baseName);
+                    console.log(prop);
+                }
+            }
+            let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            for (let i = 0; i < decorCount; i++) {
+                let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                //console.log("ball xyz " + x + " " + y + " " + z);
+                let decor = new MarbleRunSimulatorCore.Xylophone(machine);
+                decor.setPosition(new BABYLON.Vector3(x, y, z));
+                machine.decors.push(decor);
+                let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                decor.setN(n);
+                if (data.v === 8) {
+                    let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+                    decor.setFlip(f);
+                }
+            }
+            let minK = Infinity;
+            for (let i = 0; i < machine.parts.length; i++) {
+                let part = machine.parts[i];
+                minK = Math.min(minK, part.k - 1);
+            }
+            if (isFinite(minK) && minK != 0) {
+                for (let i = 0; i < machine.parts.length; i++) {
+                    let part = machine.parts[i];
+                    part.setK(part.k - minK);
+                }
+                for (let i = 0; i < machine.balls.length; i++) {
+                    let ball = machine.balls[i];
+                    ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * MarbleRunSimulatorCore.tileHeight, 0)));
+                }
+            }
+        }
+    }
+    MarbleRunSimulatorCore.DeserializeV78 = DeserializeV78;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    function SerializeV910(machine, version) {
+        let data = {
+            n: machine.name,
+            a: machine.author,
+            v: version,
+            r: machine.roomIndex
+        };
+        let dataString = "";
+        // Add ball count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.balls.length, 2);
+        for (let i = 0; i < machine.balls.length; i++) {
+            let ball = machine.balls[i];
+            let x = Math.round(ball.positionZero.x * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let y = Math.round(ball.positionZero.y * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let z = Math.round(ball.positionZero.z * 1000) + MarbleRunSimulatorCore.ballOffset;
+            dataString += MarbleRunSimulatorCore.NToHex(x, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(y, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(z, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(ball.materialIndex, 2);
+        }
+        // Add parts count
+        dataString += MarbleRunSimulatorCore.NToHex(machine.parts.length, 2);
+        for (let i = 0; i < machine.parts.length; i++) {
+            let partDataString = "";
+            let part = machine.parts[i];
+            let baseName = part.partName.split("_")[0];
+            let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
+                return name.startsWith(baseName);
+            });
+            if (index === -1) {
+                console.error("Error, can't find part index.");
+                debugger;
+            }
+            partDataString += MarbleRunSimulatorCore.NToHex(index, 2);
+            let pI = part.i + MarbleRunSimulatorCore.partOffset;
+            let pJ = part.j + MarbleRunSimulatorCore.partOffset;
+            let pK = part.k + MarbleRunSimulatorCore.partOffset;
+            partDataString += MarbleRunSimulatorCore.NToHex(pI, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pJ, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(pK, 2);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.w, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.h, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.d, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.n, 1);
+            partDataString += MarbleRunSimulatorCore.NToHex(part.s, 1);
+            let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
+            partDataString += MarbleRunSimulatorCore.NToHex(m, 1);
+            let colourCount = part.colors.length;
+            partDataString += MarbleRunSimulatorCore.NToHex(colourCount, 1);
+            for (let j = 0; j < part.colors.length; j++) {
+                let c = part.colors[j];
+                partDataString += MarbleRunSimulatorCore.NToHex(c, 1);
+            }
+            //console.log("---------------------------");
+            //console.log("serialize");
+            //console.log(part);
+            //console.log("into");
+            //console.log(partDataString);
+            //console.log("---------------------------");
+            dataString += partDataString;
+        }
+        dataString += MarbleRunSimulatorCore.NToHex(machine.decors.length, 2);
+        for (let i = 0; i < machine.decors.length; i++) {
+            let decor = machine.decors[i];
+            let x = Math.round(decor.position.x * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let y = Math.round(decor.position.y * 1000) + MarbleRunSimulatorCore.ballOffset;
+            let z = Math.round(decor.position.z * 1000) + MarbleRunSimulatorCore.ballOffset;
+            dataString += MarbleRunSimulatorCore.NToHex(x, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(y, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(z, 3);
+            dataString += MarbleRunSimulatorCore.NToHex(decor.n, 2);
+            dataString += MarbleRunSimulatorCore.NToHex(decor.flip ? 1 : 0, 1);
+        }
+        data.d = dataString;
+        if (version === 10) {
+            data.sp = machine.sleepersMeshProp;
+        }
+        return data;
+    }
+    MarbleRunSimulatorCore.SerializeV910 = SerializeV910;
+    function DeserializeV910(machine, data) {
+        let dataString = data.d;
+        if (dataString) {
+            if (data.n) {
+                machine.name = data.n;
+            }
+            if (data.a) {
+                machine.author = data.a;
+            }
+            if (data.v === 10) {
+                if (data.sp) {
+                    machine.sleepersMeshProp = data.sp;
+                }
+            }
+            machine.balls = [];
+            machine.parts = [];
+            let pt = 0;
+            let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            //console.log("ballCount = " + ballCount);
+            for (let i = 0; i < ballCount; i++) {
+                let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                x = x / 0.075 * MarbleRunSimulatorCore.tileWidth;
+                let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                y = y / 0.03 * MarbleRunSimulatorCore.tileHeight;
+                let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
+                let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
+                machine.balls.push(ball);
+                let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                ball.materialIndex = materialIndex;
+            }
+            let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            //console.log("partCount = " + partCount);
+            for (let i = 0; i < partCount; i++) {
+                let index = parseInt(dataString.substring(pt, pt += 2), 36);
+                if (index >= 0 && index < MarbleRunSimulatorCore.TrackNames.length) {
+                    let baseName = MarbleRunSimulatorCore.TrackNames[index].split("_")[0];
+                    let pI = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let pK = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
+                    let correctedPI = pI * 3;
+                    let correctedPJ = -pK * 3;
+                    let correctedPK = -pJ;
+                    //console.log("part ijk " + pI + " " + pJ + " " + pK);
+                    let w = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let h = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let d = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let n = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let s = parseInt(dataString.substring(pt, pt += 1), 36);
+                    let mirror = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log("part whdn " + w + " " + h + " " + d + " " + n);
+                    let colorCount = parseInt(dataString.substring(pt, pt += 1), 36);
+                    //console.log(colorCount);
+                    let colors = [];
+                    for (let ii = 0; ii < colorCount; ii++) {
+                        colors[ii] = parseInt(dataString.substring(pt, pt += 1), 36);
+                    }
+                    if (baseName === "spiralUTurn") {
+                        if ((mirror % 2) === 1) {
+                            if (d >= 3) {
+                                correctedPI -= 3;
+                            }
+                        }
+                    }
+                    let prop = {
+                        i: correctedPI,
+                        j: correctedPJ,
+                        k: correctedPK,
+                        l: w,
+                        h: h,
+                        d: d,
+                        n: n,
+                        s: s,
+                        mirrorX: (mirror % 2) === 1,
+                        mirrorZ: mirror >= 2,
+                        c: colors
+                    };
+                    MarbleRunSimulatorCore.DeserializeAnte11Fix(baseName, prop);
+                    let track = machine.trackFactory.createTrackBaseName(baseName, prop);
+                    if (track) {
+                        machine.parts.push(track);
+                    }
+                    else {
+                        console.warn("failed to createTrackBaseName");
+                        console.log(baseName);
+                        console.log(prop);
+                    }
+                }
+            }
+            let decorCount = parseInt(dataString.substring(pt, pt += 2), 36);
+            for (let i = 0; i < decorCount; i++) {
+                let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                //console.log("ball xyz " + x + " " + y + " " + z);
+                let decor = new MarbleRunSimulatorCore.Xylophone(machine);
+                decor.setPosition(new BABYLON.Vector3(x, y, z));
+                machine.decors.push(decor);
+                let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                decor.setN(n);
+                if (data.v === 8) {
+                    let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+                    decor.setFlip(f);
+                }
+            }
+            let minK = Infinity;
+            for (let i = 0; i < machine.parts.length; i++) {
+                let part = machine.parts[i];
+                minK = Math.min(minK, part.k);
+            }
+            if (isFinite(minK) && minK != 0) {
+                for (let i = 0; i < machine.parts.length; i++) {
+                    let part = machine.parts[i];
+                    part.setK(part.k - minK);
+                }
+                for (let i = 0; i < machine.balls.length; i++) {
+                    let ball = machine.balls[i];
+                    ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * MarbleRunSimulatorCore.tileHeight, 0)));
+                }
+            }
+            if (data.r) {
+                machine._roomIndex = data.r;
+            }
+            else {
+                if (partCount % 2 === 0) {
+                    machine._roomIndex = 0;
+                }
+                else if (partCount % 2 === 1) {
+                    machine._roomIndex = 9;
+                }
+                else {
+                    machine._roomIndex = 0;
+                }
+            }
+        }
+    }
+    MarbleRunSimulatorCore.DeserializeV910 = DeserializeV910;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {

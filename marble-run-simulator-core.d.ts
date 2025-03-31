@@ -226,6 +226,9 @@ declare namespace MarbleRunSimulatorCore {
 declare var THE_ORIGIN_OF_TIME_ms: any;
 declare var IsTouchScreen: number;
 declare namespace MarbleRunSimulatorCore {
+    function NToHex(n: number, l?: number): string;
+    var ballOffset: number;
+    var partOffset: number;
     enum GraphicQuality {
         Proxy = 0,
         VeryLow = 1,
@@ -335,7 +338,7 @@ declare namespace MarbleRunSimulatorCore {
         exitHolePath: BABYLON.Vector3[];
         exitHoleOut: BABYLON.Mesh;
         baseColor: string;
-        private _roomIndex;
+        _roomIndex: number;
         get roomIndex(): number;
         setRoomIndex(roomIndex: number): void;
         graphicQ: GraphicQuality;
@@ -381,21 +384,8 @@ declare namespace MarbleRunSimulatorCore {
         };
         static MachineDataCompare(d1: IMachineData, d2: IMachineData): boolean;
         serialize(): IMachineData;
-        serializeV1(): IMachineData;
-        serializeV2(): IMachineData;
-        serializeV3456(version: number): IMachineData;
-        serializeV8(): IMachineData;
-        serializeV910(version: number): IMachineData;
-        serializeV11(): IMachineData;
         lastDeserializedData: IMachineData;
         deserialize(data: IMachineData, makeMiniature?: boolean): void;
-        deserializeV1(data: IMachineData): void;
-        deserializeV2(data: IMachineData): void;
-        deserializeV3456(data: IMachineData): void;
-        deserializeV78(data: IMachineData): void;
-        deserializeV910(data: IMachineData): void;
-        deserializeAnte11Fix(baseName: string, prop: IMachinePartProp): void;
-        deserializeV11(data: IMachineData, makeMiniature?: boolean): void;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateBaseMesh: boolean;
@@ -874,6 +864,31 @@ declare namespace MarbleRunSimulatorCore {
     class WoodTrackMeshBuilder {
         static BuildWoodTrackMesh(track: WoodTrack, props: IWoodTrackMeshProps): Promise<void>;
     }
+}
+declare namespace MarbleRunSimulatorCore {
+    function SerializeV1(machine: Machine): IMachineData;
+    function DeserializeV1(machine: Machine, data: IMachineData): void;
+}
+declare namespace MarbleRunSimulatorCore {
+    function SerializeV11(machine: Machine): IMachineData;
+    function DeserializeAnte11Fix(baseName: string, prop: IMachinePartProp): void;
+    function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature?: boolean): void;
+}
+declare namespace MarbleRunSimulatorCore {
+    function SerializeV2(machine: Machine): IMachineData;
+    function DeserializeV2(machine: Machine, data: IMachineData): void;
+}
+declare namespace MarbleRunSimulatorCore {
+    function SerializeV3456(machine: Machine, version: number): IMachineData;
+    function DeserializeV3456(machine: Machine, data: IMachineData): void;
+}
+declare namespace MarbleRunSimulatorCore {
+    function SerializeV8(machine: Machine): IMachineData;
+    function DeserializeV78(machine: Machine, data: IMachineData): void;
+}
+declare namespace MarbleRunSimulatorCore {
+    function SerializeV910(machine: Machine, version: number): IMachineData;
+    function DeserializeV910(machine: Machine, data: IMachineData): void;
 }
 declare namespace MarbleRunSimulatorCore {
     class MachineDecorSelector extends BABYLON.Mesh {
