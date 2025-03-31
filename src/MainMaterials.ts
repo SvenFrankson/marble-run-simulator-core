@@ -131,6 +131,7 @@ namespace MarbleRunSimulatorCore {
             return this.getMaterial(6, MaterialQuality.Standard);
         }
         public plasticWhite: BABYLON.StandardMaterial;
+        public bone: BABYLON.PBRMetallicRoughnessMaterial;
         public selectorFullLitLightBlueMaterial: BABYLON.StandardMaterial;
         public selectorFullLitBlueMaterial: BABYLON.StandardMaterial;
         public selectorFullLitGreenMaterial: BABYLON.StandardMaterial;
@@ -329,6 +330,14 @@ namespace MarbleRunSimulatorCore {
                 return ballMaterial;
             }
             */
+
+            let boneMaterial = new BABYLON.PBRMetallicRoughnessMaterial("bone-material");
+            boneMaterial.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/bone_2.png");
+            //boneMaterial.normalTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/bone_nm.png");
+            boneMaterial.roughness = 0.9;
+            boneMaterial.environmentTexture = envTexture;
+
+            this.bone = boneMaterial;
 
             let makeBrandedBallMaterialSTD = (name: string, textureName: string) => {
                 let ballMaterial = new BABYLON.StandardMaterial(name, this.game.scene);

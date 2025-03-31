@@ -1041,6 +1041,12 @@ var MarbleRunSimulatorCore;
                 return ballMaterial;
             }
             */
+            let boneMaterial = new BABYLON.PBRMetallicRoughnessMaterial("bone-material");
+            boneMaterial.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/bone_2.png");
+            //boneMaterial.normalTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/bone_nm.png");
+            boneMaterial.roughness = 0.9;
+            boneMaterial.environmentTexture = envTexture;
+            this.bone = boneMaterial;
             let makeBrandedBallMaterialSTD = (name, textureName) => {
                 let ballMaterial = new BABYLON.StandardMaterial(name, this.game.scene);
                 ballMaterial.specularColor = new BABYLON.Color3(0.7, 0.7, 0.7);
@@ -5135,6 +5141,7 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
+    // Caution, order is important. Do not rearrange.
     MarbleRunSimulatorCore.TrackNames = [
         "ramp_1.1.1",
         "wave_2.1.1",
@@ -5171,6 +5178,7 @@ var MarbleRunSimulatorCore;
         "curb_2.0",
         "rampv2_1.1.1",
         "multiJoin_1",
+        "trikeSkull",
     ];
     class MachinePartFactory {
         constructor(machine) {
@@ -5502,6 +5510,9 @@ var MarbleRunSimulatorCore;
             if (partName === "speeder") {
                 return new MarbleRunSimulatorCore.Speeder(this.machine, prop);
             }
+            if (partName === "trikeSkull") {
+                return new MarbleRunSimulatorCore.TrikeSkull(this.machine, prop);
+            }
         }
         createTrackBaseName(baseName, prop) {
             if (isNaN(prop.s)) {
@@ -5618,6 +5629,9 @@ var MarbleRunSimulatorCore;
             }
             if (baseName === "speeder") {
                 return new MarbleRunSimulatorCore.Speeder(this.machine, prop);
+            }
+            if (baseName === "trikeSkull") {
+                return new MarbleRunSimulatorCore.TrikeSkull(this.machine, prop);
             }
         }
     }
@@ -6731,6 +6745,9 @@ var MarbleRunSimulatorCore;
                 else if (partName === "speeder") {
                     data = MarbleRunSimulatorCore.Speeder.GenerateTemplate(mirrorX);
                 }
+                else if (partName === "trikeSkull") {
+                    data = MarbleRunSimulatorCore.TrikeSkull.GenerateTemplate();
+                }
                 datas[mirrorIndex] = data;
             }
             return data;
@@ -6844,6 +6861,9 @@ var MarbleRunSimulatorCore;
             }
             else if (baseName === "speeder") {
                 partName = MarbleRunSimulatorCore.Speeder.PropToPartName(prop);
+            }
+            else if (baseName === "trikeSkull") {
+                partName = MarbleRunSimulatorCore.TrikeSkull.PropToPartName(prop);
             }
             if (partName) {
                 return this.getTemplate(partName, prop.mirrorX, prop.mirrorZ);
@@ -11551,6 +11571,40 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.SteamElevator = SteamElevator;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    class TrikeSkull extends MarbleRunSimulatorCore.MachinePart {
+        constructor(machine, prop) {
+            super(machine, prop);
+            this.setTemplate(this.machine.templateManager.getTemplate(TrikeSkull.PropToPartName(prop)));
+            this.skull = new BABYLON.Mesh("skull");
+            this.skull.parent = this;
+            this.skull.material = this.game.materials.bone;
+            this.generateWires();
+        }
+        static PropToPartName(prop) {
+            return "trikeSkull";
+        }
+        async instantiateMachineSpecific() {
+            let triceratopsVertexData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/triceratops.babylon");
+            triceratopsVertexData[0].applyToMesh(this.skull);
+        }
+        static GenerateTemplate() {
+            let template = new MarbleRunSimulatorCore.MachinePartTemplate();
+            template.partName = "trikeSkull";
+            template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+            template.trackTemplates[0].colorIndex = 0;
+            template.trackTemplates[0].trackpoints = [
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 11.5, MarbleRunSimulatorCore.tileHeight * 12, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 2, MarbleRunSimulatorCore.tileHeight * 8, 0)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileSize * 8.5, MarbleRunSimulatorCore.tileHeight * 10, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0)),
+            ];
+            template.initialize();
+            return template;
+        }
+    }
+    MarbleRunSimulatorCore.TrikeSkull = TrikeSkull;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {

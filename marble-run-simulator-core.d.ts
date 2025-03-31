@@ -167,6 +167,7 @@ declare namespace MarbleRunSimulatorCore {
         copperFullLitMaterial: BABYLON.StandardMaterial;
         get plasticBlack(): BABYLON.Material;
         plasticWhite: BABYLON.StandardMaterial;
+        bone: BABYLON.PBRMetallicRoughnessMaterial;
         selectorFullLitLightBlueMaterial: BABYLON.StandardMaterial;
         selectorFullLitBlueMaterial: BABYLON.StandardMaterial;
         selectorFullLitGreenMaterial: BABYLON.StandardMaterial;
@@ -1340,6 +1341,15 @@ declare namespace MarbleRunSimulatorCore {
         dispose(): void;
         reset: () => void;
         update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class TrikeSkull extends MachinePart {
+        skull: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

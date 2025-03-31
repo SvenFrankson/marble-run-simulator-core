@@ -544,6 +544,9 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "speeder") {
                     data = Speeder.GenerateTemplate(mirrorX);
                 }
+                else if (partName === "trikeSkull") {
+                    data = TrikeSkull.GenerateTemplate();
+                }
                 datas[mirrorIndex] = data;
             }
 
@@ -660,6 +663,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "speeder") {
                 partName = Speeder.PropToPartName(prop);
+            }
+            else if (baseName === "trikeSkull") {
+                partName = TrikeSkull.PropToPartName(prop);
             }
 
             if (partName) {

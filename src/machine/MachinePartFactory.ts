@@ -1,4 +1,6 @@
 namespace MarbleRunSimulatorCore {
+
+    // Caution, order is important. Do not rearrange.
     export var TrackNames = [
         "ramp_1.1.1",
         "wave_2.1.1",
@@ -35,6 +37,7 @@ namespace MarbleRunSimulatorCore {
         "curb_2.0",
         "rampv2_1.1.1",
         "multiJoin_1",
+        "trikeSkull",
     ];
 
     export interface IMachinePartProp {
@@ -388,6 +391,9 @@ namespace MarbleRunSimulatorCore {
             if (partName === "speeder") {
                 return new Speeder(this.machine, prop);
             }
+            if (partName === "trikeSkull") {
+                return new TrikeSkull(this.machine, prop);
+            }
         }
 
         public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
@@ -506,6 +512,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "speeder") {
                 return new Speeder(this.machine, prop);
+            }
+            if (baseName === "trikeSkull") {
+                return new TrikeSkull(this.machine, prop);
             }
         }
     }
