@@ -888,7 +888,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
-            return SerializeV11(this);
+            return SerializeV12(this);
         }
 
         public lastDeserializedData: IMachineData;
@@ -920,6 +920,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (version === 11) {
                     return DeserializeV11(this, data, makeMiniature);
+                }
+                else if (version === 12) {
+                    return DeserializeV12(this, data, makeMiniature);
                 }
             }
         }
