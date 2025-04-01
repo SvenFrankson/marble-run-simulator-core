@@ -512,7 +512,7 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("spiral_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = Spiral.GenerateTemplate(l, h, mirrorX, mirrorZ);
+                    data = Spiral.GenerateTemplate(l, h);
                 }
                 else if (partName.startsWith("spiralUTurn_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);

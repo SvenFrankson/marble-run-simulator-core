@@ -156,9 +156,9 @@ namespace MarbleRunSimulatorCore {
             prop.l = newL;
         }
         if (baseName === "loop") {
-            console.log("n " + prop.n);
-            console.log("mirrorX " + prop.mirrorX);
-            console.log("mirrorZ " + prop.mirrorZ);
+            //console.log("n " + prop.n);
+            //console.log("mirrorX " + prop.mirrorX);
+            //console.log("mirrorZ " + prop.mirrorZ);
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             prop.k -= 4;
@@ -206,6 +206,10 @@ namespace MarbleRunSimulatorCore {
                 prop.r = 2;
                 prop.i += prop.l - 3;
             }
+        }
+        if (baseName === "spiral") {
+            console.log(prop);
+            prop.l = 3 * prop.l;
         }
     }
 

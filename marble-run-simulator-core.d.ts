@@ -1271,7 +1271,7 @@ declare namespace MarbleRunSimulatorCore {
     class Spiral extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(l: number, h: number, mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {
