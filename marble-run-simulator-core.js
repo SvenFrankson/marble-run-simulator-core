@@ -6135,10 +6135,20 @@ var MarbleRunSimulatorCore;
             prop.l = newL;
         }
         if (baseName === "loop") {
+            console.log("n " + prop.n);
+            console.log("mirrorX " + prop.mirrorX);
+            console.log("mirrorZ " + prop.mirrorZ);
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             prop.k -= 4;
             if (prop.mirrorX) {
+                if (prop.mirrorZ) {
+                }
+                else {
+                    prop.i--;
+                    prop.j -= prop.d;
+                    console.log(prop.d);
+                }
             }
             else {
                 prop.i--;
