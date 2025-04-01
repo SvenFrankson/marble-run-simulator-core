@@ -6541,8 +6541,8 @@ var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     function SerializeV12(machine) {
         let data = {
-            n: machine.name,
-            a: machine.author,
+            title: machine.name,
+            author: machine.author,
             v: 12
         };
         let dataString = "";
@@ -6617,19 +6617,28 @@ var MarbleRunSimulatorCore;
         dataString += MarbleRunSimulatorCore.NToHex(machine.sleepersMeshProp.grndAnchors ? 1 : 0, 1);
         dataString += MarbleRunSimulatorCore.NToHex(Math.floor(machine.sleepersMeshProp.grndAnchorsMaxY * 100), 3);
         dataString += MarbleRunSimulatorCore.NToHex(Math.floor(machine.sleepersMeshProp.spacing * 100), 3);
-        data.d = dataString;
+        data.content = dataString;
         data.sp = machine.sleepersMeshProp;
         return data;
     }
     MarbleRunSimulatorCore.SerializeV12 = SerializeV12;
     function DeserializeV12(machine, data, makeMiniature = false) {
         let dataString = data.d;
+        if (!dataString) {
+            dataString = data.content;
+        }
         if (dataString) {
             if (data.n) {
                 machine.name = data.n;
             }
+            if (data.title) {
+                machine.name = data.title;
+            }
             if (data.a) {
                 machine.author = data.a;
+            }
+            if (data.author) {
+                machine.author = data.author;
             }
             machine.balls = [];
             machine.parts = [];
@@ -6796,6 +6805,7 @@ var MarbleRunSimulatorCore;
                 grndAnchorsMaxY: grndAnchorsMaxY,
                 spacing: spacing
             };
+            console.log("Spacing = " + spacing);
             if (makeMiniature) {
                 let picSize = 512;
                 let picMargin = picSize / 20;

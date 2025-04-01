@@ -3,8 +3,8 @@ namespace MarbleRunSimulatorCore {
     export function SerializeV12(machine: Machine): IMachineData {
 
         let data: IMachineData = {
-            n: machine.name,
-            a: machine.author,
+            title: machine.name,
+            author: machine.author,
             v: 12
         };
 
@@ -89,7 +89,7 @@ namespace MarbleRunSimulatorCore {
         dataString += NToHex(Math.floor(machine.sleepersMeshProp.grndAnchorsMaxY * 100), 3);
         dataString += NToHex(Math.floor(machine.sleepersMeshProp.spacing * 100), 3);
 
-        data.d = dataString;
+        data.content = dataString;
 
         data.sp = machine.sleepersMeshProp;
 
@@ -98,12 +98,21 @@ namespace MarbleRunSimulatorCore {
     
     export function DeserializeV12(machine: Machine, data: IMachineData, makeMiniature: boolean = false): void {
         let dataString = data.d;
+        if (!dataString) {
+            dataString = data.content;
+        }
         if (dataString) {
             if (data.n) {
                 machine.name = data.n;
             }
+            if (data.title) {
+                machine.name = data.title;
+            }
             if (data.a) {
                 machine.author = data.a;
+            }
+            if (data.author) {
+                machine.author = data.author;
             }
         
             machine.balls = [];
@@ -294,6 +303,8 @@ namespace MarbleRunSimulatorCore {
                 grndAnchorsMaxY: grndAnchorsMaxY,
                 spacing: spacing
             }
+
+            console.log("Spacing = " + spacing);
 
             if (makeMiniature) {
                 let picSize = 512;

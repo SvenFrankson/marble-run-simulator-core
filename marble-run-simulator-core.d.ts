@@ -294,14 +294,16 @@ declare namespace MarbleRunSimulatorCore {
         n?: string;
         name?: string;
         a?: string;
-        author?: string;
-        v?: number;
         sleepers?: ISleeperMeshProps;
         balls?: IBallData[];
         parts?: IMachinePartData[];
         d?: string;
         r?: number;
         sp?: ISleeperMeshProps;
+        v?: number;
+        title?: string;
+        author?: string;
+        content?: string;
     }
     class Machine {
         game: IGame;

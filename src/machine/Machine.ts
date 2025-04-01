@@ -84,17 +84,20 @@ namespace MarbleRunSimulatorCore {
     }
 
     export interface IMachineData {
-        n?: string; // v2
+        n?: string; // v2 - deprecated
         name?: string; // v1 - deprecated
-        a?: string; // v2
-        author?: string; // v1 - deprecated
-        v?: number; // v2
+        a?: string; // v2 - deprecated
         sleepers?: ISleeperMeshProps; // v1 - deprecated
         balls?: IBallData[]; // v1 - deprecated
         parts?: IMachinePartData[]; // v1 - deprecated
-        d?: string; // v2
+        d?: string; // v2 - deprecated
         r?: number; // v6 - RoomIndex - deprecated
         sp?: ISleeperMeshProps; // v10 - deprecated
+        
+        v?: number; // v2
+        title?: string; // v12
+        author?: string; // v12
+        content?: string; // v12
     }
 
     export class Machine {
