@@ -268,6 +268,13 @@ namespace MarbleRunSimulatorCore {
                 prop.r = 2;
             }
         }
+        if (baseName === "uturnsharp") {
+            prop.k -= prop.h;
+            if (prop.mirrorX) {
+                prop.r = 2;
+                prop.i += 2 + Math.floor((prop.h + 1) / 5);
+            }
+        }
     }
 
     export function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature: boolean = false): void {

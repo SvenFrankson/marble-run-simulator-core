@@ -6255,6 +6255,13 @@ var MarbleRunSimulatorCore;
                 prop.r = 2;
             }
         }
+        if (baseName === "uturnsharp") {
+            prop.k -= prop.h;
+            if (prop.mirrorX) {
+                prop.r = 2;
+                prop.i += 2 + Math.floor((prop.h + 1) / 5);
+            }
+        }
     }
     MarbleRunSimulatorCore.DeserializeAnte11Fix = DeserializeAnte11Fix;
     function DeserializeV11(machine, data, makeMiniature = false) {
@@ -9949,7 +9956,6 @@ var MarbleRunSimulatorCore;
                     let ball = this.machine.balls[i];
                     let delta = ball.position.subtract(this.absolutePosition);
                     if (Math.abs(BABYLON.Vector3.Dot(delta, this.forward)) < 0.002) {
-                        let relativePos = ball.position.subtract(this.absolutePosition);
                         if (Math.abs(BABYLON.Vector3.Dot(delta, this.right) + 0.022) < 0.003) {
                             if (Math.abs(BABYLON.Vector3.Dot(delta, this.up) - 0.007) < 0.003) {
                                 this._moving = true;
@@ -12275,14 +12281,10 @@ var MarbleRunSimulatorCore;
         }
         static GenerateTemplate(h) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.getWidthForHeight = (argH) => {
-                return 1 + Math.floor((argH + 1) / 5);
-            };
             if (isNaN(h)) {
                 h = 1;
             }
             template.partName = "uturnsharp_" + h.toFixed(0);
-            template.l = template.getWidthForHeight(h);
             template.h = h;
             template.hExtendableOnY = true;
             template.xMirrorable = true;

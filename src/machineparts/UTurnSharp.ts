@@ -23,15 +23,11 @@ namespace MarbleRunSimulatorCore {
 
         public static GenerateTemplate(h: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
-            template.getWidthForHeight = (argH) => {
-                return 1 + Math.floor((argH + 1) / 5)
-            }
 
             if (isNaN(h)) {
                 h = 1;
             }
             template.partName = "uturnsharp_" + h.toFixed(0);
-            template.l = template.getWidthForHeight(h);
             template.h = h;
 
 

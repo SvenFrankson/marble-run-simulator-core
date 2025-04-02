@@ -433,7 +433,6 @@ namespace MarbleRunSimulatorCore {
                     let ball = this.machine.balls[i];
                     let delta = ball.position.subtract(this.absolutePosition);
                     if (Math.abs(BABYLON.Vector3.Dot(delta, this.forward)) < 0.002) {
-                        let relativePos = ball.position.subtract(this.absolutePosition);
                         if (Math.abs(BABYLON.Vector3.Dot(delta, this.right) + 0.022) < 0.003) {
                             if (Math.abs(BABYLON.Vector3.Dot(delta, this.up) - 0.007) < 0.003) {
                                 this._moving = true;
