@@ -29,9 +29,7 @@ namespace MarbleRunSimulatorCore {
 
             this.container = new BABYLON.Mesh("screen-container");
             this.container.parent = this;
-            if (this.mirrorX) {
-                this.container.rotation.y = Math.PI;
-            }
+    
             this.pixels = [
                 new BABYLON.Mesh("pixel-0"),
                 new BABYLON.Mesh("pixel-1"),
@@ -284,15 +282,12 @@ namespace MarbleRunSimulatorCore {
             this.cable.material = this.game.materials.plasticBlack;
         }
 
-        public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
             template.partName = "screen";
             template.h = 1;
             template.l = 1;
-
-            template.mirrorX = mirrorX;
-            template.xMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -362,10 +357,6 @@ namespace MarbleRunSimulatorCore {
 
             template.trackTemplates[1].trackpoints.push(new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(- tileWidth * 0.5, yOut, 0), Tools.V3Dir(- 90), Tools.V3Dir(0)));
 
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
-
             template.initialize();
 
             let shape = new MiniatureShape();
@@ -418,17 +409,13 @@ namespace MarbleRunSimulatorCore {
 
             let cY = (yIn + yOut + dY) * 0.5;
             let center = new BABYLON.Vector3(- tileWidth * 0.5 + dY, cY, 0);
-            center.addInPlace(this.absolutePosition);
+            BABYLON.Vector3.TransformCoordinatesToRef(center, this.getWorldMatrix(), center);
 
             let delta = ball.position.subtract(this.absolutePosition);
-            if (Math.abs(delta.z) < 0.03) {
-                if (Math.abs(delta.y) < 0.03) {
-                    if (this.mirrorX) {
-                        return delta.x > 0 && delta.x < 0.05;
-                    }
-                    else {
-                        return delta.x < 0 && delta.x > - 0.05;
-                    }
+            if (Math.abs(BABYLON.Vector3.Dot(delta, this.forward)) < 0.03) {
+                if (Math.abs(BABYLON.Vector3.Dot(delta, this.up)) < 0.03) {
+                    let deltaX = BABYLON.Vector3.Dot(delta, this.right);
+                    return deltaX < 0 && deltaX > - 0.05;
                 }
             }
         }
@@ -444,11 +431,11 @@ namespace MarbleRunSimulatorCore {
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
-                    if (Math.abs(ball.position.z - this.absolutePosition.z) < 0.002) {
-                        let sx = this.mirrorX ? - 1 : 1;
+                    let delta = ball.position.subtract(this.absolutePosition);
+                    if (Math.abs(BABYLON.Vector3.Dot(delta, this.forward)) < 0.002) {
                         let relativePos = ball.position.subtract(this.absolutePosition);
-                        if (Math.abs(relativePos.x + sx * 0.022) < 0.003) {
-                            if (Math.abs(relativePos.y - 0.007) < 0.003) {
+                        if (Math.abs(BABYLON.Vector3.Dot(delta, this.right) + 0.022) < 0.003) {
+                            if (Math.abs(BABYLON.Vector3.Dot(delta, this.up) - 0.007) < 0.003) {
                                 this._moving = true;
                                 ball.marbleChocSound.setVolume(1);
                                 ball.marbleChocSound.play();
