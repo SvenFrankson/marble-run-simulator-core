@@ -209,7 +209,18 @@ namespace MarbleRunSimulatorCore {
         }
         if (baseName === "spiral") {
             console.log(prop);
+            prop.i--;
             prop.l = 3 * prop.l;
+            if (prop.mirrorX) {
+                if (prop.mirrorZ) {
+                    prop.i += prop.l - 1;
+                    prop.j -= prop.l;
+                    prop.r = 2;
+                }
+                else {
+                    prop.l = - prop.l;
+                }
+            }
         }
     }
 
