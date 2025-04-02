@@ -35,7 +35,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
-            return "speeder";
+            return "speeder_" + prop.l.toFixed(0);
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {
@@ -52,26 +52,19 @@ namespace MarbleRunSimulatorCore {
             speederDatas[2].applyToMesh(this.base);
         }
 
-        public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(l: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "speeder";
-            template.l = 1;
+            template.partName = "speeder_" + l;
+            template.lExtendableOnX = true;
+            template.l = l;
             template.h = 0;
-
-            template.mirrorX = mirrorX;
-
-            template.xMirrorable = true;
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileSize * 0.5, 0, 0), Tools.V3Dir(90)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * 0.5, 0, 0), Tools.V3Dir(90))
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * (template.l - 0.5), 0, 0), Tools.V3Dir(90))
             ];
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
 
             template.initialize();
 
