@@ -221,6 +221,52 @@ namespace MarbleRunSimulatorCore {
                     prop.l = - prop.l;
                 }
             }
+            else {
+                if (prop.mirrorZ) {
+                    prop.r = 2;
+                    prop.i += prop.l - 1;
+                    prop.j -= prop.l;
+                    prop.l = - prop.l;
+                }
+            }
+        }
+        if (baseName === "spiralUTurn") {
+            prop.l = 3 * (prop.d - 1);
+            if (prop.mirrorX) {
+                if (prop.mirrorZ) {
+                    prop.r = 2;
+                    prop.i += prop.l - 2;
+                    prop.j -= prop.l;
+                    prop.l = - prop.l;
+                }
+                else {
+                    prop.r = 2;
+                    prop.i += prop.l - 2;
+                }
+            }
+            else {
+                prop.i--;
+                if (prop.mirrorZ) {
+                    prop.j -= prop.l;
+                }
+                else {
+                    prop.l = - prop.l;
+                }
+            }
+        }
+        if (baseName === "speeder") {
+            prop.l = 3;
+            prop.i--;
+        }
+        if (baseName === "join") {
+            if (prop.mirrorX) {
+                prop.r = 2;
+            }
+        }
+        if (baseName === "screen") {
+            if (prop.mirrorX) {
+                prop.r = 2;
+            }
         }
     }
 

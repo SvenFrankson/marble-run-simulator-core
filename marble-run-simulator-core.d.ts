@@ -1125,7 +1125,7 @@ declare namespace MarbleRunSimulatorCore {
         tingle2(pixel2Value: boolean, duration: number): Promise<void>;
         rotatePixels(origin: number, target: number, duration: number, easing?: (v: number) => number): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+        static GenerateTemplate(): MachinePartTemplate;
         reset: () => void;
         isInside(ball: Ball): boolean;
         private _moving;
@@ -1262,7 +1262,7 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number): MachinePartTemplate;
         private _rotationSpeed;
         update(dt: number): void;
     }

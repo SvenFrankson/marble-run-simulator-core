@@ -389,6 +389,11 @@ namespace MarbleRunSimulatorCore {
                 return new Screen(this.machine, prop);
             }
             if (partName === "speeder") {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    prop.l = l;
+                }
                 return new Speeder(this.machine, prop);
             }
             if (partName === "trikeSkull") {

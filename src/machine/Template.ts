@@ -539,10 +539,17 @@ namespace MarbleRunSimulatorCore {
                     data = GravityWell.GenerateTemplate(mirrorX);
                 }
                 else if (partName === "screen") {
-                    data = Screen.GenerateTemplate(mirrorX);
+                    data = Screen.GenerateTemplate();
                 }
-                else if (partName === "speeder") {
-                    data = Speeder.GenerateTemplate(mirrorX);
+                else if (partName === "speeder" || partName.startsWith("speeder_")) {
+                    let l = 3;
+                    if (partName.indexOf("_") != - 1) {
+                        let lValue = parseInt(partName.split("_")[1].split(".")[0]);
+                        if (!isFinite(lValue)) {
+                            l = lValue;
+                        }
+                    }
+                    data = Speeder.GenerateTemplate(l);
                 }
                 else if (partName === "trikeSkull") {
                     data = TrikeSkull.GenerateTemplate();
