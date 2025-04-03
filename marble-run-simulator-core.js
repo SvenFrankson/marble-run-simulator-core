@@ -7709,13 +7709,23 @@ var MarbleRunSimulatorCore;
     }
     MarbleRunSimulatorCore.SerializeV910 = SerializeV910;
     function DeserializeV910(machine, data) {
+        console.log(data);
         let dataString = data.d;
+        if (!dataString) {
+            dataString = data.content;
+        }
         if (dataString) {
             if (data.n) {
                 machine.name = data.n;
             }
+            if (data.title) {
+                machine.name = data.title;
+            }
             if (data.a) {
                 machine.author = data.a;
+            }
+            if (data.author) {
+                machine.author = data.author;
             }
             if (data.v === 10) {
                 if (data.sp) {
