@@ -3,9 +3,13 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "jumper_" + prop.n.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Jumper.PropToPartName(prop)));
             this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = "jumper_" + prop.n.toFixed(0);
+            return partName;
         }
 
         public static GenerateTemplate(n: number, mirrorX?: boolean): MachinePartTemplate {

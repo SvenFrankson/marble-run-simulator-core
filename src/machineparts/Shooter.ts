@@ -225,6 +225,7 @@ namespace MarbleRunSimulatorCore {
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.4 + cupR - 0.015, 0.035 + tileHeight * h + 0, 0), new BABYLON.Vector3(-1, 1, 0).normalize(), new BABYLON.Vector3(-1, -1, 0).normalize()),
                 ];
                 template.trackTemplates[0].drawEndTip = true;
+                template.trackTemplates[0].forcedAngle = 0;
 
                 template.trackTemplates[1] = new TrackTemplate(template);
                 template.trackTemplates[1].colorIndex = 1;
@@ -248,8 +249,7 @@ namespace MarbleRunSimulatorCore {
                 template.trackTemplates[0].drawEndTip = true;
             }
 
-            template.maxAngle = 0;
-            template.trackTemplates[0].preferedStartBank = 0;
+            template.maxAngle = Math.PI / 16;
             template.initialize();
 
             template.miniatureShapes.push(MiniatureShape.MakeNGon(

@@ -20,8 +20,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "screw_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName));
+            this.setTemplate(this.machine.templateManager.getTemplate(Screw.PropToPartName(prop)));
 
             let x = 1;
 
@@ -119,6 +118,11 @@ namespace MarbleRunSimulatorCore {
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = "screw_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            return partName;
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {

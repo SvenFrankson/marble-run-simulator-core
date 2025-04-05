@@ -894,6 +894,15 @@ namespace MarbleRunSimulatorCore {
             return SerializeV12(this);
         }
 
+        public static MakeMiniature(machine: Machine, data: IMachineData): HTMLCanvasElement {
+            if (data && (data.v === 9 || data.v === 10)) {
+                let canvas = document.createElement("canvas");
+                DeserializeV910(machine, data, true, canvas);
+                return canvas;
+            }
+            return undefined;
+        }
+
         public lastDeserializedData: IMachineData;
         public deserialize(data: IMachineData, makeMiniature?: boolean): void {
             this.lastDeserializedData = data;

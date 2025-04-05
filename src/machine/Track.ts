@@ -8,6 +8,9 @@ namespace MarbleRunSimulatorCore {
         public trackInterpolatedNormals: BABYLON.Vector3[];
 
         public get preferedStartBank(): number {
+            if (this.template && isFinite(this.template.forcedAngle)) {
+                return this.template.forcedAngle;
+            }
             return this.template ? this.template.preferedStartBank : 0;
         }
         private _startWorldPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
@@ -17,6 +20,9 @@ namespace MarbleRunSimulatorCore {
         }
 
         public get preferedEndBank(): number {
+            if (this.template && isFinite(this.template.forcedAngle)) {
+                return this.template.forcedAngle;
+            }
             return this.template ? this.template.preferedEndBank : 0;
         }
         private _endWorldPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
@@ -118,6 +124,11 @@ namespace MarbleRunSimulatorCore {
                         } else {
                             startBank = this.preferedStartBank * 0.5 + otherBank * 0.5;
                         }
+
+                        let maxBank = Math.min(this.template.partTemplate.maxAngle, otherS.part.template.maxAngle);
+                        if (Math.abs(startBank) > maxBank) {
+                            startBank = Math.sign(startBank) * maxBank;
+                        }
                     }
                 }
             }
@@ -138,6 +149,11 @@ namespace MarbleRunSimulatorCore {
                         } else {
                             endBank = this.preferedEndBank * 0.5 + otherBank * 0.5;
                         }
+
+                        let maxBank = Math.min(this.template.partTemplate.maxAngle, otherE.part.template.maxAngle);
+                        if (Math.abs(endBank) > maxBank) {
+                            endBank = Math.sign(endBank) * maxBank;
+                        }
                     }
                 }
             }
@@ -153,7 +169,7 @@ namespace MarbleRunSimulatorCore {
                 distancesFromStart[i] = distancesFromStart[i - 1] + d;
             }
             let totalLength = distancesFromStart[distancesFromStart.length - 1];
-            let smoothLength = Math.min(totalLength * 0.5, 0.15);
+            let smoothLength = Math.min(totalLength * 0.5, 0.1);
 
             for (let i = 1; i < N - 1; i++) {
                 let a = angles[i];

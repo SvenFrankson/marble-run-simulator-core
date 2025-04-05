@@ -386,6 +386,7 @@ declare namespace MarbleRunSimulatorCore {
         };
         static MachineDataCompare(d1: IMachineData, d2: IMachineData): boolean;
         serialize(): IMachineData;
+        static MakeMiniature(machine: Machine, data: IMachineData): HTMLCanvasElement;
         lastDeserializedData: IMachineData;
         deserialize(data: IMachineData, makeMiniature?: boolean): void;
         getEncloseStart(): BABYLON.Vector3;
@@ -868,6 +869,9 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement): void;
+}
+declare namespace MarbleRunSimulatorCore {
     function SerializeV1(machine: Machine): IMachineData;
     function DeserializeV1(machine: Machine, data: IMachineData): void;
 }
@@ -894,7 +898,7 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV910(machine: Machine, version: number): IMachineData;
-    function DeserializeV910(machine: Machine, data: IMachineData): void;
+    function DeserializeV910(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
 }
 declare namespace MarbleRunSimulatorCore {
     class MachineDecorSelector extends BABYLON.Mesh {
@@ -1034,6 +1038,7 @@ declare namespace MarbleRunSimulatorCore {
         clicSound: BABYLON.Sound;
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
         dispose(): void;
@@ -1064,6 +1069,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Jumper extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(n: number, mirrorX?: boolean): MachinePartTemplate;
     }
 }
@@ -1151,6 +1157,7 @@ declare namespace MarbleRunSimulatorCore {
         shieldConnectorUp: BABYLON.Mesh;
         wheel: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(l: number, h: number): MachinePartTemplate;
         dispose(): void;
@@ -1399,6 +1406,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Wall extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number): MachinePartTemplate;
     }
 }
