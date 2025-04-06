@@ -168,7 +168,7 @@ namespace MarbleRunSimulatorCore {
             this.pivot.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
         }
 
-        public static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean) {
+        public static GenerateTemplate(mirrorZ: boolean) {
             let template = new MachinePartTemplate();
 
             template.partName = "forwardSplit";
@@ -176,10 +176,8 @@ namespace MarbleRunSimulatorCore {
             template.l = 1;
             template.h = 1;
             template.d = 3;
-            template.mirrorX = mirrorX;
             template.mirrorZ = mirrorZ;
 
-            template.xMirrorable = true;
             template.zMirrorable = true;
 
             template.maxAngle = Math.PI / 16;
@@ -270,10 +268,6 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[3].drawEndTip = true;
             template.trackTemplates[3].cutOutSleeper = (n) => {
                 return n > 12;
-            }
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
             }
 
             template.initialize();

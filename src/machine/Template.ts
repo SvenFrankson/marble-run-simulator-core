@@ -482,7 +482,7 @@ namespace MarbleRunSimulatorCore {
                     data = Split.GenerateTemplate(mirrorZ);
                 }
                 else if (partName === "forwardSplit") {
-                    data = ForwardSplit.GenerateTemplate(mirrorX, mirrorZ);
+                    data = ForwardSplit.GenerateTemplate(mirrorZ);
                 }
                 else if (partName === "sort") {
                     data = Sort.GenerateTemplate(mirrorX, mirrorZ);
@@ -533,7 +533,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName.startsWith("jumper_")) {
                     let n = parseInt(partName.split("_")[1].split(".")[0]);
-                    data = Jumper.GenerateTemplate(n, mirrorX);
+                    data = Jumper.GenerateTemplate(n);
                 }
                 else if (partName === "gravitywell") {
                     data = GravityWell.GenerateTemplate(mirrorX);

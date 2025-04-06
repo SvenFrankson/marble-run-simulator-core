@@ -1040,7 +1040,7 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(mirrorX: boolean, mirrorZ: boolean): MachinePartTemplate;
+        static GenerateTemplate(mirrorZ: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         private _exitLeft;
@@ -1070,7 +1070,7 @@ declare namespace MarbleRunSimulatorCore {
     class Jumper extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(n: number, mirrorX?: boolean): MachinePartTemplate;
+        static GenerateTemplate(n: number): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

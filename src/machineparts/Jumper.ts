@@ -12,7 +12,7 @@ namespace MarbleRunSimulatorCore {
             return partName;
         }
 
-        public static GenerateTemplate(n: number, mirrorX?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(n: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
             template.partName = "jumper_" + n.toFixed(0);
@@ -20,10 +20,7 @@ namespace MarbleRunSimulatorCore {
             template.h = 2;
             template.n = n;
 
-            template.mirrorX = mirrorX;
-
             template.nExtendable = true;
-            template.xMirrorable = true;
 
             if (n < 9) {
                 let d = 2.5 * tileHeight;
@@ -47,10 +44,6 @@ namespace MarbleRunSimulatorCore {
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, tileHeight * 0.5 - 0.01, 0), Tools.V3Dir(0)),
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, tileHeight * 0.5, 0), Tools.V3Dir(0), Tools.V3Dir(-90))
                 ];
-            }
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
             }
 
             template.initialize();

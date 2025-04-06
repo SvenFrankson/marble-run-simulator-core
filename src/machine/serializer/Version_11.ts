@@ -211,7 +211,6 @@ namespace MarbleRunSimulatorCore {
             }
         }
         if (baseName === "spiral") {
-            console.log(prop);
             prop.i--;
             prop.l = 3 * prop.l;
             if (prop.mirrorX) {
@@ -234,6 +233,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
         if (baseName === "spiralUTurn") {
+            console.log(prop);
             prop.l = 3 * (prop.d - 1);
             if (prop.mirrorX) {
                 if (prop.mirrorZ) {
@@ -244,7 +244,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else {
                     prop.r = 2;
-                    prop.i += prop.l - 2;
+                    prop.i += prop.l + 1;
                 }
             }
             else {
@@ -269,6 +269,18 @@ namespace MarbleRunSimulatorCore {
         if (baseName === "screen") {
             if (prop.mirrorX) {
                 prop.r = 2;
+            }
+        }
+        if (baseName === "jumper") {
+            if (prop.mirrorX) {
+                prop.i += 3;
+                prop.r = 2;
+            }
+        }
+        if (baseName === "forwardSplit") {
+            if (prop.mirrorX) {
+                prop.r = 2;
+                prop.j -= 6;
             }
         }
         if (baseName === "uturnsharp") {
