@@ -233,7 +233,6 @@ namespace MarbleRunSimulatorCore {
             }
         }
         if (baseName === "spiralUTurn") {
-            console.log(prop);
             prop.l = 3 * (prop.d - 1);
             if (prop.mirrorX) {
                 if (prop.mirrorZ) {
@@ -271,6 +270,11 @@ namespace MarbleRunSimulatorCore {
                 prop.r = 2;
             }
         }
+        if (baseName === "start") {
+            if (prop.mirrorX) {
+                prop.r = 2;
+            }
+        }
         if (baseName === "jumper") {
             if (prop.mirrorX) {
                 prop.i += 3;
@@ -288,6 +292,15 @@ namespace MarbleRunSimulatorCore {
             if (prop.mirrorX) {
                 prop.r = 2;
                 prop.i += 2 + Math.floor((prop.h + 1) / 5);
+            }
+        }
+        if (baseName === "wave") {
+            console.log(prop);
+            prop.d -= 1;
+            prop.l = prop.l * 3;
+            if (prop.mirrorX) {
+                prop.i += prop.l - 2;
+                prop.r = 2;
             }
         }
     }

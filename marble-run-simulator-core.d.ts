@@ -1414,7 +1414,7 @@ declare namespace MarbleRunSimulatorCore {
     class Wave extends MachinePartWithOriginDestination {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(w?: number, h?: number, d?: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number, d: number): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Wave;
     }
 }

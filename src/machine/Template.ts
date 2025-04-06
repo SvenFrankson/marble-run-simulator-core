@@ -445,7 +445,7 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     let d = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = Wave.GenerateTemplate(w, h, isFinite(d) ? d : 1, mirrorX, mirrorZ);
+                    data = Wave.GenerateTemplate(w, h, isFinite(d) ? d : 0);
                 }
                 else if (partName.startsWith("snake_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
