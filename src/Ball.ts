@@ -122,7 +122,7 @@ namespace MarbleRunSimulatorCore {
             return -Math.round(this.positionZero.z / tileDepth);
         }
         public set k(v: number) {
-            this.positionZero.z = -Math.round(v) * tileDepth;
+            this.positionZero.z = - Math.round(v) * tileDepth;
             this.positionZeroGhost.position.copyFrom(this.positionZero);
         }
 

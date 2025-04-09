@@ -4266,7 +4266,7 @@ var MarbleRunSimulatorCore;
             if (partName === "screen") {
                 return new MarbleRunSimulatorCore.Screen(this.machine, prop);
             }
-            if (partName === "speeder") {
+            if (partName === "speeder" || partName.startsWith("speeder_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
                     let l = parseInt(argStr.split(".")[0]);
@@ -5535,7 +5535,7 @@ var MarbleRunSimulatorCore;
                     let l = 3;
                     if (partName.indexOf("_") != -1) {
                         let lValue = parseInt(partName.split("_")[1].split(".")[0]);
-                        if (!isFinite(lValue)) {
+                        if (isFinite(lValue)) {
                             l = lValue;
                         }
                     }
@@ -6423,6 +6423,9 @@ var MarbleRunSimulatorCore;
                 if (prop.d === 5) {
                     prop.i += 10;
                 }
+                if (prop.d === 6) {
+                    prop.i += 13;
+                }
                 if (prop.mirrorZ) {
                     prop.k -= prop.h;
                 }
@@ -6585,7 +6588,14 @@ var MarbleRunSimulatorCore;
             prop.k -= prop.h;
             if (prop.mirrorX) {
                 prop.r = 2;
-                prop.i += 2 + Math.floor((prop.h + 1) / 5);
+                if (prop.h === 1) {
+                }
+                else if (prop.h === 9) {
+                    prop.i += 6;
+                }
+                else {
+                    prop.i += 2 + Math.floor((prop.h + 1) / 5);
+                }
             }
         }
         if (baseName === "wave") {

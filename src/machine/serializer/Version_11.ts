@@ -123,6 +123,9 @@ namespace MarbleRunSimulatorCore {
                 if (prop.d === 5) {
                     prop.i += 10;
                 }
+                if (prop.d === 6) {
+                    prop.i += 13;
+                }
 
                 if (prop.mirrorZ) {
                     prop.k -= prop.h;
@@ -291,7 +294,15 @@ namespace MarbleRunSimulatorCore {
             prop.k -= prop.h;
             if (prop.mirrorX) {
                 prop.r = 2;
-                prop.i += 2 + Math.floor((prop.h + 1) / 5);
+                if (prop.h === 1) {
+
+                }
+                else if (prop.h === 9) {
+                    prop.i += 6;
+                }
+                else {
+                    prop.i += 2 + Math.floor((prop.h + 1) / 5);
+                }
             }
         }
         if (baseName === "wave") {

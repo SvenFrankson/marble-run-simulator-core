@@ -545,7 +545,7 @@ namespace MarbleRunSimulatorCore {
                     let l = 3;
                     if (partName.indexOf("_") != - 1) {
                         let lValue = parseInt(partName.split("_")[1].split(".")[0]);
-                        if (!isFinite(lValue)) {
+                        if (isFinite(lValue)) {
                             l = lValue;
                         }
                     }
