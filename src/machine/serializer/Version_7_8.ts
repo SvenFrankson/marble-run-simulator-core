@@ -227,7 +227,12 @@ namespace MarbleRunSimulatorCore {
             let minK = Infinity;
             for (let i = 0; i < machine.parts.length; i++) {
                 let part = machine.parts[i];
-                minK = Math.min(minK, part.k - 1);
+                if (part.downwardYExtendable) {
+                    minK = Math.min(minK, part.k - part.h);
+                }
+                else {
+                    minK = Math.min(minK, part.k);
+                }
             }
 
             if (isFinite(minK) && minK != 0) {

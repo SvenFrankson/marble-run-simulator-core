@@ -1,7 +1,7 @@
 /// <reference path="../machine/MachinePart.ts"/>
 
 namespace MarbleRunSimulatorCore {
-    export class Loop extends MachinePart {
+    export class LargeLoop extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
@@ -10,19 +10,19 @@ namespace MarbleRunSimulatorCore {
             }
             prop.n = Math.min(prop.n, 2 * Math.abs(prop.d));
 
-            this.setTemplate(this.machine.templateManager.getTemplate(Loop.PropToPartName(prop)));
+            this.setTemplate(this.machine.templateManager.getTemplate(LargeLoop.PropToPartName(prop)));
             this.generateWires();
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
-            let partName = "loop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
+            let partName = "largeLoop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
             return partName;
         }
 
         public static GenerateTemplate(l: number, d: number, n: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "loop_" + l.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
+            template.partName = "largeLoop_" + l.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
 
             template.l = l;
             template.d = d;
@@ -44,33 +44,30 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, 0), Tools.V3Dir(90))];
 
             let loopsCount = n;
-            let xStart = - tileSize * 0.5;
-            let xEnd = - tileSize * 0.5 + tileSize * template.l;
-            let r = tileWidth * 0.7;
+            let xCenter = - tileSize * 0.5 + tileSize * template.l * 0.5;
+            let r = tileSize * template.l * 0.5 * 0.7;
             let depthStart = 0;
             let depthEnd = tileSize * template.d;
 
             for (let nLoop = 0; nLoop < loopsCount; nLoop++) {
                 for (let n = 0; n <= 8; n++) {
-                    if (n < 8 || xStart != xEnd || nLoop === loopsCount - 1) {
+                    if (n < 8 || nLoop === loopsCount - 1) {
                         let f = (n + 8 * nLoop) / (8 * loopsCount);
                         let a = (2 * Math.PI * n) / 8;
                         let cosa = Math.cos(a);
                         let sina = Math.sin(a);
+        
                         let fx = 0.5;
                         if (loopsCount > 1) {
                             fx = nLoop / (loopsCount - 1);
                         }
-
-                        let x = (1 - fx) * xStart + fx * xEnd;
-
-                        template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + x, r * 1 - cosa * r, f * (depthEnd - depthStart) + depthStart)));
+                        template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + xCenter, r * 1 - cosa * r, f * (depthEnd - depthStart) + depthStart)));
                     }
                 }
             }
 
             template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * template.l - tileSize * 0.5, 0, depthEnd), Tools.V3Dir(90)));
-            
+
             let points = template.trackTemplates[0].trackpoints.map((tp) => {
                 return tp.position.clone();
             });

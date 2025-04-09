@@ -295,10 +295,19 @@ namespace MarbleRunSimulatorCore {
             if (prop.mirrorX) {
                 prop.r = 2;
                 if (prop.h === 1) {
-
+                    prop.i -= 2;
+                }
+                if (prop.h === 2) {
+                    
+                }
+                if (prop.h === 3) {
+                    
                 }
                 else if (prop.h === 9) {
                     prop.i += 6;
+                }
+                else if (prop.h === 11) {
+                    prop.i += 7;
                 }
                 else {
                     prop.i += 2 + Math.floor((prop.h + 1) / 5);
