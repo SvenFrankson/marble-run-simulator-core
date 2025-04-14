@@ -314,21 +314,31 @@ namespace MarbleRunSimulatorCore {
             }
         }
         if (baseName === "ramp" || baseName === "wave") {
-            console.log(prop);
+            console.log(JSON.parse(JSON.stringify(prop)));
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             
             if (prop.mirrorX) {
                 prop.i -= 1;
                 prop.k -= prop.h;
+
+                if (prop.mirrorZ) {
+                    prop.d = - prop.d;
+                }
+                else {
+                    prop.j -= prop.d;
+                }
             }
             else {
                 prop.i -= 1;
                 prop.h = - prop.h;
-            }
 
-            if (prop.mirrorZ) {
-                prop.j -= prop.d;
+                if (prop.mirrorZ) {
+                    prop.j -= prop.d;
+                }
+                else {
+                    prop.d = - prop.d;
+                }
             }
         }
     }

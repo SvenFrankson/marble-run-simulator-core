@@ -179,6 +179,7 @@ namespace MarbleRunSimulatorCore {
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileSize * template.l - 0.5 * tileWidth, tileHeight * template.h, -tileDepth * (template.d - 1)), Tools.V3Dir(90)),
             ];
 
+            template.maxAngle = Math.PI / 16;
             template.initialize();
 
             return template;
