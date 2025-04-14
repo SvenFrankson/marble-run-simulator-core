@@ -112,7 +112,7 @@ namespace MarbleRunSimulatorCore {
                     prop.h = h;
                     prop.d = d;
                 }
-                return new RampV2(this.machine, prop);
+                return new Ramp(this.machine, prop);
             }
             if (partName === "piperamp" || partName.startsWith("piperamp_")) {
                 let argStr = partName.split("_")[1];
@@ -410,7 +410,7 @@ namespace MarbleRunSimulatorCore {
                 return new Ramp(this.machine, prop);
             }
             if (baseName === "rampv2") {
-                return new RampV2(this.machine, prop);
+                return new Ramp(this.machine, prop);
             }
             if (baseName === "piperamp") {
                 prop.pipeVersion = true;

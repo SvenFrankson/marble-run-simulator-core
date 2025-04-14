@@ -427,19 +427,19 @@ namespace MarbleRunSimulatorCore {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     let d = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = RampV2.GenerateTemplate(l, h, d, false, false);
+                    data = Ramp.GenerateTemplate(l, h, d, 2, false, false);
                 }
                 else if (partName.startsWith("piperamp_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     let d = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, mirrorX, mirrorZ, true);
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, true);
                 }
                 else if (partName.startsWith("woodramp_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     let d = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, mirrorX, mirrorZ, false, true);
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, false, true);
                 }
                 else if (partName.startsWith("wave_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
@@ -585,7 +585,7 @@ namespace MarbleRunSimulatorCore {
                 partName = Ramp.PropToPartName(prop);
             }
             else if (baseName === "rampv2") {
-                partName = RampV2.PropToPartName(prop);
+                partName = Ramp.PropToPartName(prop);
             }
             else if (baseName === "piperamp") {
                 partName = Ramp.PropToPartName(prop);

@@ -5,9 +5,13 @@ namespace MarbleRunSimulatorCore {
 
             prop.l = Math.max(prop.l, 2);
 
-            let partName = "snake_" + prop.l.toFixed(0) + "." + prop.s.toFixed(0);
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
+            this.setTemplate(this.machine.templateManager.getTemplate(Snake.PropToPartName(prop)));
             this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = "snake_" + prop.l.toFixed(0) + "." + prop.s.toFixed(0);
+            return partName;
         }
 
         public static GenerateTemplate(w: number, s: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {

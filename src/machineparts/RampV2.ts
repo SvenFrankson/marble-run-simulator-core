@@ -1,3 +1,4 @@
+/*
 namespace MarbleRunSimulatorCore {
     
     export class RampV2 extends MachinePart {
@@ -50,3 +51,4 @@ namespace MarbleRunSimulatorCore {
         }
     }
 }
+*/

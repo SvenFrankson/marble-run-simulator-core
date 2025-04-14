@@ -131,7 +131,7 @@ namespace MarbleRunSimulatorCore {
         public railBumpSound: BABYLON.Sound;
         public marbleLoopSound: BABYLON.Sound;
         public marbleBowlLoopSound: BABYLON.Sound;
-        public marbleBowlInsideSound: BABYLON.Sound;
+        public marbleInsideSound: BABYLON.Sound;
 
         public flybackOrigin: BABYLON.Vector3;
         public flybackDestination: BABYLON.Vector3;
@@ -146,12 +146,10 @@ namespace MarbleRunSimulatorCore {
             this.constructorIndex = Ball.ConstructorIndex++;
             this.marbleChocSound = new BABYLON.Sound("marble-choc-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-choc.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./lib/marble-run-simulator-core/datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
-            this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop-2.wav", this.getScene(), undefined, { loop: true, autoplay: true });
-            this.marbleLoopSound.setVolume(0);
-            this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: true });
-            this.marbleBowlLoopSound.setVolume(0);
-            this.marbleBowlInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
-            this.marbleBowlInsideSound.setVolume(0.2);
+            this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop-2.wav", this.getScene(), undefined, { loop: true, autoplay: false, volume: 0 });
+            this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: false, volume: 0 });
+            this.marbleInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
+            this.marbleInsideSound.setVolume(0.2);
 
             this.animatePosition = Mummu.AnimationFactory.CreateVector3(this, this, "position");
         }
@@ -359,8 +357,8 @@ namespace MarbleRunSimulatorCore {
             let sign = Math.sign(this.velocity.y);
             if (this.machine.hasExitHole && this.collisionState === CollisionState.Normal && this.position.y < this.machine.baseMeshMinY - 0.15) {
                 this.collisionState = CollisionState.Inside;
-                this.marbleBowlInsideSound.setPlaybackRate(this.game.currentTimeFactor);
-                this.marbleBowlInsideSound.play();
+                this.marbleInsideSound.setPlaybackRate(this.game.currentTimeFactor);
+                this.marbleInsideSound.play();
                 let tmpDestination = this.machine.exitHoleOut.absolutePosition.clone();
                 tmpDestination.z += 0.05;
                 this.animatePosition(tmpDestination, 2.7 / this.game.currentTimeFactor - 0.1).then(() => {
@@ -851,10 +849,16 @@ namespace MarbleRunSimulatorCore {
             if (this.surface === Surface.Rail) {
                 this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 5) + 0.8);
                 this.marbleLoopSound.setVolume(12 * this.strReaction * f * this.game.mainVolume, 0.1);
+                if (!this.marbleLoopSound.isPlaying) {
+                    this.marbleLoopSound.play();
+                }
                 this.marbleBowlLoopSound.setVolume(0, 0.5);
             } else if (this.surface === Surface.Bowl) {
                 this.marbleBowlLoopSound.setPlaybackRate(this.game.currentTimeFactor);
                 this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume, 0.1);
+                if (!this.marbleBowlLoopSound.isPlaying) {
+                    this.marbleBowlLoopSound.play();
+                }
                 this.marbleLoopSound.setVolume(0, 0.5);
             }
             let sign2 = Math.sign(this.velocity.y);

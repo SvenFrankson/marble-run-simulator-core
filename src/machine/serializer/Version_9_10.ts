@@ -92,7 +92,6 @@ namespace MarbleRunSimulatorCore {
     }
 
     export function DeserializeV910(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement): void {
-        console.log(data);
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;

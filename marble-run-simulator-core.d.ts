@@ -56,7 +56,7 @@ declare namespace MarbleRunSimulatorCore {
         railBumpSound: BABYLON.Sound;
         marbleLoopSound: BABYLON.Sound;
         marbleBowlLoopSound: BABYLON.Sound;
-        marbleBowlInsideSound: BABYLON.Sound;
+        marbleInsideSound: BABYLON.Sound;
         flybackOrigin: BABYLON.Vector3;
         flybackDestination: BABYLON.Vector3;
         flybackPeak: BABYLON.Vector3;
@@ -1095,23 +1095,10 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    abstract class MachinePartWithOriginDestination extends MachinePart {
-        abstract recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): MachinePartWithOriginDestination;
-        getOrigin(): Nabu.IJK;
-        getDestination(): Nabu.IJK;
-    }
-    class Ramp extends MachinePartWithOriginDestination {
+    class Ramp extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(w: number, h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
-        recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Ramp;
-    }
-}
-declare namespace MarbleRunSimulatorCore {
-    class RampV2 extends MachinePart {
-        constructor(machine: Machine, prop: IMachinePartProp);
-        static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(l: number, h: number, d: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number, d: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1217,6 +1204,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class Snake extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(w: number, s: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Snake;
     }
@@ -1402,12 +1390,9 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class UTurnV2 extends MachinePartWithOriginDestination {
+    class UTurnV2 extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static GenerateTemplate(h: number, d: number, s: number, mirrorX?: boolean, mirrorZ?: boolean, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
-        recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): UTurnV2;
-        getOrigin(): Nabu.IJK;
-        getDestination(): Nabu.IJK;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1418,11 +1403,10 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class Wave extends MachinePartWithOriginDestination {
+    class Wave extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number, d: number): MachinePartTemplate;
-        recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Wave;
     }
 }
 declare namespace MarbleRunSimulatorCore {

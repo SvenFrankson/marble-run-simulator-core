@@ -175,7 +175,6 @@ namespace MarbleRunSimulatorCore {
                 else {
                     prop.i--;
                     prop.j -= prop.d;
-                    console.log(prop.d);
                 }
             }
             else {
@@ -314,13 +313,22 @@ namespace MarbleRunSimulatorCore {
                 }
             }
         }
-        if (baseName === "wave") {
+        if (baseName === "ramp" || baseName === "wave") {
             console.log(prop);
-            prop.d -= 1;
             prop.l = prop.l * 3;
+            prop.d = (prop.d - 1) * 3;
+            
             if (prop.mirrorX) {
-                prop.i += prop.l - 2;
-                prop.r = 2;
+                prop.i -= 1;
+                prop.k -= prop.h;
+            }
+            else {
+                prop.i -= 1;
+                prop.h = - prop.h;
+            }
+
+            if (prop.mirrorZ) {
+                prop.j -= prop.d;
             }
         }
     }
