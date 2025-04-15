@@ -1335,10 +1335,12 @@ var MarbleRunSimulatorCore;
     MarbleRunSimulatorCore.MiniatureTrack = MiniatureTrack;
     class MiniatureShape {
         constructor() {
+            this.center = BABYLON.Vector3.Zero();
             this.points = [];
             this.dist = Infinity;
+            this.fill = true;
         }
-        static MakeNGon(c, r, axis, n) {
+        static MakeNGon(c, r, axis, n, fill) {
             let tmp = BABYLON.Axis.X;
             if (Mummu.Angle(axis, tmp) < Math.PI / 100) {
                 tmp = BABYLON.Axis.Y;
@@ -1352,7 +1354,10 @@ var MarbleRunSimulatorCore;
             }
             shape.points.forEach(pt => {
                 pt.addInPlace(c);
+                shape.center.addInPlace(pt);
             });
+            shape.center.scaleInPlace(1 / shape.points.length);
+            shape.fill = fill;
             return shape;
         }
     }
@@ -5965,6 +5970,66 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
+    function AddLinesFromData(machine, baseName, prop, lines) {
+        let template = machine.templateManager.getTemplateByProp(baseName, prop);
+        if (template) {
+            // Now draw into the miniature from the template.
+            for (let t = 0; t < template.trackTemplates.length; t++) {
+                let trackTemplate = template.trackTemplates[t];
+                let drawnTrack = new MarbleRunSimulatorCore.MiniatureTrack();
+                if (!trackTemplate.noMiniatureRender) {
+                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
+                        if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
+                            let point = trackTemplate.interpolatedPoints[p].clone();
+                            Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
+                            point.x += prop.i * MarbleRunSimulatorCore.tileSize;
+                            point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
+                            point.z += prop.j * MarbleRunSimulatorCore.tileSize;
+                            drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - point.y);
+                            if (Mummu.IsFinite(point)) {
+                                drawnTrack.points.push(point);
+                            }
+                            else {
+                                console.log("miniature fail for " + baseName);
+                                debugger;
+                            }
+                        }
+                    }
+                }
+                if (drawnTrack.points.length > 0) {
+                    lines.push(drawnTrack);
+                }
+            }
+            for (let j = 0; j < template.miniatureShapes.length; j++) {
+                let shape = template.miniatureShapes[j];
+                let drawnShape = new MarbleRunSimulatorCore.MiniatureShape();
+                drawnShape.fill = shape.fill;
+                for (let i = 0; i < shape.points.length; i++) {
+                    let point = shape.points[i].clone();
+                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
+                    point.x += prop.i * MarbleRunSimulatorCore.tileSize;
+                    point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
+                    point.z += prop.j * MarbleRunSimulatorCore.tileSize;
+                    if (Mummu.IsFinite(point)) {
+                        drawnShape.points.push(point);
+                    }
+                }
+                if (drawnShape.points.length > 0) {
+                    let center = shape.center.clone();
+                    Mummu.RotateInPlace(center, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
+                    center.x += prop.i * MarbleRunSimulatorCore.tileSize;
+                    center.y += prop.k * MarbleRunSimulatorCore.tileHeight;
+                    center.z += prop.j * MarbleRunSimulatorCore.tileSize;
+                    drawnShape.dist = center.x + center.z - center.y;
+                    lines.push(drawnShape);
+                }
+            }
+        }
+        else {
+            console.log("can't find template for " + baseName);
+        }
+    }
+    MarbleRunSimulatorCore.AddLinesFromData = AddLinesFromData;
     function DrawMiniature(lines, canvas) {
         let picSize = 512;
         let picMargin = picSize / 20;
@@ -6123,9 +6188,11 @@ var MarbleRunSimulatorCore;
                 context.strokeStyle = c.toHexString();
                 context.lineWidth = lineWidth;
                 context.stroke();
-                c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.7 * f);
-                context.fillStyle = c.toHexString();
-                context.fill();
+                if (line.fill) {
+                    c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.7 * f);
+                    context.fillStyle = c.toHexString();
+                    context.fill();
+                }
             }
         }
     }
@@ -6590,71 +6657,7 @@ var MarbleRunSimulatorCore;
                         c: colors
                     };
                     if (makeMiniature) {
-                        let template = machine.templateManager.getTemplateByProp(baseName, prop);
-                        if (template) {
-                            // Now draw into the miniature from the template.
-                            for (let t = 0; t < template.trackTemplates.length; t++) {
-                                let trackTemplate = template.trackTemplates[t];
-                                let drawnTrack = new MarbleRunSimulatorCore.MiniatureTrack();
-                                /*
-                                for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
-                                    let point = trackTemplate.trackpoints[p].position.clone();
-                                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
-                                    point.x += prop.i * tileSize;
-                                    point.y += prop.k * tileHeight;
-                                    point.z += prop.j * tileSize;
-                                    if (Mummu.IsFinite(point)) {
-                                        drawnTrack.push(point);
-                                    }
-                                    else {
-                                        console.log("miniature fail for " + baseName);
-                                    }
-                                }
-                                */
-                                if (!trackTemplate.noMiniatureRender) {
-                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
-                                        if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
-                                            let point = trackTemplate.interpolatedPoints[p].clone();
-                                            Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                            point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                            point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                            point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                            drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - 0.5 * point.y);
-                                            if (Mummu.IsFinite(point)) {
-                                                drawnTrack.points.push(point);
-                                            }
-                                            else {
-                                                console.log("miniature fail for " + baseName);
-                                            }
-                                        }
-                                    }
-                                }
-                                if (drawnTrack.points.length > 0) {
-                                    lines.push(drawnTrack);
-                                }
-                            }
-                            for (let j = 0; j < template.miniatureShapes.length; j++) {
-                                let shape = template.miniatureShapes[j];
-                                let drawnShape = new MarbleRunSimulatorCore.MiniatureShape();
-                                for (let i = 0; i < shape.points.length; i++) {
-                                    let point = shape.points[i].clone();
-                                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                    point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                    point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                    point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                    drawnShape.dist = Math.min(drawnShape.dist, point.x + point.z - 0.5 * point.y);
-                                    if (Mummu.IsFinite(point)) {
-                                        drawnShape.points.push(point);
-                                    }
-                                }
-                                if (drawnShape.points.length > 0) {
-                                    lines.push(drawnShape);
-                                }
-                            }
-                        }
-                        else {
-                            console.log("can't find template for " + baseName);
-                        }
+                        MarbleRunSimulatorCore.AddLinesFromData(machine, baseName, prop, lines);
                     }
                     else {
                         let track = machine.trackFactory.createTrackBaseName(baseName, prop);
@@ -7519,72 +7522,7 @@ var MarbleRunSimulatorCore;
                 };
                 MarbleRunSimulatorCore.DeserializeAnte11Fix(baseName, prop);
                 if (makeMiniature) {
-                    let template = machine.templateManager.getTemplateByProp(baseName, prop);
-                    if (template) {
-                        // Now draw into the miniature from the template.
-                        for (let t = 0; t < template.trackTemplates.length; t++) {
-                            let trackTemplate = template.trackTemplates[t];
-                            let drawnTrack = new MarbleRunSimulatorCore.MiniatureTrack();
-                            /*
-                            for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
-                                let point = trackTemplate.trackpoints[p].position.clone();
-                                Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
-                                point.x += prop.i * tileSize;
-                                point.y += prop.k * tileHeight;
-                                point.z += prop.j * tileSize;
-                                if (Mummu.IsFinite(point)) {
-                                    drawnTrack.push(point);
-                                }
-                                else {
-                                    console.log("miniature fail for " + baseName);
-                                }
-                            }
-                            */
-                            if (!trackTemplate.noMiniatureRender) {
-                                for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
-                                    if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
-                                        let point = trackTemplate.interpolatedPoints[p].clone();
-                                        Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                        point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                        point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                        point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                        drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - 0.5 * point.y);
-                                        if (Mummu.IsFinite(point)) {
-                                            drawnTrack.points.push(point);
-                                        }
-                                        else {
-                                            console.log("miniature fail for " + baseName);
-                                            debugger;
-                                        }
-                                    }
-                                }
-                            }
-                            if (drawnTrack.points.length > 0) {
-                                lines.push(drawnTrack);
-                            }
-                        }
-                        for (let j = 0; j < template.miniatureShapes.length; j++) {
-                            let shape = template.miniatureShapes[j];
-                            let drawnShape = new MarbleRunSimulatorCore.MiniatureShape();
-                            for (let i = 0; i < shape.points.length; i++) {
-                                let point = shape.points[i].clone();
-                                Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                drawnShape.dist = Math.min(drawnShape.dist, point.x + point.z - 0.5 * point.y);
-                                if (Mummu.IsFinite(point)) {
-                                    drawnShape.points.push(point);
-                                }
-                            }
-                            if (drawnShape.points.length > 0) {
-                                lines.push(drawnShape);
-                            }
-                        }
-                    }
-                    else {
-                        console.log("can't find template for " + baseName);
-                    }
+                    MarbleRunSimulatorCore.AddLinesFromData(machine, baseName, prop, lines);
                 }
                 else if (machine) {
                     let track = machine.trackFactory.createTrackBaseName(baseName, prop);
@@ -7826,72 +7764,7 @@ var MarbleRunSimulatorCore;
                     };
                     MarbleRunSimulatorCore.DeserializeAnte11Fix(baseName, prop);
                     if (makeMiniature) {
-                        let template = machine.templateManager.getTemplateByProp(baseName, prop);
-                        if (template) {
-                            // Now draw into the miniature from the template.
-                            for (let t = 0; t < template.trackTemplates.length; t++) {
-                                let trackTemplate = template.trackTemplates[t];
-                                let drawnTrack = new MarbleRunSimulatorCore.MiniatureTrack();
-                                /*
-                                for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
-                                    let point = trackTemplate.trackpoints[p].position.clone();
-                                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
-                                    point.x += prop.i * tileSize;
-                                    point.y += prop.k * tileHeight;
-                                    point.z += prop.j * tileSize;
-                                    if (Mummu.IsFinite(point)) {
-                                        drawnTrack.push(point);
-                                    }
-                                    else {
-                                        console.log("miniature fail for " + baseName);
-                                    }
-                                }
-                                */
-                                if (!trackTemplate.noMiniatureRender) {
-                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
-                                        if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
-                                            let point = trackTemplate.interpolatedPoints[p].clone();
-                                            Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                            point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                            point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                            point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                            drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - 0.5 * point.y);
-                                            if (Mummu.IsFinite(point)) {
-                                                drawnTrack.points.push(point);
-                                            }
-                                            else {
-                                                console.log("miniature fail for " + baseName);
-                                                debugger;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (drawnTrack.points.length > 0) {
-                                    lines.push(drawnTrack);
-                                }
-                            }
-                            for (let j = 0; j < template.miniatureShapes.length; j++) {
-                                let shape = template.miniatureShapes[j];
-                                let drawnShape = new MarbleRunSimulatorCore.MiniatureShape();
-                                for (let i = 0; i < shape.points.length; i++) {
-                                    let point = shape.points[i].clone();
-                                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, -Math.PI * 0.5 * prop.r);
-                                    point.x += prop.i * MarbleRunSimulatorCore.tileSize;
-                                    point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
-                                    point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                                    drawnShape.dist = Math.min(drawnShape.dist, point.x + point.z - 0.5 * point.y);
-                                    if (Mummu.IsFinite(point)) {
-                                        drawnShape.points.push(point);
-                                    }
-                                }
-                                if (drawnShape.points.length > 0) {
-                                    lines.push(drawnShape);
-                                }
-                            }
-                        }
-                        else {
-                            console.log("can't find template for " + baseName);
-                        }
+                        MarbleRunSimulatorCore.AddLinesFromData(machine, baseName, prop, lines);
                     }
                     else if (machine) {
                         let track = machine.trackFactory.createTrackBaseName(baseName, prop);
@@ -8798,8 +8671,7 @@ var MarbleRunSimulatorCore;
     class End extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            let partName = "end";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(End.PropToPartName(prop)));
             if (isNaN(this.colors[1])) {
                 this.colors[1] = 0;
             }
@@ -8814,6 +8686,9 @@ var MarbleRunSimulatorCore;
             this.panelPicture = new BABYLON.Mesh("panel-picture");
             this.panelPicture.parent = this.panel;
             this.generateWires();
+        }
+        static PropToPartName(prop) {
+            return "end";
         }
         async instantiateMachineSpecific() {
             let panelData = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/panel.babylon");
@@ -9176,8 +9051,7 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             this.wellPath = [];
-            let partName = "gravitywell";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(GravityWell.PropToPartName(prop), prop.mirrorX));
             this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.2, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
@@ -9189,14 +9063,15 @@ var MarbleRunSimulatorCore;
             this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
             this.circleTop = new BABYLON.Mesh("wire-top");
-            this.circleTop.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth).scaleInPlace;
-            this.circleTop.position.y += MarbleRunSimulatorCore.tileHeight * 1;
+            this.circleTop.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 0.6, -MarbleRunSimulatorCore.tileDepth);
             this.circleTop.parent = this;
             this.circleBottom = new BABYLON.Mesh("wire-top");
-            this.circleBottom.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth).scaleInPlace;
-            this.circleBottom.position.y += -0.01;
+            this.circleBottom.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6 - 0.01, -MarbleRunSimulatorCore.tileDepth);
             this.circleBottom.parent = this;
             this.generateWires();
+        }
+        static PropToPartName(prop) {
+            return "gravitywell";
         }
         async instantiateMachineSpecific() {
             if (this.wellMesh) {
@@ -9228,6 +9103,16 @@ var MarbleRunSimulatorCore;
                 template.mirrorXTrackPointsInPlace();
             }
             template.initialize();
+            let wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.2, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
+            Mummu.CatmullRomPathInPlace(wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
+            Mummu.CatmullRomPathInPlace(wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
+            wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
+            for (let i = 0; i < wellPath.length; i++) {
+                let c = new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
+                c.y += wellPath[i].y;
+                let r = wellPath[i].x;
+                template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(c, r, BABYLON.Axis.Y, 24, false));
+            }
             return template;
         }
     }
@@ -10379,9 +10264,9 @@ var MarbleRunSimulatorCore;
             }
             template.maxAngle = Math.PI / 16;
             template.initialize();
-            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4, 0.06, 0), 0.025, BABYLON.Axis.Y, 16));
-            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4, 0.04, 0), 0.015, BABYLON.Axis.Y, 16));
-            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4, 0.035, 0), 0.015, BABYLON.Axis.Y, 16));
+            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4, 0.06, 0), 0.025, BABYLON.Axis.Y, 16, true));
+            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4, 0.04, 0), 0.015, BABYLON.Axis.Y, 16, true));
+            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.4, 0.035, 0), 0.015, BABYLON.Axis.Y, 16, true));
             return template;
         }
         dispose() {

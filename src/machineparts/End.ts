@@ -8,8 +8,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "end";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(End.PropToPartName(prop)));
 
             if (isNaN(this.colors[1])) {
                 this.colors[1] = 0;
@@ -29,6 +28,10 @@ namespace MarbleRunSimulatorCore {
             this.panelPicture.parent = this.panel;
 
             this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "end";
         }
         
         protected async instantiateMachineSpecific(): Promise<void> {

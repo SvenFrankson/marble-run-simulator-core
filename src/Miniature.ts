@@ -6,10 +6,12 @@ namespace MarbleRunSimulatorCore {
     }
 
     export class MiniatureShape {
+        public center: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public points: BABYLON.Vector3[] = [];
         public dist: number = Infinity;
+        public fill: boolean = true;
 
-        public static MakeNGon(c: BABYLON.Vector3, r: number, axis: BABYLON.Vector3, n: number): MiniatureShape {
+        public static MakeNGon(c: BABYLON.Vector3, r: number, axis: BABYLON.Vector3, n: number, fill: boolean): MiniatureShape {
             let tmp = BABYLON.Axis.X;
             if (Mummu.Angle(axis, tmp) < Math.PI / 100) {
                 tmp = BABYLON.Axis.Y;
@@ -24,8 +26,12 @@ namespace MarbleRunSimulatorCore {
             }
             shape.points.forEach(pt => {
                 pt.addInPlace(c);
+                shape.center.addInPlace(pt);
             });
+            shape.center.scaleInPlace(1 / shape.points.length);
 
+            shape.fill = fill;
+            
             return shape;
         }
     }

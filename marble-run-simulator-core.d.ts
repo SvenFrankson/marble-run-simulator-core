@@ -185,9 +185,11 @@ declare namespace MarbleRunSimulatorCore {
         dist: number;
     }
     class MiniatureShape {
+        center: BABYLON.Vector3;
         points: BABYLON.Vector3[];
         dist: number;
-        static MakeNGon(c: BABYLON.Vector3, r: number, axis: BABYLON.Vector3, n: number): MiniatureShape;
+        fill: boolean;
+        static MakeNGon(c: BABYLON.Vector3, r: number, axis: BABYLON.Vector3, n: number, fill: boolean): MiniatureShape;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -869,6 +871,7 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    function AddLinesFromData(machine: Machine, baseName: string, prop: IMachinePartProp, lines: (MiniatureTrack | MiniatureShape)[]): void;
     function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement): void;
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1017,6 +1020,7 @@ declare namespace MarbleRunSimulatorCore {
         panelSupport: BABYLON.Mesh;
         panelPicture: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
     }
@@ -1055,6 +1059,7 @@ declare namespace MarbleRunSimulatorCore {
         circleTop: BABYLON.Mesh;
         circleBottom: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
     }

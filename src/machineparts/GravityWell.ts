@@ -8,8 +8,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "gravitywell";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(GravityWell.PropToPartName(prop), prop.mirrorX));
 
             this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(tileWidth * 1.2, tileHeight * 0.9, 0)];
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
@@ -25,16 +24,18 @@ namespace MarbleRunSimulatorCore {
             this.wellMesh.parent = this;
 
             this.circleTop = new BABYLON.Mesh("wire-top");
-            this.circleTop.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth).scaleInPlace;
-            this.circleTop.position.y += tileHeight * 1;
+            this.circleTop.position.copyFromFloats(tileWidth * 0.5, - tileHeight * 0.6, -tileDepth);
             this.circleTop.parent = this;
 
             this.circleBottom = new BABYLON.Mesh("wire-top");
-            this.circleBottom.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth).scaleInPlace;
-            this.circleBottom.position.y += -0.01;
+            this.circleBottom.position.copyFromFloats(tileWidth * 0.5, - tileHeight * 1.6 - 0.01, -tileDepth);
             this.circleBottom.parent = this;
 
             this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "gravitywell";
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {
@@ -77,6 +78,25 @@ namespace MarbleRunSimulatorCore {
             }
 
             template.initialize();
+
+            let wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(tileWidth * 1.2, tileHeight * 0.9, 0)];
+            Mummu.CatmullRomPathInPlace(wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
+            Mummu.CatmullRomPathInPlace(wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
+            wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
+
+            for (let i = 0; i < wellPath.length; i++) {
+                let c = new BABYLON.Vector3(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth);
+                c.y += wellPath[i].y;
+                let r = wellPath[i].x;
+
+                template.miniatureShapes.push(MiniatureShape.MakeNGon(
+                    c,
+                    r,
+                    BABYLON.Axis.Y,
+                    24,
+                    false
+                ));
+            }
 
             return template;
         }
