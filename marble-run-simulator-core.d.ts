@@ -894,7 +894,7 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV8(machine: Machine): IMachineData;
-    function DeserializeV78(machine: Machine, data: IMachineData): void;
+    function DeserializeV78(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV910(machine: Machine, version: number): IMachineData;

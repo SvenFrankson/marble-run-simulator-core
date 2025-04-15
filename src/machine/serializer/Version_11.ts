@@ -314,7 +314,6 @@ namespace MarbleRunSimulatorCore {
             }
         }
         if (baseName === "ramp" || baseName === "wave") {
-            console.log(JSON.parse(JSON.stringify(prop)));
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             

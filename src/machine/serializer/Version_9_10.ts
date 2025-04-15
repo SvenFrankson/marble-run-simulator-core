@@ -294,10 +294,8 @@ namespace MarbleRunSimulatorCore {
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
 
                 let n = parseInt(dataString.substring(pt, pt += 2), 36);
-                let f = false;
-                if (data.v === 8) {
-                    f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
-                }
+                let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+
                 if (makeMiniature) {
 
                 }
@@ -307,10 +305,7 @@ namespace MarbleRunSimulatorCore {
                     machine.decors.push(decor);
     
                     decor.setN(n);
-    
-                    if (data.v === 8) {
-                        decor.setFlip(f);
-                    }
+                    decor.setFlip(f);
                 }
             }
 
