@@ -74,24 +74,40 @@ namespace MarbleRunSimulatorCore {
         return data;
     }
     
-    export function DeserializeV3456(machine: Machine, data: IMachineData): void {
+    export function DeserializeV3456(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement): void {
         let dataString = data.d;
+        if (!dataString) {
+            dataString = data.content;
+        }
         if (dataString) {
-            if (data.n) {
-                machine.name = data.n;
+            if (makeMiniature) {
+
             }
-            if (data.a) {
-                machine.author = data.a;
+            else if (machine) {
+                if (data.n) {
+                    machine.name = data.n;
+                }
+                if (data.title) {
+                    machine.name = data.title;
+                }
+                if (data.a) {
+                    machine.author = data.a;
+                }
+                if (data.author) {
+                    machine.author = data.author;
+                }
+                if (data.r) {
+                    machine._roomIndex = data.r;
+                }
+                else {
+                    machine._roomIndex = 0;
+                }
+            
+                machine.balls = [];
+                machine.parts = [];
             }
-            if (data.r) {
-                machine._roomIndex = data.r;
-            }
-            else {
-                machine._roomIndex = 0;
-            }
-        
-            machine.balls = [];
-            machine.parts = [];
+
+            let lines: (MiniatureTrack | MiniatureShape)[] = [];
 
             let pt = 0;
             let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -104,11 +120,17 @@ namespace MarbleRunSimulatorCore {
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                 z = z / 0.06 * tileDepth;
 
-                let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);
-                machine.balls.push(ball);
-
+                let materialIndex = 0;
                 if (data.v === 4 || data.v >= 6) {
-                    let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                    materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
+                }
+
+                if (makeMiniature) {
+
+                }
+                else if (machine) {
+                    let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);
+                    machine.balls.push(ball);
                     ball.materialIndex = materialIndex;
                 }
             }
@@ -162,41 +184,53 @@ namespace MarbleRunSimulatorCore {
                     h: h,
                     d: d,
                     n: n,
+                    s: TrackSpeed.Medium,
                     mirrorX: (mirror % 2) === 1,
                     mirrorZ: mirror >= 2,
                     c: colors
                 }
                 DeserializeAnte11Fix(baseName, prop);
-                let track = machine.trackFactory.createTrackBaseName(baseName, prop);
-                if (track) {
-                    machine.parts.push(track);
+
+                if (makeMiniature) {
+                    AddLinesFromData(machine, baseName, prop, lines);
                 }
-                else {
-                    console.warn("failed to createTrackBaseName");
-                    console.log(baseName);
-                    console.log(prop);
+                else if (machine) {
+                    let track = machine.trackFactory.createTrackBaseName(baseName, prop);
+                    if (track) {
+                        machine.parts.push(track);
+                    }
+                    else {
+                        console.warn("failed to createTrackBaseName");
+                        console.log(baseName);
+                        console.log(prop);
+                    }
                 }
             }
 
-            let minK = Infinity;
-            for (let i = 0; i < machine.parts.length; i++) {
-                let part = machine.parts[i];
-                if (part.downwardYExtendable) {
-                    minK = Math.min(minK, part.k - part.h);
-                }
-                else {
-                    minK = Math.min(minK, part.k);
-                }
+            if (makeMiniature) {
+                DrawMiniature(lines, canvas);
             }
-
-            if (isFinite(minK) && minK != 0) {
+            else if (machine) {
+                let minK = Infinity;
                 for (let i = 0; i < machine.parts.length; i++) {
                     let part = machine.parts[i];
-                    part.setK(part.k - minK, true);
+                    if (part.downwardYExtendable) {
+                        minK = Math.min(minK, part.k - part.h);
+                    }
+                    else {
+                        minK = Math.min(minK, part.k);
+                    }
                 }
-                for (let i = 0; i < machine.balls.length; i++) {
-                    let ball = machine.balls[i];
-                    ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * tileHeight, 0)));
+
+                if (isFinite(minK) && minK != 0) {
+                    for (let i = 0; i < machine.parts.length; i++) {
+                        let part = machine.parts[i];
+                        part.setK(part.k - minK, true);
+                    }
+                    for (let i = 0; i < machine.balls.length; i++) {
+                        let ball = machine.balls[i];
+                        ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * tileHeight, 0)));
+                    }
                 }
             }
         }

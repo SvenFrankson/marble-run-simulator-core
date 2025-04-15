@@ -86,7 +86,6 @@ namespace MarbleRunSimulatorCore {
     }
     
     export function DeserializeV78(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement): void {
-        console.log(data);
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;
@@ -107,11 +106,6 @@ namespace MarbleRunSimulatorCore {
                 }
                 if (data.author) {
                     machine.author = data.author;
-                }
-                if (data.v === 10) {
-                    if (data.sp) {
-                        machine.sleepersMeshProp = data.sp;
-                    }
                 }
             
                 machine.balls = [];

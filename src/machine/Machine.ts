@@ -895,6 +895,11 @@ namespace MarbleRunSimulatorCore {
         }
 
         public static MakeMiniature(machine: Machine, data: IMachineData): HTMLCanvasElement {
+            if (data && (data.v >= 3 && data.v <= 6)) {
+                let canvas = document.createElement("canvas");
+                DeserializeV3456(machine, data, true, canvas);
+                return canvas;
+            }
             if (data && (data.v === 7 || data.v === 8)) {
                 let canvas = document.createElement("canvas");
                 DeserializeV78(machine, data, true, canvas);
