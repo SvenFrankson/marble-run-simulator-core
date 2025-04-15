@@ -61,7 +61,7 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
-    export function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement): void {
+    export function DrawMiniature(data: IMachineData, lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement): void {
         let picSize = 512;
         let picMargin = picSize / 20;
         let picSizeNoMargin = picSize - 2 * picMargin;
@@ -247,5 +247,9 @@ namespace MarbleRunSimulatorCore {
                 }
             }
         }
+
+        context.font = "20px monospace";
+        context.fillStyle = "white";
+        context.fillText("v" + data.v.toFixed(0), 5, 25);
     }
 }

@@ -101,6 +101,7 @@ namespace MarbleRunSimulatorCore {
     }
 
     export class Machine {
+        public version: number = -1;
         public name: string = "Unnamed Machine";
         public author: string = "Unknown Author";
         public isChallengeMachine: boolean = false;
@@ -895,6 +896,11 @@ namespace MarbleRunSimulatorCore {
         }
 
         public static MakeMiniature(machine: Machine, data: IMachineData): HTMLCanvasElement {
+            if (data && (data.v === 2)) {
+                let canvas = document.createElement("canvas");
+                DeserializeV2(machine, data, true, canvas);
+                return canvas;
+            }
             if (data && (data.v >= 3 && data.v <= 6)) {
                 let canvas = document.createElement("canvas");
                 DeserializeV3456(machine, data, true, canvas);

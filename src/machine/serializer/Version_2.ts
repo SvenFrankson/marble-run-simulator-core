@@ -71,18 +71,28 @@ namespace MarbleRunSimulatorCore {
         return data;
     }
     
-    export function DeserializeV2(machine: Machine, data: IMachineData): void {
+    export function DeserializeV2(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement): void {
         let dataString = data.d;
+        if (!dataString) {
+            dataString = data.content;
+        }
         if (dataString) {
-            if (data.n) {
-                machine.name = data.n;
+            if (makeMiniature) {
+
             }
-            if (data.a) {
-                machine.author = data.a;
+            else if (machine) {
+                if (data.n) {
+                    machine.name = data.n;
+                }
+                if (data.a) {
+                    machine.author = data.a;
+                }
             }
         
             machine.balls = [];
             machine.parts = [];
+
+            let lines: (MiniatureTrack | MiniatureShape)[] = [];
 
             let pt = 0;
             let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -96,38 +106,19 @@ namespace MarbleRunSimulatorCore {
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                 z = z / 0.06 * tileDepth;
 
-                let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);
-                machine.balls.push(ball);
+                if (makeMiniature) {
+
+                }
+                else if (machine) {
+                    let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);
+                    machine.balls.push(ball);
+                }
             }
             
             let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
             //console.log("partCount = " + partCount);
 
             for (let i = 0; i < partCount; i++) {
-                /*
-                partDataString += NToHex(index, 2);
-                
-                let pI = part.i + partOffset;
-                let pJ = part.j + partOffset;
-                let pK = part.k + partOffset;
-                partDataString += NToHex(pI, 2);
-                partDataString += NToHex(pJ, 2);
-                partDataString += NToHex(pK, 2);
-
-                partDataString += NToHex(part.w, 1);
-                partDataString += NToHex(part.h, 1);
-                partDataString += NToHex(part.d, 1);
-                partDataString += NToHex(part.n, 1);
-                let m = (part.mirrorX ? 1 : 0) + (part.mirrorZ ? 2 : 0);
-                partDataString += NToHex(m, 1);
-
-                let colourCount = part.colors.length;
-                partDataString += NToHex(colourCount, 1);
-                for (let j = 0; j < part.colors.length; j++) {
-                    let c = part.colors[j];
-                    partDataString += NToHex(c, 1);
-                }
-                */
                 let index = parseInt(dataString.substring(pt, pt += 2), 36);
                 let baseName = TrackNames[index].split("_")[0];
                 //console.log("basename " + baseName);
@@ -161,14 +152,29 @@ namespace MarbleRunSimulatorCore {
                     h: h,
                     d: d,
                     n: n,
+                    s: TrackSpeed.Medium,
                     mirrorX: (mirror % 2) === 1,
                     mirrorZ: mirror >= 2,
                     c: colors
                 }
-                let track = machine.trackFactory.createTrackBaseName(baseName, prop);
-                if (track) {
-                    machine.parts.push(track);
+                DeserializeAnte11Fix(baseName, prop);
+
+                if (makeMiniature) {
+                    AddLinesFromData(machine, baseName, prop, lines);
                 }
+                else if (machine) {
+                    let track = machine.trackFactory.createTrackBaseName(baseName, prop);
+                    if (track) {
+                        machine.parts.push(track);
+                    }
+                }
+            }
+            
+            if (makeMiniature) {
+                DrawMiniature(data, lines, canvas);
+            }
+            else if (machine) {
+                DeserializeAnte11AltitudeFix(machine);
             }
         }
     }

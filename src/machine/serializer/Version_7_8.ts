@@ -227,30 +227,10 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (makeMiniature) {
-                DrawMiniature(lines, canvas);
+                DrawMiniature(data, lines, canvas);
             }
             else if (machine) {
-                let minK = Infinity;
-                for (let i = 0; i < machine.parts.length; i++) {
-                    let part = machine.parts[i];
-                    if (part.downwardYExtendable) {
-                        minK = Math.min(minK, part.k - part.h);
-                    }
-                    else {
-                        minK = Math.min(minK, part.k);
-                    }
-                }
-    
-                if (isFinite(minK) && minK != 0) {
-                    for (let i = 0; i < machine.parts.length; i++) {
-                        let part = machine.parts[i];
-                        part.setK(part.k - minK);
-                    }
-                    for (let i = 0; i < machine.balls.length; i++) {
-                        let ball = machine.balls[i];
-                        ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * tileHeight, 0)));
-                    }
-                }
+                DeserializeAnte11AltitudeFix(machine);
             }
         }
     }

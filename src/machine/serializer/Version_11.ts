@@ -300,7 +300,7 @@ namespace MarbleRunSimulatorCore {
                     prop.i -= 2;
                 }
                 if (prop.h === 2) {
-                    
+                    prop.i -= 2;
                 }
                 if (prop.h === 3) {
                     
@@ -341,6 +341,30 @@ namespace MarbleRunSimulatorCore {
                 else {
                     prop.d = - prop.d;
                 }
+            }
+        }
+    }
+
+    export function DeserializeAnte11AltitudeFix(machine: Machine): void {
+        let minK = Infinity;
+        for (let i = 0; i < machine.parts.length; i++) {
+            let part = machine.parts[i];
+            if (part.downwardYExtendable) {
+                minK = Math.min(minK, part.k - part.h);
+            }
+            else {
+                minK = Math.min(minK, part.k);
+            }
+        }
+
+        if (isFinite(minK) && minK != 0) {
+            for (let i = 0; i < machine.parts.length; i++) {
+                let part = machine.parts[i];
+                part.setK(part.k - minK);
+            }
+            for (let i = 0; i < machine.balls.length; i++) {
+                let ball = machine.balls[i];
+                ball.setPositionZero(ball.positionZero.subtract(new BABYLON.Vector3(0, minK * tileHeight, 0)));
             }
         }
     }
@@ -485,7 +509,7 @@ namespace MarbleRunSimulatorCore {
 
             if (makeMiniature) {
                 let canvas = document.createElement("canvas");
-                DrawMiniature(lines, canvas);
+                DrawMiniature(data, lines, canvas);
 
                 var tmpLink = document.createElement( 'a' );
                 tmpLink.download = "test.png";

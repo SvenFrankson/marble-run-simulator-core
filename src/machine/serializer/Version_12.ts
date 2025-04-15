@@ -309,7 +309,7 @@ namespace MarbleRunSimulatorCore {
             if (makeMiniature) {
                 let canvas = document.createElement("canvas");
                 
-                DrawMiniature(lines, canvas);
+                DrawMiniature(data, lines, canvas);
 
                 var tmpLink = document.createElement( 'a' );
                 tmpLink.download = "test.png";

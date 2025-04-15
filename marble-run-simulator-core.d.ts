@@ -309,6 +309,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class Machine {
         game: IGame;
+        version: number;
         name: string;
         author: string;
         isChallengeMachine: boolean;
@@ -872,7 +873,7 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     function AddLinesFromData(machine: Machine, baseName: string, prop: IMachinePartProp, lines: (MiniatureTrack | MiniatureShape)[]): void;
-    function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement): void;
+    function DrawMiniature(data: IMachineData, lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV1(machine: Machine): IMachineData;
@@ -881,6 +882,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     function SerializeV11(machine: Machine): IMachineData;
     function DeserializeAnte11Fix(baseName: string, prop: IMachinePartProp): void;
+    function DeserializeAnte11AltitudeFix(machine: Machine): void;
     function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature?: boolean): void;
 }
 declare namespace MarbleRunSimulatorCore {
@@ -889,7 +891,7 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV2(machine: Machine): IMachineData;
-    function DeserializeV2(machine: Machine, data: IMachineData): void;
+    function DeserializeV2(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV3456(machine: Machine, version: number): IMachineData;
