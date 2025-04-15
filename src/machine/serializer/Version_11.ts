@@ -126,6 +126,9 @@ namespace MarbleRunSimulatorCore {
                 if (prop.d === 6) {
                     prop.i += 13;
                 }
+                if (prop.d === 7) {
+                    prop.i += 16;
+                }
 
                 if (prop.mirrorZ) {
                     prop.k -= prop.h;
