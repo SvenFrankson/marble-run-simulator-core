@@ -6567,7 +6567,7 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
-        if (baseName === "ramp" || baseName === "wave") {
+        if (baseName === "ramp" || baseName === "piperamp" || baseName === "woodramp" || baseName === "wave") {
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             if (prop.mirrorX) {
