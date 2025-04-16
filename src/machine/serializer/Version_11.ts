@@ -343,6 +343,11 @@ namespace MarbleRunSimulatorCore {
                 }
             }
         }
+        if (baseName === "snake") {
+            prop.l = prop.l * 3;
+            prop.i -= 1;
+            prop.j -= 3;
+        }
     }
 
     export function DeserializeAnte11AltitudeFix(machine: Machine): void {

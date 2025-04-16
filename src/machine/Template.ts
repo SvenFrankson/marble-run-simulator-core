@@ -453,7 +453,7 @@ namespace MarbleRunSimulatorCore {
                     if (isNaN(s)) {
                         s = 2;
                     }
-                    data = Snake.GenerateTemplate(w, s, mirrorX, mirrorZ);
+                    data = Snake.GenerateTemplate(w, s);
                 }
                 else if (partName.startsWith("elevator_")) {
                     let h = parseInt(partName.split("_")[1]);

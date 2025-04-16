@@ -14,48 +14,44 @@ namespace MarbleRunSimulatorCore {
             return partName;
         }
 
-        public static GenerateTemplate(w: number, s: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(l: number, s: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "snake_" + w.toFixed(0) + "." + s.toFixed(0);
+            template.partName = "snake_" + l.toFixed(0) + "." + s.toFixed(0);
             template.angleSmoothSteps = 40;
-            template.maxAngle = Math.PI / 8;
 
-            template.l = w;
+            template.l = l;
             template.h = 0;
             template.d = 3;
             template.s = s;
-            template.mirrorX = mirrorX;
-            template.mirrorZ = mirrorZ;
 
-            template.xExtendable = true;
+            template.lExtendableOnX = true;
+            template.minL = 5;
             template.sExtendable = true;
-            template.xMirrorable = true;
-            template.zMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
-            let count = 3 * template.l;
+            let count = template.l - 1;
             if (count % 2 === 1) {
                 count--;
             }
-            let l = tileWidth * template.l;
-            let r = l / count;
+            let length = tileSize * template.l;
+            let r = length / count;
             let r2 = r / Math.SQRT2 * 1.0;
             let r12 = r - r2;
-            let z0 = - tileDepth * Math.floor(template.d / 2);
+            let z0 = 0;
 
             template.trackTemplates[0] = new TrackTemplate(template);
 
-            let start = new BABYLON.Vector3(-tileWidth * 0.5, 0, z0);
-            let end = new BABYLON.Vector3(tileWidth * (template.l - 0.5), 0, z0);
+            let start = new BABYLON.Vector3(-tileSize * 0.5, 0, z0);
+            let end = new BABYLON.Vector3(tileSize * (template.l - 0.5), 0, z0);
 
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];
             for (let i = 1; i < count; i++) {
-                let x = - tileWidth * 0.5 + i * r;
+                let x = - tileSize * 0.5 + i * r;
                 if (i === 1) {
                     let z = z0 - r;
                     template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x - r12, 0, z + r2), new BABYLON.Vector3(1, 0, - 1)));
@@ -105,13 +101,6 @@ namespace MarbleRunSimulatorCore {
             }
             template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], end, dir, undefined, 1));
             template.maxAngle = Math.PI / 4 / 2 * template.s;
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
-            if (mirrorZ) {
-                template.mirrorZTrackPointsInPlace();
-            }
 
             template.initialize();
 

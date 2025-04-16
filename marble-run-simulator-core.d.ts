@@ -1213,7 +1213,7 @@ declare namespace MarbleRunSimulatorCore {
     class Snake extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(w: number, s: number, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, s: number): MachinePartTemplate;
         recreateFromOriginDestination(origin: Nabu.IJK, dest: Nabu.IJK, machine: Machine): Snake;
     }
 }
