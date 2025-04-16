@@ -487,8 +487,8 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "sort") {
                     data = Sort.GenerateTemplate(mirrorX, mirrorZ);
                 }
-                else if (partName === "controler") {
-                    data = Controler.GenerateTemplate(mirrorX);
+                else if (partName === "controller") {
+                    data = Controller.GenerateTemplate(mirrorX);
                 }
                 else if (partName === "spawner") {
                     data = Spawner.GenerateTemplate(mirrorX);
@@ -623,8 +623,8 @@ namespace MarbleRunSimulatorCore {
             else if (baseName === "sort") {
                 partName = Sort.PropToPartName(prop);
             }
-            else if (baseName === "controler") {
-                partName = Controler.PropToPartName(prop);
+            else if (baseName === "controller") {
+                partName = Controller.PropToPartName(prop);
             }
             else if (baseName === "spawner") {
                 partName = Spawner.PropToPartName(prop);

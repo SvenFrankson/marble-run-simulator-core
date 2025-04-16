@@ -557,8 +557,8 @@ namespace MarbleRunSimulatorCore {
                                     this.bumpSurfaceIsRail = false;
                                 }
                             }
-                            if (part instanceof Controler) {
-                                let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.pivotControlerCollider);
+                            if (part instanceof Controller) {
+                                let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.pivotControllerCollider);
                                 if (col.hit) {
                                     // Move away from collision
                                     forcedDisplacement.addInPlace(col.normal.scale(col.depth));

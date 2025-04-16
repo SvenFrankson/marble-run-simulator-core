@@ -369,7 +369,7 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
-    export function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature: boolean = false): void {
+    export function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement): void {
         let dataString = data.d;
         if (dataString) {
             if (data.n) {
@@ -508,27 +508,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (makeMiniature) {
-                let canvas = document.createElement("canvas");
                 DrawMiniature(data, lines, canvas);
-
-                var tmpLink = document.createElement( 'a' );
-                tmpLink.download = "test.png";
-                tmpLink.href = canvas.toDataURL();
-
-                document.body.appendChild(canvas);
-                canvas.style.position = "fixed";
-                canvas.style.top = "20%";
-                canvas.style.left = "40%";
-                canvas.style.width = "20%";
-                canvas.style.zIndex = "100";
-
-                setTimeout(() => {
-                    document.body.removeChild(canvas)
-                }, 1000);
-                
-                document.body.appendChild( tmpLink );
-                tmpLink.click(); 
-                document.body.removeChild( tmpLink );
             }
         }
     }

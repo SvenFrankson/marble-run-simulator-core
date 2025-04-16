@@ -916,6 +916,16 @@ namespace MarbleRunSimulatorCore {
                 DeserializeV910(machine, data, true, canvas);
                 return canvas;
             }
+            if (data && (data.v === 11)) {
+                let canvas = document.createElement("canvas");
+                DeserializeV11(machine, data, true, canvas);
+                return canvas;
+            }
+            if (data && (data.v === 12)) {
+                let canvas = document.createElement("canvas");
+                DeserializeV12(machine, data, true, canvas);
+                return canvas;
+            }
             return undefined;
         }
 

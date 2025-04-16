@@ -21,7 +21,7 @@ namespace MarbleRunSimulatorCore {
         "jumper_1",
         "gravitywell",
         "shooter_8",
-        "controler",
+        "controller",
         "screen",
         "speeder",
         "forwardSplit",
@@ -327,8 +327,8 @@ namespace MarbleRunSimulatorCore {
             if (partName === "sort") {
                 return new Sort(this.machine, prop);
             }
-            if (partName === "controler") {
-                return new Controler(this.machine, prop);
+            if (partName === "controller") {
+                return new Controller(this.machine, prop);
             }
             if (partName === "spawner") {
                 return new Spawner(this.machine, prop);
@@ -485,8 +485,8 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "sort") {
                 return new Sort(this.machine, prop);
             }
-            if (baseName === "controler") {
-                return new Controler(this.machine, prop);
+            if (baseName === "controller") {
+                return new Controller(this.machine, prop);
             }
             if (baseName === "spawner") {
                 return new Spawner(this.machine, prop);

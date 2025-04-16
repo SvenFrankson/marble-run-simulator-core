@@ -69,7 +69,20 @@ namespace MarbleRunSimulatorCore {
         canvas.width = picSize;
         canvas.height = picSize;
 
-        let backGroundColor = BABYLON.Color3.FromHexString("#103c6f");
+        let backGroundColor = BABYLON.Color3.FromHexString("#000000");
+        if (data.v === 10) {
+            backGroundColor = BABYLON.Color3.FromHexString("#103c6f");
+        }
+        if (data.v === 8) {
+            backGroundColor = BABYLON.Color3.FromHexString("#106f26");
+        }
+        if (data.v === 6) {
+            backGroundColor = BABYLON.Color3.FromHexString("#6f1610");
+        }
+        if (data.v === 2) {
+            backGroundColor = BABYLON.Color3.FromHexString("#3f106f");
+        }
+
         let backGroundColorHex = backGroundColor.toHexString();
         let context = canvas.getContext("2d");
         context.fillStyle = backGroundColorHex;

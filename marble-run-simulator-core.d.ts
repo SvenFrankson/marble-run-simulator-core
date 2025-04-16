@@ -883,11 +883,11 @@ declare namespace MarbleRunSimulatorCore {
     function SerializeV11(machine: Machine): IMachineData;
     function DeserializeAnte11Fix(baseName: string, prop: IMachinePartProp): void;
     function DeserializeAnte11AltitudeFix(machine: Machine): void;
-    function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature?: boolean): void;
+    function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV12(machine: Machine): IMachineData;
-    function DeserializeV12(machine: Machine, data: IMachineData, makeMiniature?: boolean): void;
+    function DeserializeV12(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV2(machine: Machine): IMachineData;
@@ -965,11 +965,11 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class Controler extends MachinePart {
+    class Controller extends MachinePart {
         private _animatePivot;
         pivotPass: BABYLON.Mesh;
-        pivotControler: BABYLON.Mesh;
-        pivotControlerCollider: BABYLON.Mesh;
+        pivotController: BABYLON.Mesh;
+        pivotControllerCollider: BABYLON.Mesh;
         support: BABYLON.Mesh;
         cog13: BABYLON.Mesh;
         cog8: BABYLON.Mesh;
@@ -978,6 +978,7 @@ declare namespace MarbleRunSimulatorCore {
         clicSound: BABYLON.Sound;
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
