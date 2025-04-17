@@ -6424,6 +6424,9 @@ var MarbleRunSimulatorCore;
                 if (prop.d === 7) {
                     prop.i += 16;
                 }
+                if (prop.d === 8) {
+                    prop.i += 16;
+                }
                 if (prop.mirrorZ) {
                     prop.k -= prop.h;
                 }
@@ -6661,14 +6664,18 @@ var MarbleRunSimulatorCore;
     function DeserializeV11(machine, data, makeMiniature = false, canvas) {
         let dataString = data.d;
         if (dataString) {
-            if (data.n) {
-                machine.name = data.n;
+            if (makeMiniature) {
             }
-            if (data.a) {
-                machine.author = data.a;
+            else if (machine) {
+                if (data.n) {
+                    machine.name = data.n;
+                }
+                if (data.a) {
+                    machine.author = data.a;
+                }
+                machine.balls = [];
+                machine.parts = [];
             }
-            machine.balls = [];
-            machine.parts = [];
             let lines = [];
             let pt = 0;
             let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -6680,7 +6687,7 @@ var MarbleRunSimulatorCore;
                 let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                 if (makeMiniature) {
                 }
-                else {
+                else if (machine) {
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
                     machine.balls.push(ball);
                     ball.materialIndex = materialIndex;
@@ -6727,7 +6734,7 @@ var MarbleRunSimulatorCore;
                     if (makeMiniature) {
                         MarbleRunSimulatorCore.AddLinesFromData(machine, baseName, prop, lines);
                     }
-                    else {
+                    else if (machine) {
                         let track = machine.trackFactory.createTrackBaseName(baseName, prop);
                         if (track) {
                             machine.parts.push(track);
@@ -6747,7 +6754,7 @@ var MarbleRunSimulatorCore;
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
                 if (makeMiniature) {
                 }
-                else {
+                else if (machine) {
                     let decor = new MarbleRunSimulatorCore.Xylophone(machine);
                     decor.setPosition(new BABYLON.Vector3(x, y, z));
                     machine.decors.push(decor);
@@ -6759,22 +6766,24 @@ var MarbleRunSimulatorCore;
                     }
                 }
             }
-            if (data.r) {
-                machine._roomIndex = data.r;
-            }
-            else {
-                if (partCount % 2 === 0) {
-                    machine._roomIndex = 0;
-                }
-                else if (partCount % 2 === 1) {
-                    machine._roomIndex = 9;
-                }
-                else {
-                    machine._roomIndex = 0;
-                }
-            }
             if (makeMiniature) {
                 MarbleRunSimulatorCore.DrawMiniature(data, lines, canvas);
+            }
+            else if (machine) {
+                if (data.r) {
+                    machine._roomIndex = data.r;
+                }
+                else {
+                    if (partCount % 2 === 0) {
+                        machine._roomIndex = 0;
+                    }
+                    else if (partCount % 2 === 1) {
+                        machine._roomIndex = 9;
+                    }
+                    else {
+                        machine._roomIndex = 0;
+                    }
+                }
             }
         }
     }
@@ -6871,20 +6880,24 @@ var MarbleRunSimulatorCore;
             dataString = data.content;
         }
         if (dataString) {
-            if (data.n) {
-                machine.name = data.n;
+            if (makeMiniature) {
             }
-            if (data.title) {
-                machine.name = data.title;
+            else if (machine) {
+                if (data.n) {
+                    machine.name = data.n;
+                }
+                if (data.title) {
+                    machine.name = data.title;
+                }
+                if (data.a) {
+                    machine.author = data.a;
+                }
+                if (data.author) {
+                    machine.author = data.author;
+                }
+                machine.balls = [];
+                machine.parts = [];
             }
-            if (data.a) {
-                machine.author = data.a;
-            }
-            if (data.author) {
-                machine.author = data.author;
-            }
-            machine.balls = [];
-            machine.parts = [];
             let lines = [];
             let pt = 0;
             let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -6896,7 +6909,7 @@ var MarbleRunSimulatorCore;
                 let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                 if (makeMiniature) {
                 }
-                else {
+                else if (machine) {
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
                     machine.balls.push(ball);
                     ball.materialIndex = materialIndex;
@@ -7007,7 +7020,7 @@ var MarbleRunSimulatorCore;
                             console.log("can't find template for " + baseName);
                         }
                     }
-                    else {
+                    else if (machine) {
                         let track = machine.trackFactory.createTrackBaseName(baseName, prop);
                         if (track) {
                             machine.parts.push(track);
@@ -7025,31 +7038,32 @@ var MarbleRunSimulatorCore;
                 let x = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
                 let y = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
+                let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
                 if (makeMiniature) {
                 }
-                else {
+                else if (machine) {
                     let decor = new MarbleRunSimulatorCore.Xylophone(machine);
                     decor.setPosition(new BABYLON.Vector3(x, y, z));
                     machine.decors.push(decor);
-                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                    decor.setFlip(f);
                     decor.setN(n);
-                    if (data.v === 8) {
-                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
-                        decor.setFlip(f);
-                    }
                 }
             }
-            machine._roomIndex = parseInt(dataString.substring(pt, pt += 3), 36);
+            let roomIndex = parseInt(dataString.substring(pt, pt += 3), 36);
             let grndAnchors = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
             let grndAnchorsMaxY = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
             let spacing = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
-            machine.sleepersMeshProp = {
-                grndAnchors: grndAnchors,
-                grndAnchorsMaxY: grndAnchorsMaxY,
-                spacing: spacing
-            };
             if (makeMiniature) {
                 MarbleRunSimulatorCore.DrawMiniature(data, lines, canvas);
+            }
+            else if (machine) {
+                machine._roomIndex = roomIndex;
+                machine.sleepersMeshProp = {
+                    grndAnchors: grndAnchors,
+                    grndAnchorsMaxY: grndAnchorsMaxY,
+                    spacing: spacing
+                };
             }
         }
     }

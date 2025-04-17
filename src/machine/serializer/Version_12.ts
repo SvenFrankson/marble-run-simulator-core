@@ -102,21 +102,26 @@ namespace MarbleRunSimulatorCore {
             dataString = data.content;
         }
         if (dataString) {
-            if (data.n) {
-                machine.name = data.n;
+            if (makeMiniature) {
+
             }
-            if (data.title) {
-                machine.name = data.title;
+            else if (machine) {
+                if (data.n) {
+                    machine.name = data.n;
+                }
+                if (data.title) {
+                    machine.name = data.title;
+                }
+                if (data.a) {
+                    machine.author = data.a;
+                }
+                if (data.author) {
+                    machine.author = data.author;
+                }
+            
+                machine.balls = [];
+                machine.parts = [];
             }
-            if (data.a) {
-                machine.author = data.a;
-            }
-            if (data.author) {
-                machine.author = data.author;
-            }
-        
-            machine.balls = [];
-            machine.parts = [];
 
             let lines: (MiniatureTrack | MiniatureShape)[] = [];
 
@@ -133,7 +138,7 @@ namespace MarbleRunSimulatorCore {
                 if (makeMiniature) {
 
                 }
-                else {
+                else if (machine) {
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);
                     machine.balls.push(ball);
 
@@ -254,7 +259,7 @@ namespace MarbleRunSimulatorCore {
                             console.log("can't find template for " + baseName);
                         }
                     }
-                    else {
+                    else if (machine) {
                         let track = machine.trackFactory.createTrackBaseName(baseName, prop);
                         if (track) {
                             machine.parts.push(track);
@@ -274,38 +279,37 @@ namespace MarbleRunSimulatorCore {
                 let y = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - ballOffset) / 1000;
 
+                let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+
                 if (makeMiniature) {
 
                 }
-                else {
+                else if (machine) {
                     let decor = new Xylophone(machine);
                     decor.setPosition(new BABYLON.Vector3(x, y, z));
                     machine.decors.push(decor);
 
-                    let n = parseInt(dataString.substring(pt, pt += 2), 36);
+                    decor.setFlip(f);
                     decor.setN(n);
-
-                    if (data.v === 8) {
-                        let f = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
-                        decor.setFlip(f);
-                    }
                 }
             }
 
-            machine._roomIndex = parseInt(dataString.substring(pt, pt += 3), 36);
-            
+            let roomIndex = parseInt(dataString.substring(pt, pt += 3), 36);
             let grndAnchors = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
             let grndAnchorsMaxY = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
             let spacing = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
 
-            machine.sleepersMeshProp = {
-                grndAnchors: grndAnchors,
-                grndAnchorsMaxY: grndAnchorsMaxY,
-                spacing: spacing
-            }
-
             if (makeMiniature) {
                 DrawMiniature(data, lines, canvas);
+            }
+            else if (machine) {
+                machine._roomIndex = roomIndex;
+                machine.sleepersMeshProp = {
+                    grndAnchors: grndAnchors,
+                    grndAnchorsMaxY: grndAnchorsMaxY,
+                    spacing: spacing
+                }
             }
         }
     }
