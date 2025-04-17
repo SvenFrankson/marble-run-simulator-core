@@ -129,6 +129,9 @@ namespace MarbleRunSimulatorCore {
                 if (prop.d === 7) {
                     prop.i += 16;
                 }
+                if (prop.d === 8) {
+                    prop.i += 16;
+                }
 
                 if (prop.mirrorZ) {
                     prop.k -= prop.h;
@@ -377,15 +380,20 @@ namespace MarbleRunSimulatorCore {
     export function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement): void {
         let dataString = data.d;
         if (dataString) {
-            if (data.n) {
-                machine.name = data.n;
+            if (makeMiniature) {
+
             }
-            if (data.a) {
-                machine.author = data.a;
+            else if (machine) {
+                if (data.n) {
+                    machine.name = data.n;
+                }
+                if (data.a) {
+                    machine.author = data.a;
+                }
+            
+                machine.balls = [];
+                machine.parts = [];
             }
-        
-            machine.balls = [];
-            machine.parts = [];
 
             let lines: (MiniatureTrack | MiniatureShape)[] = [];
 
@@ -402,7 +410,7 @@ namespace MarbleRunSimulatorCore {
                 if (makeMiniature) {
 
                 }
-                else {
+                else if (machine) {
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);
                     machine.balls.push(ball);
 
@@ -459,7 +467,7 @@ namespace MarbleRunSimulatorCore {
                     if (makeMiniature) {
                         AddLinesFromData(machine, baseName, prop, lines);
                     }
-                    else {
+                    else if (machine) {
                         let track = machine.trackFactory.createTrackBaseName(baseName, prop);
                         if (track) {
                             machine.parts.push(track);
@@ -482,7 +490,7 @@ namespace MarbleRunSimulatorCore {
                 if (makeMiniature) {
 
                 }
-                else {
+                else if (machine) {
                     let decor = new Xylophone(machine);
                     decor.setPosition(new BABYLON.Vector3(x, y, z));
                     machine.decors.push(decor);
@@ -497,23 +505,24 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (data.r) {
-                machine._roomIndex = data.r;
-            }
-            else {
-                if (partCount % 2 === 0) {
-                    machine._roomIndex = 0;
-                }
-                else if(partCount % 2 === 1) {
-                    machine._roomIndex = 9;
-                }
-                else {
-                    machine._roomIndex = 0;
-                }
-            }
-
             if (makeMiniature) {
                 DrawMiniature(data, lines, canvas);
+            }
+            else if (machine) {
+                if (data.r) {
+                    machine._roomIndex = data.r;
+                }
+                else {
+                    if (partCount % 2 === 0) {
+                        machine._roomIndex = 0;
+                    }
+                    else if(partCount % 2 === 1) {
+                        machine._roomIndex = 9;
+                    }
+                    else {
+                        machine._roomIndex = 0;
+                    }
+                }
             }
         }
     }
