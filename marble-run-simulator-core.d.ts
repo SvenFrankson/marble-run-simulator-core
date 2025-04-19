@@ -872,8 +872,15 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    interface IMachineMiniatureData {
+        size?: number;
+        version?: number;
+        ballsCount?: number;
+        partsCount?: number;
+        backgroundColor?: string;
+    }
     function AddLinesFromData(machine: Machine, baseName: string, prop: IMachinePartProp, lines: (MiniatureTrack | MiniatureShape)[]): void;
-    function DrawMiniature(data: IMachineData, lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement): void;
+    function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement, data?: IMachineMiniatureData): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV1(machine: Machine): IMachineData;

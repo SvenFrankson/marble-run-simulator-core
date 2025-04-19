@@ -87,10 +87,10 @@ namespace MarbleRunSimulatorCore {
                 if (data.a) {
                     machine.author = data.a;
                 }
-            }
         
-            machine.balls = [];
-            machine.parts = [];
+                machine.balls = [];
+                machine.parts = [];
+            }
 
             let lines: (MiniatureTrack | MiniatureShape)[] = [];
 
@@ -171,7 +171,15 @@ namespace MarbleRunSimulatorCore {
             }
             
             if (makeMiniature) {
-                DrawMiniature(data, lines, canvas);
+                DrawMiniature(
+                    lines,
+                    canvas,
+                    {
+                        version: data.v,
+                        partsCount: partCount,
+                        ballsCount: ballCount,
+                    }
+                );
             }
             else if (machine) {
                 DeserializeAnte11AltitudeFix(machine);

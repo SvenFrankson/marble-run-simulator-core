@@ -227,7 +227,15 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (makeMiniature) {
-                DrawMiniature(data, lines, canvas);
+                DrawMiniature(
+                    lines,
+                    canvas,
+                    {
+                        version: data.v,
+                        partsCount: partCount,
+                        ballsCount: ballCount,
+                    }
+                );
             }
             else if (machine) {
                 DeserializeAnte11AltitudeFix(machine);

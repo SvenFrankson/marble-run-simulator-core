@@ -6051,26 +6051,22 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.AddLinesFromData = AddLinesFromData;
-    function DrawMiniature(data, lines, canvas) {
-        let picSize = 512;
-        let picMargin = picSize / 20;
-        let picSizeNoMargin = picSize - 2 * picMargin;
-        let lineWidth = 2;
-        canvas.width = picSize;
-        canvas.height = picSize;
-        let backGroundColor = BABYLON.Color3.FromHexString("#000000");
-        if (data.v === 10) {
-            backGroundColor = BABYLON.Color3.FromHexString("#103c6f");
+    function DrawMiniature(lines, canvas, data) {
+        if (!data) {
+            data = {};
         }
-        if (data.v === 8) {
-            backGroundColor = BABYLON.Color3.FromHexString("#106f26");
+        if (isNaN(data.size)) {
+            data.size = 256;
         }
-        if (data.v === 6) {
-            backGroundColor = BABYLON.Color3.FromHexString("#6f1610");
+        let backGroundColor = BABYLON.Color3.FromHexString("#103c6f");
+        if (data.backgroundColor) {
+            backGroundColor = BABYLON.Color3.FromHexString(data.backgroundColor);
         }
-        if (data.v === 2) {
-            backGroundColor = BABYLON.Color3.FromHexString("#3f106f");
-        }
+        let picMargin = data.size / 20;
+        let picSizeNoMargin = data.size - 2 * picMargin;
+        let lineWidth = 1;
+        canvas.width = data.size;
+        canvas.height = data.size;
         let backGroundColorHex = backGroundColor.toHexString();
         let context = canvas.getContext("2d");
         context.fillStyle = backGroundColorHex;
@@ -6115,10 +6111,10 @@ var MarbleRunSimulatorCore;
         let mx = picMargin;
         let my = picMargin;
         if (w > h) {
-            my = (picSize - h / s * picSizeNoMargin) * 0.5;
+            my = (data.size - h / s * picSizeNoMargin) * 0.5;
         }
         else if (h > w) {
-            mx = (picSize - w / s * picSizeNoMargin) * 0.5;
+            mx = (data.size - w / s * picSizeNoMargin) * 0.5;
         }
         let framePoints = [
             new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMin.z - 0.01),
@@ -6131,12 +6127,12 @@ var MarbleRunSimulatorCore;
         let p0 = framePoints[0];
         let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
         let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-        context.moveTo(x - 2, picSize - y - 2);
+        context.moveTo(x - 2, data.size - y - 2);
         for (let j = 1; j < framePoints.length; j++) {
             let p = framePoints[j];
             let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
             let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.lineTo(x - 2, picSize - y - 2);
+            context.lineTo(x - 2, data.size - y - 2);
         }
         context.closePath();
         context.strokeStyle = cFrameLine.toHexString();
@@ -6162,10 +6158,10 @@ var MarbleRunSimulatorCore;
             context.beginPath();
             let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
             let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.moveTo(x - 2, picSize - y - 2);
+            context.moveTo(x - 2, data.size - y - 2);
             x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
             y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.lineTo(x - 2, picSize - y - 2);
+            context.lineTo(x - 2, data.size - y - 2);
             context.strokeStyle = cFrameLine.toHexString();
             context.lineWidth = 1;
             context.stroke();
@@ -6177,10 +6173,10 @@ var MarbleRunSimulatorCore;
             context.beginPath();
             let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
             let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.moveTo(x - 2, picSize - y - 2);
+            context.moveTo(x - 2, data.size - y - 2);
             x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
             y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.lineTo(x - 2, picSize - y - 2);
+            context.lineTo(x - 2, data.size - y - 2);
             context.strokeStyle = cFrameLine.toHexString();
             context.lineWidth = 1;
             context.stroke();
@@ -6195,14 +6191,14 @@ var MarbleRunSimulatorCore;
             let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
             normalizedH = p0.y;
             //console.log("p0 " + x + " " + y);
-            context.moveTo(x - 2, picSize - y - 2);
+            context.moveTo(x - 2, data.size - y - 2);
             for (let j = 1; j < line.points.length; j++) {
                 let p = line.points[j];
                 let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
                 let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
                 normalizedH += p.y;
                 //console.log("p " + x + " " + y);
-                context.lineTo(x - 2, picSize - y - 2);
+                context.lineTo(x - 2, data.size - y - 2);
             }
             normalizedH = normalizedH / line.points.length;
             normalizedH = (normalizedH - aabbMin.y) / (aabbMax.y - aabbMin.y);
@@ -6228,9 +6224,23 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
-        context.font = "20px monospace";
-        context.fillStyle = "white";
-        context.fillText("v" + data.v.toFixed(0), 5, 25);
+        let fontSize = Math.floor(data.size / 20);
+        context.font = fontSize.toFixed(0) + "px monospace";
+        let c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.7);
+        context.fillStyle = c.toHexString();
+        context.lineWidth = 1;
+        context.strokeStyle = c.toHexString();
+        context.strokeRect(-0.5, -0.5, Math.floor(6.5 * fontSize), Math.floor(3.5 * fontSize));
+        if (isFinite(data.version)) {
+            let versionText = "v" + data.version.toFixed(0);
+            context.fillText(versionText, Math.floor(data.size - 0.5 * fontSize - context.measureText(versionText).width), Math.floor(data.size - 0.5 * fontSize));
+        }
+        if (isFinite(data.partsCount)) {
+            context.fillText("parts " + data.partsCount.toFixed(0).padStart(3, " "), Math.floor(0.5 * fontSize), Math.floor(1.5 * fontSize));
+        }
+        if (isFinite(data.ballsCount)) {
+            context.fillText("balls " + data.ballsCount.toFixed(0).padStart(3, " "), Math.floor(0.5 * fontSize), Math.floor(2.5 * fontSize));
+        }
     }
     MarbleRunSimulatorCore.DrawMiniature = DrawMiniature;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
@@ -6767,7 +6777,11 @@ var MarbleRunSimulatorCore;
                 }
             }
             if (makeMiniature) {
-                MarbleRunSimulatorCore.DrawMiniature(data, lines, canvas);
+                MarbleRunSimulatorCore.DrawMiniature(lines, canvas, {
+                    version: data.v,
+                    partsCount: partCount,
+                    ballsCount: ballCount,
+                });
             }
             else if (machine) {
                 if (data.r) {
@@ -7055,7 +7069,11 @@ var MarbleRunSimulatorCore;
             let grndAnchorsMaxY = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
             let spacing = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
             if (makeMiniature) {
-                MarbleRunSimulatorCore.DrawMiniature(data, lines, canvas);
+                MarbleRunSimulatorCore.DrawMiniature(lines, canvas, {
+                    version: data.v,
+                    partsCount: partCount,
+                    ballsCount: ballCount,
+                });
             }
             else if (machine) {
                 machine._roomIndex = roomIndex;
@@ -7148,9 +7166,9 @@ var MarbleRunSimulatorCore;
                 if (data.a) {
                     machine.author = data.a;
                 }
+                machine.balls = [];
+                machine.parts = [];
             }
-            machine.balls = [];
-            machine.parts = [];
             let lines = [];
             let pt = 0;
             let ballCount = parseInt(dataString.substring(pt, pt += 2), 36);
@@ -7216,7 +7234,11 @@ var MarbleRunSimulatorCore;
                 }
             }
             if (makeMiniature) {
-                MarbleRunSimulatorCore.DrawMiniature(data, lines, canvas);
+                MarbleRunSimulatorCore.DrawMiniature(lines, canvas, {
+                    version: data.v,
+                    partsCount: partCount,
+                    ballsCount: ballCount,
+                });
             }
             else if (machine) {
                 MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix(machine);
@@ -7408,7 +7430,11 @@ var MarbleRunSimulatorCore;
                 }
             }
             if (makeMiniature) {
-                MarbleRunSimulatorCore.DrawMiniature(data, lines, canvas);
+                MarbleRunSimulatorCore.DrawMiniature(lines, canvas, {
+                    version: data.v,
+                    partsCount: partCount,
+                    ballsCount: ballCount,
+                });
             }
             else if (machine) {
                 MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix(machine);
@@ -7612,7 +7638,11 @@ var MarbleRunSimulatorCore;
                 }
             }
             if (makeMiniature) {
-                MarbleRunSimulatorCore.DrawMiniature(data, lines, canvas);
+                MarbleRunSimulatorCore.DrawMiniature(lines, canvas, {
+                    version: data.v,
+                    partsCount: partCount,
+                    ballsCount: ballCount,
+                });
             }
             else if (machine) {
                 MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix(machine);
@@ -7833,7 +7863,11 @@ var MarbleRunSimulatorCore;
                 }
             }
             if (makeMiniature) {
-                MarbleRunSimulatorCore.DrawMiniature(data, lines, canvas);
+                MarbleRunSimulatorCore.DrawMiniature(lines, canvas, {
+                    version: data.v,
+                    partsCount: partCount,
+                    ballsCount: ballCount,
+                });
             }
             else if (machine) {
                 MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix(machine);

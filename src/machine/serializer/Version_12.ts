@@ -301,7 +301,15 @@ namespace MarbleRunSimulatorCore {
             let spacing = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
 
             if (makeMiniature) {
-                DrawMiniature(data, lines, canvas);
+                DrawMiniature(
+                    lines,
+                    canvas,
+                    {
+                        version: data.v,
+                        partsCount: partCount,
+                        ballsCount: ballCount,
+                    }
+                );
             }
             else if (machine) {
                 machine._roomIndex = roomIndex;
