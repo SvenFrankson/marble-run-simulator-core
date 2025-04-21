@@ -16,7 +16,6 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "wall_" + l.toFixed(0) + "." + h.toFixed(0);
-            template.angleSmoothSteps = 100;
             template.maxAngle = (0.8 * Math.PI) / 2;
             template.minTurnRadius = 0.12;
 
@@ -28,44 +27,38 @@ namespace MarbleRunSimulatorCore {
             template.yExtendable = true;
             template.lExtendableOnZ = true;
 
-            let r = tileWidth;
-            let rY = template.h * tileHeight * 0.45;
-            let depthStart = 0;
-            let depthEnd = tileSize * template.l;
+            let height = tileHeight * template.h;
+            let depth = tileSize * template.l;
 
             template.trackTemplates[0] = new TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, 0), Tools.V3Dir(90))];
 
-            for (let n = 0; n <= 8; n++) {
-                let f = n / 8;
-                let cosa = Math.cos(2 * Math.PI * f);
-                let sina = Math.sin(Math.PI * f);
+            let N = 64;
+            for (let n = 0; n <= N; n++) {
+                let f = n / N;
+                let a = - Math.PI * 0.5 + f * Math.PI;
+                let y = Math.cos(a) * height;
+                let x = height * Math.sqrt(1 - (y / height - 1) * (y / height - 1));
+                let z = Math.sin(a) * depth * 0.5;
 
-                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-(1 - sina) * r + r, (1 - cosa) * rY, Nabu.Easing.easeInOutSine(Nabu.Easing.easeInOutSine(f)) * (depthEnd - depthStart) + depthStart), undefined, n === 4 ? Tools.V3Dir(Math.PI) : undefined));
-            }
+                x -= tileSize * 0.5;
+                z += depth * 0.5;
 
-            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, depthEnd), Tools.V3Dir(-90)));
-
-            let points = template.trackTemplates[0].trackpoints.map((tp) => {
-                return tp.position.clone();
-            });
-            let f = 3;
-            for (let n = 0; n < 1; n++) {
-                let smoothedPoints = [...points].map((p) => {
-                    return p.clone();
-                });
-                for (let i = 1; i < smoothedPoints.length - 1; i++) {
-                    smoothedPoints[i]
-                        .copyFrom(points[i - 1])
-                        .addInPlace(points[i].scale(f))
-                        .addInPlace(points[i + 1])
-                        .scaleInPlace(1 / (2 + f));
+                let dir: BABYLON.Vector3;
+                let norm: BABYLON.Vector3;
+                if (n === 0) {
+                    dir = new BABYLON.Vector3(1, 0, 0);
+                    norm = BABYLON.Vector3.Up();
                 }
-                points = smoothedPoints;
-            }
+                else if (n === N / 2) {
+                    dir = new BABYLON.Vector3(0, 0, 1);
+                    norm = new BABYLON.Vector3(-1, 1, 0);
+                }
+                else if (n === N) {
+                    dir = new BABYLON.Vector3(- 1, 0, 0);
+                    norm = BABYLON.Vector3.Up();
+                }
 
-            for (let i = 0; i < points.length; i++) {
-                template.trackTemplates[0].trackpoints[i].position.copyFrom(points[i]);
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x, y, z), dir, norm));
             }
 
             template.initialize();
