@@ -1631,10 +1631,26 @@ var MarbleRunSimulatorCore;
         GameMode[GameMode["Demo"] = 4] = "Demo";
         GameMode[GameMode["GravityControl"] = 5] = "GravityControl";
     })(GameMode = MarbleRunSimulatorCore.GameMode || (MarbleRunSimulatorCore.GameMode = {}));
+    let MachineDBState;
+    (function (MachineDBState) {
+        MachineDBState[MachineDBState["Pending"] = 0] = "Pending";
+        MachineDBState[MachineDBState["Ok"] = 1] = "Ok";
+        MachineDBState[MachineDBState["Trash"] = 2] = "Trash";
+        MachineDBState[MachineDBState["Problem"] = 3] = "Problem";
+        MachineDBState[MachineDBState["Info"] = 4] = "Info";
+    })(MachineDBState = MarbleRunSimulatorCore.MachineDBState || (MarbleRunSimulatorCore.MachineDBState = {}));
+    MarbleRunSimulatorCore.MachineDBStateStrings = [
+        "Pending",
+        "Ok",
+        "Trash",
+        "Problem",
+        "Info"
+    ];
     class Machine {
         constructor(game) {
             this.game = game;
             this.version = -1;
+            this.dbState = MachineDBState.Pending;
             this.name = "Unnamed Machine";
             this.author = "Unknown Author";
             this.isChallengeMachine = false;
@@ -2372,7 +2388,9 @@ var MarbleRunSimulatorCore;
                 if (isFinite(data.v)) {
                     version = data.v;
                 }
-                console.log("deserialize version " + version);
+                if (isFinite(data.state)) {
+                    this.dbState = data.state;
+                }
                 if (!isFinite(version) || version === 1) {
                     return MarbleRunSimulatorCore.DeserializeV1(this, data);
                 }

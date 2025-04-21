@@ -67,6 +67,22 @@ namespace MarbleRunSimulatorCore {
         GravityControl
     }
 
+    export enum MachineDBState {
+        Pending,
+        Ok,
+        Trash,
+        Problem,
+        Info
+    }
+
+    export var MachineDBStateStrings = [
+        "Pending",
+        "Ok",
+        "Trash",
+        "Problem",
+        "Info"
+    ];
+
     export interface IBallData {
         x: number;
         y: number;
@@ -98,10 +114,12 @@ namespace MarbleRunSimulatorCore {
         title?: string; // v12
         author?: string; // v12
         content?: string; // v12
+        state?: MachineDBState;
     }
 
     export class Machine {
         public version: number = -1;
+        public dbState: MachineDBState = MachineDBState.Pending;
         public name: string = "Unnamed Machine";
         public author: string = "Unknown Author";
         public isChallengeMachine: boolean = false;
@@ -939,7 +957,9 @@ namespace MarbleRunSimulatorCore {
                 if (isFinite(data.v)) {
                     version = data.v;
                 }
-                console.log("deserialize version " + version);
+                if (isFinite(data.state)) {
+                    this.dbState = data.state;
+                }
 
                 if (!isFinite(version) || version === 1) {
                     return DeserializeV1(this, data);

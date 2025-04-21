@@ -278,6 +278,14 @@ declare namespace MarbleRunSimulatorCore {
         Demo = 4,
         GravityControl = 5
     }
+    enum MachineDBState {
+        Pending = 0,
+        Ok = 1,
+        Trash = 2,
+        Problem = 3,
+        Info = 4
+    }
+    var MachineDBStateStrings: string[];
     interface IBallData {
         x: number;
         y: number;
@@ -306,10 +314,12 @@ declare namespace MarbleRunSimulatorCore {
         title?: string;
         author?: string;
         content?: string;
+        state?: MachineDBState;
     }
     class Machine {
         game: IGame;
         version: number;
+        dbState: MachineDBState;
         name: string;
         author: string;
         isChallengeMachine: boolean;
