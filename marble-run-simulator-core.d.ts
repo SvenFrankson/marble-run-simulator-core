@@ -310,6 +310,7 @@ declare namespace MarbleRunSimulatorCore {
         d?: string;
         r?: number;
         sp?: ISleeperMeshProps;
+        id?: number;
         v?: number;
         title?: string;
         author?: string;
@@ -319,6 +320,7 @@ declare namespace MarbleRunSimulatorCore {
     class Machine {
         game: IGame;
         version: number;
+        dbId: number;
         dbState: MachineDBState;
         name: string;
         author: string;

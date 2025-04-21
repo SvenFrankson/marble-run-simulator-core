@@ -110,15 +110,17 @@ namespace MarbleRunSimulatorCore {
         r?: number; // v6 - RoomIndex - deprecated
         sp?: ISleeperMeshProps; // v10 - deprecated
         
+        id?: number; // v12
         v?: number; // v2
         title?: string; // v12
         author?: string; // v12
         content?: string; // v12
-        state?: MachineDBState;
+        state?: MachineDBState; // v12
     }
 
     export class Machine {
         public version: number = -1;
+        public dbId: number = -1;
         public dbState: MachineDBState = MachineDBState.Pending;
         public name: string = "Unnamed Machine";
         public author: string = "Unknown Author";
@@ -959,6 +961,10 @@ namespace MarbleRunSimulatorCore {
                 }
                 if (isFinite(data.state)) {
                     this.dbState = data.state;
+                }
+
+                if (isFinite(data.id)) {
+                    this.dbId = data.id;
                 }
 
                 if (!isFinite(version) || version === 1) {

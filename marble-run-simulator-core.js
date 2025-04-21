@@ -1650,6 +1650,7 @@ var MarbleRunSimulatorCore;
         constructor(game) {
             this.game = game;
             this.version = -1;
+            this.dbId = -1;
             this.dbState = MachineDBState.Pending;
             this.name = "Unnamed Machine";
             this.author = "Unknown Author";
@@ -2390,6 +2391,9 @@ var MarbleRunSimulatorCore;
                 }
                 if (isFinite(data.state)) {
                     this.dbState = data.state;
+                }
+                if (isFinite(data.id)) {
+                    this.dbId = data.id;
                 }
                 if (!isFinite(version) || version === 1) {
                     return MarbleRunSimulatorCore.DeserializeV1(this, data);
