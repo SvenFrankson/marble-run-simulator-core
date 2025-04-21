@@ -1652,6 +1652,7 @@ var MarbleRunSimulatorCore;
             this.version = -1;
             this.dbId = -1;
             this.dbState = MachineDBState.Pending;
+            this.dbLikes = 1;
             this.name = "Unnamed Machine";
             this.author = "Unknown Author";
             this.isChallengeMachine = false;
@@ -2391,6 +2392,9 @@ var MarbleRunSimulatorCore;
                 }
                 if (isFinite(data.state)) {
                     this.dbState = data.state;
+                }
+                if (isFinite(data.likes)) {
+                    this.dbLikes = data.likes;
                 }
                 if (isFinite(data.id)) {
                     this.dbId = data.id;

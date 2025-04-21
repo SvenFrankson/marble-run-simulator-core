@@ -116,12 +116,14 @@ namespace MarbleRunSimulatorCore {
         author?: string; // v12
         content?: string; // v12
         state?: MachineDBState; // v12
+        likes?: number; // v12
     }
 
     export class Machine {
         public version: number = -1;
         public dbId: number = -1;
         public dbState: MachineDBState = MachineDBState.Pending;
+        public dbLikes: number = 1;
         public name: string = "Unnamed Machine";
         public author: string = "Unknown Author";
         public isChallengeMachine: boolean = false;
@@ -961,6 +963,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 if (isFinite(data.state)) {
                     this.dbState = data.state;
+                }
+                if (isFinite(data.likes)) {
+                    this.dbLikes = data.likes;
                 }
 
                 if (isFinite(data.id)) {

@@ -316,12 +316,14 @@ declare namespace MarbleRunSimulatorCore {
         author?: string;
         content?: string;
         state?: MachineDBState;
+        likes?: number;
     }
     class Machine {
         game: IGame;
         version: number;
         dbId: number;
         dbState: MachineDBState;
+        dbLikes: number;
         name: string;
         author: string;
         isChallengeMachine: boolean;
