@@ -114,6 +114,9 @@ namespace MarbleRunSimulatorCore {
                 if (prop.d === 14) {
                     prop.i += 34;
                 }
+                else if (prop.d === 2) {
+                    prop.i += 1;
+                }
                 else {
                     prop.i += 1 + (prop.d - 2) * 3;
                 }
@@ -285,7 +288,7 @@ namespace MarbleRunSimulatorCore {
                     
                 }
                 else if (prop.h === 2) {
-                    prop.i -= 2;
+                    
                 }
                 else if (prop.h === 3) {
                     
@@ -374,6 +377,9 @@ namespace MarbleRunSimulatorCore {
 
     export function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement): void {
         let dataString = data.d;
+        if (!dataString) {
+            dataString = data.content;
+        }
         if (dataString) {
             if (makeMiniature) {
 
@@ -382,8 +388,14 @@ namespace MarbleRunSimulatorCore {
                 if (data.n) {
                     machine.name = data.n;
                 }
+                if (data.title) {
+                    machine.name = data.title;
+                }
                 if (data.a) {
                     machine.author = data.a;
+                }
+                if (data.author) {
+                    machine.author = data.author;
                 }
             
                 machine.balls = [];

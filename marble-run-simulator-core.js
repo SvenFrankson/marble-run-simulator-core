@@ -6407,6 +6407,9 @@ var MarbleRunSimulatorCore;
                 if (prop.d === 14) {
                     prop.i += 34;
                 }
+                else if (prop.d === 2) {
+                    prop.i += 1;
+                }
                 else {
                     prop.i += 1 + (prop.d - 2) * 3;
                 }
@@ -6572,7 +6575,6 @@ var MarbleRunSimulatorCore;
                 if (prop.h === 1) {
                 }
                 else if (prop.h === 2) {
-                    prop.i -= 2;
                 }
                 else if (prop.h === 3) {
                 }
@@ -6656,6 +6658,9 @@ var MarbleRunSimulatorCore;
     MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix = DeserializeAnte11AltitudeFix;
     function DeserializeV11(machine, data, makeMiniature = false, canvas) {
         let dataString = data.d;
+        if (!dataString) {
+            dataString = data.content;
+        }
         if (dataString) {
             if (makeMiniature) {
             }
@@ -6663,8 +6668,14 @@ var MarbleRunSimulatorCore;
                 if (data.n) {
                     machine.name = data.n;
                 }
+                if (data.title) {
+                    machine.name = data.title;
+                }
                 if (data.a) {
                     machine.author = data.a;
+                }
+                if (data.author) {
+                    machine.author = data.author;
                 }
                 machine.balls = [];
                 machine.parts = [];
