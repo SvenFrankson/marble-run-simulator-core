@@ -1638,14 +1638,14 @@ var MarbleRunSimulatorCore;
     (function (MachineDBState) {
         MachineDBState[MachineDBState["Pending"] = 0] = "Pending";
         MachineDBState[MachineDBState["Ok"] = 1] = "Ok";
-        MachineDBState[MachineDBState["Trash"] = 2] = "Trash";
+        MachineDBState[MachineDBState["NOk"] = 2] = "NOk";
         MachineDBState[MachineDBState["Problem"] = 3] = "Problem";
         MachineDBState[MachineDBState["Info"] = 4] = "Info";
     })(MachineDBState = MarbleRunSimulatorCore.MachineDBState || (MarbleRunSimulatorCore.MachineDBState = {}));
     MarbleRunSimulatorCore.MachineDBStateStrings = [
         "Pending",
         "Ok",
-        "Trash",
+        "NOk",
         "Problem",
         "Info"
     ];

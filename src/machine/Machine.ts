@@ -70,7 +70,7 @@ namespace MarbleRunSimulatorCore {
     export enum MachineDBState {
         Pending,
         Ok,
-        Trash,
+        NOk,
         Problem,
         Info
     }
@@ -78,7 +78,7 @@ namespace MarbleRunSimulatorCore {
     export var MachineDBStateStrings = [
         "Pending",
         "Ok",
-        "Trash",
+        "NOk",
         "Problem",
         "Info"
     ];

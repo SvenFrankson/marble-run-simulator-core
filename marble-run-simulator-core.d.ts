@@ -281,7 +281,7 @@ declare namespace MarbleRunSimulatorCore {
     enum MachineDBState {
         Pending = 0,
         Ok = 1,
-        Trash = 2,
+        NOk = 2,
         Problem = 3,
         Info = 4
     }
