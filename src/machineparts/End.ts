@@ -18,7 +18,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.panel = new BABYLON.Mesh("panel");
-            this.panel.position = new BABYLON.Vector3((this.mirrorX ? tileWidth * 0.6 : tileWidth * 0.4), - 1.4 * tileHeight - 0.005, this.wireGauge * 0.5);
+            this.panel.position = new BABYLON.Vector3((this.mirrorX ? tileWidth * 0.6 : tileWidth * 0.4), 0.6 * tileHeight - 0.005, this.wireGauge * 0.5);
             this.panel.parent = this;
             
             this.panelSupport = new BABYLON.Mesh("panel-support");
@@ -58,14 +58,14 @@ namespace MarbleRunSimulatorCore {
             template.xMirrorable = true;
 
             let x0 = tileWidth * 0.4;
-            let y0 = -1.4 * tileHeight;
+            let y0 = 0.6 * tileHeight;
             let w = tileWidth * 0.5;
             let r = 0.01;
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0, -0.01, 0), Tools.V3Dir(120))
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 2 * tileHeight, 0), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(0, 2 * tileHeight - 0.01, 0), Tools.V3Dir(120))
             ];
 
             template.trackTemplates[1] = new TrackTemplate(template);

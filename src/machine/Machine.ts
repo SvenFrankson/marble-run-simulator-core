@@ -953,6 +953,8 @@ namespace MarbleRunSimulatorCore {
 
         public lastDeserializedData: IMachineData;
         public deserialize(data: IMachineData, makeMiniature?: boolean): void {
+            console.log("Deserialize version " + data.v);
+            console.log(data);
             this.lastDeserializedData = data;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.isChallengeMachine = false;

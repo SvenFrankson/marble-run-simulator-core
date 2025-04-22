@@ -111,26 +111,11 @@ namespace MarbleRunSimulatorCore {
         if (baseName === "uturn") {
             let newL = (prop.d - 1) * 3;
             if (prop.mirrorX) {
-                if (prop.d === 2) {
-                    prop.i += 1;
+                if (prop.d === 14) {
+                    prop.i += 34;
                 }
-                if (prop.d === 3) {
-                    prop.i += 4;
-                }
-                if (prop.d === 4) {
-                    prop.i += 7;
-                }
-                if (prop.d === 5) {
-                    prop.i += 10;
-                }
-                if (prop.d === 6) {
-                    prop.i += 13;
-                }
-                if (prop.d === 7) {
-                    prop.i += 16;
-                }
-                if (prop.d === 8) {
-                    prop.i += 16;
+                else {
+                    prop.i += 1 + (prop.d - 2) * 3;
                 }
 
                 if (prop.mirrorZ) {
@@ -171,6 +156,7 @@ namespace MarbleRunSimulatorCore {
             //console.log("n " + prop.n);
             //console.log("mirrorX " + prop.mirrorX);
             //console.log("mirrorZ " + prop.mirrorZ);
+            console.log(prop);
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             prop.k -= 4;
@@ -186,7 +172,7 @@ namespace MarbleRunSimulatorCore {
             else {
                 prop.i--;
                 if (prop.mirrorZ) {
-
+                    prop.j -= prop.d;
                 }
                 else {
                     prop.d = - prop.d;
@@ -302,10 +288,10 @@ namespace MarbleRunSimulatorCore {
                 if (prop.h === 1) {
                     prop.i -= 2;
                 }
-                if (prop.h === 2) {
+                else if (prop.h === 2) {
                     prop.i -= 2;
                 }
-                if (prop.h === 3) {
+                else if (prop.h === 3) {
                     
                 }
                 else if (prop.h === 9) {
@@ -313,6 +299,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (prop.h === 11) {
                     prop.i += 7;
+                }
+                else if (prop.h === 20) {
+                    prop.i += 12;
                 }
                 else {
                     prop.i += 2 + Math.floor((prop.h + 1) / 5);
@@ -350,6 +339,13 @@ namespace MarbleRunSimulatorCore {
             prop.l = prop.l * 3;
             prop.i -= 1;
             prop.j -= 3;
+        }
+        if (baseName === "end") {
+            prop.k -= 2;
+            if (prop.mirrorX) {
+                prop.i += 3;
+                prop.r = 2;
+            }
         }
     }
 
