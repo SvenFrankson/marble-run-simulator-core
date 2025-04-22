@@ -147,7 +147,6 @@ namespace MarbleRunSimulatorCore {
             }
             
             let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-            console.log("partCount = " + partCount);
 
             for (let i = 0; i < partCount; i++) {
                 let index = parseInt(dataString.substring(pt, pt += 2), 36);

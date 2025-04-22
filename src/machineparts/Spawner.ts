@@ -21,8 +21,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            let partName = "spawner";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Spawner.PropToPartName(prop)));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -145,6 +144,10 @@ namespace MarbleRunSimulatorCore {
             this.reset();
         }
 
+        public static PropToPartName(prop: IMachinePartProp): string {
+            return "spawner";
+        }
+
         protected async instantiateMachineSpecific(): Promise<void> {
             let q = Mummu.QuaternionFromYZAxis(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0));
             let axisPassVertexData = BABYLON.CreateCylinderVertexData({ height: tileDepth * 0.5 + this.wireGauge * 1.2, diameter: 0.001 });
@@ -246,6 +249,7 @@ namespace MarbleRunSimulatorCore {
             ];
             template.trackTemplates[3].drawStartTip = true;
             template.trackTemplates[3].drawEndTip = true;
+            template.trackTemplates[3].noMiniatureRender = true;
 
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();

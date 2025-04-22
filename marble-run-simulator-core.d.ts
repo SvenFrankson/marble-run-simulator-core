@@ -1275,6 +1275,7 @@ declare namespace MarbleRunSimulatorCore {
         private angleClosed;
         static pivotL: number;
         constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
         dispose(): void;

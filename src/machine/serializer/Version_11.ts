@@ -153,10 +153,6 @@ namespace MarbleRunSimulatorCore {
             prop.l = newL;
         }
         if (baseName === "loop") {
-            //console.log("n " + prop.n);
-            //console.log("mirrorX " + prop.mirrorX);
-            //console.log("mirrorZ " + prop.mirrorZ);
-            console.log(prop);
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             prop.k -= 4;
@@ -286,7 +282,7 @@ namespace MarbleRunSimulatorCore {
             if (prop.mirrorX) {
                 prop.r = 2;
                 if (prop.h === 1) {
-                    prop.i -= 2;
+                    
                 }
                 else if (prop.h === 2) {
                     prop.i -= 2;
@@ -299,6 +295,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (prop.h === 11) {
                     prop.i += 7;
+                }
+                else if (prop.h === 16) {
+                    prop.i += 9;
                 }
                 else if (prop.h === 20) {
                     prop.i += 12;

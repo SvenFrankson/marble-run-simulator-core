@@ -6444,10 +6444,6 @@ var MarbleRunSimulatorCore;
             prop.l = newL;
         }
         if (baseName === "loop") {
-            //console.log("n " + prop.n);
-            //console.log("mirrorX " + prop.mirrorX);
-            //console.log("mirrorZ " + prop.mirrorZ);
-            console.log(prop);
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             prop.k -= 4;
@@ -6574,7 +6570,6 @@ var MarbleRunSimulatorCore;
             if (prop.mirrorX) {
                 prop.r = 2;
                 if (prop.h === 1) {
-                    prop.i -= 2;
                 }
                 else if (prop.h === 2) {
                     prop.i -= 2;
@@ -6586,6 +6581,9 @@ var MarbleRunSimulatorCore;
                 }
                 else if (prop.h === 11) {
                     prop.i += 7;
+                }
+                else if (prop.h === 16) {
+                    prop.i += 9;
                 }
                 else if (prop.h === 20) {
                     prop.i += 12;
@@ -6915,7 +6913,6 @@ var MarbleRunSimulatorCore;
                 }
             }
             let partCount = parseInt(dataString.substring(pt, pt += 2), 36);
-            console.log("partCount = " + partCount);
             for (let i = 0; i < partCount; i++) {
                 let index = parseInt(dataString.substring(pt, pt += 2), 36);
                 if (index >= 0 && index < MarbleRunSimulatorCore.TrackNames.length) {
@@ -10887,8 +10884,7 @@ var MarbleRunSimulatorCore;
                 });
             };
             this._moving = false;
-            let partName = "spawner";
-            this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Spawner.PropToPartName(prop)));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
             for (let i = this.colors.length; i < 6; i++) {
@@ -10982,6 +10978,9 @@ var MarbleRunSimulatorCore;
             this.machine.onStopCallbacks.push(this.reset);
             this.reset();
         }
+        static PropToPartName(prop) {
+            return "spawner";
+        }
         async instantiateMachineSpecific() {
             let q = Mummu.QuaternionFromYZAxis(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0));
             let axisPassVertexData = BABYLON.CreateCylinderVertexData({ height: MarbleRunSimulatorCore.tileDepth * 0.5 + this.wireGauge * 1.2, diameter: 0.001 });
@@ -11066,6 +11065,7 @@ var MarbleRunSimulatorCore;
             ];
             template.trackTemplates[3].drawStartTip = true;
             template.trackTemplates[3].drawEndTip = true;
+            template.trackTemplates[3].noMiniatureRender = true;
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
             }
