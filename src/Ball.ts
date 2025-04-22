@@ -106,6 +106,9 @@ namespace MarbleRunSimulatorCore {
         public set materialIndex(v: number) {
             this._materialIndex = v;
             this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
+            if (this.positionZeroGhost) {
+                this.positionZeroGhost.material = this.material;
+            }
         }
 
         public setPositionZero(p: BABYLON.Vector3): void {
@@ -178,7 +181,7 @@ namespace MarbleRunSimulatorCore {
 
         public updateSelectorMeshVisibility(): void {
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
-            if (this.machine.playing) {
+            if (this.machine.playing || this.machine.paused) {
                 this.renderOutline = false;
                 this.positionZeroGhost.visibility = 0.5;
 

@@ -132,6 +132,9 @@ var MarbleRunSimulatorCore;
         set materialIndex(v) {
             this._materialIndex = v;
             this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
+            if (this.positionZeroGhost) {
+                this.positionZeroGhost.material = this.material;
+            }
         }
         setPositionZero(p) {
             this.positionZero.copyFrom(p);
@@ -167,7 +170,7 @@ var MarbleRunSimulatorCore;
         }
         updateSelectorMeshVisibility() {
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
-            if (this.machine.playing) {
+            if (this.machine.playing || this.machine.paused) {
                 this.renderOutline = false;
                 this.positionZeroGhost.visibility = 0.5;
                 this.positionZeroGhost.renderOutline = true;
@@ -2039,61 +2042,12 @@ var MarbleRunSimulatorCore;
                 minJ = Math.min(minJ, track.j - track.d * 3);
                 minK = Math.min(minK, track.k);
             }
-            if (false && this.game.DEBUG_MODE) {
-                if (this.debugAxis) {
-                    this.debugAxis.dispose();
-                }
-                let x = (this.baseMeshMinX + this.baseMeshMaxX) * 0.5;
-                let z = (this.baseMeshMinZ + this.baseMeshMaxZ) * 0.5;
-                this.debugAxis = BABYLON.MeshBuilder.CreateLines("debug-axis", {
-                    points: [new BABYLON.Vector3(x, this.baseMeshMaxY, z), new BABYLON.Vector3(x, this.baseMeshMinY, z), new BABYLON.Vector3(x + 0.1, this.baseMeshMinY, z)],
-                });
-            }
             if (false) {
-                let w = this.baseMeshMaxX - this.baseMeshMinX;
-                let h = this.baseMeshMaxY - this.baseMeshMinY;
-                let u = w * 4;
-                let v = h * 4;
-                if (this.pedestalTop) {
-                    this.pedestalTop.dispose();
-                }
-                this.pedestalTop = BABYLON.MeshBuilder.CreatePlane("base-wall", { width: h + 2 * this.margin, height: w + 2 * this.margin, sideOrientation: BABYLON.Mesh.DOUBLESIDE, frontUVs: new BABYLON.Vector4(0, 0, v, u) });
-                this.pedestalTop.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
-                this.pedestalTop.position.y = (this.baseMeshMaxY + this.baseMeshMinY) * 0.5;
-                this.pedestalTop.position.z += 0.016;
-                this.pedestalTop.rotation.z = Math.PI / 2;
-                if (this.baseFrame) {
-                    this.baseFrame.dispose();
-                }
-                this.baseFrame = new BABYLON.Mesh("base-frame");
-                this.baseFrame.position.copyFrom(this.pedestalTop.position);
-                this.baseFrame.material = this.game.materials.getMaterial(0, this.materialQ);
-                let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/base-frame.babylon");
-                let data = Mummu.CloneVertexData(vertexDatas[0]);
-                let positions = [...data.positions];
-                for (let i = 0; i < positions.length / 3; i++) {
-                    let x = positions[3 * i];
-                    let y = positions[3 * i + 1];
-                    if (x > 0) {
-                        positions[3 * i] += w * 0.5 - 0.01 + this.margin;
-                    }
-                    else if (x < 0) {
-                        positions[3 * i] -= w * 0.5 - 0.01 + this.margin;
-                    }
-                    if (y > 0) {
-                        positions[3 * i + 1] += h * 0.5 - 0.01 + this.margin;
-                    }
-                    else if (y < 0) {
-                        positions[3 * i + 1] -= h * 0.5 - 0.01 + this.margin;
-                    }
-                }
-                data.positions = positions;
-                data.applyToMesh(this.baseFrame);
             }
             else {
                 let w = this.baseMeshMaxX - this.baseMeshMinX;
-                let h = 1;
                 let d = this.baseMeshMaxZ - this.baseMeshMinZ;
+                let isVisible = true;
                 if (this.baseFrame) {
                     if (this.game.room) {
                         let i1 = this.game.room.light1.includedOnlyMeshes.indexOf(this.baseFrame);
@@ -2105,9 +2059,11 @@ var MarbleRunSimulatorCore;
                             this.game.room.light2.includedOnlyMeshes.splice(i2, 1);
                         }
                     }
+                    isVisible = this.baseFrame.isVisible;
                     this.baseFrame.dispose();
                 }
                 this.baseFrame = new BABYLON.Mesh("base-stand");
+                this.baseFrame.isVisible = isVisible;
                 this.baseFrame.parent = this.root;
                 this.baseFrame.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
                 this.baseFrame.position.y = this.baseMeshMinY;
@@ -2147,9 +2103,11 @@ var MarbleRunSimulatorCore;
                 data.positions = positions;
                 data.applyToMesh(this.baseFrame);
                 if (this.pedestalTop) {
+                    isVisible = this.pedestalTop.isVisible;
                     this.pedestalTop.dispose();
                 }
                 this.pedestalTop = new BABYLON.Mesh("pedestal-top");
+                this.pedestalTop.isVisible = isVisible;
                 this.pedestalTop.parent = this.root;
                 this.pedestalTop.receiveShadows = true;
                 this.pedestalTop.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
@@ -2189,9 +2147,11 @@ var MarbleRunSimulatorCore;
                 data.uvs = uvs;
                 data.applyToMesh(this.pedestalTop);
                 if (this.baseLogo) {
+                    isVisible = this.baseLogo.isVisible;
                     this.baseLogo.dispose();
                 }
                 this.baseLogo = new BABYLON.Mesh("base-logo");
+                this.baseLogo.isVisible = isVisible;
                 this.baseLogo.parent = this.root;
                 this.baseLogo.position.x = (this.baseMeshMaxX + this.baseMeshMinX) * 0.5;
                 this.baseLogo.position.y = this.baseMeshMinY + 0.0001;
