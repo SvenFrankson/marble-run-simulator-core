@@ -51,7 +51,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (n === N / 2) {
                     dir = new BABYLON.Vector3(0, 0, 1);
-                    norm = new BABYLON.Vector3(-1, 1, 0);
+                    norm = new BABYLON.Vector3(-1, -1, 0);
                 }
                 else if (n === N) {
                     dir = new BABYLON.Vector3(- 1, 0, 0);
@@ -61,6 +61,14 @@ namespace MarbleRunSimulatorCore {
                 template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x, y, z), dir, norm));
             }
 
+            let c = new BABYLON.Vector3(- tileSize * 0.5, tileHeight * template.h * 0.5, tileSize * template.l * 0.5);
+            template.trackTemplates[0].onNormalEvaluated = (n, p, i) => {
+                let f = Math.abs(2 * (i - 0.5));
+                let aim = c.subtract(p).scaleInPlace(1 - f);
+                let up = BABYLON.Vector3.Up();
+                BABYLON.Vector3.SlerpToRef(up, aim, 1 - f, n);
+                n.normalize();
+            }
             template.initialize();
 
             return template;
