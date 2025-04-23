@@ -3664,6 +3664,7 @@ var MarbleRunSimulatorCore;
                         this.tracks[i] = track;
                     }
                     track.initialize(this.template.trackTemplates[i]);
+                    track.refreshStartEndWorldPosition();
                     this.allWires.push(track.wires[0], track.wires[1]);
                 }
             }
