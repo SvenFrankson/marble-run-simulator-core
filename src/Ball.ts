@@ -404,7 +404,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 if (collisionableParts) {
                     collisionableParts.forEach((part) => {
-                        if (Mummu.SphereAABBCheck(this.position, this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
+                        if (Mummu.SphereAABBCheck(this.position, this.radius, part.worldAABBMin.x - this.radius, part.worldAABBMax.x + this.radius, part.worldAABBMin.y - this.radius, part.worldAABBMax.y + this.radius, part.worldAABBMin.z - this.radius, part.worldAABBMax.z + this.radius)) {
                             part.allWires.forEach((wire) => {
                                 let index = this.getLastIndex(wire);
                                 let col: Mummu.IIntersection;

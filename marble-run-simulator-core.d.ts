@@ -524,8 +524,10 @@ declare namespace MarbleRunSimulatorCore {
         globalSlope: number;
         localBarycenter: BABYLON.Vector3;
         localBarycenterIJK: BABYLON.Vector3;
-        AABBMin: BABYLON.Vector3;
-        AABBMax: BABYLON.Vector3;
+        localAABBMin: BABYLON.Vector3;
+        localAABBMax: BABYLON.Vector3;
+        worldAABBMin: BABYLON.Vector3;
+        worldAABBMax: BABYLON.Vector3;
         visibleWidth: number;
         visibleHeight: number;
         visibleDepth: number;
@@ -647,7 +649,8 @@ declare namespace MarbleRunSimulatorCore {
         instantiated: boolean;
         instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
-        refreshEncloseMeshAndAABB(): void;
+        refreshEncloseMeshAndLocalAABB(): void;
+        refreshWorldAABB(): void;
         dispose(): void;
         generateWires(): void;
         private _lastDist;

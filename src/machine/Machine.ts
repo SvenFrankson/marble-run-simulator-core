@@ -563,12 +563,12 @@ namespace MarbleRunSimulatorCore {
             let minK = -1;
             for (let i = 0; i < this.parts.length; i++) {
                 let track = this.parts[i];
-                this.baseMeshMinX = Math.min(this.baseMeshMinX, track.AABBMin.x);
-                this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.AABBMax.x);
+                this.baseMeshMinX = Math.min(this.baseMeshMinX, track.worldAABBMin.x);
+                this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.worldAABBMax.x);
                 //this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
-                this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.AABBMax.y);
-                this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.AABBMin.z);
-                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.AABBMax.z);
+                this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.worldAABBMax.y);
+                this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.worldAABBMin.z);
+                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.worldAABBMax.z);
                 
                 this.tracksMinX = Math.min(this.tracksMinX, track.position.x - tileWidth * 0.5);
                 this.tracksMaxX = Math.max(this.tracksMaxX, track.position.x + tileWidth * (track.w - 0.5));
@@ -763,14 +763,14 @@ namespace MarbleRunSimulatorCore {
                 this.exitShooter.setJ(minJ - 1, true);
                 this.exitShooter.setK(minK - 2, true);
                 this.exitShooter.recomputeAbsolutePath();
-                this.exitShooter.refreshEncloseMeshAndAABB();
+                this.exitShooter.refreshEncloseMeshAndLocalAABB();
             }
             if (this.exitTrack) {
                 this.exitTrack.setI(maxI - 3, true);
                 this.exitTrack.setJ(minJ - 1, true);
                 this.exitTrack.setK(minK - 3, true);
                 this.exitTrack.recomputeAbsolutePath();
-                this.exitTrack.refreshEncloseMeshAndAABB();
+                this.exitTrack.refreshEncloseMeshAndLocalAABB();
             }
             if (this.exitHoleIn) {
                 this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;

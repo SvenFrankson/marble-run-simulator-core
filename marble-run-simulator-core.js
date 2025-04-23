@@ -352,7 +352,7 @@ var MarbleRunSimulatorCore;
                 }
                 if (collisionableParts) {
                     collisionableParts.forEach((part) => {
-                        if (Mummu.SphereAABBCheck(this.position, this.radius, part.AABBMin.x - this.radius, part.AABBMax.x + this.radius, part.AABBMin.y - this.radius, part.AABBMax.y + this.radius, part.AABBMin.z - this.radius, part.AABBMax.z + this.radius)) {
+                        if (Mummu.SphereAABBCheck(this.position, this.radius, part.worldAABBMin.x - this.radius, part.worldAABBMax.x + this.radius, part.worldAABBMin.y - this.radius, part.worldAABBMax.y + this.radius, part.worldAABBMin.z - this.radius, part.worldAABBMax.z + this.radius)) {
                             part.allWires.forEach((wire) => {
                                 let index = this.getLastIndex(wire);
                                 let col;
@@ -2026,12 +2026,12 @@ var MarbleRunSimulatorCore;
             let minK = -1;
             for (let i = 0; i < this.parts.length; i++) {
                 let track = this.parts[i];
-                this.baseMeshMinX = Math.min(this.baseMeshMinX, track.AABBMin.x);
-                this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.AABBMax.x);
+                this.baseMeshMinX = Math.min(this.baseMeshMinX, track.worldAABBMin.x);
+                this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.worldAABBMax.x);
                 //this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
-                this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.AABBMax.y);
-                this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.AABBMin.z);
-                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.AABBMax.z);
+                this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.worldAABBMax.y);
+                this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.worldAABBMin.z);
+                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.worldAABBMax.z);
                 this.tracksMinX = Math.min(this.tracksMinX, track.position.x - MarbleRunSimulatorCore.tileWidth * 0.5);
                 this.tracksMaxX = Math.max(this.tracksMaxX, track.position.x + MarbleRunSimulatorCore.tileWidth * (track.w - 0.5));
                 this.tracksMinY = Math.min(this.tracksMinY, track.position.y - MarbleRunSimulatorCore.tileHeight * (track.h + 1));
@@ -2207,14 +2207,14 @@ var MarbleRunSimulatorCore;
                 this.exitShooter.setJ(minJ - 1, true);
                 this.exitShooter.setK(minK - 2, true);
                 this.exitShooter.recomputeAbsolutePath();
-                this.exitShooter.refreshEncloseMeshAndAABB();
+                this.exitShooter.refreshEncloseMeshAndLocalAABB();
             }
             if (this.exitTrack) {
                 this.exitTrack.setI(maxI - 3, true);
                 this.exitTrack.setJ(minJ - 1, true);
                 this.exitTrack.setK(minK - 3, true);
                 this.exitTrack.recomputeAbsolutePath();
-                this.exitTrack.refreshEncloseMeshAndAABB();
+                this.exitTrack.refreshEncloseMeshAndLocalAABB();
             }
             if (this.exitHoleIn) {
                 this.exitHoleIn.position.x = this.baseMeshMinX - 0.015;
@@ -2504,29 +2504,29 @@ var MarbleRunSimulatorCore;
         PartVisibilityMode[PartVisibilityMode["Ghost"] = 2] = "Ghost";
     })(PartVisibilityMode = MarbleRunSimulatorCore.PartVisibilityMode || (MarbleRunSimulatorCore.PartVisibilityMode = {}));
     var selectorHullShapeDisplayTip = [];
-    for (let i = 0; i < 10; i++) {
-        let a = (i / 10) * 2 * Math.PI;
+    for (let i = 0; i < 6; i++) {
+        let a = (i / 6) * 2 * Math.PI;
         let cosa = Math.cos(a);
         let sina = Math.sin(a);
         selectorHullShapeDisplayTip[i] = new BABYLON.Vector3(cosa * 0.01, sina * 0.01, 0);
     }
     var selectorHullPipeShapeDisplayTip = [];
-    for (let i = 0; i < 10; i++) {
-        let a = (i / 10) * 2 * Math.PI;
+    for (let i = 0; i < 6; i++) {
+        let a = (i / 6) * 2 * Math.PI;
         let cosa = Math.cos(a);
         let sina = Math.sin(a);
         selectorHullPipeShapeDisplayTip[i] = new BABYLON.Vector3(cosa * 0.014, sina * 0.014, 0);
     }
     var selectorHullShapeDisplay = [];
-    for (let i = 0; i < 10; i++) {
-        let a = (i / 10) * 2 * Math.PI;
+    for (let i = 0; i < 6; i++) {
+        let a = (i / 6) * 2 * Math.PI;
         let cosa = Math.cos(a);
         let sina = Math.sin(a);
         selectorHullShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0);
     }
     var selectorHullPipeShapeDisplay = [];
-    for (let i = 0; i < 10; i++) {
-        let a = (i / 10) * 2 * Math.PI;
+    for (let i = 0; i < 6; i++) {
+        let a = (i / 6) * 2 * Math.PI;
         let cosa = Math.cos(a);
         let sina = Math.sin(a);
         selectorHullPipeShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.012, sina * 0.012, 0);
@@ -2742,8 +2742,10 @@ var MarbleRunSimulatorCore;
             this.globalSlope = 0;
             this.localBarycenter = BABYLON.Vector3.Zero();
             this.localBarycenterIJK = BABYLON.Vector3.Zero();
-            this.AABBMin = BABYLON.Vector3.Zero();
-            this.AABBMax = BABYLON.Vector3.Zero();
+            this.localAABBMin = BABYLON.Vector3.Zero();
+            this.localAABBMax = BABYLON.Vector3.Zero();
+            this.worldAABBMin = BABYLON.Vector3.Zero();
+            this.worldAABBMax = BABYLON.Vector3.Zero();
             this.visibleWidth = 1;
             this.visibleHeight = 1;
             this.visibleDepth = 1;
@@ -2858,7 +2860,7 @@ var MarbleRunSimulatorCore;
             this.sleepersMeshProp = this.machine.sleepersMeshProp;
             this.parent = this.machine.root;
             this.tracks = [];
-            this.refreshEncloseMeshAndAABB();
+            this.refreshEncloseMeshAndLocalAABB();
         }
         get partName() {
             return this.template ? this.template.partName : "machine-part-no-template";
@@ -3111,7 +3113,7 @@ var MarbleRunSimulatorCore;
                     m.freezeWorldMatrix();
                 });
                 this.update(0);
-                this.refreshEncloseMeshAndAABB();
+                this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -3143,7 +3145,7 @@ var MarbleRunSimulatorCore;
                     m.freezeWorldMatrix();
                 });
                 this.update(0);
-                this.refreshEncloseMeshAndAABB();
+                this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -3181,7 +3183,7 @@ var MarbleRunSimulatorCore;
                     m.freezeWorldMatrix();
                 });
                 this.update(0);
-                this.refreshEncloseMeshAndAABB();
+                this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
             }
         }
@@ -3220,6 +3222,7 @@ var MarbleRunSimulatorCore;
                         m.freezeWorldMatrix();
                     });
                     this.update(0);
+                    this.refreshWorldAABB();
                     this.machine.requestUpdateShadow = true;
                 }
             }
@@ -3516,7 +3519,7 @@ var MarbleRunSimulatorCore;
                 Mummu.MergeVertexDatas(...selectorMeshLogicVertexDatas).applyToMesh(this.selectorBodyLogic);
             }
             this.selectorBodyLogic.visibility = DEBUG_logicColliderVisibility;
-            this.refreshEncloseMeshAndAABB();
+            this.refreshEncloseMeshAndLocalAABB();
             if (this.machine.geometryQ > MarbleRunSimulatorCore.GeometryQuality.Proxy) {
                 await this.instantiateMachineSpecific();
             }
@@ -3529,7 +3532,8 @@ var MarbleRunSimulatorCore;
             this.instantiated = true;
         }
         async instantiateMachineSpecific() { }
-        refreshEncloseMeshAndAABB() {
+        refreshEncloseMeshAndLocalAABB() {
+            console.log("refreshEncloseMeshAndLocalAABB");
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
             }
@@ -3616,17 +3620,15 @@ var MarbleRunSimulatorCore;
             gridRectVertexData.applyToMesh(this.gridRectMesh);
             this.gridRectMesh.material = this.game.materials.whiteFullLitMaterial;
             this.gridRectMesh.isVisible = false;
-            this.AABBMin.copyFromFloats(this.encloseStart.x, this.encloseStart.y, this.encloseStart.z);
-            this.AABBMax.copyFromFloats(this.encloseEnd.x, this.encloseEnd.y, this.encloseEnd.z);
+            this.localAABBMin.copyFromFloats(this.encloseStart.x, this.encloseStart.y, this.encloseStart.z);
+            this.localAABBMax.copyFromFloats(this.encloseEnd.x, this.encloseEnd.y, this.encloseEnd.z);
             if (this.tracks[0] && this.tracks[0].template.isWood) {
-                this.AABBMax.y += MarbleRunSimulatorCore.tileSize;
+                this.localAABBMax.y += MarbleRunSimulatorCore.tileSize;
             }
-            this.visibleWidth = Math.round((this.AABBMax.x - this.AABBMin.x) / MarbleRunSimulatorCore.tileSize);
-            this.visibleHeight = Math.round((this.AABBMax.y - this.AABBMin.y) / MarbleRunSimulatorCore.tileHeight);
-            this.visibleDepth = Math.round((this.AABBMax.z - this.AABBMin.z) / MarbleRunSimulatorCore.tileSize);
-            this.localBarycenter = new BABYLON.Vector3((this.AABBMax.x + this.AABBMin.x) * 0.5, (this.AABBMax.y + this.AABBMin.y) * 0.5, (this.AABBMax.z + this.AABBMin.z) * 0.5);
-            //let localBarycenterDebug = Mummu.DrawDebugPoint(this.localBarycenter, Infinity, BABYLON.Color3.Green(), 0.02);
-            //localBarycenterDebug.parent = this;
+            this.visibleWidth = Math.round((this.localAABBMax.x - this.localAABBMin.x) / MarbleRunSimulatorCore.tileSize);
+            this.visibleHeight = Math.round((this.localAABBMax.y - this.localAABBMin.y) / MarbleRunSimulatorCore.tileHeight);
+            this.visibleDepth = Math.round((this.localAABBMax.z - this.localAABBMin.z) / MarbleRunSimulatorCore.tileSize);
+            this.localBarycenter = new BABYLON.Vector3((this.localAABBMax.x + this.localAABBMin.x) * 0.5, (this.localAABBMax.y + this.localAABBMin.y) * 0.5, (this.localAABBMax.z + this.localAABBMin.z) * 0.5);
             if (this.visibleWidth % 2 === 0) {
                 this.localBarycenterIJK.x = Math.floor(this.localBarycenter.x / MarbleRunSimulatorCore.tileSize);
             }
@@ -3640,12 +3642,13 @@ var MarbleRunSimulatorCore;
             else {
                 this.localBarycenterIJK.z = Math.round(this.localBarycenter.z / MarbleRunSimulatorCore.tileSize);
             }
-            //let localBarycenterIJKDebug = Mummu.DrawDebugPoint(this.localBarycenterIJK.multiplyByFloats(tileSize, tileHeight, tileSize), Infinity, BABYLON.Color3.Blue(), 0.02);
-            //localBarycenterIJKDebug.parent = this;
-            let aabb1 = BABYLON.Vector3.TransformCoordinates(this.AABBMin, this.getWorldMatrix());
-            let aabb2 = BABYLON.Vector3.TransformCoordinates(this.AABBMax, this.getWorldMatrix());
-            this.AABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
-            this.AABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
+            this.refreshWorldAABB();
+        }
+        refreshWorldAABB() {
+            let aabb1 = BABYLON.Vector3.TransformCoordinates(this.localAABBMin, this.getWorldMatrix());
+            let aabb2 = BABYLON.Vector3.TransformCoordinates(this.localAABBMax, this.getWorldMatrix());
+            this.worldAABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
+            this.worldAABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
             this.machine.requestUpdateBaseMesh = true;
         }
         dispose() {
@@ -3707,12 +3710,11 @@ var MarbleRunSimulatorCore;
                     this._targetK = undefined;
                     this._targetR = undefined;
                     this.targetUpdatePivot = undefined;
-                    this.instantiate(true).then(() => {
-                        this.refreshEncloseMeshAndAABB();
-                        this.updateSelectorMeshVisibility();
-                        this.machine.requestUpdateBaseMesh = true;
-                        this.machine.requestUpdateShadow = true;
-                    });
+                    this.rebuildWireMeshes(true);
+                    this.refreshWorldAABB();
+                    this.updateSelectorMeshVisibility();
+                    this.machine.requestUpdateBaseMesh = true;
+                    this.machine.requestUpdateShadow = true;
                 }
                 else {
                     if (this.targetUpdatePivot) {
