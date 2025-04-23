@@ -114,9 +114,6 @@ namespace MarbleRunSimulatorCore {
                 if (prop.d === 14) {
                     prop.i += 34;
                 }
-                else if (prop.d === 2) {
-                    prop.i += 1;
-                }
                 else {
                     prop.i += 1 + (prop.d - 2) * 3;
                 }

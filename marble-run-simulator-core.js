@@ -6407,9 +6407,6 @@ var MarbleRunSimulatorCore;
                 if (prop.d === 14) {
                     prop.i += 34;
                 }
-                else if (prop.d === 2) {
-                    prop.i += 1;
-                }
                 else {
                     prop.i += 1 + (prop.d - 2) * 3;
                 }
@@ -7366,9 +7363,6 @@ var MarbleRunSimulatorCore;
                 let pI = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
                 let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
                 let pK = parseInt(dataString.substring(pt, pt += 2), 36) - MarbleRunSimulatorCore.partOffset;
-                let correctedPI = pI * 3;
-                let correctedPJ = -pK * 3;
-                let correctedPK = -pJ;
                 let w = parseInt(dataString.substring(pt, pt += 1), 36);
                 let h = parseInt(dataString.substring(pt, pt += 1), 36);
                 let d = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -7393,6 +7387,9 @@ var MarbleRunSimulatorCore;
                         }
                     }
                 }
+                let correctedPI = pI * 3;
+                let correctedPJ = -pK * 3;
+                let correctedPK = -pJ;
                 let prop = {
                     i: correctedPI,
                     j: correctedPJ,

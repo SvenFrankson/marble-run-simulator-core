@@ -145,10 +145,6 @@ namespace MarbleRunSimulatorCore {
                 let pJ = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
                 let pK = parseInt(dataString.substring(pt, pt += 2), 36) - partOffset;
 
-                let correctedPI = pI * 3;
-                let correctedPJ = - pK * 3;
-                let correctedPK = -pJ;
-
                 let w = parseInt(dataString.substring(pt, pt += 1), 36);
                 let h = parseInt(dataString.substring(pt, pt += 1), 36);
                 let d = parseInt(dataString.substring(pt, pt += 1), 36);
@@ -175,6 +171,10 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
                 }
+
+                let correctedPI = pI * 3;
+                let correctedPJ = - pK * 3;
+                let correctedPK = -pJ;
 
                 let prop: IMachinePartProp = {
                     i: correctedPI,
