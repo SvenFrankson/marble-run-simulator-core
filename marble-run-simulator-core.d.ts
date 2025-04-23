@@ -657,6 +657,7 @@ declare namespace MarbleRunSimulatorCore {
         updateTargetCoordinates(dt: number): boolean;
         update(dt: number): void;
         rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void;
+        rebuildWireMeshesIfNeeded(): Promise<void>;
         doSleepersMeshUpdate(): void;
         getTriCount(): number;
     }

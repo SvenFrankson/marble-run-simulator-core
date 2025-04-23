@@ -1390,7 +1390,7 @@ namespace MarbleRunSimulatorCore {
                 let targetRotationY = - tR * Math.PI * 0.5;
 
                 let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
-                if (dist < 0.0001 || dist > this._lastDist) {
+                if (dist < 0.0001 || dist > this._lastDist || f < 0.5) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
                     this._i = tI;
@@ -1403,8 +1403,8 @@ namespace MarbleRunSimulatorCore {
                     this._targetR = undefined;
                     this.targetUpdatePivot = undefined;
                     
-                    this.rebuildWireMeshes(true);
                     this.refreshWorldAABB();
+                    this.rebuildWireMeshesIfNeeded();
                     this.updateSelectorMeshVisibility();
                     this.machine.requestUpdateBaseMesh = true;
                     this.machine.requestUpdateShadow = true;
@@ -1496,6 +1496,49 @@ namespace MarbleRunSimulatorCore {
             }
             this.freezeWorldMatrix();
             this.machine.requestUpdateShadow = true;
+        }
+
+        public async rebuildWireMeshesIfNeeded(): Promise<void> {
+            let neighbours = this.neighbours.cloneAsArray();
+            await Nabu.Wait(3);
+
+            let newNeighbours = [];
+            for (let i = 0; i < this.tracks.length; i++) {
+                let track = this.tracks[i];
+                let endPoint = this.machine.getBankAt(track.startWorldPosition, this);
+                if (endPoint) {
+                    if (newNeighbours.indexOf(endPoint.part) === - 1) {
+                        newNeighbours.push(endPoint.part);
+                    }
+                }
+                endPoint = this.machine.getBankAt(track.endWorldPosition, this);
+                if (endPoint) {
+                    if (newNeighbours.indexOf(endPoint.part) === - 1) {
+                        newNeighbours.push(endPoint.part);
+                    }
+                }
+            }
+
+            let doRebuildWireMeshes = false;
+            for (let i = 0; i < neighbours.length && !doRebuildWireMeshes; i++) {
+                doRebuildWireMeshes = doRebuildWireMeshes && (neighbours[i] != newNeighbours[i]);
+            }
+
+            if (doRebuildWireMeshes) {
+                this.rebuildWireMeshes(true);
+            }
+            else {
+                this.tracks.forEach((track) => {
+                    track.recomputeWiresPath();
+                    track.recomputeAbsolutePath();
+                });
+                this.freezeWorldMatrix();
+                this.machine.requestUpdateShadow = true;
+
+                requestAnimationFrame(() => {
+                    this.doSleepersMeshUpdate();
+                });
+            }
         }
 
         public doSleepersMeshUpdate(): void {
