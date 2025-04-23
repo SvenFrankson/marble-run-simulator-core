@@ -917,6 +917,7 @@ namespace MarbleRunSimulatorCore {
                 let version: number;
                 if (isFinite(data.v)) {
                     version = data.v;
+                    this.version = version;
                 }
                 if (isFinite(data.state)) {
                     this.dbState = data.state;

@@ -17,9 +17,14 @@ namespace MarbleRunSimulatorCore {
         public cameOutCollider: BABYLON.Mesh;
         public cable: BABYLON.Mesh;
         public turnLoopSound: BABYLON.Sound;
+        public anteV11Case: boolean = false;
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+
+            if (machine.version < 11) {
+                this.anteV11Case = true;
+            }
 
             this.setTemplate(this.machine.templateManager.getTemplate(Screen.PropToPartName(prop)));
 
@@ -50,6 +55,15 @@ namespace MarbleRunSimulatorCore {
             this.pixels[2].position.copyFromFloats(tileWidth * 0.5 - 0.02, - tileHeight * 1.5, tileDepth / 4);
             this.pixels[3].parent = this.container;
             this.pixels[3].position.copyFromFloats(tileWidth * 0.5 - 0.02, - tileHeight * 1.5, - tileDepth / 4);
+
+            if (this.anteV11Case) {
+                this.pixels[0].scaling.y = 1 / 1.5;
+                this.pixels[1].scaling.y = 1 / 1.5;
+                this.pixels[2].scaling.y = 1 / 1.5;
+                this.pixels[2].position.y += tileHeight * 0.5;
+                this.pixels[3].scaling.y = 1 / 1.5;
+                this.pixels[3].position.y += tileHeight * 0.5;
+            }
 
             for (let i = 0; i < 4; i++) {
                 this.pixelPictures[i] = BABYLON.MeshBuilder.CreatePlane("pixel-pic", { width: 0.025, height: 0.026 });
@@ -269,7 +283,12 @@ namespace MarbleRunSimulatorCore {
             screenData[1].applyToMesh(this.cameInCollider);
             screenData[2].applyToMesh(this.cameOutCollider);
             for (let i = 0; i < 4; i++) {
-                screenData[3 + i].applyToMesh(this.pixels[i]);
+                if (i === 0 && this.anteV11Case) {
+                    screenData[10].applyToMesh(this.pixels[i]);
+                }
+                else {
+                    screenData[3 + i].applyToMesh(this.pixels[i]);
+                }
                 this.pixels[i].material = this.game.materials.getMaterial(2, this.machine.materialQ);
                 screenData[9].applyToMesh(this.pixelPictures[i]);
                 this.pixelPictures[i].material = this.game.materials.getMaterial(0, this.machine.materialQ);

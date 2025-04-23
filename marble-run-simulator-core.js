@@ -2351,6 +2351,7 @@ var MarbleRunSimulatorCore;
                 let version;
                 if (isFinite(data.v)) {
                     version = data.v;
+                    this.version = version;
                 }
                 if (isFinite(data.state)) {
                     this.dbState = data.state;
@@ -9628,6 +9629,7 @@ var MarbleRunSimulatorCore;
             this.pixels = [];
             this.pixelPictures = [];
             this.value = 0;
+            this.anteV11Case = false;
             this.engraine12Up = false;
             this.engraine12Down = false;
             this.reset = () => {
@@ -9662,6 +9664,9 @@ var MarbleRunSimulatorCore;
             this._moving = false;
             this._lastCamRotZ = 0;
             this._visibleAngularSpeed = 0;
+            if (machine.version < 11) {
+                this.anteV11Case = true;
+            }
             this.setTemplate(this.machine.templateManager.getTemplate(Screen.PropToPartName(prop)));
             for (let i = this.colors.length; i < 2; i++) {
                 this.colors[i] = 0;
@@ -9688,6 +9693,14 @@ var MarbleRunSimulatorCore;
             this.pixels[2].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight * 1.5, MarbleRunSimulatorCore.tileDepth / 4);
             this.pixels[3].parent = this.container;
             this.pixels[3].position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5 - 0.02, -MarbleRunSimulatorCore.tileHeight * 1.5, -MarbleRunSimulatorCore.tileDepth / 4);
+            if (this.anteV11Case) {
+                this.pixels[0].scaling.y = 1 / 1.5;
+                this.pixels[1].scaling.y = 1 / 1.5;
+                this.pixels[2].scaling.y = 1 / 1.5;
+                this.pixels[2].position.y += MarbleRunSimulatorCore.tileHeight * 0.5;
+                this.pixels[3].scaling.y = 1 / 1.5;
+                this.pixels[3].position.y += MarbleRunSimulatorCore.tileHeight * 0.5;
+            }
             for (let i = 0; i < 4; i++) {
                 this.pixelPictures[i] = BABYLON.MeshBuilder.CreatePlane("pixel-pic", { width: 0.025, height: 0.026 });
                 this.pixelPictures[i].rotation.y = Math.PI;
@@ -9850,7 +9863,12 @@ var MarbleRunSimulatorCore;
             screenData[1].applyToMesh(this.cameInCollider);
             screenData[2].applyToMesh(this.cameOutCollider);
             for (let i = 0; i < 4; i++) {
-                screenData[3 + i].applyToMesh(this.pixels[i]);
+                if (i === 0 && this.anteV11Case) {
+                    screenData[10].applyToMesh(this.pixels[i]);
+                }
+                else {
+                    screenData[3 + i].applyToMesh(this.pixels[i]);
+                }
                 this.pixels[i].material = this.game.materials.getMaterial(2, this.machine.materialQ);
                 screenData[9].applyToMesh(this.pixelPictures[i]);
                 this.pixelPictures[i].material = this.game.materials.getMaterial(0, this.machine.materialQ);

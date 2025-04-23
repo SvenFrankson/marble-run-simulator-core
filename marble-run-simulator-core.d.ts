@@ -1147,6 +1147,7 @@ declare namespace MarbleRunSimulatorCore {
         cameOutCollider: BABYLON.Mesh;
         cable: BABYLON.Mesh;
         turnLoopSound: BABYLON.Sound;
+        anteV11Case: boolean;
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         engraine12Up: boolean;
