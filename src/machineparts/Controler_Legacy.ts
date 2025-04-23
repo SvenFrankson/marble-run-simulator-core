@@ -1,5 +1,5 @@
 namespace MarbleRunSimulatorCore {
-    export class Controller extends MachinePart {
+    export class Controler_Legacy extends MachinePart {
         private _animatePivot = Mummu.AnimationFactory.EmptyNumberCallback;
 
         public pivotPass: BABYLON.Mesh;
@@ -19,7 +19,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            this.setTemplate(this.machine.templateManager.getTemplate(Controller.PropToPartName(prop), prop.mirrorX));
+            this.setTemplate(this.machine.templateManager.getTemplate(Controler_Legacy.PropToPartName(prop), prop.mirrorX));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -28,15 +28,15 @@ namespace MarbleRunSimulatorCore {
                 this.colors[i] = 0;
             }
 
-            let rCurb = Controller.pivotL * 0.3;
-
-            this.axisZMin = - this.wireGauge * 0.6 - 2 * tileSize;
-            this.axisZMax = this.wireGauge * 0.6;
+            let dz = this.wireGauge * 0.5;
+            let depth = 3;
 
             this.pivotPass = new BABYLON.Mesh("pivotPass");
             this.pivotPass.position.copyFromFloats(0, -tileHeight * 0.5, 0);
             this.pivotPass.parent = this;
-            let dz = this.wireGauge * 0.5;
+
+            this.axisZMin = - this.wireGauge * 0.6 - depth * tileSize;
+            this.axisZMax = this.wireGauge * 0.6;
 
             this.cog13 = new BABYLON.Mesh("cog13");
             this.cog13.parent = this.pivotPass;
@@ -53,18 +53,18 @@ namespace MarbleRunSimulatorCore {
             this.cog8.parent = this.pivotController;
 
             this.support = new BABYLON.Mesh("support");
-            this.support.position.copyFromFloats(0, -tileHeight * 0.5, - tileSize);
+            this.support.position.copyFromFloats(0, -tileHeight * 0.5, - depth / 2 * tileSize);
             this.support.parent = this;
 
             let wireVertical0 = new Wire(this);
             wireVertical0.colorIndex = 5;
             wireVertical0.parent = this.pivotPass;
-            wireVertical0.path = [new BABYLON.Vector3(0, Controller.pivotL, -dz - 2 * tileSize), new BABYLON.Vector3(0, -Controller.pivotL, -dz - 2 * tileSize)];
+            wireVertical0.path = [new BABYLON.Vector3(0, Controler_Legacy.pivotL, -dz - depth * tileSize), new BABYLON.Vector3(0, -Controler_Legacy.pivotL, -dz - depth * tileSize)];
 
             let wireVertical1 = new Wire(this);
             wireVertical1.colorIndex = 5;
             wireVertical1.parent = this.pivotPass;
-            wireVertical1.path = [new BABYLON.Vector3(0, Controller.pivotL, dz - 2 * tileSize), new BABYLON.Vector3(0, -Controller.pivotL, dz - 2 * tileSize)];
+            wireVertical1.path = [new BABYLON.Vector3(0, Controler_Legacy.pivotL, dz - depth * tileSize), new BABYLON.Vector3(0, -Controler_Legacy.pivotL, dz - depth * tileSize)];
 
             this.wires = [wireVertical0, wireVertical1];
 
@@ -101,18 +101,20 @@ namespace MarbleRunSimulatorCore {
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
-            return "controller";
+            return "controlerLegacy";
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {
-            let q = Mummu.QuaternionFromYZAxis(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0));
-            let axisPassVertexData = BABYLON.CreateCylinderVertexData({ height: tileSize + this.wireGauge * 1.2, diameter: 0.001 });
-            Mummu.RotateVertexDataInPlace(axisPassVertexData, q);
-            Mummu.TranslateVertexDataInPlace(axisPassVertexData, new BABYLON.Vector3(0, 0, - 0.5 * tileSize));
+            let depth = 3;
 
-            let axisControllerVertexData = BABYLON.CreateCylinderVertexData({ height: tileSize + this.wireGauge * 1.2, diameter: 0.001 });
+            let q = Mummu.QuaternionFromYZAxis(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0));
+            let axisPassVertexData = BABYLON.CreateCylinderVertexData({ height: tileSize * depth / 2 + this.wireGauge * 1.2, diameter: 0.001 });
+            Mummu.RotateVertexDataInPlace(axisPassVertexData, q);
+            Mummu.TranslateVertexDataInPlace(axisPassVertexData, new BABYLON.Vector3(0, 0, - 0.5 * tileSize * depth / 2));
+
+            let axisControllerVertexData = BABYLON.CreateCylinderVertexData({ height: tileSize * depth / 2 + this.wireGauge * 1.2, diameter: 0.001 });
             Mummu.RotateVertexDataInPlace(axisControllerVertexData, q);
-            Mummu.TranslateVertexDataInPlace(axisControllerVertexData, new BABYLON.Vector3(0, tileHeight, 0.5 * tileSize));
+            Mummu.TranslateVertexDataInPlace(axisControllerVertexData, new BABYLON.Vector3(0, tileHeight, 0.5 * tileSize * depth / 2));
 
             let supportData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 2);
             supportData = Mummu.MergeVertexDatas(axisControllerVertexData, axisPassVertexData, supportData);
@@ -121,13 +123,13 @@ namespace MarbleRunSimulatorCore {
 
             let cog8Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 0);
             cog8Data = Mummu.CloneVertexData(cog8Data);
-            Mummu.TranslateVertexDataInPlace(cog8Data, new BABYLON.Vector3(0, 0, - tileSize));
+            Mummu.TranslateVertexDataInPlace(cog8Data, new BABYLON.Vector3(0, 0, - depth / 2 * tileSize));
             cog8Data.applyToMesh(this.cog8);
             this.cog8.material = this.game.materials.getMaterial(this.getColor(5), this.machine.materialQ);
 
             let cog13Data = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/cog.babylon", 1);
             cog13Data = Mummu.CloneVertexData(cog13Data);
-            Mummu.TranslateVertexDataInPlace(cog13Data, new BABYLON.Vector3(0, 0, - tileSize));
+            Mummu.TranslateVertexDataInPlace(cog13Data, new BABYLON.Vector3(0, 0, - depth / 2 * tileSize));
             cog13Data.applyToMesh(this.cog13);
             this.cog13.material = this.game.materials.getMaterial(this.getColor(5), this.machine.materialQ);
 
@@ -148,7 +150,7 @@ namespace MarbleRunSimulatorCore {
         public static GenerateTemplate(mirrorX: boolean) {
             let template = new MachinePartTemplate();
 
-            template.partName = "controller";
+            template.partName = "controlerLegacy";
 
             template.l = 1;
             template.h = 1;
@@ -163,13 +165,14 @@ namespace MarbleRunSimulatorCore {
             n.normalize();
 
             let pEndLeft = new BABYLON.Vector3(0, -tileHeight * 0.5, 0);
-            pEndLeft.x -= Controller.pivotL / Math.SQRT2;
-            pEndLeft.y += Controller.pivotL / Math.SQRT2;
+            pEndLeft.x -= Controler_Legacy.pivotL / Math.SQRT2;
+            pEndLeft.y += Controler_Legacy.pivotL / Math.SQRT2;
             let pEndRight = new BABYLON.Vector3(0, -tileHeight * 0.5, 0);
-            pEndRight.x += Controller.pivotL / Math.SQRT2;
-            pEndRight.y += Controller.pivotL / Math.SQRT2;
+            pEndRight.x += Controler_Legacy.pivotL / Math.SQRT2;
+            pEndRight.y += Controler_Legacy.pivotL / Math.SQRT2;
             let dirEnd = Tools.V3Dir(115);
             let dirEndMirror = dirEnd.multiplyByFloats(- 1, 1, 1);
+            let depth = 3;
 
             // Control
             // Control In Left
@@ -204,33 +207,33 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[3] = new TrackTemplate(template);
             template.trackTemplates[3].colorIndex = 2;
             template.trackTemplates[3].trackpoints = [
-                new TrackPoint(template.trackTemplates[3], new BABYLON.Vector3(-tileWidth * 0.5, 0, - 2 * tileSize), dir), 
-                new TrackPoint(template.trackTemplates[3], pEndLeft.subtract(dirEnd.scale(0.0005)).subtractFromFloats(0, 0, 2 * tileSize), dirEnd)
+                new TrackPoint(template.trackTemplates[3], new BABYLON.Vector3(-tileWidth * 0.5, 0, - depth * tileSize), dir), 
+                new TrackPoint(template.trackTemplates[3], pEndLeft.subtract(dirEnd.scale(0.0005)).subtractFromFloats(0, 0, depth * tileSize), dirEnd)
             ];
 
             // Pass out Left
             template.trackTemplates[4] = new TrackTemplate(template);
             template.trackTemplates[4].colorIndex = 2;
             template.trackTemplates[4].trackpoints = [
-                new TrackPoint(template.trackTemplates[4], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, - 2 * tileSize), dir), 
-                new TrackPoint(template.trackTemplates[4], new BABYLON.Vector3(-Split.pivotL / Math.SQRT2, -tileHeight * 0.5 - Split.pivotL / Math.SQRT2 - 0.001, - 2 * tileSize), dirEnd.multiplyByFloats(1, -1, 1))
+                new TrackPoint(template.trackTemplates[4], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, - depth * tileSize), dir), 
+                new TrackPoint(template.trackTemplates[4], new BABYLON.Vector3(-Split.pivotL / Math.SQRT2, -tileHeight * 0.5 - Split.pivotL / Math.SQRT2 - 0.001, - depth * tileSize), dirEnd.multiplyByFloats(1, -1, 1))
             ];
 
             // Pass out Right
             template.trackTemplates[5] = new TrackTemplate(template);
             template.trackTemplates[5].colorIndex = 3;
             template.trackTemplates[5].trackpoints = [
-                new TrackPoint(template.trackTemplates[5], new BABYLON.Vector3(Split.pivotL / Math.SQRT2, -tileHeight * 0.5 - Split.pivotL / Math.SQRT2 - 0.001, - 2 * tileSize), dirEnd), 
-                new TrackPoint(template.trackTemplates[5], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight * template.h, - 2 * tileSize), dir)
+                new TrackPoint(template.trackTemplates[5], new BABYLON.Vector3(Split.pivotL / Math.SQRT2, -tileHeight * 0.5 - Split.pivotL / Math.SQRT2 - 0.001, - depth * tileSize), dirEnd), 
+                new TrackPoint(template.trackTemplates[5], new BABYLON.Vector3(tileWidth * 0.5, -tileHeight * template.h, - depth * tileSize), dir)
             ];
 
             // Shield
             template.trackTemplates[6] = new TrackTemplate(template);
             template.trackTemplates[6].colorIndex = 4;
             template.trackTemplates[6].trackpoints = [
-                new TrackPoint(template.trackTemplates[6], new BABYLON.Vector3(-tileWidth * 0.25, 0.016, - 2 * tileSize), Tools.V3Dir(100), new BABYLON.Vector3(0, -1, 0)),
-                new TrackPoint(template.trackTemplates[6], new BABYLON.Vector3(0, 0.005, -2 * tileSize)),
-                new TrackPoint(template.trackTemplates[6], new BABYLON.Vector3(tileWidth * 0.25, 0.016, - 2 * tileSize), Tools.V3Dir(80), new BABYLON.Vector3(0, -1, 0)),
+                new TrackPoint(template.trackTemplates[6], new BABYLON.Vector3(-tileWidth * 0.25, 0.016, - depth * tileSize), Tools.V3Dir(100), new BABYLON.Vector3(0, -1, 0)),
+                new TrackPoint(template.trackTemplates[6], new BABYLON.Vector3(0, 0.005, - depth * tileSize)),
+                new TrackPoint(template.trackTemplates[6], new BABYLON.Vector3(tileWidth * 0.25, 0.016, - depth * tileSize), Tools.V3Dir(80), new BABYLON.Vector3(0, -1, 0)),
             ];
             template.trackTemplates[6].drawStartTip = true;
             template.trackTemplates[6].drawEndTip = true;

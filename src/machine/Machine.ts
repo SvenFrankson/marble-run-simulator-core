@@ -120,7 +120,7 @@ namespace MarbleRunSimulatorCore {
     }
 
     export class Machine {
-        public version: number = -1;
+        public version: number = 12;
         public dbId: number = -1;
         public dbState: MachineDBState = MachineDBState.Pending;
         public dbLikes: number = 1;

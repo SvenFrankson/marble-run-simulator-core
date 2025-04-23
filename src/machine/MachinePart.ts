@@ -1171,7 +1171,6 @@ namespace MarbleRunSimulatorCore {
         protected async instantiateMachineSpecific(): Promise<void> {}
 
         public refreshEncloseMeshAndLocalAABB(): void {
-            console.log("refreshEncloseMeshAndLocalAABB");
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
             }

@@ -21,7 +21,7 @@ namespace MarbleRunSimulatorCore {
         "jumper_1",
         "gravitywell",
         "shooter_8",
-        "controller",
+        "controlerLegacy",
         "screen",
         "speeder",
         "forwardSplit",
@@ -38,6 +38,7 @@ namespace MarbleRunSimulatorCore {
         "rampv2_1.1.1",
         "multiJoin_1",
         "trikeSkull",
+        "controler"
     ];
 
     export interface IMachinePartProp {
@@ -327,8 +328,11 @@ namespace MarbleRunSimulatorCore {
             if (partName === "sort") {
                 return new Sort(this.machine, prop);
             }
-            if (partName === "controller") {
-                return new Controller(this.machine, prop);
+            if (partName === "controlerLegacy") {
+                return new Controler_Legacy(this.machine, prop);
+            }
+            if (partName === "controler") {
+                return new Controler(this.machine, prop);
             }
             if (partName === "spawner") {
                 return new Spawner(this.machine, prop);
@@ -485,8 +489,11 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "sort") {
                 return new Sort(this.machine, prop);
             }
-            if (baseName === "controller") {
-                return new Controller(this.machine, prop);
+            if (baseName === "controlerLegacy") {
+                return new Controler_Legacy(this.machine, prop);
+            }
+            if (baseName === "controler") {
+                return new Controler(this.machine, prop);
             }
             if (baseName === "spawner") {
                 return new Spawner(this.machine, prop);

@@ -992,7 +992,30 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class Controller extends MachinePart {
+    class Controler extends MachinePart {
+        private _animatePivot;
+        pivotPass: BABYLON.Mesh;
+        pivotController: BABYLON.Mesh;
+        pivotControllerCollider: BABYLON.Mesh;
+        support: BABYLON.Mesh;
+        cog13: BABYLON.Mesh;
+        cog8: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
+        clicSound: BABYLON.Sound;
+        static pivotL: number;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(mirrorX: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        private _moving;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class Controler_Legacy extends MachinePart {
         private _animatePivot;
         pivotPass: BABYLON.Mesh;
         pivotController: BABYLON.Mesh;
