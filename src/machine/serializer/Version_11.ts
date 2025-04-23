@@ -111,8 +111,14 @@ namespace MarbleRunSimulatorCore {
         if (baseName === "uturn") {
             let newL = (prop.d - 1) * 3;
             if (prop.mirrorX) {
-                if (prop.d === 14) {
+                if (prop.d === 8) {
+                    prop.i += 16;
+                }
+                else if (prop.d === 14) {
                     prop.i += 34;
+                }
+                else if (prop.d === 15) {
+                    prop.i += 37;
                 }
                 else {
                     prop.i += 1 + (prop.d - 2) * 3;
