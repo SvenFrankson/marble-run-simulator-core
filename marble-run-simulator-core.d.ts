@@ -656,6 +656,7 @@ declare namespace MarbleRunSimulatorCore {
         private _lastDist;
         updateTargetCoordinates(dt: number): boolean;
         update(dt: number): void;
+        refreshWorldMatrix(): void;
         rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void;
         rebuildWireMeshesIfNeeded(): Promise<void>;
         doSleepersMeshUpdate(): void;
@@ -701,6 +702,7 @@ declare namespace MarbleRunSimulatorCore {
         get preferedEndBank(): number;
         private _endWorldPosition;
         get endWorldPosition(): BABYLON.Vector3;
+        refreshStartEndWorldPosition(): void;
         AABBMin: BABYLON.Vector3;
         AABBMax: BABYLON.Vector3;
         template: TrackTemplate;

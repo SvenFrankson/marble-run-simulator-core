@@ -15,7 +15,6 @@ namespace MarbleRunSimulatorCore {
         }
         private _startWorldPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public get startWorldPosition(): BABYLON.Vector3 {
-            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[0], this.part.getWorldMatrix(), this._startWorldPosition);
             return this._startWorldPosition;
         }
 
@@ -27,8 +26,12 @@ namespace MarbleRunSimulatorCore {
         }
         private _endWorldPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public get endWorldPosition(): BABYLON.Vector3 {
-            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1], this.part.getWorldMatrix(), this._endWorldPosition);
             return this._endWorldPosition;
+        }
+
+        public refreshStartEndWorldPosition(): void {
+            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[0], this.part.getWorldMatrix(), this._startWorldPosition);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1], this.part.getWorldMatrix(), this._endWorldPosition);
         }
 
         public AABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();

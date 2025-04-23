@@ -3108,10 +3108,7 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 this.position.x = this._i * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
+                this.refreshWorldMatrix();
                 this.update(0);
                 this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
@@ -3140,10 +3137,7 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 this.position.z = this._j * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
+                this.refreshWorldMatrix();
                 this.update(0);
                 this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
@@ -3178,10 +3172,7 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 this.position.y = this._k * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
+                this.refreshWorldMatrix();
                 this.update(0);
                 this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
@@ -3217,10 +3208,7 @@ var MarbleRunSimulatorCore;
                         }
                     }
                     this.rotation.y = -this._r * Math.PI * 0.5;
-                    this.freezeWorldMatrix();
-                    this.getChildMeshes().forEach((m) => {
-                        m.freezeWorldMatrix();
-                    });
+                    this.refreshWorldMatrix();
                     this.update(0);
                     this.refreshWorldAABB();
                     this.machine.requestUpdateShadow = true;
@@ -3524,10 +3512,7 @@ var MarbleRunSimulatorCore;
                 await this.instantiateMachineSpecific();
             }
             this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
-            this.freezeWorldMatrix();
-            this.getChildMeshes().forEach((m) => {
-                m.freezeWorldMatrix();
-            });
+            this.refreshWorldMatrix();
             this.machine.requestUpdateShadow = true;
             this.instantiated = true;
         }
@@ -3742,15 +3727,19 @@ var MarbleRunSimulatorCore;
                     this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
                 }
                 this._lastDist = dist;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
+                this.refreshWorldMatrix();
                 return true;
             }
             return false;
         }
         update(dt) {
+        }
+        refreshWorldMatrix() {
+            this.freezeWorldMatrix();
+            this.getChildMeshes().forEach((m) => {
+                m.freezeWorldMatrix();
+            });
+            this.tracks.forEach(track => { track.refreshStartEndWorldPosition(); });
         }
         rebuildWireMeshes(rebuildNeighboursWireMeshes) {
             let neighboursToUpdate;
@@ -3791,7 +3780,8 @@ var MarbleRunSimulatorCore;
                     neighboursToUpdate[i].rebuildWireMeshes();
                 }
             }
-            this.freezeWorldMatrix();
+            this.refreshWorldMatrix();
+            this.tracks.forEach(track => { track.refreshStartEndWorldPosition(); });
             this.machine.requestUpdateShadow = true;
         }
         async rebuildWireMeshesIfNeeded() {
@@ -3821,11 +3811,11 @@ var MarbleRunSimulatorCore;
                 this.rebuildWireMeshes(true);
             }
             else {
+                this.refreshWorldMatrix();
                 this.tracks.forEach((track) => {
                     track.recomputeWiresPath();
                     track.recomputeAbsolutePath();
                 });
-                this.freezeWorldMatrix();
                 this.machine.requestUpdateShadow = true;
                 requestAnimationFrame(() => {
                     this.doSleepersMeshUpdate();
@@ -4387,7 +4377,6 @@ var MarbleRunSimulatorCore;
             return this.template ? this.template.preferedStartBank : 0;
         }
         get startWorldPosition() {
-            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[0], this.part.getWorldMatrix(), this._startWorldPosition);
             return this._startWorldPosition;
         }
         get preferedEndBank() {
@@ -4397,8 +4386,11 @@ var MarbleRunSimulatorCore;
             return this.template ? this.template.preferedEndBank : 0;
         }
         get endWorldPosition() {
-            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1], this.part.getWorldMatrix(), this._endWorldPosition);
             return this._endWorldPosition;
+        }
+        refreshStartEndWorldPosition() {
+            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[0], this.part.getWorldMatrix(), this._startWorldPosition);
+            BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1], this.part.getWorldMatrix(), this._endWorldPosition);
         }
         get trackIndex() {
             return this.part.tracks.indexOf(this);

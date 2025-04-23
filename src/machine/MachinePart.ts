@@ -624,10 +624,7 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
                 this.position.x = this._i * tileSize + this.offsetPosition.x;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
+                this.refreshWorldMatrix();
                 this.update(0);
                 this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
@@ -659,10 +656,7 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
                 this.position.z = this._j * tileSize + this.offsetPosition.z;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
+                this.refreshWorldMatrix();
                 this.update(0);
                 this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
@@ -701,10 +695,7 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
                 this.position.y = this._k * tileHeight + this.offsetPosition.y;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
+                this.refreshWorldMatrix();
                 this.update(0);
                 this.refreshWorldAABB();
                 this.machine.requestUpdateShadow = true;
@@ -743,10 +734,7 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
                     this.rotation.y = - this._r * Math.PI * 0.5;
-                    this.freezeWorldMatrix();
-                    this.getChildMeshes().forEach((m) => {
-                        m.freezeWorldMatrix();
-                    });
+                    this.refreshWorldMatrix();
                     this.update(0);
                     this.refreshWorldAABB();
                     this.machine.requestUpdateShadow = true;
@@ -1175,10 +1163,7 @@ namespace MarbleRunSimulatorCore {
 
             this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
 
-            this.freezeWorldMatrix();
-            this.getChildMeshes().forEach((m) => {
-                m.freezeWorldMatrix();
-            });
+            this.refreshWorldMatrix();
             this.machine.requestUpdateShadow = true;
             this.instantiated = true;
         }
@@ -1438,10 +1423,7 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 this._lastDist = dist;
-                this.freezeWorldMatrix();
-                this.getChildMeshes().forEach((m) => {
-                    m.freezeWorldMatrix();
-                });
+                this.refreshWorldMatrix();
                 return true;
             }
             return false;
@@ -1449,6 +1431,14 @@ namespace MarbleRunSimulatorCore {
 
         public update(dt: number): void {
 
+        }
+
+        public refreshWorldMatrix(): void {
+            this.freezeWorldMatrix();
+            this.getChildMeshes().forEach((m) => {
+                m.freezeWorldMatrix();
+            });
+            this.tracks.forEach(track => { track.refreshStartEndWorldPosition(); });
         }
 
         public rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void {
@@ -1494,7 +1484,8 @@ namespace MarbleRunSimulatorCore {
                     neighboursToUpdate[i].rebuildWireMeshes();
                 }
             }
-            this.freezeWorldMatrix();
+            this.refreshWorldMatrix();
+            this.tracks.forEach(track => { track.refreshStartEndWorldPosition(); });
             this.machine.requestUpdateShadow = true;
         }
 
@@ -1528,11 +1519,11 @@ namespace MarbleRunSimulatorCore {
                 this.rebuildWireMeshes(true);
             }
             else {
+                this.refreshWorldMatrix();
                 this.tracks.forEach((track) => {
                     track.recomputeWiresPath();
                     track.recomputeAbsolutePath();
                 });
-                this.freezeWorldMatrix();
                 this.machine.requestUpdateShadow = true;
 
                 requestAnimationFrame(() => {
