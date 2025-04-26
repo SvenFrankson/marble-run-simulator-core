@@ -2140,8 +2140,8 @@ var MarbleRunSimulatorCore;
                     }
                     //uvs.push(positions[3 * i] * 2);
                     //uvs.push(positions[3 * i + 2] * 2);
-                    uvs.push(positions[3 * i] / MarbleRunSimulatorCore.tileSize + 0.5);
-                    uvs.push(positions[3 * i + 2] / MarbleRunSimulatorCore.tileSize + 0.5);
+                    uvs.push((positions[3 * i] - this.pedestalTop.position.x) / MarbleRunSimulatorCore.tileSize + 0.5);
+                    uvs.push((positions[3 * i + 2] - this.pedestalTop.position.z) / MarbleRunSimulatorCore.tileSize + 0.5);
                 }
                 data.positions = positions;
                 data.uvs = uvs;

@@ -683,8 +683,8 @@ namespace MarbleRunSimulatorCore {
                     }
                     //uvs.push(positions[3 * i] * 2);
                     //uvs.push(positions[3 * i + 2] * 2);
-                    uvs.push(positions[3 * i] / tileSize + 0.5);
-                    uvs.push(positions[3 * i + 2] / tileSize + 0.5);
+                    uvs.push((positions[3 * i] - this.pedestalTop.position.x) / tileSize + 0.5);
+                    uvs.push((positions[3 * i + 2] - this.pedestalTop.position.z) / tileSize + 0.5);
                 }
                 data.positions = positions;
                 data.uvs = uvs;
