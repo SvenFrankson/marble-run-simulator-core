@@ -835,7 +835,6 @@ declare namespace MarbleRunSimulatorCore {
         endPointDirections: BABYLON.Vector3[];
         miniatureExtraLines: MiniatureTrack[];
         miniatureShapes: MiniatureShape[];
-        supportPosition: BABYLON.Vector3;
         mirrorXTrackPointsInPlace(): void;
         mirrorZTrackPointsInPlace(): void;
         initialize(): void;

@@ -20,31 +20,16 @@ namespace MarbleRunSimulatorCore {
             let q = part.machine.geometryQ;
             let partialsDatas: BABYLON.VertexData[][] = [];
 
-            let supportPosition = part.template.supportPosition;
-            let supportTrack: Track;
-            let supportPointIndex: number = -1;
-            let bestSupportMatchDist: number = Infinity;
-
             for (let j = 0; j < part.tracks.length; j++) {
                 let track = part.tracks[j];
                 let colorIndex = track.part.getColor(track.template.colorIndex);
                 let interpolatedPoints = track.templateInterpolatedPoints;
                 let summedLength: number[] = [0];
-
                 for (let i = 1; i < interpolatedPoints.length; i++) {
                     let prev = interpolatedPoints[i - 1];
                     let trackpoint = interpolatedPoints[i];
                     let dist = BABYLON.Vector3.Distance(prev, trackpoint);
                     summedLength[i] = summedLength[i - 1] + dist;
-
-                    if (supportPosition) {
-                        let supportMatchDist = BABYLON.Vector3.Distance(trackpoint, supportPosition);
-                        if (supportMatchDist < bestSupportMatchDist) {
-                            bestSupportMatchDist = supportMatchDist;
-                            supportTrack = track;
-                            supportPointIndex = i;
-                        }
-                    }
                 }
 
                 let count = Math.round(summedLength[summedLength.length - 1] / props.spacing / 3) * 3;
@@ -122,7 +107,6 @@ namespace MarbleRunSimulatorCore {
                         }
                         partialsDatas[colorIndex].push(tmp);
 
-                        /*
                         if (track.part.isPlaced && (props.drawWallAnchors || props.forceDrawWallAnchors)) {
                             let addAnchor = false;
                             if ((part.k === 0 || props.forceDrawWallAnchors) && (n - 1.5) % 3 === 0 && up.y > 0.1) {
@@ -182,7 +166,7 @@ namespace MarbleRunSimulatorCore {
                                 anchorBase.y = part.machine.baseMeshMinY - part.position.y;
 
                                 if (anchorYWorld < minY + props.grndAnchorsMaxY * (maxY - minY)) {
-                                    let rayOrigin = BABYLON.Vector3.TransformCoordinates(supportPosition, part.getWorldMatrix());
+                                    let rayOrigin = anchor.add(part.position);
                                     let rayDir = new BABYLON.Vector3(0, -1, 0);
                                     rayOrigin.addInPlace(rayDir.scale(0.01));
                                     let ray = new BABYLON.Ray(rayOrigin, rayDir, 3);
@@ -208,75 +192,8 @@ namespace MarbleRunSimulatorCore {
                                 }
                             }
                         }
-                        */
                         n++;
                     }
-                }
-            }
-
-            if (supportPosition && supportTrack) {
-                let rayOrigin = BABYLON.Vector3.TransformCoordinates(supportPosition, part.getWorldMatrix());
-                let rayDir = new BABYLON.Vector3(0, -1, 0);
-                rayOrigin.addInPlace(rayDir.scale(0.01));
-                let ray = new BABYLON.Ray(rayOrigin, rayDir, 3);
-                let pick = part.game.scene.pickWithRay(ray, (m) => {
-                    return m instanceof MachinePartSelectorMesh;
-                });
-                if (!pick.hit) {
-                    let prev = supportTrack.templateInterpolatedPoints[Math.max(0, supportPointIndex - 1)];
-                    let next = supportTrack.templateInterpolatedPoints[Math.min(supportTrack.templateInterpolatedPoints.length - 1, supportPointIndex + 1)];
-                    let dir = next.subtract(prev).normalize();
-
-                    let back = supportPosition.subtract(dir.scale(part.wireGauge * 0.5));
-                    let front = supportPosition.add(dir.scale(part.wireGauge * 0.5));
-
-                    let backLeft = { index: 0, point: BABYLON.Vector3.Zero() };
-                    Mummu.ProjectPointOnPathToRef(back, supportTrack.wires[0].path, backLeft);
-
-                    let backRight = { index: 0, point: BABYLON.Vector3.Zero() };
-                    Mummu.ProjectPointOnPathToRef(back, supportTrack.wires[1].path, backRight);
-
-                    let frontLeft = { index: 0, point: BABYLON.Vector3.Zero() };
-                    Mummu.ProjectPointOnPathToRef(front, supportTrack.wires[0].path, frontLeft);
-
-                    let frontRight = { index: 0, point: BABYLON.Vector3.Zero() };
-                    Mummu.ProjectPointOnPathToRef(front, supportTrack.wires[1].path, frontRight);
-                    
-
-                    let anchorYWorld = backLeft.point.y + part.position.y;
-                    let groundY = - tileHeight * 0.5;
-                    let supportLength = anchorYWorld - groundY;
-                    let support = BABYLON.CreateCylinderVertexData({ diameterTop: 0.001, diameterBottom: 0.001, height: supportLength });
-                    Mummu.TranslateVertexDataInPlace(support, new BABYLON.Vector3(backLeft.point.x, backLeft.point.y - supportLength / 2, backLeft.point.z));
-                    partialsDatas[0].push(support);
-
-                    
-                    anchorYWorld = backRight.point.y + part.position.y;
-                    groundY = - tileHeight * 0.5;
-                    supportLength = anchorYWorld - groundY;
-                    support = BABYLON.CreateCylinderVertexData({ diameterTop: 0.001, diameterBottom: 0.001, height: supportLength });
-                    Mummu.TranslateVertexDataInPlace(support, new BABYLON.Vector3(backRight.point.x, backRight.point.y - supportLength / 2, backRight.point.z));
-                    partialsDatas[0].push(support);
-
-                    
-                    anchorYWorld = frontLeft.point.y + part.position.y;
-                    groundY = - tileHeight * 0.5;
-                    supportLength = anchorYWorld - groundY;
-                    support = BABYLON.CreateCylinderVertexData({ diameterTop: 0.001, diameterBottom: 0.001, height: supportLength });
-                    Mummu.TranslateVertexDataInPlace(support, new BABYLON.Vector3(frontLeft.point.x, frontLeft.point.y - supportLength / 2, frontLeft.point.z));
-                    partialsDatas[0].push(support);
-
-                    
-                    anchorYWorld = frontRight.point.y + part.position.y;
-                    groundY = - tileHeight * 0.5;
-                    supportLength = anchorYWorld - groundY;
-                    support = BABYLON.CreateCylinderVertexData({ diameterTop: 0.001, diameterBottom: 0.001, height: supportLength });
-                    Mummu.TranslateVertexDataInPlace(support, new BABYLON.Vector3(frontRight.point.x, frontRight.point.y - supportLength / 2, frontRight.point.z));
-                    partialsDatas[0].push(support);
-
-                    support = BABYLON.CreateBoxVertexData({ width: tileSize * 0.8, height: 0.001, depth: tileSize * 0.8 });
-                    Mummu.TranslateVertexDataInPlace(support, new BABYLON.Vector3(supportPosition.x, - part.position.y + groundY + 0.0005, supportPosition.z));
-                    partialsDatas[0].push(support);
                 }
             }
 

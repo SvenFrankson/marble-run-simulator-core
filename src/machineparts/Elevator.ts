@@ -182,8 +182,6 @@ namespace MarbleRunSimulatorCore {
             ];
 
             template.maxAngle = Math.PI / 16;
-
-            template.supportPosition = new BABYLON.Vector3(0, tileHeight - 0.014 * 0.5 - 0.001, 0);
             template.initialize();
 
             return template;
