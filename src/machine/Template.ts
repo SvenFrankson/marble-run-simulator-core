@@ -338,6 +338,8 @@ namespace MarbleRunSimulatorCore {
         public miniatureExtraLines: MiniatureTrack[] = [];
         public miniatureShapes: MiniatureShape[] = [];
 
+        public supportPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+
         public mirrorXTrackPointsInPlace(): void {
             for (let i = 0; i < this.trackTemplates.length; i++) {
                 this.trackTemplates[i].mirrorXTrackPointsInPlace();

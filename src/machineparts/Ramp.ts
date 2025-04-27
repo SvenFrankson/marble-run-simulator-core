@@ -53,6 +53,17 @@ namespace MarbleRunSimulatorCore {
 
             template.maxAngle = Math.PI / 4 / 2 * template.s;
 
+            if (template.l)
+            if (template.d != 0) {
+                template.supportPosition = BABYLON.Vector3.Zero();   
+            }
+            else {
+                template.supportPosition = template.trackTemplates[0].trackpoints[0].position.add(template.trackTemplates[0].trackpoints[1].position).scaleInPlace(0.5);
+                if (template.l % 2 === 0) {
+                    template.supportPosition.x -= tileSize * 0.5;
+                }
+            }
+
             template.initialize();
 
             return template;
