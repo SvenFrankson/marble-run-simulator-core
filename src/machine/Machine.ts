@@ -325,12 +325,21 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.parts = this.parts.sort((a, b) => {
-                return b.j + b.h - (a.j + a.h);
+                return a.k - b.k;
             });
             for (let i = 0; i < this.parts.length; i++) {
                 if (!(hotReload && !this.parts[i].isPlaced)) {
-                    await this.parts[i].instantiate();
+                    await this.parts[i].instantiate(undefined, true);
                     this.parts[i].isPlaced = true;
+                    await Nabu.Wait(1);
+                }
+            }
+            
+            await this.generateBaseMesh();
+
+            for (let i = 0; i < this.parts.length; i++) {
+                if (!(hotReload && !this.parts[i].isPlaced)) {
+                    await this.parts[i].doSleepersMeshUpdate();
                     await Nabu.Wait(1);
                 }
             }

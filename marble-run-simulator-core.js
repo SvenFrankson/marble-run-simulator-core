@@ -1824,12 +1824,19 @@ var MarbleRunSimulatorCore;
                 this.exitTrack.isPlaced = true;
             }
             this.parts = this.parts.sort((a, b) => {
-                return b.j + b.h - (a.j + a.h);
+                return a.k - b.k;
             });
             for (let i = 0; i < this.parts.length; i++) {
                 if (!(hotReload && !this.parts[i].isPlaced)) {
-                    await this.parts[i].instantiate();
+                    await this.parts[i].instantiate(undefined, true);
                     this.parts[i].isPlaced = true;
+                    await Nabu.Wait(1);
+                }
+            }
+            await this.generateBaseMesh();
+            for (let i = 0; i < this.parts.length; i++) {
+                if (!(hotReload && !this.parts[i].isPlaced)) {
+                    await this.parts[i].doSleepersMeshUpdate();
                     await Nabu.Wait(1);
                 }
             }
@@ -3403,7 +3410,7 @@ var MarbleRunSimulatorCore;
                 wire.recomputeAbsolutePath();
             });
         }
-        async instantiate(rebuildNeighboursWireMeshes) {
+        async instantiate(rebuildNeighboursWireMeshes, skipSleepersAndSupport) {
             this.instantiated = false;
             let selectorHullShapeLogic = [];
             for (let i = 0; i < 6; i++) {
@@ -3511,7 +3518,7 @@ var MarbleRunSimulatorCore;
             if (this.machine.geometryQ > MarbleRunSimulatorCore.GeometryQuality.Proxy) {
                 await this.instantiateMachineSpecific();
             }
-            this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
+            this.rebuildWireMeshes(rebuildNeighboursWireMeshes, skipSleepersAndSupport);
             this.refreshWorldMatrix();
             this.machine.requestUpdateShadow = true;
             this.instantiated = true;
@@ -3741,7 +3748,7 @@ var MarbleRunSimulatorCore;
             });
             this.tracks.forEach(track => { track.refreshStartEndWorldPosition(); });
         }
-        rebuildWireMeshes(rebuildNeighboursWireMeshes) {
+        rebuildWireMeshes(rebuildNeighboursWireMeshes, skipSleepersAndSupport) {
             let neighboursToUpdate;
             if (rebuildNeighboursWireMeshes) {
                 neighboursToUpdate = this.neighbours.cloneAsArray();
@@ -3771,9 +3778,11 @@ var MarbleRunSimulatorCore;
             this.wires.forEach((wire) => {
                 wire.instantiate(isFinite(wire.colorIndex) ? this.getColor(wire.colorIndex) : this.getColor(0));
             });
-            requestAnimationFrame(() => {
-                this.doSleepersMeshUpdate();
-            });
+            if (!skipSleepersAndSupport) {
+                requestAnimationFrame(() => {
+                    this.doSleepersMeshUpdate();
+                });
+            }
             if (rebuildNeighboursWireMeshes) {
                 neighboursToUpdate = this.neighbours.cloneAsArray();
                 for (let i = 0; i < neighboursToUpdate.length; i++) {
@@ -4947,10 +4956,12 @@ var MarbleRunSimulatorCore;
                                 let minY = part.machine.baseMeshMinY;
                                 let maxY = part.machine.baseMeshMaxY;
                                 anchorBase.y = part.machine.baseMeshMinY - part.position.y;
-                                if (anchorYWorld < minY + props.grndAnchorsMaxY * (maxY - minY)) {
-                                    let rayOrigin = anchor.add(part.position);
+                                let anchorMaxY = minY + props.grndAnchorsMaxY * (maxY - minY);
+                                console.log("anchorMaxY " + anchorMaxY.toFixed(3));
+                                if (anchorYWorld < anchorMaxY) {
+                                    let rayOrigin = BABYLON.Vector3.TransformCoordinates(anchor, part.getWorldMatrix());
                                     let rayDir = new BABYLON.Vector3(0, -1, 0);
-                                    rayOrigin.addInPlace(rayDir.scale(0.01));
+                                    rayOrigin.addInPlace(rayDir.scale(0.02));
                                     let ray = new BABYLON.Ray(rayOrigin, rayDir, 3);
                                     let pick = part.game.scene.pickWithRay(ray, (m) => {
                                         return m instanceof MarbleRunSimulatorCore.MachinePartSelectorMesh;

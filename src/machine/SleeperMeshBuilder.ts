@@ -165,10 +165,13 @@ namespace MarbleRunSimulatorCore {
                                 let maxY = part.machine.baseMeshMaxY;
                                 anchorBase.y = part.machine.baseMeshMinY - part.position.y;
 
-                                if (anchorYWorld < minY + props.grndAnchorsMaxY * (maxY - minY)) {
-                                    let rayOrigin = anchor.add(part.position);
+                                let anchorMaxY = minY + props.grndAnchorsMaxY * (maxY - minY)
+                                console.log("anchorMaxY " + anchorMaxY.toFixed(3));
+                                
+                                if (anchorYWorld < anchorMaxY) {
+                                    let rayOrigin = BABYLON.Vector3.TransformCoordinates(anchor, part.getWorldMatrix());
                                     let rayDir = new BABYLON.Vector3(0, -1, 0);
-                                    rayOrigin.addInPlace(rayDir.scale(0.01));
+                                    rayOrigin.addInPlace(rayDir.scale(0.02));
                                     let ray = new BABYLON.Ray(rayOrigin, rayDir, 3);
                                     let pick = part.game.scene.pickWithRay(ray, (m) => {
                                         return m instanceof MachinePartSelectorMesh;

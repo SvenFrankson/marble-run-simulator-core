@@ -647,7 +647,7 @@ declare namespace MarbleRunSimulatorCore {
         getBarycenter(): BABYLON.Vector3;
         recomputeAbsolutePath(): void;
         instantiated: boolean;
-        instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void>;
+        instantiate(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
         refreshEncloseMeshAndLocalAABB(): void;
         refreshWorldAABB(): void;
@@ -657,7 +657,7 @@ declare namespace MarbleRunSimulatorCore {
         updateTargetCoordinates(dt: number): boolean;
         update(dt: number): void;
         refreshWorldMatrix(): void;
-        rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void;
+        rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): void;
         rebuildWireMeshesIfNeeded(): Promise<void>;
         doSleepersMeshUpdate(): void;
         getTriCount(): number;

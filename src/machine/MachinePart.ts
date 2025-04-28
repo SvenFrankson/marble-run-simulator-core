@@ -1037,7 +1037,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public instantiated = false;
-        public async instantiate(rebuildNeighboursWireMeshes?: boolean): Promise<void> {
+        public async instantiate(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): Promise<void> {
             this.instantiated = false;
 
             let selectorHullShapeLogic: BABYLON.Vector3[] = [];
@@ -1161,7 +1161,7 @@ namespace MarbleRunSimulatorCore {
                 await this.instantiateMachineSpecific();
             }
 
-            this.rebuildWireMeshes(rebuildNeighboursWireMeshes);
+            this.rebuildWireMeshes(rebuildNeighboursWireMeshes, skipSleepersAndSupport);
 
             this.refreshWorldMatrix();
             this.machine.requestUpdateShadow = true;
@@ -1441,7 +1441,7 @@ namespace MarbleRunSimulatorCore {
             this.tracks.forEach(track => { track.refreshStartEndWorldPosition(); });
         }
 
-        public rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean): void {
+        public rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): void {
             let neighboursToUpdate: MachinePart[];
             if (rebuildNeighboursWireMeshes) {
                 neighboursToUpdate = this.neighbours.cloneAsArray();
@@ -1474,9 +1474,11 @@ namespace MarbleRunSimulatorCore {
                 wire.instantiate(isFinite(wire.colorIndex) ? this.getColor(wire.colorIndex) : this.getColor(0));
             });
 
-            requestAnimationFrame(() => {
-                this.doSleepersMeshUpdate();
-            });
+            if (!skipSleepersAndSupport) {
+                requestAnimationFrame(() => {
+                    this.doSleepersMeshUpdate();
+                });
+            }
 
             if (rebuildNeighboursWireMeshes) {
                 neighboursToUpdate = this.neighbours.cloneAsArray();
