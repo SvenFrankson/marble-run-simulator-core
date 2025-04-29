@@ -609,23 +609,35 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
                             }
+                            if (part instanceof Wall) {
+                                let outPos = BABYLON.Vector3.Zero();
+                                let outUp = BABYLON.Vector3.Zero();
+                                part.getProjection(this.position, outPos, BABYLON.Vector3.Zero(), outUp);
+                                let delta = outPos.subtract(this.position);
+                                let deltaL = delta.length();
+                                delta.scaleInPlace(1 / deltaL);
+                                if (deltaL > 0.005 && deltaL < 0.01) {
+                                    let reaction = delta.scale((deltaL - 0.005) * 1000); // 1000 is a magic number.
+                                    reactions.addInPlace(reaction);
+                                }
+                            }
                             /*
-                        if (part instanceof QuarterNote || part instanceof DoubleNote) {
-                            part.tings.forEach(ting => {
-                                let col = Mummu.SphereMeshIntersection(this.position, this.radius, ting);
-                                if (col.hit) {
-                                    if (BABYLON.Vector3.Dot(this.velocity, col.normal) < 0) {
-                                        part.notes[0].play();
-                                        console.log(part.notes[0].name);
-                                        BABYLON.Vector3.ReflectToRef(this.velocity, col.normal, this.velocity);
-                                        if (this.velocity.length() > 0.8) {
-                                            this.velocity.normalize().scaleInPlace(0.8);
+                            if (part instanceof QuarterNote || part instanceof DoubleNote) {
+                                part.tings.forEach(ting => {
+                                    let col = Mummu.SphereMeshIntersection(this.position, this.radius, ting);
+                                    if (col.hit) {
+                                        if (BABYLON.Vector3.Dot(this.velocity, col.normal) < 0) {
+                                            part.notes[0].play();
+                                            console.log(part.notes[0].name);
+                                            BABYLON.Vector3.ReflectToRef(this.velocity, col.normal, this.velocity);
+                                            if (this.velocity.length() > 0.8) {
+                                                this.velocity.normalize().scaleInPlace(0.8);
+                                            }
                                         }
                                     }
-                                }
-                            })
-                        }
-                        */
+                                })
+                            }
+                            */
                         }
                     });
                 }
