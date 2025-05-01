@@ -3,6 +3,10 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
+            if (this.machine.version < 11) {
+                this.magnetic = true;
+            }
+
             this.setTemplate(this.machine.templateManager.getTemplate(Wall.PropToPartName(prop)));
             this.generateWires();
         }
@@ -17,7 +21,7 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "wall_" + l.toFixed(0) + "." + h.toFixed(0);
             template.maxAngle = 0;
-            template.minTurnRadius = 0.12;
+            template.defaultAngle = 0;
 
             template.l = l;
             template.minL = 3;
@@ -31,10 +35,12 @@ namespace MarbleRunSimulatorCore {
             let depth = tileSize * template.l;
 
             template.trackTemplates[0] = new TrackTemplate(template);
+            template.trackTemplates[0].forcedAngle = 0;
 
-            let N = 64;
+            let N = 16;
             for (let n = 0; n <= N; n++) {
                 let f = n / N;
+
                 let a = - Math.PI * 0.5 + f * Math.PI;
                 let y = Math.cos(a) * height;
                 let x = height * Math.sqrt(1 - (y / height - 1) * (y / height - 1));
@@ -47,23 +53,18 @@ namespace MarbleRunSimulatorCore {
                 let norm: BABYLON.Vector3;
                 if (n === 0) {
                     dir = new BABYLON.Vector3(1, 0, 0);
-                    norm = BABYLON.Vector3.Up();
-                }
-                else if (n === N / 2) {
-                    dir = new BABYLON.Vector3(0, 0, 1);
-                    norm = new BABYLON.Vector3(-1, -1, 0);
                 }
                 else if (n === N) {
                     dir = new BABYLON.Vector3(- 1, 0, 0);
-                    norm = BABYLON.Vector3.Up();
                 }
 
-                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x, y, z), dir, norm));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x, y, z), dir, norm, 0.5, 0.5));
             }
 
-            let c = new BABYLON.Vector3(- tileSize * 0.5, tileHeight * template.h * 0.5, tileSize * template.l * 0.5);
+            let c = new BABYLON.Vector3(- tileSize * 0.5, tileHeight * template.h * 0.25, tileSize * template.l * 0.5);
             template.trackTemplates[0].onNormalEvaluated = (n, p, i) => {
                 let f = Math.abs(2 * (i - 0.5));
+                f = f * f;
                 let aim = c.subtract(p).scaleInPlace(1 - f);
                 let up = BABYLON.Vector3.Up();
                 BABYLON.Vector3.SlerpToRef(up, aim, 1 - f, n);

@@ -556,6 +556,7 @@ declare namespace MarbleRunSimulatorCore {
         get d(): number;
         get n(): number;
         get s(): number;
+        magnetic: boolean;
         get mirrorX(): boolean;
         get mirrorZ(): boolean;
         get lExtendableOnX(): boolean;

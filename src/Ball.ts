@@ -609,7 +609,7 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
                             }
-                            if (part instanceof Wall) {
+                            if (part.magnetic) {
                                 let outPos = BABYLON.Vector3.Zero();
                                 let outUp = BABYLON.Vector3.Zero();
                                 part.getProjection(this.position, outPos, BABYLON.Vector3.Zero(), outUp);
@@ -617,7 +617,7 @@ namespace MarbleRunSimulatorCore {
                                 let deltaL = delta.length();
                                 delta.scaleInPlace(1 / deltaL);
                                 if (deltaL > 0.005 && deltaL < 0.01) {
-                                    let reaction = delta.scale((deltaL - 0.005) * 1000); // 1000 is a magic number.
+                                    let reaction = delta.scale((deltaL - 0.005) * 100); // 1000 is a magic number.
                                     reactions.addInPlace(reaction);
                                 }
                             }

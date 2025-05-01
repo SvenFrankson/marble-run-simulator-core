@@ -440,6 +440,7 @@ namespace MarbleRunSimulatorCore {
         public get s(): number {
             return this.template.s;
         }
+        public magnetic: boolean = false;
         public get mirrorX(): boolean {
             return this.template.mirrorX;
         }
