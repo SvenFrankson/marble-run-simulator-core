@@ -44,8 +44,8 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, 0), Tools.V3Dir(90))];
 
             let loopsCount = n;
-            let xStart = - tileSize * 0.5;
-            let xEnd = - tileSize * 0.5 + tileSize * template.l;
+            let xStart = - tileSize * 0.5 + 1 * tileSize;
+            let xEnd = - tileSize * 0.5 + tileSize * template.l - 1 * tileSize;
             let r = tileWidth * 0.7;
             let depthStart = 0;
             let depthEnd = tileSize * template.d;
