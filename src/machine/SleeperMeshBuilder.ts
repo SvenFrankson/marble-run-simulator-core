@@ -165,8 +165,7 @@ namespace MarbleRunSimulatorCore {
                                 let maxY = part.machine.baseMeshMaxY;
                                 anchorBase.y = part.machine.baseMeshMinY - part.position.y;
 
-                                let anchorMaxY = minY + props.grndAnchorsMaxY * (maxY - minY)
-                                console.log("anchorMaxY " + anchorMaxY.toFixed(3));
+                                let anchorMaxY = minY + props.grndAnchorsMaxY * (maxY - minY);
                                 
                                 if (anchorYWorld < anchorMaxY) {
                                     let rayOrigin = BABYLON.Vector3.TransformCoordinates(anchor, part.getWorldMatrix());
