@@ -3122,7 +3122,7 @@ var MarbleRunSimulatorCore;
             if (this._i != v) {
                 this._i = v;
                 if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                    let i = this._i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax - (this.w - 1));
+                    let i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax - (this.w - 1));
                     if (isFinite(i)) {
                         this._i = i;
                     }
@@ -3134,8 +3134,14 @@ var MarbleRunSimulatorCore;
                 this.machine.requestUpdateShadow = true;
             }
         }
-        setTargetI(v) {
+        setTargetI(v, doNotCheckGridLimits) {
             this._targetI = v;
+            if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
+                let i = Nabu.MinMax(this._targetI, this.game.gridIMin, this.game.gridIMax);
+                if (isFinite(i)) {
+                    this._targetI = i;
+                }
+            }
             this._lastDist = Infinity;
         }
         get j() {
@@ -3163,8 +3169,14 @@ var MarbleRunSimulatorCore;
                 this.machine.requestUpdateShadow = true;
             }
         }
-        setTargetJ(v) {
+        setTargetJ(v, doNotCheckGridLimits) {
             this._targetJ = v;
+            if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
+                let j = Nabu.MinMax(this._targetJ, this.game.gridJMin, this.game.gridJMax);
+                if (isFinite(j)) {
+                    this._targetJ = j;
+                }
+            }
             this._lastDist = Infinity;
         }
         get k() {
@@ -3198,8 +3210,14 @@ var MarbleRunSimulatorCore;
                 this.machine.requestUpdateShadow = true;
             }
         }
-        setTargetK(v) {
+        setTargetK(v, doNotCheckGridLimits) {
             this._targetK = v;
+            if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
+                let k = Nabu.MinMax(this._targetK, this.game.gridKMin, this.game.gridKMax);
+                if (isFinite(k)) {
+                    this._targetK = k;
+                }
+            }
             this._lastDist = Infinity;
         }
         get r() {

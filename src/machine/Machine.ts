@@ -375,7 +375,7 @@ namespace MarbleRunSimulatorCore {
             this.author = "";
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
         }
-        
+
         public dispose(): void {
             this.reset();
             while (this.balls.length > 0) {

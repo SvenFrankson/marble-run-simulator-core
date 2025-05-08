@@ -619,7 +619,7 @@ namespace MarbleRunSimulatorCore {
             if (this._i != v) {
                 this._i = v;
                 if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let i = this._i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax - (this.w - 1));
+                    let i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax - (this.w - 1));
                     if (isFinite(i)) {
                         this._i = i;
                     }
@@ -631,8 +631,14 @@ namespace MarbleRunSimulatorCore {
                 this.machine.requestUpdateShadow = true;
             }
         }
-        public setTargetI(v: number): void {
+        public setTargetI(v: number, doNotCheckGridLimits?: boolean): void {
             this._targetI = v;
+            if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
+                let i = Nabu.MinMax(this._targetI, this.game.gridIMin, this.game.gridIMax);
+                if (isFinite(i)) {
+                    this._targetI = i;
+                }
+            }
             this._lastDist = Infinity;
         }
 
@@ -663,8 +669,14 @@ namespace MarbleRunSimulatorCore {
                 this.machine.requestUpdateShadow = true;
             }
         }
-        public setTargetJ(v: number): void {
+        public setTargetJ(v: number, doNotCheckGridLimits?: boolean): void {
             this._targetJ = v;
+            if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
+                let j = Nabu.MinMax(this._targetJ, this.game.gridJMin, this.game.gridJMax);
+                if (isFinite(j)) {
+                    this._targetJ = j;
+                }
+            }
             this._lastDist = Infinity;
         }
 
@@ -702,8 +714,14 @@ namespace MarbleRunSimulatorCore {
                 this.machine.requestUpdateShadow = true;
             }
         }
-        public setTargetK(v: number): void {
+        public setTargetK(v: number, doNotCheckGridLimits?: boolean): void {
             this._targetK = v;
+            if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
+                let k = Nabu.MinMax(this._targetK, this.game.gridKMin, this.game.gridKMax);
+                if (isFinite(k)) {
+                    this._targetK = k;
+                }
+            }
             this._lastDist = Infinity;
         }
 
