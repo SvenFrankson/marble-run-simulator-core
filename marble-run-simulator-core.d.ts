@@ -526,6 +526,8 @@ declare namespace MarbleRunSimulatorCore {
         localBarycenterIJK: BABYLON.Vector3;
         localAABBMin: BABYLON.Vector3;
         localAABBMax: BABYLON.Vector3;
+        localRotatedAABBMin: BABYLON.Vector3;
+        localRotatedAABBMax: BABYLON.Vector3;
         worldAABBMin: BABYLON.Vector3;
         worldAABBMax: BABYLON.Vector3;
         visibleWidth: number;
@@ -654,7 +656,6 @@ declare namespace MarbleRunSimulatorCore {
         refreshWorldAABB(): void;
         dispose(): void;
         generateWires(): void;
-        private _lastDist;
         updateTargetCoordinates(dt: number): boolean;
         update(dt: number): void;
         refreshWorldMatrix(): void;

@@ -319,6 +319,8 @@ namespace MarbleRunSimulatorCore {
         public localBarycenterIJK: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public localAABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public localAABBMax: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public localRotatedAABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public localRotatedAABBMax: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public worldAABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public worldAABBMax: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public visibleWidth: number = 1;
@@ -619,7 +621,7 @@ namespace MarbleRunSimulatorCore {
             if (this._i != v) {
                 this._i = v;
                 if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax - (this.w - 1));
+                    let i = Nabu.MinMax(this._i, this.game.gridIMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.x / tileSize), this.game.gridIMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.x / tileSize));
                     if (isFinite(i)) {
                         this._i = i;
                     }
@@ -634,12 +636,11 @@ namespace MarbleRunSimulatorCore {
         public setTargetI(v: number, doNotCheckGridLimits?: boolean): void {
             this._targetI = v;
             if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                let i = Nabu.MinMax(this._targetI, this.game.gridIMin, this.game.gridIMax);
+                let i = Nabu.MinMax(this._targetI, this.game.gridIMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.x / tileSize), this.game.gridIMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.x / tileSize));
                 if (isFinite(i)) {
                     this._targetI = i;
                 }
             }
-            this._lastDist = Infinity;
         }
 
         private _j: number = 0;
@@ -657,7 +658,7 @@ namespace MarbleRunSimulatorCore {
             if (this._j != v) {
                 this._j = v;
                 if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let j = this._j = Nabu.MinMax(this._j, this.game.gridJMin, this.game.gridJMax - this.h);
+                    let j = Nabu.MinMax(this._j, this.game.gridJMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.z / tileSize), this.game.gridJMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.z / tileSize));
                     if (isFinite(j)) {
                         this._j = j;
                     }
@@ -672,12 +673,11 @@ namespace MarbleRunSimulatorCore {
         public setTargetJ(v: number, doNotCheckGridLimits?: boolean): void {
             this._targetJ = v;
             if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                let j = Nabu.MinMax(this._targetJ, this.game.gridJMin, this.game.gridJMax);
+                let j = Nabu.MinMax(this._targetJ, this.game.gridJMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.z / tileSize), this.game.gridJMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.z / tileSize));
                 if (isFinite(j)) {
                     this._targetJ = j;
                 }
             }
-            this._lastDist = Infinity;
         }
 
         private _k: number = 0;
@@ -695,7 +695,7 @@ namespace MarbleRunSimulatorCore {
             if (this._k != v) {
                 this._k = v;
                 if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax - this.h);
+                    let k = Nabu.MinMax(this._k, this.game.gridKMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / tileHeight), this.game.gridKMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.y / tileHeight));
                     if (isFinite(k)) {
                         this._k = k;
                     }
@@ -717,12 +717,11 @@ namespace MarbleRunSimulatorCore {
         public setTargetK(v: number, doNotCheckGridLimits?: boolean): void {
             this._targetK = v;
             if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                let k = Nabu.MinMax(this._targetK, this.game.gridKMin, this.game.gridKMax);
+                let k = Nabu.MinMax(this._targetK, this.game.gridKMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / tileHeight), this.game.gridKMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.y / tileHeight));
                 if (isFinite(k)) {
                     this._targetK = k;
                 }
             }
-            this._lastDist = Infinity;
         }
 
         private _r: number = 0;
@@ -771,7 +770,6 @@ namespace MarbleRunSimulatorCore {
                 v -= 4;
             }
             this._targetR = v;
-            this._lastDist = Infinity;
         }
         public static DirectionToRValue(dir: BABYLON.Vector3): number {
             let a = - Mummu.AngleFromToAround(BABYLON.Axis.X, dir, BABYLON.Axis.Y) / (Math.PI * 0.5);
@@ -1328,12 +1326,14 @@ namespace MarbleRunSimulatorCore {
         }
 
         public refreshWorldAABB(): void {
+            let aabb1 = BABYLON.Vector3.TransformNormal(this.localAABBMin, this.getWorldMatrix());
+            let aabb2 = BABYLON.Vector3.TransformNormal(this.localAABBMax, this.getWorldMatrix());
 
-            let aabb1 = BABYLON.Vector3.TransformCoordinates(this.localAABBMin, this.getWorldMatrix());
-            let aabb2 = BABYLON.Vector3.TransformCoordinates(this.localAABBMax, this.getWorldMatrix());
+            this.localRotatedAABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
+            this.localRotatedAABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
 
-            this.worldAABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
-            this.worldAABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
+            this.worldAABBMin.copyFrom(this.localRotatedAABBMin).addInPlace(this.position);
+            this.worldAABBMax.copyFrom(this.localRotatedAABBMax).addInPlace(this.position);
 
             this.machine.requestUpdateBaseMesh = true;
         }
@@ -1377,7 +1377,6 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        private _lastDist = Infinity;
         public updateTargetCoordinates(dt: number): boolean {
             if (this.instantiated && isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
                 let f = Nabu.Easing.smoothNSec(1 / dt, 0.1);
@@ -1394,7 +1393,7 @@ namespace MarbleRunSimulatorCore {
                 let targetRotationY = - tR * Math.PI * 0.5;
 
                 let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
-                if (dist < 0.0001 || dist > this._lastDist || f < 0.5) {
+                if (dist < 0.0001 || f < 0.5) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
                     this._i = tI;
@@ -1441,7 +1440,6 @@ namespace MarbleRunSimulatorCore {
                     this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
                 }
 
-                this._lastDist = dist;
                 this.refreshWorldMatrix();
                 return true;
             }

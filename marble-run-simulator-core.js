@@ -2763,6 +2763,8 @@ var MarbleRunSimulatorCore;
             this.localBarycenterIJK = BABYLON.Vector3.Zero();
             this.localAABBMin = BABYLON.Vector3.Zero();
             this.localAABBMax = BABYLON.Vector3.Zero();
+            this.localRotatedAABBMin = BABYLON.Vector3.Zero();
+            this.localRotatedAABBMax = BABYLON.Vector3.Zero();
             this.worldAABBMin = BABYLON.Vector3.Zero();
             this.worldAABBMax = BABYLON.Vector3.Zero();
             this.visibleWidth = 1;
@@ -2855,7 +2857,6 @@ var MarbleRunSimulatorCore;
                 }
             };
             this.instantiated = false;
-            this._lastDist = Infinity;
             //let origin = Mummu.DrawDebugPoint(BABYLON.Vector3.Zero(), Infinity, BABYLON.Color3.Red(), 0.02);
             //origin.parent = this;
             if (prop.fullPartName) {
@@ -3122,7 +3123,7 @@ var MarbleRunSimulatorCore;
             if (this._i != v) {
                 this._i = v;
                 if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                    let i = Nabu.MinMax(this._i, this.game.gridIMin, this.game.gridIMax - (this.w - 1));
+                    let i = Nabu.MinMax(this._i, this.game.gridIMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.x / MarbleRunSimulatorCore.tileSize), this.game.gridIMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.x / MarbleRunSimulatorCore.tileSize));
                     if (isFinite(i)) {
                         this._i = i;
                     }
@@ -3137,12 +3138,11 @@ var MarbleRunSimulatorCore;
         setTargetI(v, doNotCheckGridLimits) {
             this._targetI = v;
             if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                let i = Nabu.MinMax(this._targetI, this.game.gridIMin, this.game.gridIMax);
+                let i = Nabu.MinMax(this._targetI, this.game.gridIMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.x / MarbleRunSimulatorCore.tileSize), this.game.gridIMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.x / MarbleRunSimulatorCore.tileSize));
                 if (isFinite(i)) {
                     this._targetI = i;
                 }
             }
-            this._lastDist = Infinity;
         }
         get j() {
             return this._j;
@@ -3157,7 +3157,7 @@ var MarbleRunSimulatorCore;
             if (this._j != v) {
                 this._j = v;
                 if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                    let j = this._j = Nabu.MinMax(this._j, this.game.gridJMin, this.game.gridJMax - this.h);
+                    let j = Nabu.MinMax(this._j, this.game.gridJMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.z / MarbleRunSimulatorCore.tileSize), this.game.gridJMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.z / MarbleRunSimulatorCore.tileSize));
                     if (isFinite(j)) {
                         this._j = j;
                     }
@@ -3172,12 +3172,11 @@ var MarbleRunSimulatorCore;
         setTargetJ(v, doNotCheckGridLimits) {
             this._targetJ = v;
             if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                let j = Nabu.MinMax(this._targetJ, this.game.gridJMin, this.game.gridJMax);
+                let j = Nabu.MinMax(this._targetJ, this.game.gridJMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.z / MarbleRunSimulatorCore.tileSize), this.game.gridJMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.z / MarbleRunSimulatorCore.tileSize));
                 if (isFinite(j)) {
                     this._targetJ = j;
                 }
             }
-            this._lastDist = Infinity;
         }
         get k() {
             return this._k;
@@ -3192,7 +3191,7 @@ var MarbleRunSimulatorCore;
             if (this._k != v) {
                 this._k = v;
                 if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                    let k = Nabu.MinMax(this._k, this.game.gridKMin, this.game.gridKMax - this.h);
+                    let k = Nabu.MinMax(this._k, this.game.gridKMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / MarbleRunSimulatorCore.tileHeight), this.game.gridKMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.y / MarbleRunSimulatorCore.tileHeight));
                     if (isFinite(k)) {
                         this._k = k;
                     }
@@ -3213,12 +3212,11 @@ var MarbleRunSimulatorCore;
         setTargetK(v, doNotCheckGridLimits) {
             this._targetK = v;
             if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
-                let k = Nabu.MinMax(this._targetK, this.game.gridKMin, this.game.gridKMax);
+                let k = Nabu.MinMax(this._targetK, this.game.gridKMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / MarbleRunSimulatorCore.tileHeight), this.game.gridKMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.y / MarbleRunSimulatorCore.tileHeight));
                 if (isFinite(k)) {
                     this._targetK = k;
                 }
             }
-            this._lastDist = Infinity;
         }
         get r() {
             return this._r;
@@ -3264,7 +3262,6 @@ var MarbleRunSimulatorCore;
                 v -= 4;
             }
             this._targetR = v;
-            this._lastDist = Infinity;
         }
         static DirectionToRValue(dir) {
             let a = -Mummu.AngleFromToAround(BABYLON.Axis.X, dir, BABYLON.Axis.Y) / (Math.PI * 0.5);
@@ -3667,10 +3664,12 @@ var MarbleRunSimulatorCore;
             this.refreshWorldAABB();
         }
         refreshWorldAABB() {
-            let aabb1 = BABYLON.Vector3.TransformCoordinates(this.localAABBMin, this.getWorldMatrix());
-            let aabb2 = BABYLON.Vector3.TransformCoordinates(this.localAABBMax, this.getWorldMatrix());
-            this.worldAABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
-            this.worldAABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
+            let aabb1 = BABYLON.Vector3.TransformNormal(this.localAABBMin, this.getWorldMatrix());
+            let aabb2 = BABYLON.Vector3.TransformNormal(this.localAABBMax, this.getWorldMatrix());
+            this.localRotatedAABBMin = BABYLON.Vector3.Minimize(aabb1, aabb2);
+            this.localRotatedAABBMax = BABYLON.Vector3.Maximize(aabb1, aabb2);
+            this.worldAABBMin.copyFrom(this.localRotatedAABBMin).addInPlace(this.position);
+            this.worldAABBMax.copyFrom(this.localRotatedAABBMax).addInPlace(this.position);
             this.machine.requestUpdateBaseMesh = true;
         }
         dispose() {
@@ -3721,7 +3720,7 @@ var MarbleRunSimulatorCore;
                 let targetPosition = new BABYLON.Vector3(tI * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x, tK * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y, tJ * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z);
                 let targetRotationY = -tR * Math.PI * 0.5;
                 let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
-                if (dist < 0.0001 || dist > this._lastDist || f < 0.5) {
+                if (dist < 0.0001 || f < 0.5) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
                     this._i = tI;
@@ -3764,7 +3763,6 @@ var MarbleRunSimulatorCore;
                     }
                     this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
                 }
-                this._lastDist = dist;
                 this.refreshWorldMatrix();
                 return true;
             }
