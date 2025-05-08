@@ -3196,8 +3196,8 @@ var MarbleRunSimulatorCore;
                         this._k = k;
                     }
                 }
-                if (!doNotCheckGridLimits) {
-                    let k = Math.max(this._k, 0 - this.h, 0);
+                else {
+                    let k = Math.max(this._k, 0 - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / MarbleRunSimulatorCore.tileHeight));
                     if (isFinite(k)) {
                         this._k = k;
                     }
@@ -3213,6 +3213,12 @@ var MarbleRunSimulatorCore;
             this._targetK = v;
             if (!doNotCheckGridLimits && this.game.mode === MarbleRunSimulatorCore.GameMode.Challenge) {
                 let k = Nabu.MinMax(this._targetK, this.game.gridKMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / MarbleRunSimulatorCore.tileHeight), this.game.gridKMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.y / MarbleRunSimulatorCore.tileHeight));
+                if (isFinite(k)) {
+                    this._targetK = k;
+                }
+            }
+            else {
+                let k = Math.max(this._targetK, 0 - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / MarbleRunSimulatorCore.tileHeight));
                 if (isFinite(k)) {
                     this._targetK = k;
                 }
@@ -4986,7 +4992,6 @@ var MarbleRunSimulatorCore;
                                 let maxY = part.machine.baseMeshMaxY;
                                 anchorBase.y = part.machine.baseMeshMinY - part.position.y;
                                 let anchorMaxY = minY + props.grndAnchorsMaxY * (maxY - minY);
-                                console.log("anchorMaxY " + anchorMaxY.toFixed(3));
                                 if (anchorYWorld < anchorMaxY) {
                                     let rayOrigin = BABYLON.Vector3.TransformCoordinates(anchor, part.getWorldMatrix());
                                     let rayDir = new BABYLON.Vector3(0, -1, 0);

@@ -700,13 +700,13 @@ namespace MarbleRunSimulatorCore {
                         this._k = k;
                     }
                 }
-
-                if (!doNotCheckGridLimits) {
-                    let k = Math.max(this._k, 0 - this.h, 0);
+                else {
+                    let k = Math.max(this._k, 0 - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / tileHeight));
                     if (isFinite(k)) {
                         this._k = k;
                     }
                 }
+                
                 this.position.y = this._k * tileHeight + this.offsetPosition.y;
                 this.refreshWorldMatrix();
                 this.update(0);
@@ -718,6 +718,12 @@ namespace MarbleRunSimulatorCore {
             this._targetK = v;
             if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
                 let k = Nabu.MinMax(this._targetK, this.game.gridKMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / tileHeight), this.game.gridKMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.y / tileHeight));
+                if (isFinite(k)) {
+                    this._targetK = k;
+                }
+            }
+            else {
+                let k = Math.max(this._targetK, 0 - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / tileHeight));
                 if (isFinite(k)) {
                     this._targetK = k;
                 }
