@@ -3816,7 +3816,7 @@ var MarbleRunSimulatorCore;
         }
         updateTargetCoordinates(dt) {
             if (this.instantiated && isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
-                let f = Nabu.Easing.smoothNSec(1 / dt, 0.1);
+                let f = Nabu.Easing.smoothNSec(1 / dt, 0.2);
                 let tI = isFinite(this._targetI) ? this._targetI : this.i;
                 let tJ = isFinite(this._targetJ) ? this._targetJ : this.j;
                 let tK = isFinite(this._targetK) ? this._targetK : this.k;
@@ -3824,7 +3824,7 @@ var MarbleRunSimulatorCore;
                 let targetPosition = new BABYLON.Vector3(tI * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x, tK * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y, tJ * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z);
                 let targetRotationY = -tR * Math.PI * 0.5;
                 let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
-                if (dist < 0.0001 || f < 0.5) {
+                if (dist < 0.0001 || f < 0.6) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
                     this._i = tI;
@@ -3928,7 +3928,7 @@ var MarbleRunSimulatorCore;
         }
         async rebuildWireMeshesIfNeeded() {
             let neighbours = this.neighbours.cloneAsArray();
-            await Nabu.Wait(3);
+            await Nabu.Wait(2);
             let newNeighbours = [];
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
@@ -3945,7 +3945,7 @@ var MarbleRunSimulatorCore;
                     }
                 }
             }
-            let doRebuildWireMeshes = false;
+            let doRebuildWireMeshes = newNeighbours.length != neighbours.length;
             for (let i = 0; i < neighbours.length && !doRebuildWireMeshes; i++) {
                 doRebuildWireMeshes = doRebuildWireMeshes && (neighbours[i] != newNeighbours[i]);
             }
@@ -12870,10 +12870,6 @@ var MarbleRunSimulatorCore;
             let rBottom = Math.abs(yBottom - cY);
             let aMaxTop = Math.PI * 0.5 + 0.02 / (rTop);
             aMaxTop = Nabu.MinMax(aMaxTop, 0, Math.PI);
-            let endAngle = 120;
-            let dirJoin = MarbleRunSimulatorCore.Tools.V3Dir(endAngle);
-            let nJoin = MarbleRunSimulatorCore.Tools.V3Dir(endAngle - 90);
-            let pEnd = new BABYLON.Vector3(-0.01, -MarbleRunSimulatorCore.tileHeight * 0.3, 0);
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0))

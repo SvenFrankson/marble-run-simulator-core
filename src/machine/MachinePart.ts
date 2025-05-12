@@ -1385,7 +1385,7 @@ namespace MarbleRunSimulatorCore {
 
         public updateTargetCoordinates(dt: number): boolean {
             if (this.instantiated && isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
-                let f = Nabu.Easing.smoothNSec(1 / dt, 0.1);
+                let f = Nabu.Easing.smoothNSec(1 / dt, 0.2);
                 let tI = isFinite(this._targetI) ? this._targetI : this.i;
                 let tJ = isFinite(this._targetJ) ? this._targetJ : this.j;
                 let tK = isFinite(this._targetK) ? this._targetK : this.k;
@@ -1399,7 +1399,7 @@ namespace MarbleRunSimulatorCore {
                 let targetRotationY = - tR * Math.PI * 0.5;
 
                 let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
-                if (dist < 0.0001 || f < 0.5) {
+                if (dist < 0.0001 || f < 0.6) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
                     this._i = tI;
@@ -1516,7 +1516,7 @@ namespace MarbleRunSimulatorCore {
 
         public async rebuildWireMeshesIfNeeded(): Promise<void> {
             let neighbours = this.neighbours.cloneAsArray();
-            await Nabu.Wait(3);
+            await Nabu.Wait(2);
 
             let newNeighbours = [];
             for (let i = 0; i < this.tracks.length; i++) {
@@ -1535,7 +1535,7 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            let doRebuildWireMeshes = false;
+            let doRebuildWireMeshes = newNeighbours.length != neighbours.length;
             for (let i = 0; i < neighbours.length && !doRebuildWireMeshes; i++) {
                 doRebuildWireMeshes = doRebuildWireMeshes && (neighbours[i] != newNeighbours[i]);
             }

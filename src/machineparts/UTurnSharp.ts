@@ -50,11 +50,6 @@ namespace MarbleRunSimulatorCore {
             let aMaxTop = Math.PI * 0.5 + 0.02 / (rTop);
             aMaxTop = Nabu.MinMax(aMaxTop, 0, Math.PI);
 
-            let endAngle = 120;
-            let dirJoin = Tools.V3Dir(endAngle);
-            let nJoin = Tools.V3Dir(endAngle - 90);
-            let pEnd = new BABYLON.Vector3(- 0.01, -tileHeight * 0.3, 0);
-
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, yBottom, 0), Tools.V3Dir(90), Tools.V3Dir(0))
