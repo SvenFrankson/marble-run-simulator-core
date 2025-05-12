@@ -29,7 +29,7 @@ namespace MarbleRunSimulatorCore {
             }
             template.partName = "uturnsharp_" + h.toFixed(0);
             template.h = h;
-
+            template.minH = 1;
 
             template.hExtendableOnY = true;
             template.xMirrorable = true;
