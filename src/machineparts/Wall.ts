@@ -37,11 +37,12 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].forcedAngle = 0;
 
-            let N = 16;
-            for (let n = 0; n <= N; n++) {
+            let N = 6;
+            for (let n = 0; n < N; n++) {
                 let f = n / N;
+                f = f * f;
 
-                let a = - Math.PI * 0.5 + f * Math.PI;
+                let a = - Math.PI * 0.5 + f * Math.PI * 0.5;
                 let y = Math.cos(a) * height;
                 let x = height * Math.sqrt(1 - (y / height - 1) * (y / height - 1));
                 let z = Math.sin(a) * depth * 0.5;
@@ -50,22 +51,39 @@ namespace MarbleRunSimulatorCore {
                 z += depth * 0.5;
 
                 let dir: BABYLON.Vector3;
-                let norm: BABYLON.Vector3;
                 if (n === 0) {
                     dir = new BABYLON.Vector3(1, 0, 0);
                 }
-                else if (n === N) {
+
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x, y, z), dir));
+            }
+            for (let n = 0; n <= N; n++) {
+                let f = n / N;
+                f = 1 - f;
+                f = f * f;
+                f = 1 - f;
+
+                let a = f * Math.PI * 0.5;
+                let y = Math.cos(a) * height;
+                let x = height * Math.sqrt(1 - (y / height - 1) * (y / height - 1));
+                let z = Math.sin(a) * depth * 0.5;
+
+                x -= tileSize * 0.5;
+                z += depth * 0.5;
+
+                let dir: BABYLON.Vector3;
+                if (n === N) {
                     dir = new BABYLON.Vector3(- 1, 0, 0);
                 }
 
-                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x, y, z), dir, norm, 0.5, 0.5));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x, y, z), dir));
             }
 
             let c = new BABYLON.Vector3(- tileSize * 0.5, tileHeight * template.h * 0.25, tileSize * template.l * 0.5);
             template.trackTemplates[0].onNormalEvaluated = (n, p, i) => {
                 let f = Math.abs(2 * (i - 0.5));
                 f = f * f;
-                let aim = c.subtract(p).scaleInPlace(1 - f);
+                let aim = c.subtract(p).normalize();
                 let up = BABYLON.Vector3.Up();
                 BABYLON.Vector3.SlerpToRef(up, aim, 1 - f, n);
                 n.normalize();
