@@ -695,7 +695,8 @@ namespace MarbleRunSimulatorCore {
             if (this._k != v) {
                 this._k = v;
                 if (!doNotCheckGridLimits && this.game.mode === GameMode.Challenge) {
-                    let k = Nabu.MinMax(this._k, this.game.gridKMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / tileHeight), this.game.gridKMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.y / tileHeight));
+                    let k = Math.min(this._k, this.game.gridKMax - Nabu.RoundTowardZero(this.localRotatedAABBMax.y / tileHeight));
+                    k = Math.max(k, this.game.gridKMin - Nabu.RoundTowardZero(this.localRotatedAABBMin.y / tileHeight))
                     if (isFinite(k)) {
                         this._k = k;
                     }
