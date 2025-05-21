@@ -16,14 +16,10 @@ namespace MarbleRunSimulatorCore {
             return "join";
         }
 
-        public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
             template.partName = "join";
-
-            template.mirrorX = mirrorX;
-
-            template.xMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -57,10 +53,6 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[2].drawStartTip = true;
             template.trackTemplates[2].drawEndTip = true;
             template.trackTemplates[2].noMiniatureRender = true;
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
 
             template.initialize();
 

@@ -1084,7 +1084,7 @@ declare namespace MarbleRunSimulatorCore {
     class FlatJoin extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+        static GenerateTemplate(): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1123,7 +1123,7 @@ declare namespace MarbleRunSimulatorCore {
     class Join extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+        static GenerateTemplate(): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

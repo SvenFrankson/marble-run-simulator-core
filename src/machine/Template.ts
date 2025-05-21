@@ -497,10 +497,10 @@ namespace MarbleRunSimulatorCore {
                     data = Spawner.GenerateTemplate(mirrorX);
                 }
                 else if (partName === "flatjoin") {
-                    data = FlatJoin.GenerateTemplate(mirrorX);
+                    data = FlatJoin.GenerateTemplate();
                 }
                 else if (partName === "join") {
-                    data = Join.GenerateTemplate(mirrorX);
+                    data = Join.GenerateTemplate();
                 }
                 else if (partName.startsWith("multiJoin_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);

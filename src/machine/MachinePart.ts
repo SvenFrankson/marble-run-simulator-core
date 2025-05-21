@@ -1400,10 +1400,6 @@ namespace MarbleRunSimulatorCore {
                 let targetRotationY = - tR * Math.PI * 0.5;
 
                 let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
-                console.log("dist = " + dist);
-                if (isNaN(dist)) {
-                    debugger;
-                }
                 if (dist < 0.0001 || f < 0.6) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
@@ -1458,12 +1454,8 @@ namespace MarbleRunSimulatorCore {
                     else {
                         BABYLON.Vector3.LerpToRef(this.position, targetPosition, 1 - f, this.position);
                     }
-                    
-                    this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
-                }
 
-                if (!Mummu.IsFinite(this.position)) {
-                    debugger;
+                    this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
                 }
                 this.refreshWorldMatrix();
                 return true;

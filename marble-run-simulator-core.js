@@ -3737,10 +3737,6 @@ var MarbleRunSimulatorCore;
                 let targetPosition = new BABYLON.Vector3(tI * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x, tK * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y, tJ * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z);
                 let targetRotationY = -tR * Math.PI * 0.5;
                 let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
-                console.log("dist = " + dist);
-                if (isNaN(dist)) {
-                    debugger;
-                }
                 if (dist < 0.0001 || f < 0.6) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
@@ -3792,9 +3788,6 @@ var MarbleRunSimulatorCore;
                         BABYLON.Vector3.LerpToRef(this.position, targetPosition, 1 - f, this.position);
                     }
                     this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
-                }
-                if (!Mummu.IsFinite(this.position)) {
-                    debugger;
                 }
                 this.refreshWorldMatrix();
                 return true;
@@ -5512,10 +5505,10 @@ var MarbleRunSimulatorCore;
                     data = MarbleRunSimulatorCore.Spawner.GenerateTemplate(mirrorX);
                 }
                 else if (partName === "flatjoin") {
-                    data = MarbleRunSimulatorCore.FlatJoin.GenerateTemplate(mirrorX);
+                    data = MarbleRunSimulatorCore.FlatJoin.GenerateTemplate();
                 }
                 else if (partName === "join") {
-                    data = MarbleRunSimulatorCore.Join.GenerateTemplate(mirrorX);
+                    data = MarbleRunSimulatorCore.Join.GenerateTemplate();
                 }
                 else if (partName.startsWith("multiJoin_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
@@ -9190,12 +9183,10 @@ var MarbleRunSimulatorCore;
         static PropToPartName(prop) {
             return "flatjoin";
         }
-        static GenerateTemplate(mirrorX) {
+        static GenerateTemplate() {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "flatjoin";
             template.l = 1;
-            template.mirrorX = mirrorX;
-            template.xMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
@@ -9219,9 +9210,6 @@ var MarbleRunSimulatorCore;
             template.trackTemplates[2].drawStartTip = true;
             template.trackTemplates[2].drawEndTip = true;
             template.trackTemplates[2].noMiniatureRender = true;
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
             template.initialize();
             return template;
         }
@@ -9567,11 +9555,9 @@ var MarbleRunSimulatorCore;
         static PropToPartName(prop) {
             return "join";
         }
-        static GenerateTemplate(mirrorX) {
+        static GenerateTemplate() {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "join";
-            template.mirrorX = mirrorX;
-            template.xMirrorable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
@@ -9600,9 +9586,6 @@ var MarbleRunSimulatorCore;
             template.trackTemplates[2].drawStartTip = true;
             template.trackTemplates[2].drawEndTip = true;
             template.trackTemplates[2].noMiniatureRender = true;
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
             template.initialize();
             return template;
         }
