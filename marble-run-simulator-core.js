@@ -463,6 +463,16 @@ var MarbleRunSimulatorCore;
                                     }
                                 });
                             }
+                            if (part instanceof MarbleRunSimulatorCore.End) {
+                                if (part.r % 2 === 0) {
+                                    this.position.z = part.absolutePosition.z;
+                                    this.velocity.z = 0;
+                                }
+                                else {
+                                    this.position.x = part.absolutePosition.x;
+                                    this.velocity.x = 0;
+                                }
+                            }
                             if (part instanceof MarbleRunSimulatorCore.Shooter && part.hasCollidingKicker) {
                                 let col = Mummu.SphereMeshIntersection(this.position, this.radius, part.kickerCollider);
                                 if (col.hit) {
