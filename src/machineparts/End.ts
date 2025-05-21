@@ -57,6 +57,8 @@ namespace MarbleRunSimulatorCore {
 
             template.xMirrorable = true;
 
+            template.maxAngle = Math.PI / 16;
+
             let x0 = tileWidth * 0.4;
             let y0 = 0.6 * tileHeight;
             let w = tileWidth * 0.5;
