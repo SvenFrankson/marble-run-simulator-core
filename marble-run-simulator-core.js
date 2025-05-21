@@ -3727,6 +3727,10 @@ var MarbleRunSimulatorCore;
                 let targetPosition = new BABYLON.Vector3(tI * MarbleRunSimulatorCore.tileSize + this.offsetPosition.x, tK * MarbleRunSimulatorCore.tileHeight + this.offsetPosition.y, tJ * MarbleRunSimulatorCore.tileSize + this.offsetPosition.z);
                 let targetRotationY = -tR * Math.PI * 0.5;
                 let dist = BABYLON.Vector3.Distance(this.position, targetPosition) + Math.abs(Nabu.AngularDistance(this.rotation.y, targetRotationY));
+                console.log("dist = " + dist);
+                if (isNaN(dist)) {
+                    debugger;
+                }
                 if (dist < 0.0001 || f < 0.6) {
                     this.position.copyFrom(targetPosition);
                     this.rotation.y = targetRotationY;
@@ -3751,24 +3755,36 @@ var MarbleRunSimulatorCore;
                         let y0 = v0.y;
                         v0.y = 0;
                         let l0 = v0.length();
-                        v0.scaleInPlace(1 / l0);
-                        let v1 = targetPosition.subtract(this.targetUpdatePivot);
-                        let y1 = v1.y;
-                        v1.y = 0;
-                        let l1 = v1.length();
-                        v1.scaleInPlace(1 / l1);
-                        let v = BABYLON.Vector3.One();
-                        BABYLON.Vector3.SlerpToRef(v0, v1, 1 - f, v);
-                        let l = l0 * f + l1 * (1 - f);
-                        v.normalize().scaleInPlace(l);
-                        v.y = y0 * f + y1 * (1 - f);
-                        ;
-                        this.position.copyFrom(v).addInPlace(this.targetUpdatePivot);
+                        if (l0 > 0) {
+                            v0.scaleInPlace(1 / l0);
+                            let v1 = targetPosition.subtract(this.targetUpdatePivot);
+                            let y1 = v1.y;
+                            v1.y = 0;
+                            let l1 = v1.length();
+                            if (l1 > 0) {
+                                v1.scaleInPlace(1 / l1);
+                                let v = BABYLON.Vector3.One();
+                                BABYLON.Vector3.SlerpToRef(v0, v1, 1 - f, v);
+                                let l = l0 * f + l1 * (1 - f);
+                                v.normalize().scaleInPlace(l);
+                                v.y = y0 * f + y1 * (1 - f);
+                                this.position.copyFrom(v).addInPlace(this.targetUpdatePivot);
+                            }
+                            else {
+                                BABYLON.Vector3.LerpToRef(this.position, targetPosition, 1 - f, this.position);
+                            }
+                        }
+                        else {
+                            BABYLON.Vector3.LerpToRef(this.position, targetPosition, 1 - f, this.position);
+                        }
                     }
                     else {
                         BABYLON.Vector3.LerpToRef(this.position, targetPosition, 1 - f, this.position);
                     }
                     this.rotation.y = Nabu.LerpAngle(this.rotation.y, targetRotationY, 1 - f);
+                }
+                if (!Mummu.IsFinite(this.position)) {
+                    debugger;
                 }
                 this.refreshWorldMatrix();
                 return true;
