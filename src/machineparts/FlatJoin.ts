@@ -22,6 +22,8 @@ namespace MarbleRunSimulatorCore {
             template.partName = "flatjoin";
             template.l = 1;
 
+            template.maxAngle = 0;
+
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);

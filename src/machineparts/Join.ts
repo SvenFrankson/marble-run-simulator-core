@@ -21,6 +21,8 @@ namespace MarbleRunSimulatorCore {
 
             template.partName = "join";
 
+            template.maxAngle = 0;
+
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
