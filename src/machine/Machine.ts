@@ -125,7 +125,7 @@ namespace MarbleRunSimulatorCore {
         public dbState: MachineDBState = MachineDBState.Pending;
         public dbLikes: number = 1;
         public name: string = "Unnamed Machine";
-        public author: string = "Unknown Author";
+        public author: string = "Anonymous";
         public isChallengeMachine: boolean = false;
 
         public root: BABYLON.Mesh;
@@ -372,7 +372,7 @@ namespace MarbleRunSimulatorCore {
         public reset(): void {
             this.isChallengeMachine = false;
             this.name = MachineName.GetRandom();
-            this.author = "";
+            this.author = "Anonymous";
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
         }
 

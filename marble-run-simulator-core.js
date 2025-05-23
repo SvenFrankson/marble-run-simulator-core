@@ -1669,7 +1669,7 @@ var MarbleRunSimulatorCore;
             this.dbState = MachineDBState.Pending;
             this.dbLikes = 1;
             this.name = "Unnamed Machine";
-            this.author = "Unknown Author";
+            this.author = "Anonymous";
             this.isChallengeMachine = false;
             this.TEST_USE_BASE_FPS = false; // only for Poki playtest
             this.parts = [];
@@ -1877,7 +1877,7 @@ var MarbleRunSimulatorCore;
         reset() {
             this.isChallengeMachine = false;
             this.name = MachineName.GetRandom();
-            this.author = "";
+            this.author = "Anonymous";
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
         }
         dispose() {
