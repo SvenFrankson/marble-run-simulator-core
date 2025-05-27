@@ -9467,13 +9467,13 @@ var MarbleRunSimulatorCore;
             super(machine, prop);
             this.wellPath = [];
             this.setTemplate(this.machine.templateManager.getTemplate(GravityWell.PropToPartName(prop), prop.mirrorX));
-            this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.2, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
+            this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             this.wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
-            this.wellPath.push(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.2, MarbleRunSimulatorCore.tileHeight * 1, 0));
+            this.wellPath.push(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 1, 0));
             this.wellMesh = new BABYLON.Mesh("gravitywell-mesh");
             this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
@@ -9496,7 +9496,7 @@ var MarbleRunSimulatorCore;
             this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
             this.wellMesh.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
-            BABYLON.CreateTorusVertexData({ diameter: MarbleRunSimulatorCore.tileWidth * 2 * 1.2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
+            BABYLON.CreateTorusVertexData({ diameter: MarbleRunSimulatorCore.tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
             this.circleTop.material = this.wellMesh.material;
             BABYLON.CreateTorusVertexData({ diameter: 0.01 * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleBottom);
             this.circleBottom.material = this.wellMesh.material;
@@ -9510,7 +9510,25 @@ var MarbleRunSimulatorCore;
             template.mirrorX = mirrorX;
             template.xMirrorable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.2 + MarbleRunSimulatorCore.tileWidth * 0.5, -0.01, 0), MarbleRunSimulatorCore.Tools.V3Dir(120))];
+            template.trackTemplates[0].trackpoints = [
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))
+            ];
+            for (let n = 0; n <= 7; n++) {
+                let a = n * Math.PI / 4;
+                let x = Math.sin(a) * MarbleRunSimulatorCore.tileWidth;
+                let z = Math.cos(a) * MarbleRunSimulatorCore.tileWidth;
+                let f = n / 7;
+                let dir = undefined;
+                let norm = (new BABYLON.Vector3(-x, 0, -z)).normalize();
+                BABYLON.Vector3.SlerpToRef(BABYLON.Vector3.Up(), norm, f, norm);
+                norm.normalize();
+                if (n === 7) {
+                    dir = new BABYLON.Vector3(1, -0.1, 1).normalize();
+                    x += 0.002;
+                }
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.5 + x, -0.007 * n / 7, -MarbleRunSimulatorCore.tileDepth + z), dir, norm));
+            }
+            template.trackTemplates[0].drawEndTip = true;
             template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[1].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.2 + MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h + 0.025, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(150)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.5, -MarbleRunSimulatorCore.tileHeight * template.h, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(90))];
             template.trackTemplates[1].drawStartTip = true;
@@ -9518,11 +9536,11 @@ var MarbleRunSimulatorCore;
                 template.mirrorXTrackPointsInPlace();
             }
             template.initialize();
-            let wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.2, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
+            let wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
             Mummu.CatmullRomPathInPlace(wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
-            for (let i = 0; i < wellPath.length; i++) {
+            for (let i = 0; i < wellPath.length - 1; i++) {
                 let c = new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
                 c.y += wellPath[i].y;
                 let r = wellPath[i].x;
