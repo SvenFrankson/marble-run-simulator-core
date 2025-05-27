@@ -3572,12 +3572,6 @@ var MarbleRunSimulatorCore;
             let x1 = this.wireGauge * 0.5;
             let y1 = this.wireGauge * 0.5;
             let z1 = this.wireGauge * 0.5;
-            if (this instanceof MarbleRunSimulatorCore.GravityWell) {
-                x0 = MarbleRunSimulatorCore.tileWidth * 0.5 - MarbleRunSimulatorCore.tileWidth * 1.2;
-                x1 = MarbleRunSimulatorCore.tileWidth * 0.5 + MarbleRunSimulatorCore.tileWidth * 1.2;
-                z0 = -MarbleRunSimulatorCore.tileDepth - MarbleRunSimulatorCore.tileWidth * 1.2;
-                z1 = -MarbleRunSimulatorCore.tileDepth + MarbleRunSimulatorCore.tileWidth * 1.2;
-            }
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
                 for (let j = 0; j < track.template.trackpoints.length; j++) {
