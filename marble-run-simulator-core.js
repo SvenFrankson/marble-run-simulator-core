@@ -11524,13 +11524,16 @@ var MarbleRunSimulatorCore;
             this.generateWires();
             this.base = new BABYLON.Mesh("base");
             this.base.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
+            this.base.position.x = (-MarbleRunSimulatorCore.tileSize * 0.5 + MarbleRunSimulatorCore.tileSize * (prop.l - 0.5)) * 0.5;
             this.base.parent = this;
             this.wheel0 = new BABYLON.Mesh("wheel0");
             this.wheel0.parent = this;
+            this.wheel0.position.x = (-MarbleRunSimulatorCore.tileSize * 0.5 + MarbleRunSimulatorCore.tileSize * (prop.l - 0.5)) * 0.5;
             this.wheel0.position.y = 0.006;
             this.wheel0.position.z = -0.008 - 0.006;
             this.wheel1 = new BABYLON.Mesh("wheel1");
             this.wheel1.parent = this;
+            this.wheel1.position.x = (-MarbleRunSimulatorCore.tileSize * 0.5 + MarbleRunSimulatorCore.tileSize * (prop.l - 0.5)) * 0.5;
             this.wheel1.position.y = 0.006;
             this.wheel1.position.z = 0.008 + 0.007;
             this.rubber0 = new BABYLON.Mesh("rubber0");
@@ -11579,15 +11582,15 @@ var MarbleRunSimulatorCore;
             }
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
-                let deltaPos = ball.position.subtract(this.position);
-                if (Math.abs(deltaPos.x) < 0.04) {
-                    if (Math.abs(deltaPos.y) < MarbleRunSimulatorCore.tileHeight * 0.5) {
-                        if (Math.abs(deltaPos.z) < 0.001) {
-                            if (ball.velocity.length() < 1) {
-                                ball.velocity.normalize().scaleInPlace(1);
-                            }
-                            this._rotationSpeed = 20 * Math.sign(ball.velocity.x);
+                let deltaPos = ball.position.subtract(this.base.absolutePosition);
+                let dY = deltaPos.y;
+                deltaPos.y = 0;
+                if (dY < MarbleRunSimulatorCore.tileHeight * 0.5) {
+                    if (deltaPos.length() < 0.02) {
+                        if (ball.velocity.length() < 1) {
+                            ball.velocity.normalize().scaleInPlace(1);
                         }
+                        this._rotationSpeed = 20 * Math.sign(ball.velocity.x);
                     }
                 }
             }
