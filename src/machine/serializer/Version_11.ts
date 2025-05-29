@@ -261,6 +261,11 @@ namespace MarbleRunSimulatorCore {
                 prop.r = 2;
             }
         }
+        if (baseName === "flatjoin") {
+            if (prop.mirrorX) {
+                prop.r = 2;
+            }
+        }
         if (baseName === "screen") {
             if (prop.mirrorX) {
                 prop.r = 2;
