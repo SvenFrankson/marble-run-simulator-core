@@ -313,12 +313,12 @@ namespace MarbleRunSimulatorCore {
         public sExtendable: boolean = false;
         public minLAbsolute: number = 0;
         public minL: number = 1;
-        public maxL: number = 35;
+        public maxL: number = 64;
         public minH: number = 0;
         public maxH: number = 35;
         public minDAbsolute: number = 0;
-        public minD: number = 1;
-        public maxD: number = 35;
+        public minD: number = 0;
+        public maxD: number = 64;
         public minN: number = 1;
         public maxN: number = 35;
         public minS: number = 0;
