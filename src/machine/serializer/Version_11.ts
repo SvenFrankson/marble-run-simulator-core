@@ -304,6 +304,9 @@ namespace MarbleRunSimulatorCore {
                 else if (prop.h === 9) {
                     prop.i += 6;
                 }
+                else if (prop.h === 10) {
+                    prop.i += 6;
+                }
                 else if (prop.h === 11) {
                     prop.i += 7;
                 }
