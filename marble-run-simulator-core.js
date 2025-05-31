@@ -5313,12 +5313,12 @@ var MarbleRunSimulatorCore;
             this.sExtendable = false;
             this.minLAbsolute = 0;
             this.minL = 1;
-            this.maxL = 35;
+            this.maxL = 64;
             this.minH = 0;
             this.maxH = 35;
             this.minDAbsolute = 0;
-            this.minD = 1;
-            this.maxD = 35;
+            this.minD = 0;
+            this.maxD = 64;
             this.minN = 1;
             this.maxN = 35;
             this.minS = 0;
@@ -6682,6 +6682,9 @@ var MarbleRunSimulatorCore;
                 else if (prop.h === 3) {
                 }
                 else if (prop.h === 9) {
+                    prop.i += 6;
+                }
+                else if (prop.h === 10) {
                     prop.i += 6;
                 }
                 else if (prop.h === 11) {
@@ -11582,11 +11585,11 @@ var MarbleRunSimulatorCore;
             }
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
-                let deltaPos = ball.position.subtract(this.base.absolutePosition);
-                let dY = deltaPos.y;
-                deltaPos.y = 0;
-                if (dY < MarbleRunSimulatorCore.tileHeight * 0.5) {
-                    if (deltaPos.length() < 0.02) {
+                let dX = ball.position.x - this.base.absolutePosition.x;
+                let dY = ball.position.y - (this.base.absolutePosition.y + 0.006);
+                let dZ = ball.position.z - this.base.absolutePosition.z;
+                if (Math.abs(dY) < 0.01) {
+                    if ((dX * dX + dZ * dZ) < 0.02 * 0.02) {
                         if (ball.velocity.length() < 1) {
                             ball.velocity.normalize().scaleInPlace(1);
                         }
@@ -12806,7 +12809,7 @@ var MarbleRunSimulatorCore;
         static GenerateTemplate(l, h) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "wall_" + l.toFixed(0) + "." + h.toFixed(0);
-            template.maxAngle = 0;
+            template.maxAngle = Math.PI / 6;
             template.defaultAngle = 0;
             template.l = l;
             template.minL = 3;
