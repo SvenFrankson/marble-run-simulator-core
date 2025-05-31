@@ -88,11 +88,11 @@ namespace MarbleRunSimulatorCore {
 
             for (let i = 0; i < this.machine.balls.length; i++) {
                 let ball = this.machine.balls[i];
-                let deltaPos = ball.position.subtract(this.base.absolutePosition);
-                let dY = deltaPos.y;
-                deltaPos.y = 0;
-                if (dY < tileHeight * 0.5) {
-                    if (deltaPos.length() < 0.02) {
+                let dX = ball.position.x - this.base.absolutePosition.x;
+                let dY = ball.position.y - (this.base.absolutePosition.y + 0.006);
+                let dZ = ball.position.z - this.base.absolutePosition.z;
+                if (Math.abs(dY) < 0.01) {
+                    if ((dX * dX + dZ * dZ) < 0.02 * 0.02) {
                         if (ball.velocity.length() < 1) {
                             ball.velocity.normalize().scaleInPlace(1);
                         }
