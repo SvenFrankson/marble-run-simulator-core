@@ -20,7 +20,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = "wall_" + l.toFixed(0) + "." + h.toFixed(0);
-            template.maxAngle = 0;
+            template.maxAngle = Math.PI / 6;
             template.defaultAngle = 0;
 
             template.l = l;
