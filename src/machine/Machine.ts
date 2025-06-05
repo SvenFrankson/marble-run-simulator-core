@@ -328,11 +328,13 @@ namespace MarbleRunSimulatorCore {
                 return a.k - b.k;
             });
             for (let i = 0; i < this.parts.length; i++) {
-                if (!(hotReload && !this.parts[i].isPlaced)) {
-                    await this.parts[i].instantiate(undefined, true);
-                    this.parts[i].isPlaced = true;
+                let part = this.parts[i];
+                if (!(hotReload && !part.isPlaced)) {
+                    await part.instantiate(undefined, true);
+                    part.isPlaced = true;
                     await Nabu.Wait(1);
                 }
+                console.log(part.partName + " " + part.i + " " + part.j + " " + part.k);
             }
             
             await this.generateBaseMesh();

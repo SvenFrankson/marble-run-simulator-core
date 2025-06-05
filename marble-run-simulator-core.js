@@ -1839,11 +1839,13 @@ var MarbleRunSimulatorCore;
                 return a.k - b.k;
             });
             for (let i = 0; i < this.parts.length; i++) {
-                if (!(hotReload && !this.parts[i].isPlaced)) {
-                    await this.parts[i].instantiate(undefined, true);
-                    this.parts[i].isPlaced = true;
+                let part = this.parts[i];
+                if (!(hotReload && !part.isPlaced)) {
+                    await part.instantiate(undefined, true);
+                    part.isPlaced = true;
                     await Nabu.Wait(1);
                 }
+                console.log(part.partName + " " + part.i + " " + part.j + " " + part.k);
             }
             await this.generateBaseMesh();
             for (let i = 0; i < this.parts.length; i++) {
@@ -6753,10 +6755,11 @@ var MarbleRunSimulatorCore;
                 minK = Math.min(minK, part.k);
             }
         }
+        console.log("DeserializeAnte11AltitudeFix finds a minK of " + minK.toFixed(0));
         if (isFinite(minK) && minK != 0) {
             for (let i = 0; i < machine.parts.length; i++) {
                 let part = machine.parts[i];
-                part.setK(part.k - minK);
+                part.setK(part.k - minK, true);
             }
             for (let i = 0; i < machine.balls.length; i++) {
                 let ball = machine.balls[i];

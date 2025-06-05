@@ -377,10 +377,12 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        console.log("DeserializeAnte11AltitudeFix finds a minK of " + minK.toFixed(0));
+
         if (isFinite(minK) && minK != 0) {
             for (let i = 0; i < machine.parts.length; i++) {
                 let part = machine.parts[i];
-                part.setK(part.k - minK);
+                part.setK(part.k - minK, true);
             }
             for (let i = 0; i < machine.balls.length; i++) {
                 let ball = machine.balls[i];
