@@ -529,7 +529,7 @@ namespace MarbleRunSimulatorCore {
                     data = DoubleNote.GenerateTemplate(mirrorX);
                 }
                 else if (partName === "start") {
-                    data = Start.GenerateTemplate(mirrorX);
+                    data = Start.GenerateTemplate();
                 }
                 else if (partName === "end") {
                     data = End.GenerateTemplate(mirrorX);

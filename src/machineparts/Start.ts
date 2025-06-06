@@ -11,26 +11,20 @@ namespace MarbleRunSimulatorCore {
             return "start";
         }
 
-        public static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
             template.partName = "start";
             template.h = 0;
 
-            template.mirrorX = mirrorX;
-
             template.xMirrorable = true;
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, 0.008, 0), Tools.V3Dir(110)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, 0, 0), Tools.V3Dir(90))
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, 0.008, 0), Tools.V3Dir(70))
             ];
-            template.trackTemplates[0].drawStartTip = true;
-
-            if (mirrorX) {
-                template.mirrorXTrackPointsInPlace();
-            }
+            template.trackTemplates[0].drawEndTip = true;
 
             template.initialize();
 

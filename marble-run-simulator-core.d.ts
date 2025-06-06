@@ -1396,7 +1396,7 @@ declare namespace MarbleRunSimulatorCore {
     class Start extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(mirrorX?: boolean): MachinePartTemplate;
+        static GenerateTemplate(): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

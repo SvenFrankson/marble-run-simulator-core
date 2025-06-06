@@ -356,6 +356,14 @@ namespace MarbleRunSimulatorCore {
             prop.i -= 1;
             prop.j -= 3;
         }
+        if (baseName === "start") {
+            if (prop.mirrorX) {
+                prop.r = 0;
+            }
+            else {
+                prop.r = 2;
+            }
+        }
         if (baseName === "end") {
             prop.k -= 2;
             if (prop.mirrorX) {
