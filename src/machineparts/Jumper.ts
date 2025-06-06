@@ -34,15 +34,19 @@ namespace MarbleRunSimulatorCore {
                 template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0), Tools.V3Dir(90)), new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(xEnd, yEnd, 0), Tools.V3Dir(90 - aDeg))];
             }
             else {
-                let d = 2.5 * tileHeight - 0.02;
+                let d = 0.015;
+                let x0 = - tileWidth * 0.5 + d;
+                let y0 = - tileHeight * 2;
+                let radius = tileSize * 3 - d;
 
                 template.trackTemplates[0] = new TrackTemplate(template);
                 template.trackTemplates[0].trackpoints = [
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, -tileHeight * template.h, 0), Tools.V3Dir(90)),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5 + 0.02, -tileHeight * template.h, 0), Tools.V3Dir(90)),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5 + 0.02 + d * Math.SQRT2 / 2, tileHeight * 0.5 - 0.02 - d * Math.SQRT2 / 2, 0)),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, tileHeight * 0.5 - 0.01, 0), Tools.V3Dir(0)),
-                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 0.5, tileHeight * 0.5, 0), Tools.V3Dir(0), Tools.V3Dir(-90))
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, y0, 0), Tools.V3Dir(90)),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0, y0, 0), Tools.V3Dir(90)),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + radius * Math.sin(Math.PI / 6), y0 + radius * (1 - Math.cos(Math.PI / 6)), 0)),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + radius * Math.sin(2 * Math.PI / 6), y0 + radius * (1 - Math.cos(2 * Math.PI / 6)), 0)),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + radius, y0 + radius, 0), Tools.V3Dir(0)),
+                    new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0 + radius, y0 + radius + d, 0), Tools.V3Dir(0), Tools.V3Dir(-90))
                 ];
             }
 
