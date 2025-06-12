@@ -1845,7 +1845,6 @@ var MarbleRunSimulatorCore;
                     part.isPlaced = true;
                     await Nabu.Wait(1);
                 }
-                console.log(part.partName + " " + part.i + " " + part.j + " " + part.k);
             }
             await this.generateBaseMesh();
             for (let i = 0; i < this.parts.length; i++) {
@@ -6504,6 +6503,9 @@ var MarbleRunSimulatorCore;
                 if (prop.d === 8) {
                     prop.i += 16;
                 }
+                else if (prop.d === 11) {
+                    prop.i += 25;
+                }
                 else if (prop.d === 14) {
                     prop.i += 34;
                 }
@@ -6547,11 +6549,14 @@ var MarbleRunSimulatorCore;
             prop.l = newL;
         }
         if (baseName === "loop") {
+            console.log(JSON.stringify(prop));
             prop.l = prop.l * 3;
             prop.d = (prop.d - 1) * 3;
             prop.k -= 4;
             if (prop.mirrorX) {
                 if (prop.mirrorZ) {
+                    prop.i -= 1;
+                    prop.d = -prop.d;
                 }
                 else {
                     prop.i--;
@@ -6618,7 +6623,7 @@ var MarbleRunSimulatorCore;
             if (prop.mirrorX) {
                 if (prop.mirrorZ) {
                     prop.r = 2;
-                    prop.i += prop.l - 2;
+                    prop.i += prop.l + 1;
                     prop.j -= prop.l;
                     prop.l = -prop.l;
                 }

@@ -334,7 +334,6 @@ namespace MarbleRunSimulatorCore {
                     part.isPlaced = true;
                     await Nabu.Wait(1);
                 }
-                console.log(part.partName + " " + part.i + " " + part.j + " " + part.k);
             }
             
             await this.generateBaseMesh();
