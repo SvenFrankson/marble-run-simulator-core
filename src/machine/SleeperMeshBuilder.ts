@@ -14,7 +14,7 @@ namespace MarbleRunSimulatorCore {
                 props.spacing = 0.03;
             }
             if (!isFinite(props.grndAnchorsMaxY)) {
-                props.grndAnchorsMaxY = 1;
+                props.grndAnchorsMaxY = 0.35;
             }
 
             let q = part.machine.geometryQ;

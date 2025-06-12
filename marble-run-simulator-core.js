@@ -4862,7 +4862,7 @@ var MarbleRunSimulatorCore;
                 props.spacing = 0.03;
             }
             if (!isFinite(props.grndAnchorsMaxY)) {
-                props.grndAnchorsMaxY = 1;
+                props.grndAnchorsMaxY = 0.35;
             }
             let q = part.machine.geometryQ;
             let partialsDatas = [];
@@ -6768,7 +6768,6 @@ var MarbleRunSimulatorCore;
                 minK = Math.min(minK, part.k);
             }
         }
-        console.log("DeserializeAnte11AltitudeFix finds a minK of " + minK.toFixed(0));
         if (isFinite(minK) && minK != 0) {
             for (let i = 0; i < machine.parts.length; i++) {
                 let part = machine.parts[i];

@@ -390,8 +390,6 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        console.log("DeserializeAnte11AltitudeFix finds a minK of " + minK.toFixed(0));
-
         if (isFinite(minK) && minK != 0) {
             for (let i = 0; i < machine.parts.length; i++) {
                 let part = machine.parts[i];
