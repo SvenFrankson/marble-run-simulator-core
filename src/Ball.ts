@@ -747,8 +747,8 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
     
-                                this.velocity.copyFrom(otherSpeed.scale(0.999));
-                                ball.velocity.copyFrom(mySpeed.scale(0.999));
+                                this.velocity.copyFrom(otherSpeed.scale(0.995));
+                                ball.velocity.copyFrom(mySpeed.scale(0.995));
                                 canceledSpeed.copyFromFloats(0, 0, 0);
                                 //this.velocity.copyFrom(otherSpeed).scaleInPlace(.5);
                                 //ball.velocity.copyFrom(mySpeed).scaleInPlace(.6);
