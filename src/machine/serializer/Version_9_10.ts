@@ -140,7 +140,7 @@ namespace MarbleRunSimulatorCore {
                 let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
 
                 if (makeMiniature) {
-
+                    CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);

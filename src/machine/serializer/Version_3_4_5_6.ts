@@ -126,7 +126,7 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 if (makeMiniature) {
-
+                    CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);

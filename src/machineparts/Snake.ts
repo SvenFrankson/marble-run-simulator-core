@@ -34,7 +34,7 @@ namespace MarbleRunSimulatorCore {
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
-            let count = template.l - 1;
+            let count = template.l - 3;
             if (count % 2 === 1) {
                 count--;
             }

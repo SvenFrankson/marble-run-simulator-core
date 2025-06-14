@@ -75,6 +75,15 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
+    export function CommonAddBall(lines: (MiniatureTrack | MiniatureShape)[], x: number, y: number, z: number): void {      
+        x -= 0.01;
+        y += 0.01;
+        z -= 0.01;  
+        let ballShape = MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, new BABYLON.Vector3(-1, 1, -1), 16, false);
+        ballShape.dist = x + z - y;
+        lines.push(ballShape);
+    }
+
     export function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement, data: IMachineMiniatureData, miniatureProps?: IMiniatureProps): void {
         if (!data) {
             data = {};

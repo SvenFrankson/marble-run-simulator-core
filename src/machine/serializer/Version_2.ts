@@ -107,7 +107,7 @@ namespace MarbleRunSimulatorCore {
                 z = z / 0.06 * tileDepth;
 
                 if (makeMiniature) {
-
+                    CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);

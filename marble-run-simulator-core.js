@@ -6135,6 +6135,15 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.AddLinesFromData = AddLinesFromData;
+    function CommonAddBall(lines, x, y, z) {
+        x -= 0.01;
+        y += 0.01;
+        z -= 0.01;
+        let ballShape = MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, new BABYLON.Vector3(-1, 1, -1), 16, false);
+        ballShape.dist = x + z - y;
+        lines.push(ballShape);
+    }
+    MarbleRunSimulatorCore.CommonAddBall = CommonAddBall;
     function DrawMiniature(lines, canvas, data, miniatureProps) {
         if (!data) {
             data = {};
@@ -6827,6 +6836,7 @@ var MarbleRunSimulatorCore;
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
                 let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                 if (makeMiniature) {
+                    MarbleRunSimulatorCore.CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
@@ -7053,6 +7063,7 @@ var MarbleRunSimulatorCore;
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
                 let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                 if (makeMiniature) {
+                    MarbleRunSimulatorCore.CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
@@ -7311,6 +7322,7 @@ var MarbleRunSimulatorCore;
                 let z = (parseInt(dataString.substring(pt, pt += 3), 36) - MarbleRunSimulatorCore.ballOffset) / 1000;
                 z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
                 if (makeMiniature) {
+                    MarbleRunSimulatorCore.CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
@@ -7489,6 +7501,7 @@ var MarbleRunSimulatorCore;
                     materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                 }
                 if (makeMiniature) {
+                    MarbleRunSimulatorCore.CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
@@ -7687,6 +7700,7 @@ var MarbleRunSimulatorCore;
                 z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
                 let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                 if (makeMiniature) {
+                    MarbleRunSimulatorCore.CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
@@ -7905,6 +7919,7 @@ var MarbleRunSimulatorCore;
                 z = z / 0.06 * MarbleRunSimulatorCore.tileDepth;
                 let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                 if (makeMiniature) {
+                    MarbleRunSimulatorCore.CommonAddBall(lines, x, y, z);
                 }
                 else if (machine) {
                     let ball = new MarbleRunSimulatorCore.Ball(new BABYLON.Vector3(x, y, z), machine);
@@ -10997,7 +11012,7 @@ var MarbleRunSimulatorCore;
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
-            let count = template.l - 1;
+            let count = template.l - 3;
             if (count % 2 === 1) {
                 count--;
             }

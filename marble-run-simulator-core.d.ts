@@ -907,6 +907,7 @@ declare namespace MarbleRunSimulatorCore {
         showInfoBox?: boolean;
     }
     function AddLinesFromData(machine: Machine, baseName: string, prop: IMachinePartProp, lines: (MiniatureTrack | MiniatureShape)[]): void;
+    function CommonAddBall(lines: (MiniatureTrack | MiniatureShape)[], x: number, y: number, z: number): void;
     function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement, data: IMachineMiniatureData, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
