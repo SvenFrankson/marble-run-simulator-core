@@ -403,7 +403,7 @@ declare namespace MarbleRunSimulatorCore {
         };
         static MachineDataCompare(d1: IMachineData, d2: IMachineData): boolean;
         serialize(): IMachineData;
-        static MakeMiniature(machine: Machine, data: IMachineData): HTMLCanvasElement;
+        static MakeMiniature(machine: Machine, data: IMachineData, miniatureProps?: IMiniatureProps): HTMLCanvasElement;
         lastDeserializedData: IMachineData;
         deserialize(data: IMachineData, makeMiniature?: boolean): void;
         getEncloseStart(): BABYLON.Vector3;
@@ -901,8 +901,13 @@ declare namespace MarbleRunSimulatorCore {
         partsCount?: number;
         backgroundColor?: string;
     }
+    interface IMiniatureProps {
+        backgroundColor?: string;
+        showGround?: boolean;
+        showInfoBox?: boolean;
+    }
     function AddLinesFromData(machine: Machine, baseName: string, prop: IMachinePartProp, lines: (MiniatureTrack | MiniatureShape)[]): void;
-    function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement, data?: IMachineMiniatureData): void;
+    function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement, data: IMachineMiniatureData, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV1(machine: Machine): IMachineData;
@@ -912,27 +917,27 @@ declare namespace MarbleRunSimulatorCore {
     function SerializeV11(machine: Machine): IMachineData;
     function DeserializeAnte11Fix(baseName: string, prop: IMachinePartProp): void;
     function DeserializeAnte11AltitudeFix(machine: Machine): void;
-    function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
+    function DeserializeV11(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV12(machine: Machine): IMachineData;
-    function DeserializeV12(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
+    function DeserializeV12(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV2(machine: Machine): IMachineData;
-    function DeserializeV2(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
+    function DeserializeV2(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV3456(machine: Machine, version: number): IMachineData;
-    function DeserializeV3456(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
+    function DeserializeV3456(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV8(machine: Machine): IMachineData;
-    function DeserializeV78(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
+    function DeserializeV78(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
     function SerializeV910(machine: Machine, version: number): IMachineData;
-    function DeserializeV910(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement): void;
+    function DeserializeV910(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
     class MachineDecorSelector extends BABYLON.Mesh {

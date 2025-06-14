@@ -85,7 +85,7 @@ namespace MarbleRunSimulatorCore {
         return data;
     }
     
-    export function DeserializeV78(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement): void {
+    export function DeserializeV78(machine: Machine, data: IMachineData, makeMiniature: boolean = false, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void {
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;
@@ -234,7 +234,8 @@ namespace MarbleRunSimulatorCore {
                         version: data.v,
                         partsCount: partCount,
                         ballsCount: ballCount,
-                    }
+                    },
+                    miniatureProps
                 );
             }
             else if (machine) {

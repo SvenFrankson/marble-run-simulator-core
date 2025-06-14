@@ -882,35 +882,35 @@ namespace MarbleRunSimulatorCore {
             return SerializeV12(this);
         }
 
-        public static MakeMiniature(machine: Machine, data: IMachineData): HTMLCanvasElement {
+        public static MakeMiniature(machine: Machine, data: IMachineData, miniatureProps?: IMiniatureProps): HTMLCanvasElement {
             if (data && (data.v === 2)) {
                 let canvas = document.createElement("canvas");
-                DeserializeV2(machine, data, true, canvas);
+                DeserializeV2(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v >= 3 && data.v <= 6)) {
                 let canvas = document.createElement("canvas");
-                DeserializeV3456(machine, data, true, canvas);
+                DeserializeV3456(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v === 7 || data.v === 8)) {
                 let canvas = document.createElement("canvas");
-                DeserializeV78(machine, data, true, canvas);
+                DeserializeV78(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v === 9 || data.v === 10)) {
                 let canvas = document.createElement("canvas");
-                DeserializeV910(machine, data, true, canvas);
+                DeserializeV910(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v === 11)) {
                 let canvas = document.createElement("canvas");
-                DeserializeV11(machine, data, true, canvas);
+                DeserializeV11(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v === 12)) {
                 let canvas = document.createElement("canvas");
-                DeserializeV12(machine, data, true, canvas);
+                DeserializeV12(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             return undefined;

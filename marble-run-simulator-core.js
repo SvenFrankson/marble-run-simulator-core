@@ -2328,35 +2328,35 @@ var MarbleRunSimulatorCore;
         serialize() {
             return MarbleRunSimulatorCore.SerializeV12(this);
         }
-        static MakeMiniature(machine, data) {
+        static MakeMiniature(machine, data, miniatureProps) {
             if (data && (data.v === 2)) {
                 let canvas = document.createElement("canvas");
-                MarbleRunSimulatorCore.DeserializeV2(machine, data, true, canvas);
+                MarbleRunSimulatorCore.DeserializeV2(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v >= 3 && data.v <= 6)) {
                 let canvas = document.createElement("canvas");
-                MarbleRunSimulatorCore.DeserializeV3456(machine, data, true, canvas);
+                MarbleRunSimulatorCore.DeserializeV3456(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v === 7 || data.v === 8)) {
                 let canvas = document.createElement("canvas");
-                MarbleRunSimulatorCore.DeserializeV78(machine, data, true, canvas);
+                MarbleRunSimulatorCore.DeserializeV78(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v === 9 || data.v === 10)) {
                 let canvas = document.createElement("canvas");
-                MarbleRunSimulatorCore.DeserializeV910(machine, data, true, canvas);
+                MarbleRunSimulatorCore.DeserializeV910(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v === 11)) {
                 let canvas = document.createElement("canvas");
-                MarbleRunSimulatorCore.DeserializeV11(machine, data, true, canvas);
+                MarbleRunSimulatorCore.DeserializeV11(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             if (data && (data.v === 12)) {
                 let canvas = document.createElement("canvas");
-                MarbleRunSimulatorCore.DeserializeV12(machine, data, true, canvas);
+                MarbleRunSimulatorCore.DeserializeV12(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             return undefined;
@@ -6135,17 +6135,26 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.AddLinesFromData = AddLinesFromData;
-    function DrawMiniature(lines, canvas, data) {
+    function DrawMiniature(lines, canvas, data, miniatureProps) {
         if (!data) {
             data = {};
+        }
+        if (!miniatureProps) {
+            miniatureProps = {};
         }
         if (isNaN(data.size)) {
             data.size = 256;
         }
-        let backGroundColor = BABYLON.Color3.FromHexString("#103c6f");
+        let color4White = new BABYLON.Color4(1, 1, 1, 1);
+        let backGroundColor = BABYLON.Color4.FromHexString("#103c6fff");
         if (data.backgroundColor) {
-            backGroundColor = BABYLON.Color3.FromHexString(data.backgroundColor);
+            backGroundColor = BABYLON.Color4.FromHexString(data.backgroundColor);
         }
+        if (miniatureProps.backgroundColor) {
+            backGroundColor = BABYLON.Color4.FromHexString(miniatureProps.backgroundColor);
+        }
+        let showGround = miniatureProps.showGround;
+        let showInfo = miniatureProps.showInfoBox;
         let picMargin = data.size / 20;
         let picSizeNoMargin = data.size - 2 * picMargin;
         let lineWidth = 1;
@@ -6200,70 +6209,72 @@ var MarbleRunSimulatorCore;
         else if (h > w) {
             mx = (data.size - w / s * picSizeNoMargin) * 0.5;
         }
-        let framePoints = [
-            new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMin.z - 0.01),
-            new BABYLON.Vector3(aabbMax.x + 0.01, aabbMin.y, aabbMin.z - 0.01),
-            new BABYLON.Vector3(aabbMax.x + 0.01, aabbMin.y, aabbMax.z + 0.01),
-            new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMax.z + 0.01)
-        ];
-        let cFrameLine = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.5);
-        context.beginPath();
-        let p0 = framePoints[0];
-        let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-        let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-        context.moveTo(x - 2, data.size - y - 2);
-        for (let j = 1; j < framePoints.length; j++) {
-            let p = framePoints[j];
-            let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-            let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.lineTo(x - 2, data.size - y - 2);
-        }
-        context.closePath();
-        context.strokeStyle = cFrameLine.toHexString();
-        context.lineWidth = 1;
-        context.stroke();
-        let cFrameBackground = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.05);
-        context.fillStyle = cFrameBackground.toHexString();
-        context.fill();
-        let dist01 = BABYLON.Vector3.Distance(framePoints[0], framePoints[1]);
-        let dist03 = BABYLON.Vector3.Distance(framePoints[0], framePoints[3]);
-        let count01 = 10;
-        let count03 = 10;
-        if (dist01 > dist03) {
-            count03 = Math.round(dist03 / (dist01 / count01));
-        }
-        if (dist03 > dist01) {
-            count01 = Math.round(dist01 / (dist03 / count03));
-        }
-        for (let i = 1; i < count01; i++) {
-            let f = i / count01;
-            let p0 = BABYLON.Vector3.Lerp(framePoints[0], framePoints[1], f);
-            let p1 = BABYLON.Vector3.Lerp(framePoints[3], framePoints[2], f);
+        if (showGround) {
+            let framePoints = [
+                new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMin.z - 0.01),
+                new BABYLON.Vector3(aabbMax.x + 0.01, aabbMin.y, aabbMin.z - 0.01),
+                new BABYLON.Vector3(aabbMax.x + 0.01, aabbMin.y, aabbMax.z + 0.01),
+                new BABYLON.Vector3(aabbMin.x - 0.01, aabbMin.y, aabbMax.z + 0.01)
+            ];
+            let cFrameLine = BABYLON.Color4.Lerp(backGroundColor, color4White, 0.5);
             context.beginPath();
+            let p0 = framePoints[0];
             let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
             let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
             context.moveTo(x - 2, data.size - y - 2);
-            x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-            y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.lineTo(x - 2, data.size - y - 2);
+            for (let j = 1; j < framePoints.length; j++) {
+                let p = framePoints[j];
+                let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                context.lineTo(x - 2, data.size - y - 2);
+            }
+            context.closePath();
             context.strokeStyle = cFrameLine.toHexString();
             context.lineWidth = 1;
             context.stroke();
-        }
-        for (let i = 1; i < count03; i++) {
-            let f = i / count03;
-            let p0 = BABYLON.Vector3.Lerp(framePoints[0], framePoints[3], f);
-            let p1 = BABYLON.Vector3.Lerp(framePoints[1], framePoints[2], f);
-            context.beginPath();
-            let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-            let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.moveTo(x - 2, data.size - y - 2);
-            x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
-            y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.lineTo(x - 2, data.size - y - 2);
-            context.strokeStyle = cFrameLine.toHexString();
-            context.lineWidth = 1;
-            context.stroke();
+            let cFrameBackground = BABYLON.Color4.Lerp(backGroundColor, color4White, 0.05);
+            context.fillStyle = cFrameBackground.toHexString();
+            context.fill();
+            let dist01 = BABYLON.Vector3.Distance(framePoints[0], framePoints[1]);
+            let dist03 = BABYLON.Vector3.Distance(framePoints[0], framePoints[3]);
+            let count01 = 10;
+            let count03 = 10;
+            if (dist01 > dist03) {
+                count03 = Math.round(dist03 / (dist01 / count01));
+            }
+            if (dist03 > dist01) {
+                count01 = Math.round(dist01 / (dist03 / count03));
+            }
+            for (let i = 1; i < count01; i++) {
+                let f = i / count01;
+                let p0 = BABYLON.Vector3.Lerp(framePoints[0], framePoints[1], f);
+                let p1 = BABYLON.Vector3.Lerp(framePoints[3], framePoints[2], f);
+                context.beginPath();
+                let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                context.moveTo(x - 2, data.size - y - 2);
+                x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                context.lineTo(x - 2, data.size - y - 2);
+                context.strokeStyle = cFrameLine.toHexString();
+                context.lineWidth = 1;
+                context.stroke();
+            }
+            for (let i = 1; i < count03; i++) {
+                let f = i / count03;
+                let p0 = BABYLON.Vector3.Lerp(framePoints[0], framePoints[3], f);
+                let p1 = BABYLON.Vector3.Lerp(framePoints[1], framePoints[2], f);
+                context.beginPath();
+                let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                context.moveTo(x - 2, data.size - y - 2);
+                x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
+                y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
+                context.lineTo(x - 2, data.size - y - 2);
+                context.strokeStyle = cFrameLine.toHexString();
+                context.lineWidth = 1;
+                context.stroke();
+            }
         }
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
@@ -6288,7 +6299,7 @@ var MarbleRunSimulatorCore;
             normalizedH = (normalizedH - aabbMin.y) / (aabbMax.y - aabbMin.y);
             let f = normalizedH * 0.8 + 0.2;
             if (line instanceof MarbleRunSimulatorCore.MiniatureTrack) {
-                let c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), f);
+                let c = BABYLON.Color4.Lerp(backGroundColor, color4White, f);
                 context.strokeStyle = c.toHexString();
                 context.stroke();
                 context.lineWidth = 3 * lineWidth;
@@ -6296,34 +6307,36 @@ var MarbleRunSimulatorCore;
                 context.stroke();
             }
             else if (line instanceof MarbleRunSimulatorCore.MiniatureShape) {
-                let c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 1);
+                let c = BABYLON.Color4.Lerp(backGroundColor, color4White, 1);
                 context.closePath();
                 context.strokeStyle = c.toHexString();
                 context.lineWidth = lineWidth;
                 context.stroke();
                 if (line.fill) {
-                    c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.7 * f);
+                    c = BABYLON.Color4.Lerp(backGroundColor, color4White, 0.7 * f);
                     context.fillStyle = c.toHexString();
                     context.fill();
                 }
             }
         }
-        let fontSize = Math.floor(data.size / 20);
-        context.font = fontSize.toFixed(0) + "px monospace";
-        let c = BABYLON.Color3.Lerp(backGroundColor, BABYLON.Color3.White(), 0.7);
-        context.fillStyle = c.toHexString();
-        context.lineWidth = 1;
-        context.strokeStyle = c.toHexString();
-        context.strokeRect(-0.5, -0.5, Math.floor(6.5 * fontSize), Math.floor(3.5 * fontSize));
-        if (isFinite(data.version)) {
-            let versionText = "v" + data.version.toFixed(0);
-            context.fillText(versionText, Math.floor(data.size - 0.5 * fontSize - context.measureText(versionText).width), Math.floor(data.size - 0.5 * fontSize));
-        }
-        if (isFinite(data.partsCount)) {
-            context.fillText("parts " + data.partsCount.toFixed(0).padStart(3, " "), Math.floor(0.5 * fontSize), Math.floor(1.5 * fontSize));
-        }
-        if (isFinite(data.ballsCount)) {
-            context.fillText("balls " + data.ballsCount.toFixed(0).padStart(3, " "), Math.floor(0.5 * fontSize), Math.floor(2.5 * fontSize));
+        if (showInfo) {
+            let fontSize = Math.floor(data.size / 20);
+            context.font = fontSize.toFixed(0) + "px monospace";
+            let c = BABYLON.Color4.Lerp(backGroundColor, color4White, 0.7);
+            context.fillStyle = c.toHexString();
+            context.lineWidth = 1;
+            context.strokeStyle = c.toHexString();
+            context.strokeRect(-0.5, -0.5, Math.floor(6.5 * fontSize), Math.floor(3.5 * fontSize));
+            if (isFinite(data.version)) {
+                let versionText = "v" + data.version.toFixed(0);
+                context.fillText(versionText, Math.floor(data.size - 0.5 * fontSize - context.measureText(versionText).width), Math.floor(data.size - 0.5 * fontSize));
+            }
+            if (isFinite(data.partsCount)) {
+                context.fillText("parts " + data.partsCount.toFixed(0).padStart(3, " "), Math.floor(0.5 * fontSize), Math.floor(1.5 * fontSize));
+            }
+            if (isFinite(data.ballsCount)) {
+                context.fillText("balls " + data.ballsCount.toFixed(0).padStart(3, " "), Math.floor(0.5 * fontSize), Math.floor(2.5 * fontSize));
+            }
         }
     }
     MarbleRunSimulatorCore.DrawMiniature = DrawMiniature;
@@ -6780,7 +6793,7 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix = DeserializeAnte11AltitudeFix;
-    function DeserializeV11(machine, data, makeMiniature = false, canvas) {
+    function DeserializeV11(machine, data, makeMiniature = false, canvas, miniatureProps) {
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;
@@ -6899,7 +6912,7 @@ var MarbleRunSimulatorCore;
                     version: data.v,
                     partsCount: partCount,
                     ballsCount: ballCount,
-                });
+                }, miniatureProps);
             }
             else if (machine) {
                 if (data.r) {
@@ -7006,7 +7019,7 @@ var MarbleRunSimulatorCore;
         return data;
     }
     MarbleRunSimulatorCore.SerializeV12 = SerializeV12;
-    function DeserializeV12(machine, data, makeMiniature = false, canvas) {
+    function DeserializeV12(machine, data, makeMiniature = false, canvas, miniatureProps) {
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;
@@ -7190,7 +7203,7 @@ var MarbleRunSimulatorCore;
                     version: data.v,
                     partsCount: partCount,
                     ballsCount: ballCount,
-                });
+                }, miniatureProps);
             }
             else if (machine) {
                 machine._roomIndex = roomIndex;
@@ -7268,7 +7281,7 @@ var MarbleRunSimulatorCore;
         return data;
     }
     MarbleRunSimulatorCore.SerializeV2 = SerializeV2;
-    function DeserializeV2(machine, data, makeMiniature = false, canvas) {
+    function DeserializeV2(machine, data, makeMiniature = false, canvas, miniatureProps) {
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;
@@ -7355,7 +7368,7 @@ var MarbleRunSimulatorCore;
                     version: data.v,
                     partsCount: partCount,
                     ballsCount: ballCount,
-                });
+                }, miniatureProps);
             }
             else if (machine) {
                 MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix(machine);
@@ -7431,7 +7444,7 @@ var MarbleRunSimulatorCore;
         return data;
     }
     MarbleRunSimulatorCore.SerializeV3456 = SerializeV3456;
-    function DeserializeV3456(machine, data, makeMiniature = false, canvas) {
+    function DeserializeV3456(machine, data, makeMiniature = false, canvas, miniatureProps) {
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;
@@ -7551,7 +7564,7 @@ var MarbleRunSimulatorCore;
                     version: data.v,
                     partsCount: partCount,
                     ballsCount: ballCount,
-                });
+                }, miniatureProps);
             }
             else if (machine) {
                 MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix(machine);
@@ -7637,7 +7650,7 @@ var MarbleRunSimulatorCore;
         return data;
     }
     MarbleRunSimulatorCore.SerializeV8 = SerializeV8;
-    function DeserializeV78(machine, data, makeMiniature = false, canvas) {
+    function DeserializeV78(machine, data, makeMiniature = false, canvas, miniatureProps) {
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;
@@ -7759,7 +7772,7 @@ var MarbleRunSimulatorCore;
                     version: data.v,
                     partsCount: partCount,
                     ballsCount: ballCount,
-                });
+                }, miniatureProps);
             }
             else if (machine) {
                 MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix(machine);
@@ -7850,7 +7863,7 @@ var MarbleRunSimulatorCore;
         return data;
     }
     MarbleRunSimulatorCore.SerializeV910 = SerializeV910;
-    function DeserializeV910(machine, data, makeMiniature = false, canvas) {
+    function DeserializeV910(machine, data, makeMiniature = false, canvas, miniatureProps) {
         let dataString = data.d;
         if (!dataString) {
             dataString = data.content;
@@ -7984,7 +7997,7 @@ var MarbleRunSimulatorCore;
                     version: data.v,
                     partsCount: partCount,
                     ballsCount: ballCount,
-                });
+                }, miniatureProps);
             }
             else if (machine) {
                 MarbleRunSimulatorCore.DeserializeAnte11AltitudeFix(machine);
