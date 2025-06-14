@@ -4565,7 +4565,13 @@ var MarbleRunSimulatorCore;
                 distancesFromStart[i] = distancesFromStart[i - 1] + d;
             }
             let totalLength = distancesFromStart[distancesFromStart.length - 1];
-            let smoothLength = Math.min(totalLength * 0.5, 0.1);
+            let smoothLength = 0.1;
+            if (startBank * endBank > 0) {
+                smoothLength = Math.min(totalLength, smoothLength);
+            }
+            else if (startBank * endBank < 0) {
+                smoothLength = Math.min(totalLength * 0.5, smoothLength);
+            }
             for (let i = 1; i < N - 1; i++) {
                 let a = angles[i];
                 let d = distancesFromStart[i];
