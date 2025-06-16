@@ -1,7 +1,6 @@
 namespace MarbleRunSimulatorCore {
 
     export interface IMachineMiniatureData {
-        size?: number;
         version?: number;
         ballsCount?: number;
         partsCount?: number;
@@ -9,6 +8,7 @@ namespace MarbleRunSimulatorCore {
     }
 
     export interface IMiniatureProps {
+        size?: number;
         backgroundColor?: string;
         showGround?: boolean;
         showInfoBox?: boolean;
@@ -91,9 +91,7 @@ namespace MarbleRunSimulatorCore {
         if (!miniatureProps) {
             miniatureProps = {};
         }
-        if (isNaN(data.size)) {
-            data.size = 256;
-        }
+
         let color4White = new BABYLON.Color4(1, 1, 1, 1);
         let backGroundColor = BABYLON.Color4.FromHexString("#103c6fff");
         if (data.backgroundColor) {
@@ -102,15 +100,19 @@ namespace MarbleRunSimulatorCore {
         if (miniatureProps.backgroundColor) {
             backGroundColor = BABYLON.Color4.FromHexString(miniatureProps.backgroundColor);
         }
+        let size = 256;
+        if (isFinite(miniatureProps.size)) {
+            size = miniatureProps.size;
+        }
 
         let showGround = miniatureProps.showGround;
         let showInfo = miniatureProps.showInfoBox;
 
-        let picMargin = data.size / 20;
-        let picSizeNoMargin = data.size - 2 * picMargin;
+        let picMargin = size / 20;
+        let picSizeNoMargin = size - 2 * picMargin;
         let lineWidth = 1;
-        canvas.width = data.size;
-        canvas.height = data.size;
+        canvas.width = size;
+        canvas.height = size;
 
         let backGroundColorHex = backGroundColor.toHexString();
         let backGroundColorHexNoAlpha = backGroundColorHex.substring(0, 7) + "ff";
@@ -163,10 +165,10 @@ namespace MarbleRunSimulatorCore {
         let mx = picMargin;
         let my = picMargin;
         if (w > h) {
-            my = (data.size - h / s * picSizeNoMargin) * 0.5;
+            my = (size - h / s * picSizeNoMargin) * 0.5;
         }
         else if (h > w) {
-            mx = (data.size - w / s * picSizeNoMargin) * 0.5;
+            mx = (size - w / s * picSizeNoMargin) * 0.5;
         }
 
         if (showGround) {
@@ -182,12 +184,12 @@ namespace MarbleRunSimulatorCore {
             let p0 = framePoints[0];
             let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
             let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-            context.moveTo(x - 2, data.size - y - 2);
+            context.moveTo(x - 2, size - y - 2);
             for (let j = 1; j < framePoints.length; j++) {
                 let p = framePoints[j];
                 let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
                 let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                context.lineTo(x - 2, data.size - y - 2);
+                context.lineTo(x - 2, size - y - 2);
             }
             context.closePath();
             context.strokeStyle = cFrameLine.toHexString();
@@ -217,10 +219,10 @@ namespace MarbleRunSimulatorCore {
                 context.beginPath();
                 let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
                 let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                context.moveTo(x - 2, data.size - y - 2);
+                context.moveTo(x - 2, size - y - 2);
                 x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
                 y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                context.lineTo(x - 2, data.size - y - 2);
+                context.lineTo(x - 2, size - y - 2);
 
                 context.strokeStyle = cFrameLine.toHexString();
                 context.lineWidth = 1;
@@ -236,10 +238,10 @@ namespace MarbleRunSimulatorCore {
                 context.beginPath();
                 let x = (vToX(p0) - abstractPixelXMin) / s * picSizeNoMargin + mx;
                 let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                context.moveTo(x - 2, data.size - y - 2);
+                context.moveTo(x - 2, size - y - 2);
                 x = (vToX(p1) - abstractPixelXMin) / s * picSizeNoMargin + mx;
                 y = (vToY(p1) - abstractPixelYMin) / s * picSizeNoMargin + my;
-                context.lineTo(x - 2, data.size - y - 2);
+                context.lineTo(x - 2, size - y - 2);
 
                 context.strokeStyle = cFrameLine.toHexString();
                 context.lineWidth = 1;
@@ -257,14 +259,14 @@ namespace MarbleRunSimulatorCore {
             let y = (vToY(p0) - abstractPixelYMin) / s * picSizeNoMargin + my;
             normalizedH = p0.y;
             //console.log("p0 " + x + " " + y);
-            context.moveTo(x - 2, data.size - y - 2);
+            context.moveTo(x - 2, size - y - 2);
             for (let j = 1; j < line.points.length; j++) {
                 let p = line.points[j];
                 let x = (vToX(p) - abstractPixelXMin) / s * picSizeNoMargin + mx;
                 let y = (vToY(p) - abstractPixelYMin) / s * picSizeNoMargin + my;
                 normalizedH += p.y;
                 //console.log("p " + x + " " + y);
-                context.lineTo(x - 2, data.size - y - 2);
+                context.lineTo(x - 2, size - y - 2);
             }
             normalizedH = normalizedH / line.points.length;
             normalizedH = (normalizedH - aabbMin.y) / (aabbMax.y - aabbMin.y);
@@ -294,7 +296,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         if (showInfo) {
-            let fontSize = Math.floor(data.size / 20);
+            let fontSize = Math.floor(size / 20);
             context.font = fontSize.toFixed(0) + "px monospace";
             let c = BABYLON.Color4.Lerp(backGroundColor, color4White, 0.7);
             context.fillStyle = c.toHexString();
@@ -303,7 +305,7 @@ namespace MarbleRunSimulatorCore {
             context.strokeRect(- 0.5, - 0.5, Math.floor(6.5 * fontSize), Math.floor(3.5 * fontSize));
             if (isFinite(data.version)) {
                 let versionText = "v" + data.version.toFixed(0)
-                context.fillText(versionText, Math.floor(data.size - 0.5 * fontSize - context.measureText(versionText).width), Math.floor(data.size - 0.5 * fontSize));
+                context.fillText(versionText, Math.floor(size - 0.5 * fontSize - context.measureText(versionText).width), Math.floor(size - 0.5 * fontSize));
             }
             if (isFinite(data.partsCount)) {
                 context.fillText("parts " + data.partsCount.toFixed(0).padStart(3, " "), Math.floor(0.5 * fontSize), Math.floor(1.5 * fontSize));

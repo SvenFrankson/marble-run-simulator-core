@@ -895,13 +895,13 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     interface IMachineMiniatureData {
-        size?: number;
         version?: number;
         ballsCount?: number;
         partsCount?: number;
         backgroundColor?: string;
     }
     interface IMiniatureProps {
+        size?: number;
         backgroundColor?: string;
         showGround?: boolean;
         showInfoBox?: boolean;
