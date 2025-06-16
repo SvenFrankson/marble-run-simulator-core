@@ -113,6 +113,7 @@ namespace MarbleRunSimulatorCore {
         canvas.height = data.size;
 
         let backGroundColorHex = backGroundColor.toHexString();
+        let backGroundColorHexNoAlpha = backGroundColorHex.substring(0, 7) + "ff";
         let context = canvas.getContext("2d");
         context.fillStyle = backGroundColorHex;
         context.fillRect(0, 0, canvas.width, canvas.height);
@@ -274,7 +275,7 @@ namespace MarbleRunSimulatorCore {
                 context.stroke();
             
                 context.lineWidth = 3 * lineWidth;
-                context.strokeStyle = backGroundColorHex;
+                context.strokeStyle = backGroundColorHexNoAlpha;
                 context.stroke();
             }
             else if (line instanceof MiniatureShape) {

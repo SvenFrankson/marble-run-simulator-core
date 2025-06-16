@@ -6176,6 +6176,7 @@ var MarbleRunSimulatorCore;
         canvas.width = data.size;
         canvas.height = data.size;
         let backGroundColorHex = backGroundColor.toHexString();
+        let backGroundColorHexNoAlpha = backGroundColorHex.substring(0, 7) + "ff";
         let context = canvas.getContext("2d");
         context.fillStyle = backGroundColorHex;
         context.fillRect(0, 0, canvas.width, canvas.height);
@@ -6318,7 +6319,7 @@ var MarbleRunSimulatorCore;
                 context.strokeStyle = c.toHexString();
                 context.stroke();
                 context.lineWidth = 3 * lineWidth;
-                context.strokeStyle = backGroundColorHex;
+                context.strokeStyle = backGroundColorHexNoAlpha;
                 context.stroke();
             }
             else if (line instanceof MarbleRunSimulatorCore.MiniatureShape) {
