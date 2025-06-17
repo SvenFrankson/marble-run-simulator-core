@@ -176,7 +176,7 @@ namespace MarbleRunSimulatorCore {
             if (startBank * endBank > 0) {
                 smoothLength = Math.min(totalLength, smoothLength);
             }
-            else if (startBank * endBank < 0) {
+            else {
                 smoothLength = Math.min(totalLength * 0.5, smoothLength);
             }
 

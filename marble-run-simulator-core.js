@@ -4569,7 +4569,7 @@ var MarbleRunSimulatorCore;
             if (startBank * endBank > 0) {
                 smoothLength = Math.min(totalLength, smoothLength);
             }
-            else if (startBank * endBank < 0) {
+            else {
                 smoothLength = Math.min(totalLength * 0.5, smoothLength);
             }
             for (let i = 1; i < N - 1; i++) {
@@ -9066,7 +9066,7 @@ var MarbleRunSimulatorCore;
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, MarbleRunSimulatorCore.tileHeight * h, 0), dirLeft),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-0.008 + MarbleRunSimulatorCore.tileWidth * 0.5, MarbleRunSimulatorCore.tileHeight * h + MarbleRunSimulatorCore.tileHeight * 0.5, 0), dirRight)
             ];
-            template.maxAngle = Math.PI / 16;
+            template.maxAngle = Math.PI / 8;
             template.initialize();
             return template;
         }
@@ -9253,7 +9253,7 @@ var MarbleRunSimulatorCore;
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "flatjoin";
             template.l = 1;
-            template.maxAngle = 0;
+            template.maxAngle = Math.PI / 8;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);
@@ -12723,7 +12723,7 @@ var MarbleRunSimulatorCore;
             template.minH = 1;
             template.hExtendableOnY = true;
             template.xMirrorable = true;
-            template.maxAngle = Math.PI / 16;
+            template.maxAngle = Math.PI / 8;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
             let n = new BABYLON.Vector3(0, 1, 0);

@@ -34,7 +34,7 @@ namespace MarbleRunSimulatorCore {
             template.hExtendableOnY = true;
             template.xMirrorable = true;
 
-            template.maxAngle = Math.PI / 16;
+            template.maxAngle = Math.PI / 8;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
