@@ -791,6 +791,14 @@ namespace MarbleRunSimulatorCore {
             )
         }
 
+        public getAbsoluteAfterUpdateCoordinatesPosition(): BABYLON.Vector3 {
+            return new BABYLON.Vector3(
+                this.iAfterUpdate * tileSize + this.offsetPosition.x,
+                this.kAfterUpdate * tileHeight + this.offsetPosition.y,
+                this.jAfterUpdate * tileSize + this.offsetPosition.z
+            )
+        }
+
         public setIsVisible(isVisible: boolean): void {
             this.isVisible = isVisible;
             this.getChildren(undefined, false).forEach((m) => {
@@ -1379,7 +1387,7 @@ namespace MarbleRunSimulatorCore {
 
         public updateTargetCoordinates(dt: number): boolean {
             if (this.instantiated && isFinite(this._targetI) || isFinite(this._targetJ) || isFinite(this._targetK) || isFinite(this._targetR)) {
-                let f = Nabu.Easing.smoothNSec(1 / dt, 0.2);
+                let f = Nabu.Easing.smoothNSec(1 / dt, 0.15);
                 let tI = isFinite(this._targetI) ? this._targetI : this.i;
                 let tJ = isFinite(this._targetJ) ? this._targetJ : this.j;
                 let tK = isFinite(this._targetK) ? this._targetK : this.k;

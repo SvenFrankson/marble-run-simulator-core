@@ -626,6 +626,7 @@ declare namespace MarbleRunSimulatorCore {
         setTargetR(v: number): void;
         static DirectionToRValue(dir: BABYLON.Vector3): number;
         getAbsoluteCoordinatesPosition(): BABYLON.Vector3;
+        getAbsoluteAfterUpdateCoordinatesPosition(): BABYLON.Vector3;
         setIsVisible(isVisible: boolean): void;
         private _partVisibilityMode;
         get partVisilibityMode(): PartVisibilityMode;
