@@ -10,7 +10,7 @@ namespace MarbleRunSimulatorCore {
 
         let dataString = "";
 
-        // Add ball count
+        // Add ball count²
         dataString += NToHex(machine.balls.length, 2);
         for (let i = 0; i < machine.balls.length; i++) {
             let ball = machine.balls[i];
@@ -30,8 +30,9 @@ namespace MarbleRunSimulatorCore {
             let part = machine.parts[i];
             let baseName = part.partName.split("_")[0];
             let index = TrackNames.findIndex((name) => {
-                return name.startsWith(baseName);
+                return name === baseName;
             });
+            console.log(baseName + " " + index);
             if (index === - 1) {
                 console.error("Error, can't find part index.");
                 debugger;

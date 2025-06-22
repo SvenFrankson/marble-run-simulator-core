@@ -2,41 +2,41 @@ namespace MarbleRunSimulatorCore {
 
     // Caution, order is important. Do not rearrange.
     export var TrackNames = [
-        "ramp_1.1.1",
-        "wave_2.1.1",
-        "snake_2.1.1",
+        "ramp",
+        "wave",
+        "snake",
         "join",
         "flatjoin",
         "split",
-        "uturn_2.0",
-        "wall_3.3",
-        "uturnsharp_1",
-        "loop_2.2.1",
-        "spiral_1.2",
-        "elevator_4",
-        "stairway_2.4",
-        "screw_2.2",
+        "uturn",
+        "wall",
+        "uturnsharp",
+        "loop",
+        "spiral",
+        "elevator",
+        "stairway",
+        "screw",
         "start",
         "end",
-        "jumper_1",
+        "jumper",
         "gravitywell",
-        "shooter_8",
+        "shooter",
         "controlerLegacy",
         "screen",
         "speeder",
         "forwardSplit",
-        "spiralUTurn_3.2",
-        "piperamp_1.1.1",
-        "pipeuturn_2.0",
-        "steamelevator_4",
+        "spiralUTurn",
+        "piperamp",
+        "pipeuturn",
+        "steamelevator",
         "sort",
         "spawner",
-        "woodramp_1.1.1",
-        "wooduturn_2.0",
-        "uturnv2_0.2",
-        "curb_2.0",
-        "rampv2_1.1.1",
-        "multiJoin_1",
+        "woodramp",
+        "wooduturn",
+        "uturnv2",
+        "curb",
+        "rampv2",
+        "multiJoin",
         "trikeSkull",
         "controler"
     ];
@@ -481,6 +481,7 @@ namespace MarbleRunSimulatorCore {
                 return new FlatJoin(this.machine, prop);
             }
             if (baseName === "split") {
+                console.log("new split " + prop.mirrorX + " " + prop.mirrorZ);
                 return new Split(this.machine, prop);
             }
             if (baseName === "forwardSplit") {

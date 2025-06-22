@@ -681,8 +681,8 @@ var MarbleRunSimulatorCore;
                                         this.marbleChocSound.play();
                                     }
                                 }
-                                this.velocity.copyFrom(otherSpeed.scale(0.995));
-                                ball.velocity.copyFrom(mySpeed.scale(0.995));
+                                this.velocity.copyFrom(otherSpeed.scale(0.99));
+                                ball.velocity.copyFrom(mySpeed.scale(0.99));
                                 canceledSpeed.copyFromFloats(0, 0, 0);
                                 //this.velocity.copyFrom(otherSpeed).scaleInPlace(.5);
                                 //ball.velocity.copyFrom(mySpeed).scaleInPlace(.6);
@@ -3909,41 +3909,41 @@ var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     // Caution, order is important. Do not rearrange.
     MarbleRunSimulatorCore.TrackNames = [
-        "ramp_1.1.1",
-        "wave_2.1.1",
-        "snake_2.1.1",
+        "ramp",
+        "wave",
+        "snake",
         "join",
         "flatjoin",
         "split",
-        "uturn_2.0",
-        "wall_3.3",
-        "uturnsharp_1",
-        "loop_2.2.1",
-        "spiral_1.2",
-        "elevator_4",
-        "stairway_2.4",
-        "screw_2.2",
+        "uturn",
+        "wall",
+        "uturnsharp",
+        "loop",
+        "spiral",
+        "elevator",
+        "stairway",
+        "screw",
         "start",
         "end",
-        "jumper_1",
+        "jumper",
         "gravitywell",
-        "shooter_8",
+        "shooter",
         "controlerLegacy",
         "screen",
         "speeder",
         "forwardSplit",
-        "spiralUTurn_3.2",
-        "piperamp_1.1.1",
-        "pipeuturn_2.0",
-        "steamelevator_4",
+        "spiralUTurn",
+        "piperamp",
+        "pipeuturn",
+        "steamelevator",
         "sort",
         "spawner",
-        "woodramp_1.1.1",
-        "wooduturn_2.0",
-        "uturnv2_0.2",
-        "curb_2.0",
-        "rampv2_1.1.1",
-        "multiJoin_1",
+        "woodramp",
+        "wooduturn",
+        "uturnv2",
+        "curb",
+        "rampv2",
+        "multiJoin",
         "trikeSkull",
         "controler"
     ];
@@ -4364,6 +4364,7 @@ var MarbleRunSimulatorCore;
                 return new MarbleRunSimulatorCore.FlatJoin(this.machine, prop);
             }
             if (baseName === "split") {
+                console.log("new split " + prop.mirrorX + " " + prop.mirrorZ);
                 return new MarbleRunSimulatorCore.Split(this.machine, prop);
             }
             if (baseName === "forwardSplit") {
@@ -6964,7 +6965,7 @@ var MarbleRunSimulatorCore;
             v: 12
         };
         let dataString = "";
-        // Add ball count
+        // Add ball count²
         dataString += MarbleRunSimulatorCore.NToHex(machine.balls.length, 2);
         for (let i = 0; i < machine.balls.length; i++) {
             let ball = machine.balls[i];
@@ -6983,8 +6984,9 @@ var MarbleRunSimulatorCore;
             let part = machine.parts[i];
             let baseName = part.partName.split("_")[0];
             let index = MarbleRunSimulatorCore.TrackNames.findIndex((name) => {
-                return name.startsWith(baseName);
+                return name === baseName;
             });
+            console.log(baseName + " " + index);
             if (index === -1) {
                 console.error("Error, can't find part index.");
                 debugger;
@@ -11827,14 +11829,9 @@ var MarbleRunSimulatorCore;
             this.axisZMin = 0;
             this.axisZMax = 1;
             this.reset = () => {
-                this._exitLeft = !this.mirrorX && !this.mirrorZ;
+                this._exitLeft = !this.mirrorZ;
                 this._moving = false;
-                if (this.mirrorX) {
-                    this.pivot.rotation.z = -(this.mirrorZ ? -1 : 1) * Math.PI / 4;
-                }
-                else {
-                    this.pivot.rotation.z = (this.mirrorZ ? -1 : 1) * Math.PI / 4;
-                }
+                this.pivot.rotation.z = (this.mirrorZ ? -1 : 1) * Math.PI / 4;
                 this.pivot.freezeWorldMatrix();
                 this.pivot.getChildMeshes().forEach((child) => {
                     child.freezeWorldMatrix();
@@ -11842,7 +11839,7 @@ var MarbleRunSimulatorCore;
             };
             this._exitLeft = true;
             this._moving = false;
-            this.setTemplate(this.machine.templateManager.getTemplate(Split.PropToPartName(prop)));
+            this.setTemplate(this.machine.templateManager.getTemplate(Split.PropToPartName(prop), prop.mirrorX, prop.mirrorZ));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
             for (let i = this.colors.length; i < 5; i++) {
