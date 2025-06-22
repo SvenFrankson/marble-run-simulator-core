@@ -14,7 +14,7 @@ namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
 
-            this.setTemplate(this.machine.templateManager.getTemplate(Split.PropToPartName(prop)));
+            this.setTemplate(this.machine.templateManager.getTemplate(Split.PropToPartName(prop), prop.mirrorX, prop.mirrorZ));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -226,13 +226,9 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
-            this._exitLeft = !this.mirrorX && !this.mirrorZ;
+            this._exitLeft = !this.mirrorZ;
             this._moving = false;
-            if (this.mirrorX) {
-                this.pivot.rotation.z = - (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
-            } else {
-                this.pivot.rotation.z = (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
-            }
+            this.pivot.rotation.z = (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
             this.pivot.freezeWorldMatrix();
             this.pivot.getChildMeshes().forEach((child) => {
                 child.freezeWorldMatrix();
