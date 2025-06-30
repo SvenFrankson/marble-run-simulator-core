@@ -12668,11 +12668,26 @@ var MarbleRunSimulatorCore;
             let dZ = 0;
             let r = MarbleRunSimulatorCore.tileSize * l * 0.5;
             let r2 = r / Math.SQRT2;
+            let legacyR = MarbleRunSimulatorCore.legacyTileDepth * (l / 3) * 0.5;
+            let legacyX0 = -MarbleRunSimulatorCore.tileSize * 0.5 + (2 * Math.PI * legacyR) / 6;
+            let legacyXMax = legacyX0 + legacyR;
+            let dX = legacyXMax - (-MarbleRunSimulatorCore.tileSize * 0.5 + r);
+            let f = legacyXMax / (-MarbleRunSimulatorCore.tileSize * 0.5 + r);
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].isPipe = pipeVersion;
             template.trackTemplates[0].isWood = woodVersion;
             template.trackTemplates[0].trackpoints = [];
-            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5 + 0, 0, dZ), new BABYLON.Vector3(1, 0, 0)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5 + r2, 0, r - r2)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5 + r, 0, r)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5 + r2, 0, r + r2)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5 + 0, 0, 2 * r - dZ), new BABYLON.Vector3(-1, 0, 0)));
+            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5 + 0, 0, 0), new BABYLON.Vector3(1, 0, 0)));
+            for (let i = 1; i < 6; i++) {
+                let a = Math.PI * i / 6;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                let x = -MarbleRunSimulatorCore.tileSize * 0.5 + sina * r;
+                x += dX * Math.sqrt(sina);
+                let z = r - cosa * r;
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x, 0, z)));
+            }
+            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, 0, 2 * r), new BABYLON.Vector3(-1, 0, 0)));
             template.defaultAngle = Math.PI / 4 / 4 * template.s;
             template.maxAngle = Math.PI / 4 / 2 * template.s;
             let hermite = (x) => {
