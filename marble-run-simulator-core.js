@@ -11019,7 +11019,7 @@ var MarbleRunSimulatorCore;
             template.d = 3;
             template.s = s;
             template.lExtendableOnX = true;
-            template.minL = 5;
+            template.minL = 3;
             template.sExtendable = true;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -11029,6 +11029,7 @@ var MarbleRunSimulatorCore;
             if (count % 2 === 1) {
                 count--;
             }
+            count = Math.max(count, 4);
             let length = MarbleRunSimulatorCore.tileSize * template.l;
             let r = length / count;
             let r2 = r / Math.SQRT2 * 1.0;
