@@ -34,6 +34,7 @@ namespace MarbleRunSimulatorCore {
             template.minD = -32;
             template.maxD = 32;
             if (!pipeVersion) {
+                template.s = s;
                 template.sExtendable = true;
             }
 
