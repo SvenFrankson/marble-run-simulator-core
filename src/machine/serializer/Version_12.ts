@@ -137,7 +137,7 @@ namespace MarbleRunSimulatorCore {
 
                 let materialIndex = parseInt(dataString.substring(pt, pt += 2), 36);
                 if (makeMiniature) {
-                    CommonAddBall(lines, x, y, z);
+                    CommonAddBall(machine, x, y, z, materialIndex, lines);
                 }
                 else if (machine) {
                     let ball = new Ball(new BABYLON.Vector3(x, y, z), machine);
@@ -193,71 +193,7 @@ namespace MarbleRunSimulatorCore {
                     }
                     
                     if (makeMiniature) {
-                        let template = machine.templateManager.getTemplateByProp(baseName, prop);
-                        if (template) {
-                            // Now draw into the miniature from the template.
-                            for (let t = 0; t < template.trackTemplates.length; t++) {
-                                let trackTemplate = template.trackTemplates[t];
-                                let drawnTrack: MiniatureTrack = new MiniatureTrack();
-                                /*
-                                for (let p = 0; p < trackTemplate.trackpoints.length; p++) {
-                                    let point = trackTemplate.trackpoints[p].position.clone();
-                                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
-                                    point.x += prop.i * tileSize;
-                                    point.y += prop.k * tileHeight;
-                                    point.z += prop.j * tileSize;
-                                    if (Mummu.IsFinite(point)) {
-                                        drawnTrack.push(point);
-                                    }
-                                    else {
-                                        console.log("miniature fail for " + baseName);
-                                    }
-                                }
-                                */
-                                if (!trackTemplate.noMiniatureRender) {
-                                    for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
-                                        if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
-                                            let point = trackTemplate.interpolatedPoints[p].clone();
-                                            Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
-                                            point.x += prop.i * tileSize;
-                                            point.y += prop.k * tileHeight;
-                                            point.z += prop.j * tileSize;
-                                            drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - 0.5 * point.y);
-                                            if (Mummu.IsFinite(point)) {
-                                                drawnTrack.points.push(point);
-                                            }
-                                            else {
-                                                console.log("miniature fail for " + baseName);
-                                            }
-                                        }
-                                    }
-                                }
-                                if (drawnTrack.points.length > 0) {
-                                    lines.push(drawnTrack);
-                                }
-                            }
-                            for (let j = 0; j < template.miniatureShapes.length; j++) {
-                                let shape = template.miniatureShapes[j];
-                                let drawnShape: MiniatureShape = new MiniatureShape();
-                                for (let i = 0; i < shape.points.length; i++) {
-                                    let point = shape.points[i].clone();
-                                    Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
-                                    point.x += prop.i * tileSize;
-                                    point.y += prop.k * tileHeight;
-                                    point.z += prop.j * tileSize;
-                                    drawnShape.dist = Math.min(drawnShape.dist, point.x + point.z - 0.5 * point.y);
-                                    if (Mummu.IsFinite(point)) {
-                                        drawnShape.points.push(point);
-                                    }
-                                }
-                                if (drawnShape.points.length > 0) {
-                                    lines.push(drawnShape);
-                                }
-                            }
-                        }
-                        else {
-                            console.log("can't find template for " + baseName);
-                        }
+                        AddLinesFromData(machine, baseName, prop, lines);
                     }
                     else if (machine) {
                         let track = machine.trackFactory.createTrackBaseName(baseName, prop);

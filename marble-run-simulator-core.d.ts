@@ -182,11 +182,14 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class MiniatureTrack {
         points: BABYLON.Vector3[];
+        color: BABYLON.Color4;
         dist: number;
     }
     class MiniatureShape {
         center: BABYLON.Vector3;
         points: BABYLON.Vector3[];
+        colorSlot: number;
+        color: BABYLON.Color4;
         dist: number;
         fill: boolean;
         static MakeNGon(c: BABYLON.Vector3, r: number, axis: BABYLON.Vector3, n: number, fill: boolean): MiniatureShape;
@@ -386,12 +389,6 @@ declare namespace MarbleRunSimulatorCore {
         baseMeshMaxY: number;
         baseMeshMinZ: number;
         baseMeshMaxZ: number;
-        tracksMinX: number;
-        tracksMaxX: number;
-        tracksMinY: number;
-        tracksMaxY: number;
-        tracksMinZ: number;
-        tracksMaxZ: number;
         generateBaseMesh(): Promise<void>;
         regenerateBaseAxis(): void;
         setBaseIsVisible(v: boolean): void;
@@ -908,7 +905,7 @@ declare namespace MarbleRunSimulatorCore {
         showInfoBox?: boolean;
     }
     function AddLinesFromData(machine: Machine, baseName: string, prop: IMachinePartProp, lines: (MiniatureTrack | MiniatureShape)[]): void;
-    function CommonAddBall(lines: (MiniatureTrack | MiniatureShape)[], x: number, y: number, z: number): void;
+    function CommonAddBall(machine: Machine, x: number, y: number, z: number, materialIndex: number, lines: (MiniatureTrack | MiniatureShape)[]): void;
     function DrawMiniature(lines: (MiniatureTrack | MiniatureShape)[], canvas: HTMLCanvasElement, data: IMachineMiniatureData, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {

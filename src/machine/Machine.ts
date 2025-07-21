@@ -536,13 +536,6 @@ namespace MarbleRunSimulatorCore {
         public baseMeshMinZ: number = -this.margin;
         public baseMeshMaxZ: number = this.margin;
 
-        public tracksMinX: number = 0;
-        public tracksMaxX: number = 0;
-        public tracksMinY: number = 0;
-        public tracksMaxY: number = 0;
-        public tracksMinZ: number = 0;
-        public tracksMaxZ: number = 0;
-
         public async generateBaseMesh(): Promise<void> {
             let previousBaseMinY = this.baseMeshMinY;
 
@@ -552,21 +545,6 @@ namespace MarbleRunSimulatorCore {
             this.baseMeshMaxY = tileHeight;
             this.baseMeshMinZ = - tileDepth * 0.5;
             this.baseMeshMaxZ = tileDepth * 0.5;
-
-            this.tracksMinX = Infinity;
-            this.tracksMaxX = - Infinity;
-            this.tracksMinY = Infinity;
-            this.tracksMaxY = - Infinity;
-            this.tracksMinZ = Infinity;
-            this.tracksMaxZ = - Infinity;
-            if (this.parts.length === 0) {
-                this.tracksMinX = 0;
-                this.tracksMaxX = 0;
-                this.tracksMinY = 0;
-                this.tracksMaxY = 0;
-                this.tracksMinZ = 0;
-                this.tracksMaxZ = 0;
-            }
 
             let maxI = 1;
             let minJ = - 1;
@@ -579,13 +557,6 @@ namespace MarbleRunSimulatorCore {
                 this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.worldAABBMax.y);
                 this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.worldAABBMin.z);
                 this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.worldAABBMax.z);
-                
-                this.tracksMinX = Math.min(this.tracksMinX, track.position.x - tileWidth * 0.5);
-                this.tracksMaxX = Math.max(this.tracksMaxX, track.position.x + tileWidth * (track.w - 0.5));
-                this.tracksMinY = Math.min(this.tracksMinY, track.position.y - tileHeight * (track.h + 1));
-                this.tracksMaxY = Math.max(this.tracksMaxY, track.position.y);
-                this.tracksMinZ = Math.min(this.tracksMinZ, track.position.z - tileDepth * (track.d - 0.5));
-                this.tracksMaxZ = Math.max(this.tracksMaxZ, track.position.z + tileDepth * 0.5);
 
                 maxI = Math.max(maxI, track.i + track.w * 3);
                 minJ = Math.min(minJ, track.j - track.d * 3);

@@ -300,6 +300,7 @@ namespace MarbleRunSimulatorCore {
                     new BABYLON.Vector3(stepW * 0.5 + dx, f * tileHeight * h, stepW * 0.5),
                     new BABYLON.Vector3(- stepW * 0.5 + dx, f * tileHeight * h, stepW * 0.5)
                 ];
+                shape.colorSlot = 1;
                 template.miniatureShapes.push(shape);
             }
 

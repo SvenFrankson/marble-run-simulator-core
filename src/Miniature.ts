@@ -2,12 +2,15 @@ namespace MarbleRunSimulatorCore {
     
     export class MiniatureTrack {
         public points: BABYLON.Vector3[] = [];
+        public color: BABYLON.Color4;
         public dist: number = Infinity;
     }
 
     export class MiniatureShape {
         public center: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public points: BABYLON.Vector3[] = [];
+        public colorSlot: number = 0;
+        public color: BABYLON.Color4;
         public dist: number = Infinity;
         public fill: boolean = true;
 

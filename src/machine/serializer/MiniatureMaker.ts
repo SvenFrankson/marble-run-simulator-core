@@ -20,7 +20,14 @@ namespace MarbleRunSimulatorCore {
             // Now draw into the miniature from the template.
             for (let t = 0; t < template.trackTemplates.length; t++) {
                 let trackTemplate = template.trackTemplates[t];
-                let drawnTrack: MiniatureTrack = new MiniatureTrack();
+                let miniatureTrack: MiniatureTrack = new MiniatureTrack();
+                
+                let materialIndex = prop.c[trackTemplate.colorIndex];
+                let mat = machine.game.materials.getMaterial(materialIndex, MaterialQuality.Standard);
+                if (mat instanceof BABYLON.StandardMaterial) {
+                    miniatureTrack.color = mat.diffuseColor.toColor4(1);
+                }
+
                 if (!trackTemplate.noMiniatureRender) {
                     for (let p = 0; p < trackTemplate.interpolatedPoints.length; p++) {
                         if (p % 3 === 0 || p === trackTemplate.interpolatedPoints.length - 1) {
@@ -29,9 +36,9 @@ namespace MarbleRunSimulatorCore {
                             point.x += prop.i * tileSize;
                             point.y += prop.k * tileHeight;
                             point.z += prop.j * tileSize;
-                            drawnTrack.dist = Math.min(drawnTrack.dist, point.x + point.z - point.y);
+                            miniatureTrack.dist = Math.min(miniatureTrack.dist, point.x + point.z - point.y);
                             if (Mummu.IsFinite(point)) {
-                                drawnTrack.points.push(point);
+                                miniatureTrack.points.push(point);
                             }
                             else {
                                 console.log("miniature fail for " + baseName);
@@ -40,14 +47,24 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
                 }
-                if (drawnTrack.points.length > 0) {
-                    lines.push(drawnTrack);
+                if (miniatureTrack.points.length > 0) {
+                    lines.push(miniatureTrack);
                 }
             }
             for (let j = 0; j < template.miniatureShapes.length; j++) {
                 let shape = template.miniatureShapes[j];
                 let drawnShape: MiniatureShape = new MiniatureShape();
                 drawnShape.fill = shape.fill;
+                if (isFinite(shape.colorSlot)) {
+                    let materialIndex = prop.c[shape.colorSlot];
+                    if (isFinite(materialIndex)) {
+                        let mat = machine.game.materials.getMaterial(materialIndex, MaterialQuality.Standard);
+                        if (mat instanceof BABYLON.StandardMaterial) {
+                            drawnShape.color = mat.diffuseColor.toColor4(1);
+                        }
+                    }
+                }
+
                 for (let i = 0; i < shape.points.length; i++) {
                     let point = shape.points[i].clone();
                     Mummu.RotateInPlace(point, BABYLON.Axis.Y, - Math.PI * 0.5 * prop.r);
@@ -75,12 +92,19 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
-    export function CommonAddBall(lines: (MiniatureTrack | MiniatureShape)[], x: number, y: number, z: number): void {      
+    export function CommonAddBall(machine: Machine, x: number, y: number, z: number, materialIndex: number, lines: (MiniatureTrack | MiniatureShape)[]): void {      
         x -= 0.01;
         y += 0.01;
         z -= 0.01;  
         let ballShape = MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, new BABYLON.Vector3(-1, 1, -1), 16, false);
         ballShape.dist = x + z - y;
+        ballShape.fill = true;
+
+        let mat = machine.game.materials.getBallMaterial(materialIndex, MaterialQuality.Standard);
+        if (mat instanceof BABYLON.StandardMaterial) {
+            ballShape.color = mat.diffuseColor.toColor4(1);
+        }
+
         lines.push(ballShape);
     }
 
@@ -270,9 +294,16 @@ namespace MarbleRunSimulatorCore {
             }
             normalizedH = normalizedH / line.points.length;
             normalizedH = (normalizedH - aabbMin.y) / (aabbMax.y - aabbMin.y);
-            let f = normalizedH * 0.8 + 0.2;
+            let f = normalizedH * 0.5 + 0.5;
+            if (line.color) {
+                line.color.r *= 1.3;
+                line.color.g *= 1.3;
+                line.color.b *= 1.3;
+                line.color.minimizeInPlaceFromFloats(1, 1, 1, 1);
+            }
+
             if (line instanceof MiniatureTrack) {
-                let c = BABYLON.Color4.Lerp(backGroundColor, color4White, f);
+                let c = BABYLON.Color4.Lerp(backGroundColor, line.color ? line.color : color4White, f);
                 context.strokeStyle = c.toHexString();
                 context.stroke();
             
@@ -281,14 +312,14 @@ namespace MarbleRunSimulatorCore {
                 context.stroke();
             }
             else if (line instanceof MiniatureShape) {
-                let c = BABYLON.Color4.Lerp(backGroundColor, color4White, 1);
+                let c = BABYLON.Color4.Lerp(backGroundColor, line.color ? line.color : color4White, 1);
                 context.closePath();
                 context.strokeStyle = c.toHexString();
                 context.lineWidth = lineWidth;
                 context.stroke();
 
                 if (line.fill) {
-                    c = BABYLON.Color4.Lerp(backGroundColor, color4White, 0.7 * f);
+                    c = BABYLON.Color4.Lerp(backGroundColor, line.color ? line.color : color4White, 0.7 * f);
                     context.fillStyle = c.toHexString();
                     context.fill();
                 }
