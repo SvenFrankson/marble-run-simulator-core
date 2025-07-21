@@ -337,6 +337,14 @@ namespace MarbleRunSimulatorCore {
         public findEndPoint(localPosition: BABYLON.Vector3): MachinePartEndpoint {
             return this.endPoints.find(endpoint => { return BABYLON.Vector3.Distance(endpoint.localPosition, localPosition) < 0.001});
         }
+        public findEndPointByWorldPos(worldPosition: BABYLON.Vector3): MachinePartEndpoint {
+            let invMatrix = this.getWorldMatrix().clone().invert();
+            let localPosition = BABYLON.Vector3.TransformCoordinates(worldPosition, invMatrix);
+            return this.findEndPoint(localPosition);
+        }
+        public findEndPointIndexByWorldPos(worldPosition: BABYLON.Vector3): number {
+            return this.endPoints.indexOf(this.findEndPointByWorldPos(worldPosition));
+        }
         public neighbours: Nabu.UniqueList<MachinePart> = new Nabu.UniqueList<MachinePart>();
         public addNeighbour(other: MachinePart): void {
             for (let i = 0; i < this.endPoints.length; i++) {
@@ -1528,21 +1536,39 @@ namespace MarbleRunSimulatorCore {
 
         public async rebuildWireMeshesIfNeeded(): Promise<void> {
             let neighbours = this.neighbours.cloneAsArray();
+            let connections = [];
+            this.endPoints.forEach(ep => {
+                if (ep.connectedEndPoint) {
+                    connections.push(true);
+                }
+                else {
+                    connections.push(false);
+                }
+            })
             await Nabu.Wait(2);
 
             let newNeighbours = [];
+            let newConnections = connections.map(v => { return false; });
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
-                let endPoint = this.machine.getBankAt(track.startWorldPosition, this);
-                if (endPoint) {
-                    if (newNeighbours.indexOf(endPoint.part) === - 1) {
-                        newNeighbours.push(endPoint.part);
+                let otherEndpoint = this.machine.getBankAt(track.startWorldPosition, this);
+                if (otherEndpoint) {
+                    if (newNeighbours.indexOf(otherEndpoint.part) === - 1) {
+                        newNeighbours.push(otherEndpoint.part);
+                        let thisEndpointIndex = this.findEndPointIndexByWorldPos(track.startWorldPosition);
+                        if (thisEndpointIndex > -1) {
+                            newNeighbours[thisEndpointIndex] = true;
+                        }
                     }
                 }
-                endPoint = this.machine.getBankAt(track.endWorldPosition, this);
-                if (endPoint) {
-                    if (newNeighbours.indexOf(endPoint.part) === - 1) {
-                        newNeighbours.push(endPoint.part);
+                otherEndpoint = this.machine.getBankAt(track.endWorldPosition, this);
+                if (otherEndpoint) {
+                    if (newNeighbours.indexOf(otherEndpoint.part) === - 1) {
+                        newNeighbours.push(otherEndpoint.part);
+                        let thisEndpointIndex = this.findEndPointIndexByWorldPos(track.startWorldPosition);
+                        if (thisEndpointIndex > -1) {
+                            newNeighbours[thisEndpointIndex] = true;
+                        }
                     }
                 }
             }
@@ -1550,6 +1576,9 @@ namespace MarbleRunSimulatorCore {
             let doRebuildWireMeshes = newNeighbours.length != neighbours.length;
             for (let i = 0; i < neighbours.length && !doRebuildWireMeshes; i++) {
                 doRebuildWireMeshes = doRebuildWireMeshes && (neighbours[i] != newNeighbours[i]);
+            }
+            for (let i = 0; i < connections.length && !doRebuildWireMeshes; i++) {
+                doRebuildWireMeshes = doRebuildWireMeshes && (connections[i] != newConnections[i]);
             }
 
             if (doRebuildWireMeshes) {

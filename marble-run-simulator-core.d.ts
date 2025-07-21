@@ -538,6 +538,8 @@ declare namespace MarbleRunSimulatorCore {
         localCenter: BABYLON.Vector3;
         endPoints: MachinePartEndpoint[];
         findEndPoint(localPosition: BABYLON.Vector3): MachinePartEndpoint;
+        findEndPointByWorldPos(worldPosition: BABYLON.Vector3): MachinePartEndpoint;
+        findEndPointIndexByWorldPos(worldPosition: BABYLON.Vector3): number;
         neighbours: Nabu.UniqueList<MachinePart>;
         addNeighbour(other: MachinePart): void;
         removeNeighbour(other: MachinePart): void;

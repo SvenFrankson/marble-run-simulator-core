@@ -2872,6 +2872,14 @@ var MarbleRunSimulatorCore;
         findEndPoint(localPosition) {
             return this.endPoints.find(endpoint => { return BABYLON.Vector3.Distance(endpoint.localPosition, localPosition) < 0.001; });
         }
+        findEndPointByWorldPos(worldPosition) {
+            let invMatrix = this.getWorldMatrix().clone().invert();
+            let localPosition = BABYLON.Vector3.TransformCoordinates(worldPosition, invMatrix);
+            return this.findEndPoint(localPosition);
+        }
+        findEndPointIndexByWorldPos(worldPosition) {
+            return this.endPoints.indexOf(this.findEndPointByWorldPos(worldPosition));
+        }
         addNeighbour(other) {
             for (let i = 0; i < this.endPoints.length; i++) {
                 let thisEndpoint = this.endPoints[i];
@@ -3813,26 +3821,47 @@ var MarbleRunSimulatorCore;
         }
         async rebuildWireMeshesIfNeeded() {
             let neighbours = this.neighbours.cloneAsArray();
+            let connections = [];
+            this.endPoints.forEach(ep => {
+                if (ep.connectedEndPoint) {
+                    connections.push(true);
+                }
+                else {
+                    connections.push(false);
+                }
+            });
             await Nabu.Wait(2);
             let newNeighbours = [];
+            let newConnections = connections.map(v => { return false; });
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
-                let endPoint = this.machine.getBankAt(track.startWorldPosition, this);
-                if (endPoint) {
-                    if (newNeighbours.indexOf(endPoint.part) === -1) {
-                        newNeighbours.push(endPoint.part);
+                let otherEndpoint = this.machine.getBankAt(track.startWorldPosition, this);
+                if (otherEndpoint) {
+                    if (newNeighbours.indexOf(otherEndpoint.part) === -1) {
+                        newNeighbours.push(otherEndpoint.part);
+                        let thisEndpointIndex = this.findEndPointIndexByWorldPos(track.startWorldPosition);
+                        if (thisEndpointIndex > -1) {
+                            newNeighbours[thisEndpointIndex] = true;
+                        }
                     }
                 }
-                endPoint = this.machine.getBankAt(track.endWorldPosition, this);
-                if (endPoint) {
-                    if (newNeighbours.indexOf(endPoint.part) === -1) {
-                        newNeighbours.push(endPoint.part);
+                otherEndpoint = this.machine.getBankAt(track.endWorldPosition, this);
+                if (otherEndpoint) {
+                    if (newNeighbours.indexOf(otherEndpoint.part) === -1) {
+                        newNeighbours.push(otherEndpoint.part);
+                        let thisEndpointIndex = this.findEndPointIndexByWorldPos(track.startWorldPosition);
+                        if (thisEndpointIndex > -1) {
+                            newNeighbours[thisEndpointIndex] = true;
+                        }
                     }
                 }
             }
             let doRebuildWireMeshes = newNeighbours.length != neighbours.length;
             for (let i = 0; i < neighbours.length && !doRebuildWireMeshes; i++) {
                 doRebuildWireMeshes = doRebuildWireMeshes && (neighbours[i] != newNeighbours[i]);
+            }
+            for (let i = 0; i < connections.length && !doRebuildWireMeshes; i++) {
+                doRebuildWireMeshes = doRebuildWireMeshes && (connections[i] != newConnections[i]);
             }
             if (doRebuildWireMeshes) {
                 this.rebuildWireMeshes(true);
