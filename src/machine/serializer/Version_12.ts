@@ -5,6 +5,7 @@ namespace MarbleRunSimulatorCore {
         let data: IMachineData = {
             title: machine.name,
             author: machine.author,
+            country: machine.country,
             v: 12
         };
 
@@ -118,6 +119,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 if (data.author) {
                     machine.author = data.author;
+                }
+                if (data.country) {
+                    machine.country = data.country;
                 }
             
                 machine.balls = [];

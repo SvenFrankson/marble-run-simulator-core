@@ -317,6 +317,7 @@ declare namespace MarbleRunSimulatorCore {
         v?: number;
         title?: string;
         author?: string;
+        country?: string;
         content?: string;
         state?: MachineDBState;
         likes?: number;
@@ -329,6 +330,7 @@ declare namespace MarbleRunSimulatorCore {
         dbLikes: number;
         name: string;
         author: string;
+        country: string;
         isChallengeMachine: boolean;
         root: BABYLON.Mesh;
         pedestalTop: BABYLON.Mesh;

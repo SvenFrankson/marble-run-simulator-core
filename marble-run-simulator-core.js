@@ -1671,6 +1671,7 @@ var MarbleRunSimulatorCore;
             this.dbLikes = 1;
             this.name = "Unnamed Machine";
             this.author = "Anonymous";
+            this.country = "un";
             this.isChallengeMachine = false;
             this.TEST_USE_BASE_FPS = false; // only for Poki playtest
             this.parts = [];
@@ -7001,6 +7002,7 @@ var MarbleRunSimulatorCore;
         let data = {
             title: machine.name,
             author: machine.author,
+            country: machine.country,
             v: 12
         };
         let dataString = "";
@@ -7101,6 +7103,9 @@ var MarbleRunSimulatorCore;
                 }
                 if (data.author) {
                     machine.author = data.author;
+                }
+                if (data.country) {
+                    machine.country = data.country;
                 }
                 machine.balls = [];
                 machine.parts = [];

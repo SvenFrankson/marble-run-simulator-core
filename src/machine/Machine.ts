@@ -114,6 +114,7 @@ namespace MarbleRunSimulatorCore {
         v?: number; // v2
         title?: string; // v12
         author?: string; // v12
+        country?: string; // v12
         content?: string; // v12
         state?: MachineDBState; // v12
         likes?: number; // v12
@@ -126,6 +127,7 @@ namespace MarbleRunSimulatorCore {
         public dbLikes: number = 1;
         public name: string = "Unnamed Machine";
         public author: string = "Anonymous";
+        public country: string = "un";
         public isChallengeMachine: boolean = false;
 
         public root: BABYLON.Mesh;
