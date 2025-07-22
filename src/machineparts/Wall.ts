@@ -2,6 +2,7 @@ namespace MarbleRunSimulatorCore {
     export class Wall extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
 
             if (this.machine.version < 11) {
                 this.magnetic = true;

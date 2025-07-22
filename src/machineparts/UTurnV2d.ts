@@ -2,6 +2,7 @@ namespace MarbleRunSimulatorCore {
     export class UTurnV2 extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
             
             let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturnv2_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             if (!prop.pipeVersion && !prop.woodVersion) {

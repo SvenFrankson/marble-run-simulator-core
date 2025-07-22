@@ -58,12 +58,9 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(4);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Stairway.PropToPartName(prop)));
-
-            for (let i = this.colors.length; i < 4; i++) {
-                this.colors[i] = 0;
-            }
 
             this.x0 = -tileWidth * 0.3;
             this.x1 = tileWidth * 0.3 + (this.l - 3) * tileSize;

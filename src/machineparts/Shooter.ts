@@ -54,6 +54,7 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(5);
 
             prop.h = Nabu.MinMax(prop.h, 3, 22);
             if (isNaN(prop.n)) {
@@ -61,10 +62,6 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.setTemplate(this.machine.templateManager.getTemplate(Shooter.PropToPartName(prop)));
-
-            for (let i = this.colors.length; i < 5; i++) {
-                this.colors[i] = 0;
-            }
 
             let x = 1;
 

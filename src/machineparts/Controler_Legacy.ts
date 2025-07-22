@@ -18,15 +18,12 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(6);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Controler_Legacy.PropToPartName(prop), prop.mirrorX));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-
-            for (let i = this.colors.length; i < 6; i++) {
-                this.colors[i] = 0;
-            }
 
             let dz = this.wireGauge * 0.5;
             let depth = 3;

@@ -2,6 +2,7 @@ namespace MarbleRunSimulatorCore {
     export class Jumper extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Jumper.PropToPartName(prop)));
             this.generateWires();

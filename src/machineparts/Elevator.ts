@@ -10,12 +10,9 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(4);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Elevator.PropToPartName(prop)));
-
-            for (let i = this.colors.length; i < 4; i++) {
-                this.colors[i] = 0;
-            }
 
             let x = 1;
 

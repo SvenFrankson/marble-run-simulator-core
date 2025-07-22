@@ -19,6 +19,7 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(5);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Screw.PropToPartName(prop)));
 
@@ -29,10 +30,6 @@ namespace MarbleRunSimulatorCore {
 
             this.y0 = -tileHeight * (this.h - 2 + 0.05) - 0.005;
             this.y1 = tileHeight * 0.05 + 0.005;
-
-            for (let i = this.colors.length; i < 5; i++) {
-                this.colors[i] = 0;
-            }
 
             let r = 0.014;
             let period = 0.022;

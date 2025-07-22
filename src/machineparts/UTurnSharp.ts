@@ -2,16 +2,13 @@ namespace MarbleRunSimulatorCore {
     export class UTurnSharp extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(2);
 
             if (isNaN(prop.h)) {
                 prop.h = 1;
             }
 
             this.setTemplate(this.machine.templateManager.getTemplate(UTurnSharp.PropToPartName(prop)));
-
-            for (let i = this.colors.length; i < 2; i++) {
-                this.colors[i] = 0;
-            }
 
             this.generateWires();
         }

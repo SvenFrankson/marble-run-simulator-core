@@ -20,15 +20,12 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(6);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Spawner.PropToPartName(prop)));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-
-            for (let i = this.colors.length; i < 6; i++) {
-                this.colors[i] = 0;
-            }
 
             this.axisZMin = - this.wireGauge * 0.6 - tileDepth;
             this.axisZMax = this.wireGauge * 0.6;

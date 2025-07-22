@@ -2,12 +2,9 @@ namespace MarbleRunSimulatorCore {
     export class FlatJoin extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(3);
 
             this.setTemplate(this.machine.templateManager.getTemplate(FlatJoin.PropToPartName(prop), prop.mirrorX));
-
-            for (let i = this.colors.length; i < 3; i++) {
-                this.colors[i] = 0;
-            }
 
             this.generateWires();
         }

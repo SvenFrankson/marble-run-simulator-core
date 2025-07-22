@@ -301,6 +301,16 @@ namespace MarbleRunSimulatorCore {
             index = Nabu.MinMax(index, 0, this.colors.length - 1);
             return this.colors[index];
         }
+        public setColorCount(c: number, defaultValue: number = 0): void {
+            if (this.colors.length > c) {
+                this.colors = this.colors.slice(0, c);
+            }
+            else {
+                while (this.colors.length < c) {
+                    this.colors.push(defaultValue);
+                }
+            }
+        }
         public sleepersMeshes: Map<number, BABYLON.Mesh> = new Map<number, BABYLON.Mesh>();
         public selectorBodyDisplay: BABYLON.Mesh;
         public selectorBodyLogic: MachinePartSelectorMesh;

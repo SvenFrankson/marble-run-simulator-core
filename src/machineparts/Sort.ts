@@ -18,16 +18,13 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(6);
 
             let partName = "sort";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-
-            for (let i = this.colors.length; i < 6; i++) {
-                this.colors[i] = 0;
-            }
 
             this.anchor = new BABYLON.Mesh("anchor");
             this.anchor.position.copyFromFloats(0, -tileHeight * 0.5, 0);

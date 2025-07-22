@@ -4,6 +4,7 @@ namespace MarbleRunSimulatorCore {
     export class Loop extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
 
             if (!isFinite(prop.n)) {
                 prop.n = 1;

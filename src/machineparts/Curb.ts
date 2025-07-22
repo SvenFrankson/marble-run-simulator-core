@@ -3,7 +3,8 @@ namespace MarbleRunSimulatorCore {
     export class Curb extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-            
+            this.setColorCount(1);
+
             this.setTemplate(this.machine.templateManager.getTemplate(Curb.PropToPartName(prop)));
             this.generateWires();
         }

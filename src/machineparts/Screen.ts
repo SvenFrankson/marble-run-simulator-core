@@ -21,16 +21,13 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(2);
 
             if (machine.version < 11) {
                 this.anteV11Case = true;
             }
 
             this.setTemplate(this.machine.templateManager.getTemplate(Screen.PropToPartName(prop)));
-
-            for (let i = this.colors.length; i < 2; i++) {
-                this.colors[i] = 0;
-            }
 
             this.container = new BABYLON.Mesh("screen-container");
             this.container.parent = this;

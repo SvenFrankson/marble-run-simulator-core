@@ -2,6 +2,7 @@ namespace MarbleRunSimulatorCore {
     export class UTurn extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
             
             this.setTemplate(this.machine.templateManager.getTemplate(UTurn.PropToPartName(prop)));
             this.generateWires();

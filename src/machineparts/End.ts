@@ -7,15 +7,9 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(3);
 
             this.setTemplate(this.machine.templateManager.getTemplate(End.PropToPartName(prop)));
-
-            if (isNaN(this.colors[1])) {
-                this.colors[1] = 0;
-            }
-            if (isNaN(this.colors[2])) {
-                this.colors[2] = 17;
-            }
 
             this.panel = new BABYLON.Mesh("panel");
             this.panel.position = new BABYLON.Vector3((this.mirrorX ? tileWidth * 0.6 : tileWidth * 0.4), 0.6 * tileHeight - 0.005, this.wireGauge * 0.5);

@@ -1,8 +1,9 @@
 namespace MarbleRunSimulatorCore {
     export class Ramp extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
-            super(machine, prop);
-            
+            super(machine, prop);            
+            this.setColorCount(1);
+
             this.setTemplate(this.machine.templateManager.getTemplate(Ramp.PropToPartName(prop)));
             this.generateWires();
         }

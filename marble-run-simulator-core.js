@@ -2869,6 +2869,16 @@ var MarbleRunSimulatorCore;
             index = Nabu.MinMax(index, 0, this.colors.length - 1);
             return this.colors[index];
         }
+        setColorCount(c, defaultValue = 0) {
+            if (this.colors.length > c) {
+                this.colors = this.colors.slice(0, c);
+            }
+            else {
+                while (this.colors.length < c) {
+                    this.colors.push(defaultValue);
+                }
+            }
+        }
         findEndPoint(localPosition) {
             return this.endPoints.find(endpoint => { return BABYLON.Vector3.Distance(endpoint.localPosition, localPosition) < 0.001; });
         }
@@ -8340,12 +8350,10 @@ var MarbleRunSimulatorCore;
                 });
             };
             this._moving = false;
+            this.setColorCount(6);
             this.setTemplate(this.machine.templateManager.getTemplate(Controler.PropToPartName(prop), prop.mirrorX));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-            for (let i = this.colors.length; i < 6; i++) {
-                this.colors[i] = 0;
-            }
             let dz = this.wireGauge * 0.5;
             let depth = 2;
             this.pivotPass = new BABYLON.Mesh("pivotPass");
@@ -8598,12 +8606,10 @@ var MarbleRunSimulatorCore;
                 });
             };
             this._moving = false;
+            this.setColorCount(6);
             this.setTemplate(this.machine.templateManager.getTemplate(Controler_Legacy.PropToPartName(prop), prop.mirrorX));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-            for (let i = this.colors.length; i < 6; i++) {
-                this.colors[i] = 0;
-            }
             let dz = this.wireGauge * 0.5;
             let depth = 3;
             this.pivotPass = new BABYLON.Mesh("pivotPass");
@@ -8831,6 +8837,7 @@ var MarbleRunSimulatorCore;
     class Curb extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(Curb.PropToPartName(prop)));
             this.generateWires();
         }
@@ -8895,10 +8902,8 @@ var MarbleRunSimulatorCore;
             this.p = 0;
             this.chainLength = 0;
             this.speed = 0.04; // in m/s
+            this.setColorCount(4);
             this.setTemplate(this.machine.templateManager.getTemplate(Elevator.PropToPartName(prop)));
-            for (let i = this.colors.length; i < 4; i++) {
-                this.colors[i] = 0;
-            }
             let x = 1;
             this.wheels = [new BABYLON.Mesh("wheel-0"), new BABYLON.Mesh("wheel-1")];
             this.wheels[0].position.copyFromFloats(0.03 * x + MarbleRunSimulatorCore.tileWidth * 0.5, MarbleRunSimulatorCore.tileHeight * (this.h + 1) - MarbleRunSimulatorCore.tileHeight * (this.h + 0.35), 0);
@@ -9112,13 +9117,8 @@ var MarbleRunSimulatorCore;
     class End extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(3);
             this.setTemplate(this.machine.templateManager.getTemplate(End.PropToPartName(prop)));
-            if (isNaN(this.colors[1])) {
-                this.colors[1] = 0;
-            }
-            if (isNaN(this.colors[2])) {
-                this.colors[2] = 17;
-            }
             this.panel = new BABYLON.Mesh("panel");
             this.panel.position = new BABYLON.Vector3((this.mirrorX ? MarbleRunSimulatorCore.tileWidth * 0.6 : MarbleRunSimulatorCore.tileWidth * 0.4), 0.6 * MarbleRunSimulatorCore.tileHeight - 0.005, this.wireGauge * 0.5);
             this.panel.parent = this;
@@ -9210,10 +9210,8 @@ var MarbleRunSimulatorCore;
     class FlatJoin extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(3);
             this.setTemplate(this.machine.templateManager.getTemplate(FlatJoin.PropToPartName(prop), prop.mirrorX));
-            for (let i = this.colors.length; i < 3; i++) {
-                this.colors[i] = 0;
-            }
             this.generateWires();
         }
         static PropToPartName(prop) {
@@ -9277,12 +9275,10 @@ var MarbleRunSimulatorCore;
             };
             this._exitLeft = true;
             this._moving = false;
+            this.setColorCount(5);
             this.setTemplate(this.machine.templateManager.getTemplate(ForwardSplit.PropToPartName(prop)));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-            for (let i = this.colors.length; i < 5; i++) {
-                this.colors[i] = 0;
-            }
             let rCurb = MarbleRunSimulatorCore.Split.pivotL * 0.3;
             this.anchor = new BABYLON.Mesh("anchor");
             this.anchor.position.copyFromFloats(0, -MarbleRunSimulatorCore.tileHeight * 0.5, -MarbleRunSimulatorCore.tileDepth);
@@ -9511,6 +9507,7 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             this.wellPath = [];
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(GravityWell.PropToPartName(prop), prop.mirrorX));
             this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
@@ -9601,10 +9598,8 @@ var MarbleRunSimulatorCore;
     class Join extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(3);
             this.setTemplate(this.machine.templateManager.getTemplate(Join.PropToPartName(prop)));
-            for (let i = this.colors.length; i < 3; i++) {
-                this.colors[i] = 0;
-            }
             this.generateWires();
         }
         static PropToPartName(prop) {
@@ -9653,6 +9648,7 @@ var MarbleRunSimulatorCore;
     class Jumper extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(Jumper.PropToPartName(prop)));
             this.generateWires();
         }
@@ -9703,6 +9699,7 @@ var MarbleRunSimulatorCore;
     class LargeLoop extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             if (!isFinite(prop.n)) {
                 prop.n = 1;
             }
@@ -9786,6 +9783,7 @@ var MarbleRunSimulatorCore;
     class Loop extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             if (!isFinite(prop.n)) {
                 prop.n = 1;
             }
@@ -9871,6 +9869,7 @@ var MarbleRunSimulatorCore;
     class MultiJoin extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(MultiJoin.PropToPartName(prop)));
             this.generateWires();
         }
@@ -9936,6 +9935,7 @@ var MarbleRunSimulatorCore;
     class Ramp extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(Ramp.PropToPartName(prop)));
             this.generateWires();
         }
@@ -9990,6 +9990,7 @@ namespace MarbleRunSimulatorCore {
     export class RampV2 extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
             
             this.setTemplate(this.machine.templateManager.getTemplate(RampV2.PropToPartName(prop)));
             this.generateWires();
@@ -10085,13 +10086,11 @@ var MarbleRunSimulatorCore;
             this._moving = false;
             this._lastCamRotZ = 0;
             this._visibleAngularSpeed = 0;
+            this.setColorCount(2);
             if (machine.version < 11) {
                 this.anteV11Case = true;
             }
             this.setTemplate(this.machine.templateManager.getTemplate(Screen.PropToPartName(prop)));
-            for (let i = this.colors.length; i < 2; i++) {
-                this.colors[i] = 0;
-            }
             this.container = new BABYLON.Mesh("screen-container");
             this.container.parent = this;
             this.pixels = [
@@ -10433,15 +10432,13 @@ var MarbleRunSimulatorCore;
             this.p = 0;
             this.speed = 2 * Math.PI; // in m/s
             this.a = 0;
+            this.setColorCount(5);
             this.setTemplate(this.machine.templateManager.getTemplate(Screw.PropToPartName(prop)));
             let x = 1;
             this.x0 = -MarbleRunSimulatorCore.tileWidth * 0.3;
             this.x1 = MarbleRunSimulatorCore.tileWidth * 0.3 + (this.l - 3) * MarbleRunSimulatorCore.tileSize;
             this.y0 = -MarbleRunSimulatorCore.tileHeight * (this.h - 2 + 0.05) - 0.005;
             this.y1 = MarbleRunSimulatorCore.tileHeight * 0.05 + 0.005;
-            for (let i = this.colors.length; i < 5; i++) {
-                this.colors[i] = 0;
-            }
             let r = 0.014;
             let period = 0.022;
             let p0 = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0);
@@ -10619,14 +10616,12 @@ var MarbleRunSimulatorCore;
             this.currentShootState = 0;
             this.shieldSpeed = 0.15;
             this.delayTimeout = 0;
+            this.setColorCount(5);
             prop.h = Nabu.MinMax(prop.h, 3, 22);
             if (isNaN(prop.n)) {
                 prop.n = 0;
             }
             this.setTemplate(this.machine.templateManager.getTemplate(Shooter.PropToPartName(prop)));
-            for (let i = this.colors.length; i < 5; i++) {
-                this.colors[i] = 0;
-            }
             let x = 1;
             this.generateWires();
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
@@ -10968,6 +10963,7 @@ var MarbleRunSimulatorCore;
     class Snake extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             prop.l = Math.max(prop.l, 2);
             this.setTemplate(this.machine.templateManager.getTemplate(Snake.PropToPartName(prop)));
             this.generateWires();
@@ -11118,13 +11114,11 @@ var MarbleRunSimulatorCore;
                 });
             };
             this._moving = false;
+            this.setColorCount(6);
             let partName = "sort";
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX, prop.mirrorZ));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-            for (let i = this.colors.length; i < 6; i++) {
-                this.colors[i] = 0;
-            }
             this.anchor = new BABYLON.Mesh("anchor");
             this.anchor.position.copyFromFloats(0, -MarbleRunSimulatorCore.tileHeight * 0.5, 0);
             this.anchor.parent = this;
@@ -11341,12 +11335,10 @@ var MarbleRunSimulatorCore;
                 });
             };
             this._moving = false;
+            this.setColorCount(6);
             this.setTemplate(this.machine.templateManager.getTemplate(Spawner.PropToPartName(prop)));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-            for (let i = this.colors.length; i < 6; i++) {
-                this.colors[i] = 0;
-            }
             this.axisZMin = -this.wireGauge * 0.6 - MarbleRunSimulatorCore.tileDepth;
             this.axisZMax = this.wireGauge * 0.6;
             if (this.mirrorX) {
@@ -11572,6 +11564,7 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             this._rotationSpeed = 0;
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(Speeder.PropToPartName(prop)));
             this.generateWires();
             this.base = new BABYLON.Mesh("base");
@@ -11656,6 +11649,7 @@ var MarbleRunSimulatorCore;
     class Spiral extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(Spiral.PropToPartName(prop), prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
@@ -11727,6 +11721,7 @@ var MarbleRunSimulatorCore;
     class SpiralUTurn extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(SpiralUTurn.PropToPartName(prop), prop.mirrorX, prop.mirrorZ));
             this.generateWires();
         }
@@ -11806,12 +11801,10 @@ var MarbleRunSimulatorCore;
             };
             this._exitLeft = true;
             this._moving = false;
+            this.setColorCount(5);
             this.setTemplate(this.machine.templateManager.getTemplate(Split.PropToPartName(prop), prop.mirrorX, prop.mirrorZ));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-            for (let i = this.colors.length; i < 5; i++) {
-                this.colors[i] = 0;
-            }
             let rCurb = Split.pivotL * 0.3;
             this.pivot = new BABYLON.Mesh("pivot");
             this.pivot.position.copyFromFloats(0, MarbleRunSimulatorCore.tileHeight * 0.5, 0);
@@ -12037,10 +12030,8 @@ var MarbleRunSimulatorCore;
             this.p = 0;
             this.speed = Math.PI; // in m/s
             this.a = 0;
+            this.setColorCount(4);
             this.setTemplate(this.machine.templateManager.getTemplate(Stairway.PropToPartName(prop)));
-            for (let i = this.colors.length; i < 4; i++) {
-                this.colors[i] = 0;
-            }
             this.x0 = -MarbleRunSimulatorCore.tileWidth * 0.3;
             this.x1 = MarbleRunSimulatorCore.tileWidth * 0.3 + (this.l - 3) * MarbleRunSimulatorCore.tileSize;
             this.boxesCount = Math.round((this.x1 - this.x0) / 0.02);
@@ -12328,6 +12319,7 @@ var MarbleRunSimulatorCore;
     class Start extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(Start.PropToPartName(prop)));
             this.generateWires();
         }
@@ -12367,6 +12359,7 @@ var MarbleRunSimulatorCore;
             this.reset = () => {
                 this.update(0);
             };
+            this.setColorCount(1);
             let partName = "steamelevator_" + prop.h.toFixed(0);
             this.setTemplate(this.machine.templateManager.getTemplate(partName, prop.mirrorX));
             let x = 1;
@@ -12568,6 +12561,7 @@ var MarbleRunSimulatorCore;
     class TrikeSkull extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(TrikeSkull.PropToPartName(prop)));
             this.skull = new BABYLON.Mesh("skull");
             this.skull.parent = this;
@@ -12602,6 +12596,7 @@ var MarbleRunSimulatorCore;
     class UTurn extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(UTurn.PropToPartName(prop)));
             this.generateWires();
         }
@@ -12683,13 +12678,11 @@ var MarbleRunSimulatorCore;
     class UTurnSharp extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(2);
             if (isNaN(prop.h)) {
                 prop.h = 1;
             }
             this.setTemplate(this.machine.templateManager.getTemplate(UTurnSharp.PropToPartName(prop)));
-            for (let i = this.colors.length; i < 2; i++) {
-                this.colors[i] = 0;
-            }
             this.generateWires();
         }
         static PropToPartName(prop) {
@@ -12769,6 +12762,7 @@ var MarbleRunSimulatorCore;
     class UTurnV2 extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturnv2_" + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
             if (!prop.pipeVersion && !prop.woodVersion) {
                 partName += "." + prop.s.toFixed(0);
@@ -12852,6 +12846,7 @@ var MarbleRunSimulatorCore;
     class Wall extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             if (this.machine.version < 11) {
                 this.magnetic = true;
             }
@@ -12930,6 +12925,7 @@ var MarbleRunSimulatorCore;
     class Wave extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(Wave.PropToPartName(prop)));
             this.generateWires();
         }

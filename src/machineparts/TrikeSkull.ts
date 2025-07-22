@@ -5,6 +5,7 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
 
             this.setTemplate(this.machine.templateManager.getTemplate(TrikeSkull.PropToPartName(prop)));
 

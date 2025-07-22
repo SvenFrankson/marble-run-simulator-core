@@ -2,12 +2,9 @@ namespace MarbleRunSimulatorCore {
     export class Join extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(3);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Join.PropToPartName(prop)));
-
-            for (let i = this.colors.length; i < 3; i++) {
-                this.colors[i] = 0;
-            }
 
             this.generateWires();
         }

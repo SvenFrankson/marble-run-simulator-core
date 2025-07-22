@@ -2,6 +2,7 @@ namespace MarbleRunSimulatorCore {
     export class Snake extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
 
             prop.l = Math.max(prop.l, 2);
 

@@ -13,15 +13,12 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(5);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Split.PropToPartName(prop), prop.mirrorX, prop.mirrorZ));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
-
-            for (let i = this.colors.length; i < 5; i++) {
-                this.colors[i] = 0;
-            }
 
             let rCurb = Split.pivotL * 0.3;
             

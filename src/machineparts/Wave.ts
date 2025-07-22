@@ -2,6 +2,7 @@ namespace MarbleRunSimulatorCore {
     export class Wave extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.setColorCount(1);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Wave.PropToPartName(prop)));
             this.generateWires();

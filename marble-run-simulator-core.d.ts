@@ -506,6 +506,7 @@ declare namespace MarbleRunSimulatorCore {
         wireGauge: number;
         colors: number[];
         getColor(index: number): number;
+        setColorCount(c: number, defaultValue?: number): void;
         sleepersMeshes: Map<number, BABYLON.Mesh>;
         selectorBodyDisplay: BABYLON.Mesh;
         selectorBodyLogic: MachinePartSelectorMesh;
