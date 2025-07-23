@@ -98,7 +98,7 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
             template.trackTemplates[1].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.2 + tileWidth * 0.5, -tileHeight * template.h + 0.01, -tileDepth), Tools.V3Dir(130), undefined, undefined, 0.8),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.2 + tileWidth * 0.5, -tileHeight * template.h + 0.01, -tileDepth), Tools.V3Dir(125), undefined, undefined, 0.7),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 1.5, -tileHeight * template.h, -tileDepth), Tools.V3Dir(90))
             ];
             template.trackTemplates[1].drawStartTip = true;

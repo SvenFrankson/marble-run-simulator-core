@@ -9607,7 +9607,7 @@ var MarbleRunSimulatorCore;
             template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
             template.trackTemplates[1].trackpoints = [
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.2 + MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h + 0.01, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(130), undefined, undefined, 0.8),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.2 + MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h + 0.01, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(125), undefined, undefined, 0.7),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.5, -MarbleRunSimulatorCore.tileHeight * template.h, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(90))
             ];
             template.trackTemplates[1].drawStartTip = true;
