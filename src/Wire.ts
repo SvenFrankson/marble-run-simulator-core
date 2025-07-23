@@ -1,7 +1,9 @@
 namespace MarbleRunSimulatorCore {
     export class Wire extends BABYLON.Mesh {
         public static DEBUG_DISPLAY: boolean = false;
+        public static DEBUG_SHOW_LENGTH: boolean = false;
 
+        public debugLengthTagMesh: BABYLON.Mesh;
         public path: BABYLON.Vector3[] = [];
         public normals: BABYLON.Vector3[] = [];
         public absolutePath: BABYLON.Vector3[] = [];
@@ -129,6 +131,38 @@ namespace MarbleRunSimulatorCore {
                     wireSection.parent = this;
                     Mummu.QuaternionFromYZAxisToRef(dir, BABYLON.Axis.Y, wireSection.rotationQuaternion);
                 }
+            }
+
+            if (Wire.DEBUG_SHOW_LENGTH) {
+                
+                this.debugLengthTagMesh = new BABYLON.Mesh("wire-length-tag");
+                this.debugLengthTagMesh.parent = this;
+                this.debugLengthTagMesh.rotation.x = Math.PI * 0.5;
+
+                Mummu.CreateQuadVertexData({
+                    width: 0.02,
+                    height: 0.02,
+                    sideOrientation: 0
+                }).applyToMesh(this.debugLengthTagMesh);
+
+                let center = this.path[Math.floor(this.path.length / 2)];
+                if (center) {
+                    this.debugLengthTagMesh.position.copyFrom(center);
+                }
+                this.debugLengthTagMesh.position.y += 0.001 + 0.001 * Math.random();
+
+                let text = this.path.length.toFixed(0);
+                let texture = new BABYLON.DynamicTexture("wire-length-tag-texture", { width: 128, height: 128 });
+                let context = texture.getContext();
+                context.font = "64px monospace";
+                context.fillStyle = "white";
+                context.fillText(text, 64 - context.measureText(text).width * 0.5, 64 + 16);
+                texture.update();
+                let material = new BABYLON.StandardMaterial("wire-length-tag-material");
+                material.diffuseTexture = texture;
+                material.emissiveColor.copyFromFloats(1, 1, 1);
+
+                this.debugLengthTagMesh.material = material;
             }
         }
     }
