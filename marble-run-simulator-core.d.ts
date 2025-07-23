@@ -74,6 +74,7 @@ declare namespace MarbleRunSimulatorCore {
         updateSelectorMeshVisibility(): void;
         setIsVisible(isVisible: boolean): void;
         instantiate(hotReload?: boolean): Promise<void>;
+        updateFrozenStatus(): void;
         dispose(doNotRecurse?: boolean, disposeMaterialAndTextures?: boolean): void;
         reset(): void;
         private memCount;

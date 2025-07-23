@@ -183,7 +183,7 @@ namespace MarbleRunSimulatorCore {
 
         public updateSelectorMeshVisibility(): void {
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
-            if (this.machine.playing || this.machine.paused) {
+            if (this.machine.playing || this.machine.paused || (this.frozen && this.machine.stopped)) {
                 this.renderOutline = false;
                 this.positionZeroGhost.visibility = 0.5;
 
@@ -215,6 +215,9 @@ namespace MarbleRunSimulatorCore {
         }
 
         public setIsVisible(isVisible: boolean): void {
+            if (this.frozen) {
+                isVisible = false;
+            }
             this.isVisible = isVisible;
             this.getChildMeshes().forEach((m) => {
                 m.isVisible = isVisible;
@@ -251,6 +254,14 @@ namespace MarbleRunSimulatorCore {
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
             this.updateSelectorMeshVisibility();
 
+            this.updateFrozenStatus();
+
+            if (!hotReload) {
+                this.reset();
+            }
+        }
+
+        public updateFrozenStatus(): void {
             let ballIndex = this.machine.balls.indexOf(this);
             let maxActiveBall = MaxActiveBalls[this.machine.graphicQ];
             if (ballIndex < maxActiveBall) {
@@ -261,10 +272,7 @@ namespace MarbleRunSimulatorCore {
                 this.frozen = true;
                 this.isVisible = false;
             }
-
-            if (!hotReload) {
-                this.reset();
-            }
+            this.updateSelectorMeshVisibility();
         }
 
         public dispose(doNotRecurse?: boolean, disposeMaterialAndTextures?: boolean): void {

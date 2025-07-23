@@ -171,7 +171,7 @@ var MarbleRunSimulatorCore;
         }
         updateSelectorMeshVisibility() {
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
-            if (this.machine.playing || this.machine.paused) {
+            if (this.machine.playing || this.machine.paused || (this.frozen && this.machine.stopped)) {
                 this.renderOutline = false;
                 this.positionZeroGhost.visibility = 0.5;
                 this.positionZeroGhost.renderOutline = true;
@@ -198,6 +198,9 @@ var MarbleRunSimulatorCore;
             }
         }
         setIsVisible(isVisible) {
+            if (this.frozen) {
+                isVisible = false;
+            }
             this.isVisible = isVisible;
             this.getChildMeshes().forEach((m) => {
                 m.isVisible = isVisible;
@@ -229,7 +232,12 @@ var MarbleRunSimulatorCore;
             this.positionZeroGhost.material = this.material;
             this.positionZeroGhost.position.copyFrom(this.positionZero);
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
-            this.updateSelectorMeshVisibility();
+            this.updateFrozenStatus();
+            if (!hotReload) {
+                this.reset();
+            }
+        }
+        updateFrozenStatus() {
             let ballIndex = this.machine.balls.indexOf(this);
             let maxActiveBall = MarbleRunSimulatorCore.MaxActiveBalls[this.machine.graphicQ];
             if (ballIndex < maxActiveBall) {
@@ -240,9 +248,7 @@ var MarbleRunSimulatorCore;
                 this.frozen = true;
                 this.isVisible = false;
             }
-            if (!hotReload) {
-                this.reset();
-            }
+            this.updateSelectorMeshVisibility();
         }
         dispose(doNotRecurse, disposeMaterialAndTextures) {
             super.dispose(doNotRecurse, disposeMaterialAndTextures);
