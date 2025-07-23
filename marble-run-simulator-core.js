@@ -170,7 +170,9 @@ var MarbleRunSimulatorCore;
             this.updateSelectorMeshVisibility();
         }
         updateSelectorMeshVisibility() {
-            this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
+            if (this.positionZeroGhost) {
+                this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
+            }
             if (this.machine.playing || this.machine.paused || (this.frozen && this.machine.stopped)) {
                 this.renderOutline = false;
                 this.positionZeroGhost.visibility = 0.5;
@@ -232,6 +234,7 @@ var MarbleRunSimulatorCore;
             this.positionZeroGhost.material = this.material;
             this.positionZeroGhost.position.copyFrom(this.positionZero);
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
+            this.updateSelectorMeshVisibility();
             this.updateFrozenStatus();
             if (!hotReload) {
                 this.reset();
