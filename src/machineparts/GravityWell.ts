@@ -7,21 +7,21 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-            this.setColorCount(1);
+            this.setColorCount(3);
 
             this.setTemplate(this.machine.templateManager.getTemplate(GravityWell.PropToPartName(prop), prop.mirrorX));
 
-            this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(tileWidth, tileHeight * 0.9, 0)];
+            this.wellPath = [new BABYLON.Vector3(0.012, -0.005, 0), new BABYLON.Vector3(tileWidth, tileHeight * 1.2, 0)];
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, Tools.V3Dir(0), Tools.V3Dir(0));
 
             this.wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
-            this.wellPath.push(new BABYLON.Vector3(tileWidth, tileHeight * 1, 0));
+            this.wellPath.push(new BABYLON.Vector3(tileWidth, tileHeight * 1.3, 0));
 
             this.wellMesh = new BABYLON.Mesh("gravitywell-mesh");
-            this.wellMesh.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth);
+            this.wellMesh.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.9, -tileDepth);
             this.wellMesh.parent = this;
 
             this.circleTop = new BABYLON.Mesh("wire-top");
@@ -29,7 +29,7 @@ namespace MarbleRunSimulatorCore {
             this.circleTop.parent = this;
 
             this.circleBottom = new BABYLON.Mesh("wire-top");
-            this.circleBottom.position.copyFromFloats(tileWidth * 0.5, - tileHeight * 1.6 - 0.01, -tileDepth);
+            this.circleBottom.position.copyFromFloats(tileWidth * 0.5, - tileHeight * 1.9 - 0.01, -tileDepth);
             this.circleBottom.parent = this;
 
             this.generateWires();
@@ -44,9 +44,9 @@ namespace MarbleRunSimulatorCore {
                 this.wellMesh.dispose();
             }
             this.wellMesh = BABYLON.MeshBuilder.CreateLathe("gravitywell-mesh", { shape: this.wellPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
-            this.wellMesh.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.6, -tileDepth);
+            this.wellMesh.position.copyFromFloats(tileWidth * 0.5, -tileHeight * 1.9, -tileDepth);
             this.wellMesh.parent = this;
-            this.wellMesh.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
+            this.wellMesh.material = this.machine.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             
             BABYLON.CreateTorusVertexData({ diameter: tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
             this.circleTop.material = this.wellMesh.material;
@@ -68,6 +68,7 @@ namespace MarbleRunSimulatorCore {
             template.xMirrorable = true;
 
             template.trackTemplates[0] = new TrackTemplate(template);
+            template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), Tools.V3Dir(90))
             ];
@@ -95,7 +96,11 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[0].drawEndTip = true;
 
             template.trackTemplates[1] = new TrackTemplate(template);
-            template.trackTemplates[1].trackpoints = [new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.2 + tileWidth * 0.5, -tileHeight * template.h + 0.025, -tileDepth), Tools.V3Dir(150)), new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 1.5, -tileHeight * template.h, -tileDepth), Tools.V3Dir(90))];
+            template.trackTemplates[1].colorIndex = 1;
+            template.trackTemplates[1].trackpoints = [
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.2 + tileWidth * 0.5, -tileHeight * template.h + 0.01, -tileDepth), Tools.V3Dir(130), undefined, undefined, 0.8),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(tileWidth * 1.5, -tileHeight * template.h, -tileDepth), Tools.V3Dir(90))
+            ];
             template.trackTemplates[1].drawStartTip = true;
 
             if (mirrorX) {

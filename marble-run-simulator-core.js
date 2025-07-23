@@ -9512,23 +9512,23 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             this.wellPath = [];
-            this.setColorCount(1);
+            this.setColorCount(3);
             this.setTemplate(this.machine.templateManager.getTemplate(GravityWell.PropToPartName(prop), prop.mirrorX));
-            this.wellPath = [new BABYLON.Vector3(0.012, 0, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 0.9, 0)];
+            this.wellPath = [new BABYLON.Vector3(0.012, -0.005, 0), new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 1.2, 0)];
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             Mummu.CatmullRomPathInPlace(this.wellPath, MarbleRunSimulatorCore.Tools.V3Dir(0), MarbleRunSimulatorCore.Tools.V3Dir(0));
             this.wellPath.splice(0, 0, new BABYLON.Vector3(0.01, -0.01, 0));
-            this.wellPath.push(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 1, 0));
+            this.wellPath.push(new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth, MarbleRunSimulatorCore.tileHeight * 1.3, 0));
             this.wellMesh = new BABYLON.Mesh("gravitywell-mesh");
-            this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
+            this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.9, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
             this.circleTop = new BABYLON.Mesh("wire-top");
             this.circleTop.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 0.6, -MarbleRunSimulatorCore.tileDepth);
             this.circleTop.parent = this;
             this.circleBottom = new BABYLON.Mesh("wire-top");
-            this.circleBottom.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6 - 0.01, -MarbleRunSimulatorCore.tileDepth);
+            this.circleBottom.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.9 - 0.01, -MarbleRunSimulatorCore.tileDepth);
             this.circleBottom.parent = this;
             this.generateWires();
         }
@@ -9540,9 +9540,9 @@ var MarbleRunSimulatorCore;
                 this.wellMesh.dispose();
             }
             this.wellMesh = BABYLON.MeshBuilder.CreateLathe("gravitywell-mesh", { shape: this.wellPath, tessellation: 32, sideOrientation: BABYLON.Mesh.DOUBLESIDE });
-            this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.6, -MarbleRunSimulatorCore.tileDepth);
+            this.wellMesh.position.copyFromFloats(MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * 1.9, -MarbleRunSimulatorCore.tileDepth);
             this.wellMesh.parent = this;
-            this.wellMesh.material = this.machine.game.materials.getMaterial(0, this.machine.materialQ);
+            this.wellMesh.material = this.machine.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             BABYLON.CreateTorusVertexData({ diameter: MarbleRunSimulatorCore.tileWidth * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleTop);
             this.circleTop.material = this.wellMesh.material;
             BABYLON.CreateTorusVertexData({ diameter: 0.01 * 2, thickness: this.wireSize, tessellation: 32 }).applyToMesh(this.circleBottom);
@@ -9557,6 +9557,7 @@ var MarbleRunSimulatorCore;
             template.mirrorX = mirrorX;
             template.xMirrorable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+            template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90))
             ];
@@ -9577,7 +9578,11 @@ var MarbleRunSimulatorCore;
             }
             template.trackTemplates[0].drawEndTip = true;
             template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[1].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.2 + MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h + 0.025, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(150)), new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.5, -MarbleRunSimulatorCore.tileHeight * template.h, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(90))];
+            template.trackTemplates[1].colorIndex = 1;
+            template.trackTemplates[1].trackpoints = [
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.2 + MarbleRunSimulatorCore.tileWidth * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h + 0.01, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(130), undefined, undefined, 0.8),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileWidth * 1.5, -MarbleRunSimulatorCore.tileHeight * template.h, -MarbleRunSimulatorCore.tileDepth), MarbleRunSimulatorCore.Tools.V3Dir(90))
+            ];
             template.trackTemplates[1].drawStartTip = true;
             if (mirrorX) {
                 template.mirrorXTrackPointsInPlace();
