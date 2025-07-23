@@ -182,7 +182,9 @@ namespace MarbleRunSimulatorCore {
         }
 
         public updateSelectorMeshVisibility(): void {
-            this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
+            if (this.positionZeroGhost) {
+                this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
+            }
             if (this.machine.playing || this.machine.paused || (this.frozen && this.machine.stopped)) {
                 this.renderOutline = false;
                 this.positionZeroGhost.visibility = 0.5;
