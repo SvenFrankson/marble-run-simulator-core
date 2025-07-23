@@ -41,6 +41,8 @@ namespace MarbleRunSimulatorCore {
         }
         public velocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
 
+        public frozen: boolean = false;
+
         private _boostAnimation: BallBoostAnimation;
         private _hasBoostMaterial: boolean = false;
         private _baseColor: BABYLON.Color3;
@@ -249,6 +251,17 @@ namespace MarbleRunSimulatorCore {
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
             this.updateSelectorMeshVisibility();
 
+            let ballIndex = this.machine.balls.indexOf(this);
+            let maxActiveBall = MaxActiveBalls[this.machine.graphicQ];
+            if (ballIndex < maxActiveBall) {
+                this.frozen = false;
+                this.isVisible = true;
+            }
+            else {
+                this.frozen = true;
+                this.isVisible = false;
+            }
+
             if (!hotReload) {
                 this.reset();
             }
@@ -354,6 +367,9 @@ namespace MarbleRunSimulatorCore {
         }
 
         public update(dt: number): void {
+            if (this.frozen) {
+                return;
+            }
             if (this.game.DEBUG_MODE && (this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01 && this.recordedPositions.length < 1000)) {
                 this.recordedPositions.push(this.position.clone());
             }
@@ -730,7 +746,7 @@ namespace MarbleRunSimulatorCore {
 
                 if (this.collisionState === CollisionState.Normal || this.collisionState === CollisionState.Exit) {
                     this.machine.balls.forEach((ball) => {
-                        if (ball != this && ball.collisionState === this.collisionState) {
+                        if (ball != this && ball.collisionState === this.collisionState && !ball.frozen) {
                             let dist = BABYLON.Vector3.Distance(this.position, ball.position);
                             if (dist < this.size) {
                                 let depth = this.size - dist;

@@ -30,6 +30,7 @@ declare namespace MarbleRunSimulatorCore {
         get mass(): number;
         get sectionArea(): number;
         velocity: BABYLON.Vector3;
+        frozen: boolean;
         private _boostAnimation;
         private _hasBoostMaterial;
         private _baseColor;
@@ -254,6 +255,7 @@ declare namespace MarbleRunSimulatorCore {
         Standard = 0,
         PBR = 1
     }
+    var MaxActiveBalls: number[];
     interface IGame {
         scene: BABYLON.Scene;
         DEBUG_MODE: boolean;

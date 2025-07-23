@@ -29,6 +29,7 @@ var MarbleRunSimulatorCore;
             this.constructorIndex = 0;
             this.size = 0.016;
             this.velocity = BABYLON.Vector3.Zero();
+            this.frozen = false;
             this._hasBoostMaterial = false;
             this._boostColor = new BABYLON.Color3(0.9, 0.1, 0.3);
             this._boosting = false;
@@ -229,6 +230,16 @@ var MarbleRunSimulatorCore;
             this.positionZeroGhost.position.copyFrom(this.positionZero);
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
             this.updateSelectorMeshVisibility();
+            let ballIndex = this.machine.balls.indexOf(this);
+            let maxActiveBall = MarbleRunSimulatorCore.MaxActiveBalls[this.machine.graphicQ];
+            if (ballIndex < maxActiveBall) {
+                this.frozen = false;
+                this.isVisible = true;
+            }
+            else {
+                this.frozen = true;
+                this.isVisible = false;
+            }
             if (!hotReload) {
                 this.reset();
             }
@@ -308,6 +319,9 @@ var MarbleRunSimulatorCore;
             }
         }
         update(dt) {
+            if (this.frozen) {
+                return;
+            }
             if (this.game.DEBUG_MODE && (this.recordedPositions.length === 0 || BABYLON.Vector3.Distance(this.position, this.recordedPositions[this.recordedPositions.length - 1]) > 0.01 && this.recordedPositions.length < 1000)) {
                 this.recordedPositions.push(this.position.clone());
             }
@@ -666,7 +680,7 @@ var MarbleRunSimulatorCore;
                 }
                 if (this.collisionState === CollisionState.Normal || this.collisionState === CollisionState.Exit) {
                     this.machine.balls.forEach((ball) => {
-                        if (ball != this && ball.collisionState === this.collisionState) {
+                        if (ball != this && ball.collisionState === this.collisionState && !ball.frozen) {
                             let dist = BABYLON.Vector3.Distance(this.position, ball.position);
                             if (dist < this.size) {
                                 let depth = this.size - dist;
@@ -1664,6 +1678,13 @@ var MarbleRunSimulatorCore;
         MaterialQuality[MaterialQuality["Standard"] = 0] = "Standard";
         MaterialQuality[MaterialQuality["PBR"] = 1] = "PBR";
     })(MaterialQuality = MarbleRunSimulatorCore.MaterialQuality || (MarbleRunSimulatorCore.MaterialQuality = {}));
+    MarbleRunSimulatorCore.MaxActiveBalls = [];
+    MarbleRunSimulatorCore.MaxActiveBalls[GraphicQuality.Proxy] = 0;
+    MarbleRunSimulatorCore.MaxActiveBalls[GraphicQuality.VeryLow] = 3;
+    MarbleRunSimulatorCore.MaxActiveBalls[GraphicQuality.Low] = 3;
+    MarbleRunSimulatorCore.MaxActiveBalls[GraphicQuality.Medium] = 5;
+    MarbleRunSimulatorCore.MaxActiveBalls[GraphicQuality.High] = 10;
+    MarbleRunSimulatorCore.MaxActiveBalls[GraphicQuality.VeryHigh] = Infinity;
     // Should be removed
     let GameMode;
     (function (GameMode) {

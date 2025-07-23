@@ -35,6 +35,14 @@ namespace MarbleRunSimulatorCore {
         PBR
     }
 
+    export var MaxActiveBalls: number[] = [];
+    MaxActiveBalls[GraphicQuality.Proxy] = 0;
+    MaxActiveBalls[GraphicQuality.VeryLow] = 3;
+    MaxActiveBalls[GraphicQuality.Low] = 3;
+    MaxActiveBalls[GraphicQuality.Medium] = 5;
+    MaxActiveBalls[GraphicQuality.High] = 10;
+    MaxActiveBalls[GraphicQuality.VeryHigh] = Infinity;
+
     export interface IGame {
         scene: BABYLON.Scene;
         DEBUG_MODE: boolean;
