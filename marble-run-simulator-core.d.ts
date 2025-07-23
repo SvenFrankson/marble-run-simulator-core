@@ -208,6 +208,8 @@ declare namespace MarbleRunSimulatorCore {
     class Wire extends BABYLON.Mesh {
         part: MachinePart;
         static DEBUG_DISPLAY: boolean;
+        static DEBUG_SHOW_LENGTH: boolean;
+        debugLengthTagMesh: BABYLON.Mesh;
         path: BABYLON.Vector3[];
         normals: BABYLON.Vector3[];
         absolutePath: BABYLON.Vector3[];

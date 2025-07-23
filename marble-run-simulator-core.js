@@ -357,8 +357,8 @@ var MarbleRunSimulatorCore;
                                 let index = this.getLastIndex(wire);
                                 let col;
                                 let f = Nabu.MinMax(this.velocity.lengthSquared(), 0, 1);
-                                let range = Math.round(f * 32 + (1 - f) * 2);
-                                col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, !(part instanceof MarbleRunSimulatorCore.Spiral || part instanceof MarbleRunSimulatorCore.SpiralUTurn), index, range);
+                                let range = Math.round(f * 8 + (1 - f) * 2);
+                                col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.5, true, index, range);
                                 //}
                                 if (col.hit) {
                                     //this.setLastHit(wire, col.index);
@@ -1598,9 +1598,36 @@ var MarbleRunSimulatorCore;
                     Mummu.QuaternionFromYZAxisToRef(dir, BABYLON.Axis.Y, wireSection.rotationQuaternion);
                 }
             }
+            if (Wire.DEBUG_SHOW_LENGTH) {
+                this.debugLengthTagMesh = new BABYLON.Mesh("wire-length-tag");
+                this.debugLengthTagMesh.parent = this;
+                this.debugLengthTagMesh.rotation.x = Math.PI * 0.5;
+                Mummu.CreateQuadVertexData({
+                    width: 0.02,
+                    height: 0.02,
+                    sideOrientation: 0
+                }).applyToMesh(this.debugLengthTagMesh);
+                let center = this.path[Math.floor(this.path.length / 2)];
+                if (center) {
+                    this.debugLengthTagMesh.position.copyFrom(center);
+                }
+                this.debugLengthTagMesh.position.y += 0.001 + 0.001 * Math.random();
+                let text = this.path.length.toFixed(0);
+                let texture = new BABYLON.DynamicTexture("wire-length-tag-texture", { width: 128, height: 128 });
+                let context = texture.getContext();
+                context.font = "64px monospace";
+                context.fillStyle = "white";
+                context.fillText(text, 64 - context.measureText(text).width * 0.5, 64 + 16);
+                texture.update();
+                let material = new BABYLON.StandardMaterial("wire-length-tag-material");
+                material.diffuseTexture = texture;
+                material.emissiveColor.copyFromFloats(1, 1, 1);
+                this.debugLengthTagMesh.material = material;
+            }
         }
     }
     Wire.DEBUG_DISPLAY = false;
+    Wire.DEBUG_SHOW_LENGTH = false;
     MarbleRunSimulatorCore.Wire = Wire;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 /// <reference path="../../../babylon.d.ts"/>
