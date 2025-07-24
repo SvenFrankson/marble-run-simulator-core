@@ -291,7 +291,8 @@ declare namespace MarbleRunSimulatorCore {
         Ok = 1,
         NOk = 2,
         Problem = 3,
-        Info = 4
+        Info = 4,
+        Star = 5
     }
     var MachineDBStateStrings: string[];
     interface IBallData {

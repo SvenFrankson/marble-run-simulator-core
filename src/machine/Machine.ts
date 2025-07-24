@@ -80,7 +80,8 @@ namespace MarbleRunSimulatorCore {
         Ok,
         NOk,
         Problem,
-        Info
+        Info,
+        Star
     }
 
     export var MachineDBStateStrings = [
@@ -88,7 +89,8 @@ namespace MarbleRunSimulatorCore {
         "Ok",
         "NOk",
         "Problem",
-        "Info"
+        "Info",
+        "Ok+"
     ];
 
     export interface IBallData {
@@ -135,7 +137,7 @@ namespace MarbleRunSimulatorCore {
         public dbLikes: number = 1;
         public name: string = "Unnamed Machine";
         public author: string = "Anonymous";
-        public country: string = "un";
+        public country: string = "";
         public isChallengeMachine: boolean = false;
 
         public root: BABYLON.Mesh;

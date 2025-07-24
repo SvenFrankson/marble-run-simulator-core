@@ -1711,13 +1711,15 @@ var MarbleRunSimulatorCore;
         MachineDBState[MachineDBState["NOk"] = 2] = "NOk";
         MachineDBState[MachineDBState["Problem"] = 3] = "Problem";
         MachineDBState[MachineDBState["Info"] = 4] = "Info";
+        MachineDBState[MachineDBState["Star"] = 5] = "Star";
     })(MachineDBState = MarbleRunSimulatorCore.MachineDBState || (MarbleRunSimulatorCore.MachineDBState = {}));
     MarbleRunSimulatorCore.MachineDBStateStrings = [
         "Pending",
         "Ok",
         "NOk",
         "Problem",
-        "Info"
+        "Info",
+        "Ok+"
     ];
     class Machine {
         constructor(game) {
@@ -1728,7 +1730,7 @@ var MarbleRunSimulatorCore;
             this.dbLikes = 1;
             this.name = "Unnamed Machine";
             this.author = "Anonymous";
-            this.country = "un";
+            this.country = "";
             this.isChallengeMachine = false;
             this.TEST_USE_BASE_FPS = false; // only for Poki playtest
             this.parts = [];
