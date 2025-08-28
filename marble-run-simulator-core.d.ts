@@ -1149,6 +1149,13 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Ladder extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class LargeLoop extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;

@@ -557,6 +557,11 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "trikeSkull") {
                     data = TrikeSkull.GenerateTemplate();
                 }
+                else if (partName.startsWith("ladder_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = Ladder.GenerateTemplate(l, h);
+                }
                 datas[mirrorIndex] = data;
             }
 
@@ -679,6 +684,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "trikeSkull") {
                 partName = TrikeSkull.PropToPartName(prop);
+            }
+            else if (baseName === "ladder") {
+                partName = Ladder.PropToPartName(prop);
             }
 
             if (partName) {

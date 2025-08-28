@@ -38,7 +38,8 @@ namespace MarbleRunSimulatorCore {
         "rampv2",
         "multiJoin",
         "trikeSkull",
-        "controler"
+        "controler",
+        "ladder"
     ];
 
     export interface IMachinePartProp {
@@ -403,6 +404,16 @@ namespace MarbleRunSimulatorCore {
             if (partName === "trikeSkull") {
                 return new TrikeSkull(this.machine, prop);
             }
+            if (partName.startsWith("ladder_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
+                    prop.h = h;
+                }
+                return new Ladder(this.machine, prop);
+            }
         }
 
         public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
@@ -528,6 +539,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "trikeSkull") {
                 return new TrikeSkull(this.machine, prop);
+            }
+            if (baseName === "ladder") {
+                return new Ladder(this.machine, prop);
             }
         }
     }
