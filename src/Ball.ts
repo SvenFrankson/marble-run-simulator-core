@@ -516,13 +516,13 @@ namespace MarbleRunSimulatorCore {
                                         if (!this.marbleChocSound.isPlaying) {
                                             this.marbleChocSound.setVolume(((v - 0.15) / 0.85) * this.game.mainVolume);
                                             if (this.surface === Surface.Metal) {
-                                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.9);
+                                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.8);
                                             }
                                             else if (this.surface === Surface.Plastic) {
                                                 this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.5);
                                             }
                                             else {
-                                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.8);
+                                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.65);
                                             }
                                             this.marbleChocSound.play();
                                         }
@@ -930,7 +930,7 @@ namespace MarbleRunSimulatorCore {
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
                 this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 5) + 0.8);
-                this.marbleLoopSound.setVolume(12 * this.strReaction * f * this.game.mainVolume, 0.1);
+                this.marbleLoopSound.setVolume(48 * this.strReaction * f * this.game.mainVolume, 0.1);
                 if (!this.marbleLoopSound.isPlaying) {
                     this.marbleLoopSound.play();
                 }

@@ -39,7 +39,8 @@ namespace MarbleRunSimulatorCore {
         "multiJoin",
         "trikeSkull",
         "controler",
-        "ladder"
+        "ladder",
+        "teardropTurn"
     ];
 
     export interface IMachinePartProp {
@@ -72,6 +73,7 @@ namespace MarbleRunSimulatorCore {
             trackname = trackname.split("_")[0];
 
             console.log("createTrackWHDN " + trackname)
+            console.log(props);
             return this.createTrack(trackname, props);
         }
 
@@ -414,6 +416,16 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Ladder(this.machine, prop);
             }
+            if (partName === "teardropTurn" || partName.startsWith("teardropTurn_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    let s = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    prop.s = s;
+                }
+                return new TeardropTurn(this.machine, prop);
+            }
         }
 
         public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
@@ -542,6 +554,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "ladder") {
                 return new Ladder(this.machine, prop);
+            }
+            if (baseName === "teardropTurn") {
+                return new TeardropTurn(this.machine, prop);
             }
         }
     }

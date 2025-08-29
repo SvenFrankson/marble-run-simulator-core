@@ -42,15 +42,6 @@ namespace MarbleRunSimulatorCore {
             leftCollider.depth = Ladder._WallDepth;
 
             let leftMachineCollider = new MachineCollider(leftCollider);
-            leftMachineCollider.getSurface = () => {
-                let type = this.game.materials.getMaterialType(this.getColor(2));
-                if (type === MaterialType.Metal) {
-                    return Surface.Metal;
-                }
-                else {
-                    return Surface.Plastic;
-                }
-            }
             
             let rightCollider = new Mummu.BoxCollider(this.rightWall._worldMatrix);
             rightCollider.width = Ladder._WallThickness;
@@ -58,15 +49,6 @@ namespace MarbleRunSimulatorCore {
             rightCollider.depth = Ladder._WallDepth;
             
             let rightMachineCollider = new MachineCollider(rightCollider);
-            rightMachineCollider.getSurface = () => {
-                let type = this.game.materials.getMaterialType(this.getColor(2));
-                if (type === MaterialType.Metal) {
-                    return Surface.Metal;
-                }
-                else {
-                    return Surface.Plastic;
-                }
-            }
 
             this.colliders = [leftMachineCollider, rightMachineCollider];
 
@@ -84,6 +66,21 @@ namespace MarbleRunSimulatorCore {
             
             this.leftWall.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             this.rightWall.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
+
+            let type = this.game.materials.getMaterialType(this.getColor(2));
+            let surface = Surface.Rail;
+            if (type === MaterialType.Metal) {
+                surface = Surface.Metal;
+            }
+            else {
+                surface = Surface.Plastic;
+            }
+            this.colliders[0].getSurface = () => {
+                return surface;
+            }
+            this.colliders[1].getSurface = () => {
+                return surface;
+            }
         }
 
         public static GenerateTemplate(l: number, h: number): MachinePartTemplate {

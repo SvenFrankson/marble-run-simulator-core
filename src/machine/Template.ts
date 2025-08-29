@@ -562,6 +562,11 @@ namespace MarbleRunSimulatorCore {
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = Ladder.GenerateTemplate(l, h);
                 }
+                else if (partName.startsWith("teardropTurn_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    let s = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = TeardropTurn.GenerateTemplate(h, s);
+                }
                 datas[mirrorIndex] = data;
             }
 
@@ -687,6 +692,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "ladder") {
                 partName = Ladder.PropToPartName(prop);
+            }
+            else if (baseName === "teardropTurn") {
+                partName = TeardropTurn.PropToPartName(prop);
             }
 
             if (partName) {

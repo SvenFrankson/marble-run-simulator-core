@@ -1469,6 +1469,13 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class TeardropTurn extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(h: number, s: number): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class TrikeSkull extends MachinePart {
         skull: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
