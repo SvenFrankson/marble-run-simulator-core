@@ -292,6 +292,7 @@ namespace MarbleRunSimulatorCore {
         public tracks: Track[] = [];
         public wires: Wire[] = [];
         public allWires: Wire[] = [];
+        public colliders: MachineCollider[] = [];
 
         public wireSize: number = 0.0015;
         public wireGauge: number = 0.014;

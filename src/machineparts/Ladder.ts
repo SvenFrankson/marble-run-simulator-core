@@ -1,11 +1,75 @@
 namespace MarbleRunSimulatorCore {
     export class Ladder extends MachinePart {
+
+        private static _WallThickness: number = 0.005;
+        private static _WallDepth: number = 0.02;
+        private static _Drop: number = 0.01;
+        
+        public leftWall: BABYLON.Mesh;
+        public leftWallH: number;
+        public rightWall: BABYLON.Mesh;
+        public rightWallH: number;
+
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-
-            this.setColorCount(1);
-
+            this.setColorCount(3);
             this.setTemplate(this.machine.templateManager.getTemplate(Ladder.PropToPartName(prop)));
+
+            let x0 = - tileSize * 0.5;
+            let x1 = - tileSize * 0.5 + prop.l * tileSize;
+
+            let leftYMax = - tileHeight;
+            let leftYMin = - prop.h * tileHeight + Ladder._Drop - 0.005;
+            this.leftWallH = leftYMax - leftYMin;
+
+            let rightYMax = 0;
+            let rightYMin = -prop.h * tileHeight + tileHeight + Ladder._Drop - 0.005;
+            this.rightWallH = rightYMax - rightYMin;
+
+            this.leftWall = new BABYLON.Mesh("left-ladder-wall");
+            this.leftWall.position.x = x0 + 0.5 * Ladder._WallThickness;
+            this.leftWall.position.y = (leftYMax + leftYMin) * 0.5;
+            this.leftWall.parent = this;
+
+            this.rightWall = new BABYLON.Mesh("left-ladder-wall");
+            this.rightWall.position.x = x1 - 0.5 * Ladder._WallThickness;
+            this.rightWall.position.y = (rightYMax + rightYMin) * 0.5;
+            this.rightWall.parent = this;
+
+            let leftCollider = new Mummu.BoxCollider(this.leftWall._worldMatrix);
+            leftCollider.width = Ladder._WallThickness;
+            leftCollider.height = this.leftWallH;
+            leftCollider.depth = Ladder._WallDepth;
+
+            let leftMachineCollider = new MachineCollider(leftCollider);
+            leftMachineCollider.getSurface = () => {
+                let type = this.game.materials.getMaterialType(this.getColor(2));
+                if (type === MaterialType.Metal) {
+                    return Surface.Metal;
+                }
+                else {
+                    return Surface.Plastic;
+                }
+            }
+            
+            let rightCollider = new Mummu.BoxCollider(this.rightWall._worldMatrix);
+            rightCollider.width = Ladder._WallThickness;
+            rightCollider.height = this.rightWallH;
+            rightCollider.depth = Ladder._WallDepth;
+            
+            let rightMachineCollider = new MachineCollider(rightCollider);
+            rightMachineCollider.getSurface = () => {
+                let type = this.game.materials.getMaterialType(this.getColor(2));
+                if (type === MaterialType.Metal) {
+                    return Surface.Metal;
+                }
+                else {
+                    return Surface.Plastic;
+                }
+            }
+
+            this.colliders = [leftMachineCollider, rightMachineCollider];
+
             this.generateWires();
         }
 
@@ -14,29 +78,34 @@ namespace MarbleRunSimulatorCore {
             return partName;
         }
 
+        protected async instantiateMachineSpecific(): Promise<void> {
+            Mummu.CreateBeveledBoxVertexData({ width: Ladder._WallThickness, height: this.leftWallH, depth: Ladder._WallDepth }).applyToMesh(this.leftWall);
+            Mummu.CreateBeveledBoxVertexData({ width: Ladder._WallThickness, height: this.rightWallH, depth: Ladder._WallDepth }).applyToMesh(this.rightWall);
+            
+            this.leftWall.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
+            this.rightWall.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
+        }
+
         public static GenerateTemplate(l: number, h: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
             template.partName = "ladder_" + l.toFixed(0) + "." + h.toFixed(0);
             template.l = l;
             template.h = h;
-            template.n = h;
 
             template.lExtendableOnX = true;
             template.minLAbsolute = 1;
-            template.minL = -32;
-            template.maxL = 32;
+            template.minL = 2;
+            template.maxL = 8;
             template.hExtendableOnY = true;
-            template.minH = 1;
+            template.minH = 2;
             template.downwardYExtendable = true;
 
             template.nExtendable = true;
 
             let x0 = - tileSize * 0.5;
             let x1 = - tileSize * 0.5 + l * tileSize;
-            let wallD = 0.005;
-            let hole = 0.02;
-            let drop = 0.005;
+            let hole = 0.016;
             
             let count: number;
             if (h % 2 === 0) {
@@ -45,45 +114,39 @@ namespace MarbleRunSimulatorCore {
             else {
                 count = h - 2;
             }
-            let dy = h * tileSize / (count + 1);
+            let dy = (h * tileSize - Ladder._Drop) / (count + 1);
+            let angleDrop = Math.atan(Ladder._Drop / ((x1 - x0) / 6)) / Math.PI * 180 + 90;
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0, 0, 0), Tools.V3Dir(90)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x1 - wallD - hole, - drop, 0), Tools.V3Dir(90)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x1 - Ladder._WallThickness - hole, - Ladder._Drop, 0), Tools.V3Dir(90)),
             ];
+            template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[1] = new TrackTemplate(template);
             template.trackTemplates[1].trackpoints = [
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + wallD, - h * tileHeight + drop, 0), Tools.V3Dir(92)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + Ladder._WallThickness, - h * tileHeight + Ladder._Drop, 0), Tools.V3Dir(angleDrop)),
                 new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x1, - h * tileHeight, 0), Tools.V3Dir(90)),
             ];
-            template.trackTemplates[2] = new TrackTemplate(template);
-            template.trackTemplates[2].trackpoints = [
-                new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(x0 + wallD, - tileHeight * 0.5, 0), Tools.V3Dir(180), Tools.V3Dir(90)),
-                new TrackPoint(template.trackTemplates[2], new BABYLON.Vector3(x0 + wallD, - h * tileHeight, 0), Tools.V3Dir(180), Tools.V3Dir(90)),
-            ];
-
-            template.trackTemplates[3] = new TrackTemplate(template);
-            template.trackTemplates[3].trackpoints = [
-                new TrackPoint(template.trackTemplates[3], new BABYLON.Vector3(x1 - wallD, tileHeight * 0.5, 0), Tools.V3Dir(180), Tools.V3Dir(-90)),
-                new TrackPoint(template.trackTemplates[3], new BABYLON.Vector3(x1 - wallD, - h * tileHeight + tileHeight, 0), Tools.V3Dir(180), Tools.V3Dir(-90)),
-            ];
+            template.trackTemplates[1].colorIndex = 1;
 
             for (let n = 0; n < count; n++) {
                 if (n % 2 === 0) {
                     let trackTemplate = new TrackTemplate(template);
                     trackTemplate.trackpoints = [
-                        new TrackPoint(trackTemplate, new BABYLON.Vector3(x1 - wallD, 0 - dy * (n + 1), 0), Tools.V3Dir(- 90)),
-                        new TrackPoint(trackTemplate, new BABYLON.Vector3(x0 + wallD + hole, 0 - dy * (n + 1) - drop, 0), Tools.V3Dir(- 90)),
+                        new TrackPoint(trackTemplate, new BABYLON.Vector3(x1 - Ladder._WallThickness + 0.002, 0 - dy * (n + 1), 0), Tools.V3Dir(- angleDrop)),
+                        new TrackPoint(trackTemplate, new BABYLON.Vector3(x0 + Ladder._WallThickness + hole, 0 - dy * (n + 1) - Ladder._Drop, 0), Tools.V3Dir(- 90)),
                     ];
+                    trackTemplate.colorIndex = 1;
                     template.trackTemplates.push(trackTemplate);
                 }
                 else {
                     let trackTemplate = new TrackTemplate(template);
                     trackTemplate.trackpoints = [
-                        new TrackPoint(trackTemplate, new BABYLON.Vector3(x0 + wallD, 0 - dy * (n + 1), 0), Tools.V3Dir(90)),
-                        new TrackPoint(trackTemplate, new BABYLON.Vector3(x1 - wallD - hole, 0 - dy * (n + 1) - drop, 0), Tools.V3Dir(90)),
+                        new TrackPoint(trackTemplate, new BABYLON.Vector3(x0 + Ladder._WallThickness - 0.002, 0 - dy * (n + 1), 0), Tools.V3Dir(angleDrop)),
+                        new TrackPoint(trackTemplate, new BABYLON.Vector3(x1 - Ladder._WallThickness - hole, 0 - dy * (n + 1) - Ladder._Drop, 0), Tools.V3Dir(90)),
                     ];
+                    trackTemplate.colorIndex = 0;
                     template.trackTemplates.push(trackTemplate);
                 }
             }

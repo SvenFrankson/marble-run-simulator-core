@@ -9,7 +9,9 @@ declare namespace MarbleRunSimulatorCore {
     enum Surface {
         Rail = 0,
         Bowl = 1,
-        Velvet = 2
+        Velvet = 2,
+        Metal = 3,
+        Plastic = 4
     }
     enum CollisionState {
         Normal = 0,
@@ -418,6 +420,13 @@ declare namespace MarbleRunSimulatorCore {
         updateShadow(): void;
     }
 }
+declare namespace MarbleRunSimulatorCore {
+    class MachineCollider {
+        baseCollider: Mummu.Collider;
+        constructor(baseCollider: Mummu.Collider);
+        getSurface: () => Surface;
+    }
+}
 declare class MachineName {
     static PartOnes: string[];
     static PartTwos: string[];
@@ -510,6 +519,7 @@ declare namespace MarbleRunSimulatorCore {
         tracks: Track[];
         wires: Wire[];
         allWires: Wire[];
+        colliders: MachineCollider[];
         wireSize: number;
         wireGauge: number;
         colors: number[];
@@ -1150,8 +1160,16 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class Ladder extends MachinePart {
+        private static _WallThickness;
+        private static _WallDepth;
+        private static _Drop;
+        leftWall: BABYLON.Mesh;
+        leftWallH: number;
+        rightWall: BABYLON.Mesh;
+        rightWallH: number;
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
         static GenerateTemplate(l: number, h: number): MachinePartTemplate;
     }
 }

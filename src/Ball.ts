@@ -8,7 +8,9 @@ namespace MarbleRunSimulatorCore {
     export enum Surface {
         Rail,
         Bowl,
-        Velvet
+        Velvet,
+        Metal,
+        Plastic
     }
 
     export enum CollisionState {
@@ -488,6 +490,45 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
                             })
+                            part.colliders.forEach((collider) => {
+                                let col: Mummu.IIntersection;
+                                col = Mummu.SphereColliderIntersection(this.position, this.radius, collider.baseCollider);
+                                //}
+                                if (col.hit) {
+                                    //this.setLastHit(wire, col.index);
+                                    let colDig = col.normal.scale(-1);
+                                    // Move away from collision
+                                    forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                    // Cancel depth component of speed
+                                    let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                    if (depthSpeed > 0) {
+                                        canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                    }
+                                    // Add ground reaction
+                                    let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                    reactions.addInPlace(reaction);
+                                    reactionsCount++;
+    
+                                    this.surface = collider.getSurface();
+
+                                    let v = Math.abs(BABYLON.Vector3.Dot(this.velocity, col.normal));
+                                    if (v > 0.15) {
+                                        if (!this.marbleChocSound.isPlaying) {
+                                            this.marbleChocSound.setVolume(((v - 0.15) / 0.85) * this.game.mainVolume);
+                                            if (this.surface === Surface.Metal) {
+                                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.9);
+                                            }
+                                            else if (this.surface === Surface.Plastic) {
+                                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.5);
+                                            }
+                                            else {
+                                                this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.8);
+                                            }
+                                            this.marbleChocSound.play();
+                                        }
+                                    }
+                                }
+                            });
                             part.decors.forEach(decor => {
                                 decor.onBallCollideAABB(this);
                             })

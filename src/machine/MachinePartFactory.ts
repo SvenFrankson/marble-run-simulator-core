@@ -404,7 +404,7 @@ namespace MarbleRunSimulatorCore {
             if (partName === "trikeSkull") {
                 return new TrikeSkull(this.machine, prop);
             }
-            if (partName.startsWith("ladder_")) {
+            if (partName === "ladder" || partName.startsWith("ladder_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
                     let l = parseInt(argStr.split(".")[0]);
