@@ -12337,10 +12337,10 @@ var MarbleRunSimulatorCore;
             this.stepH = Math.abs((this.y1 - this.y0) / this.boxesCount);
             for (let i = 0; i < this.boxesCount; i++) {
                 let data = Stairway.MakeStairwayColliderVertexData(this.stepW, this.stepH * 2, 0.02, this.dH, 0.001);
-                let box = new BABYLON.Mesh("collider_" + i);
+                let box = new BABYLON.Mesh("collider-" + i);
+                box.isVisible = false;
                 this.boxesColliders[i] = box;
                 this.boxesDisplayedMesh[i] = new BABYLON.Mesh("display-box_" + i);
-                box.isVisible = false;
                 data.applyToMesh(box);
                 box.parent = this;
                 let fX = i / this.boxesCount;
