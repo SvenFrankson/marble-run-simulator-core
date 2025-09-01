@@ -2163,7 +2163,9 @@ var MarbleRunSimulatorCore;
                 this.baseFrame.position.y = this.baseMeshMinY;
                 this.baseFrame.position.z = (this.baseMeshMaxZ + this.baseMeshMinZ) * 0.5;
                 this.baseFrame.material = this.root.material;
-                this.game.spotLight.excludedMeshes = [this.baseFrame];
+                if (this.game.spotLight) {
+                    this.game.spotLight.excludedMeshes = [this.baseFrame];
+                }
                 if (this.game.room) {
                     this.game.room.light1.includedOnlyMeshes.push(this.baseFrame);
                     this.game.room.light2.includedOnlyMeshes.push(this.baseFrame);
@@ -2320,10 +2322,12 @@ var MarbleRunSimulatorCore;
                 this.exitHoleOut.position.y = this.baseMeshMinY - 0.055;
                 this.exitHoleOut.position.z = this.baseMeshMinZ - 0.05;
             }
-            this.game.spotLight.position.y = this.baseMeshMinY + 2.2;
-            this.game.spotLight.parent = this.root;
-            let dir = new BABYLON.Vector3((this.baseMeshMinX + this.baseMeshMaxX) * 0.5, -3, (this.baseMeshMinZ + this.baseMeshMaxZ) * 0.5).normalize();
-            this.game.spotLight.direction = dir;
+            if (this.game.spotLight) {
+                this.game.spotLight.position.y = this.baseMeshMinY + 2.2;
+                this.game.spotLight.parent = this.root;
+                let dir = new BABYLON.Vector3((this.baseMeshMinX + this.baseMeshMaxX) * 0.5, -3, (this.baseMeshMinZ + this.baseMeshMaxZ) * 0.5).normalize();
+                this.game.spotLight.direction = dir;
+            }
             this.ready = true;
             this.requestUpdateBaseMesh = false;
         }
