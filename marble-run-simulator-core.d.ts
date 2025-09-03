@@ -296,6 +296,10 @@ declare namespace MarbleRunSimulatorCore {
         Info = 4,
         Star = 5
     }
+    enum MachineConstructionMode {
+        Mode3D = 1,
+        Mode2D = 2
+    }
     var MachineDBStateStrings: string[];
     interface IBallData {
         x: number;
@@ -329,6 +333,7 @@ declare namespace MarbleRunSimulatorCore {
         content?: string;
         state?: MachineDBState;
         likes?: number;
+        mode?: MachineConstructionMode;
     }
     class Machine {
         game: IGame;
@@ -340,6 +345,7 @@ declare namespace MarbleRunSimulatorCore {
         author: string;
         country: string;
         isChallengeMachine: boolean;
+        constructionMode: MachineConstructionMode;
         root: BABYLON.Mesh;
         pedestalTop: BABYLON.Mesh;
         baseFrame: BABYLON.Mesh;

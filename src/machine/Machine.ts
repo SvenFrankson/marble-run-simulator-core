@@ -84,6 +84,11 @@ namespace MarbleRunSimulatorCore {
         Star
     }
 
+    export enum MachineConstructionMode {
+        Mode3D = 1,
+        Mode2D = 2,
+    }
+
     export var MachineDBStateStrings = [
         "Pending",
         "Ok",
@@ -128,6 +133,7 @@ namespace MarbleRunSimulatorCore {
         content?: string; // v12
         state?: MachineDBState; // v12
         likes?: number; // v12
+        mode?: MachineConstructionMode;
     }
 
     export class Machine {
@@ -139,6 +145,7 @@ namespace MarbleRunSimulatorCore {
         public author: string = "Anonymous";
         public country: string = "";
         public isChallengeMachine: boolean = false;
+        public constructionMode: MachineConstructionMode = MachineConstructionMode.Mode3D;
 
         public root: BABYLON.Mesh;
         public pedestalTop: BABYLON.Mesh;

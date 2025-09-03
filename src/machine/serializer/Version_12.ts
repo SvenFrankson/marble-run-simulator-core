@@ -6,7 +6,8 @@ namespace MarbleRunSimulatorCore {
             title: machine.name,
             author: machine.author,
             country: machine.country,
-            v: 12
+            v: 12,
+            mode: machine.constructionMode
         };
 
         let dataString = "";
@@ -122,6 +123,12 @@ namespace MarbleRunSimulatorCore {
                 }
                 if (data.country) {
                     machine.country = data.country;
+                }
+                if (isFinite(data.mode)) {
+                    machine.constructionMode = data.mode;
+                }
+                else {
+                    machine.constructionMode = MachineConstructionMode.Mode3D;
                 }
             
                 machine.balls = [];

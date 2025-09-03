@@ -1752,6 +1752,11 @@ var MarbleRunSimulatorCore;
         MachineDBState[MachineDBState["Info"] = 4] = "Info";
         MachineDBState[MachineDBState["Star"] = 5] = "Star";
     })(MachineDBState = MarbleRunSimulatorCore.MachineDBState || (MarbleRunSimulatorCore.MachineDBState = {}));
+    let MachineConstructionMode;
+    (function (MachineConstructionMode) {
+        MachineConstructionMode[MachineConstructionMode["Mode3D"] = 1] = "Mode3D";
+        MachineConstructionMode[MachineConstructionMode["Mode2D"] = 2] = "Mode2D";
+    })(MachineConstructionMode = MarbleRunSimulatorCore.MachineConstructionMode || (MarbleRunSimulatorCore.MachineConstructionMode = {}));
     MarbleRunSimulatorCore.MachineDBStateStrings = [
         "Pending",
         "Ok",
@@ -1771,6 +1776,7 @@ var MarbleRunSimulatorCore;
             this.author = "Anonymous";
             this.country = "";
             this.isChallengeMachine = false;
+            this.constructionMode = MachineConstructionMode.Mode3D;
             this.TEST_USE_BASE_FPS = false; // only for Poki playtest
             this.parts = [];
             this.decors = [];
@@ -7163,7 +7169,8 @@ var MarbleRunSimulatorCore;
             title: machine.name,
             author: machine.author,
             country: machine.country,
-            v: 12
+            v: 12,
+            mode: machine.constructionMode
         };
         let dataString = "";
         // Add ball count²
@@ -7266,6 +7273,12 @@ var MarbleRunSimulatorCore;
                 }
                 if (data.country) {
                     machine.country = data.country;
+                }
+                if (isFinite(data.mode)) {
+                    machine.constructionMode = data.mode;
+                }
+                else {
+                    machine.constructionMode = MarbleRunSimulatorCore.MachineConstructionMode.Mode3D;
                 }
                 machine.balls = [];
                 machine.parts = [];
