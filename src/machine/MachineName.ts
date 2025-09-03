@@ -5,7 +5,9 @@ class MachineName {
         "A ",
         "Our ",
         "My ",
-        ""
+        "",
+        "Your ",
+        "People's "
     ];
 
     public static PartTwos = [
@@ -23,7 +25,27 @@ class MachineName {
         "Little ",
         "Best ",
         "Cute ",
-        "Tiny "
+        "Tiny ",
+        "Reliable ",
+        "Vertical ",
+        "Specialized ",
+        "Heavy ",
+        "Automated ",
+        "Sophisticated ",
+        "Synchronous ",
+        "Mechanical ",
+        "Efficient ",
+        "Quick ",
+        "Fast ",
+        "Precise ",
+        "Accurate ",
+        "Special ",
+        "Different ",
+        "Smart ",
+        "Clever ",
+        "Intelligent ",
+        "Beautiful ",
+        "Charming "
     ];
 
     public static PartThrees = [
@@ -38,7 +60,12 @@ class MachineName {
         "Brass ",
         "Copper ",
         "Toggle ",
-        "Split "
+        "Split ",
+        "Ramp ",
+        "Elevator ",
+        "Plastic ",
+        "Spline ",
+        "Physic "
     ];
 
     public static PartFours = [
@@ -50,7 +77,21 @@ class MachineName {
         "Computer",
         "Engine",
         "Knot",
-        "Building"
+        "Building",
+        "Abstraction",
+        "Maker",
+        "Converter",
+        "Appliance",
+        "Transformer",
+        "Apparatus",
+        "Device",
+        "Contraption",
+        "Gadget",
+        "Mechanism",
+        "Structure",
+        "System",
+        "Set-Up",
+        "Tower"
     ];
 
     public static GetRandom(): string {

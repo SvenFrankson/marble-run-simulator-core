@@ -2560,7 +2560,9 @@ MachineName.PartOnes = [
     "A ",
     "Our ",
     "My ",
-    ""
+    "",
+    "Your ",
+    "People's "
 ];
 MachineName.PartTwos = [
     "Great ",
@@ -2577,7 +2579,27 @@ MachineName.PartTwos = [
     "Little ",
     "Best ",
     "Cute ",
-    "Tiny "
+    "Tiny ",
+    "Reliable ",
+    "Vertical ",
+    "Specialized ",
+    "Heavy ",
+    "Automated ",
+    "Sophisticated ",
+    "Synchronous ",
+    "Mechanical ",
+    "Efficient ",
+    "Quick ",
+    "Fast ",
+    "Precise ",
+    "Accurate ",
+    "Special ",
+    "Different ",
+    "Smart ",
+    "Clever ",
+    "Intelligent ",
+    "Beautiful ",
+    "Charming "
 ];
 MachineName.PartThrees = [
     "Ball ",
@@ -2591,7 +2613,12 @@ MachineName.PartThrees = [
     "Brass ",
     "Copper ",
     "Toggle ",
-    "Split "
+    "Split ",
+    "Ramp ",
+    "Elevator ",
+    "Plastic ",
+    "Spline ",
+    "Physic "
 ];
 MachineName.PartFours = [
     "Machine",
@@ -2602,7 +2629,21 @@ MachineName.PartFours = [
     "Computer",
     "Engine",
     "Knot",
-    "Building"
+    "Building",
+    "Abstraction",
+    "Maker",
+    "Converter",
+    "Appliance",
+    "Transformer",
+    "Apparatus",
+    "Device",
+    "Contraption",
+    "Gadget",
+    "Mechanism",
+    "Structure",
+    "System",
+    "Set-Up",
+    "Tower"
 ];
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
