@@ -2554,6 +2554,9 @@ class MachineName {
         let r4 = Math.floor(Math.random() * MachineName.PartFours.length);
         return MachineName.PartOnes[r1] + MachineName.PartTwos[r2] + MachineName.PartThrees[r3] + MachineName.PartFours[r4];
     }
+    static GetCount() {
+        return MachineName.PartOnes.length * MachineName.PartTwos.length * MachineName.PartThrees.length * MachineName.PartFours.length;
+    }
 }
 MachineName.PartOnes = [
     "The ",

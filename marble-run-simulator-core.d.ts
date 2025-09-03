@@ -439,6 +439,7 @@ declare class MachineName {
     static PartThrees: string[];
     static PartFours: string[];
     static GetRandom(): string;
+    static GetCount(): number;
 }
 declare namespace MarbleRunSimulatorCore {
     var tileSize: number;

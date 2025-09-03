@@ -102,4 +102,8 @@ class MachineName {
 
         return MachineName.PartOnes[r1] + MachineName.PartTwos[r2] + MachineName.PartThrees[r3] + MachineName.PartFours[r4];
     }
+
+    public static GetCount(): number {
+        return MachineName.PartOnes.length * MachineName.PartTwos.length * MachineName.PartThrees.length * MachineName.PartFours.length;
+    }
 }
