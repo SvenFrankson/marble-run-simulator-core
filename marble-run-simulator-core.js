@@ -2888,16 +2888,24 @@ var MarbleRunSimulatorCore;
             this._multiSelected = false;
             this._hovered = false;
             this._alignShadow = () => {
-                if (this._selected) {
+                if (this._selected && this.machine.constructionMode === MarbleRunSimulatorCore.MachineConstructionMode.Mode3D) {
                     this.gridRectMesh.position.x = this.position.x;
                     this.gridRectMesh.position.y = -MarbleRunSimulatorCore.tileHeight * 0.5;
                     this.gridRectMesh.position.z = this.position.z;
                     this.gridRectMesh.rotation.y = this.rotation.y;
+                    let min = this.encloseStart.clone();
+                    let max = this.encloseEnd.clone();
+                    /*
+                    if (this.machine.constructionMode === MachineConstructionMode.Mode2D) {
+                        min.z = - tileSize * 0.5;
+                        max.z = tileSize * 0.5;
+                    }
+                    */
                     let points = [
-                        new BABYLON.Vector3(this.encloseStart.x, 0, this.encloseStart.z),
-                        new BABYLON.Vector3(this.encloseEnd.x, 0, this.encloseStart.z),
-                        new BABYLON.Vector3(this.encloseEnd.x, 0, this.encloseEnd.z),
-                        new BABYLON.Vector3(this.encloseStart.x, 0, this.encloseEnd.z)
+                        new BABYLON.Vector3(min.x, 0, min.z),
+                        new BABYLON.Vector3(max.x, 0, min.z),
+                        new BABYLON.Vector3(max.x, 0, max.z),
+                        new BABYLON.Vector3(min.x, 0, max.z)
                     ];
                     BABYLON.Vector3.TransformCoordinatesToRef(points[0], this.getWorldMatrix(), points[0]);
                     BABYLON.Vector3.TransformCoordinatesToRef(points[1], this.getWorldMatrix(), points[1]);
@@ -3466,7 +3474,7 @@ var MarbleRunSimulatorCore;
                 }
             }
             if (this.gridRectMesh) {
-                if (this._selected && !this._multiSelected) {
+                if (this._selected && !this._multiSelected && this.machine.constructionMode === MarbleRunSimulatorCore.MachineConstructionMode.Mode3D) {
                     this.gridRectMesh.isVisible = true;
                     this._scene.onBeforeRenderObservable.add(this._alignShadow);
                 }
@@ -3741,17 +3749,23 @@ var MarbleRunSimulatorCore;
                 .scaleInPlace(1 / 3)
                 .addInPlace(this.encloseEnd.scale(2 / 3));
             this.encloseMesh = new BABYLON.Mesh("enclose-mesh");
-            let encloseMeshVertexData = MarbleRunSimulatorCore.Tools.Box9SliceVertexData(this.encloseStart, this.encloseEnd, 0.001);
+            let min = this.encloseStart.clone();
+            let max = this.encloseEnd.clone();
+            if (this.machine.constructionMode === MarbleRunSimulatorCore.MachineConstructionMode.Mode2D) {
+                min.z = -MarbleRunSimulatorCore.tileSize * 0.5;
+                max.z = MarbleRunSimulatorCore.tileSize * 0.5;
+            }
+            let encloseMeshVertexData = MarbleRunSimulatorCore.Tools.Box9SliceVertexData(min, max, 0.001);
             encloseMeshVertexData.applyToMesh(this.encloseMesh);
             this.encloseMesh.material = this.game.materials.slice9Cutoff;
             this.encloseMesh.parent = this;
             this.encloseMesh.visibility = 0;
             this.gridRectMesh = new BABYLON.Mesh("grid-rect-mesh");
             let points = [
-                new BABYLON.Vector3(x0, 0, z0),
-                new BABYLON.Vector3(x0, 0, z1),
-                new BABYLON.Vector3(x1, 0, z1),
-                new BABYLON.Vector3(x1, 0, z0),
+                new BABYLON.Vector3(min.x, 0, min.z),
+                new BABYLON.Vector3(min.x, 0, max.z),
+                new BABYLON.Vector3(max.x, 0, max.z),
+                new BABYLON.Vector3(max.x, 0, min.z)
             ];
             points = Mummu.BevelClosedPath(points, 0.001);
             points = Mummu.BevelClosedPath(points, 0.0003);
