@@ -10155,6 +10155,7 @@ var MarbleRunSimulatorCore;
                 prop.n = 1;
             }
             prop.n = Math.min(prop.n, 2 * Math.abs(prop.d));
+            prop.n = Math.max(prop.n, 1);
             this.setTemplate(this.machine.templateManager.getTemplate(Loop.PropToPartName(prop)));
             this.generateWires();
         }
@@ -10173,7 +10174,6 @@ var MarbleRunSimulatorCore;
             template.dExtendableOnZ = true;
             template.minD = -32;
             template.maxD = 32;
-            template.minDAbsolute = 1;
             template.nExtendable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].onNormalEvaluated = (n) => {
@@ -10187,6 +10187,10 @@ var MarbleRunSimulatorCore;
             let r = MarbleRunSimulatorCore.tileWidth * 0.7;
             let depthStart = 0;
             let depthEnd = MarbleRunSimulatorCore.tileSize * template.d;
+            if (template.d === 0) {
+                depthStart = -MarbleRunSimulatorCore.tileSize * 0.3;
+                depthEnd = MarbleRunSimulatorCore.tileSize * 0.3;
+            }
             for (let nLoop = 0; nLoop < loopsCount; nLoop++) {
                 for (let n = 0; n <= 8; n++) {
                     if (n < 8 || xStart != xEnd || nLoop === loopsCount - 1) {
@@ -10199,11 +10203,18 @@ var MarbleRunSimulatorCore;
                             fx = (nLoop + 1) / (loopsCount + 1);
                         }
                         let x = (1 - fx) * xStart + fx * xEnd;
-                        template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(sina * r + x, r * 1 - cosa * r, f * (depthEnd - depthStart) + depthStart)));
+                        let p = new BABYLON.Vector3(sina * r + x, r * 1 - cosa * r, f * (depthEnd - depthStart) + depthStart);
+                        if (template.d === 0) {
+                            let c = new BABYLON.Vector3(0.5 * (xStart + xEnd), 0, 0);
+                            p.subtractInPlace(c);
+                            Mummu.RotateInPlace(p, BABYLON.Axis.Y, Math.PI / 12);
+                            p.addInPlace(c);
+                        }
+                        template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], p));
                     }
                 }
             }
-            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileSize * template.l - MarbleRunSimulatorCore.tileSize * 0.5, 0, depthEnd), MarbleRunSimulatorCore.Tools.V3Dir(90)));
+            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(MarbleRunSimulatorCore.tileSize * template.l - MarbleRunSimulatorCore.tileSize * 0.5, 0, MarbleRunSimulatorCore.tileSize * template.d), MarbleRunSimulatorCore.Tools.V3Dir(90)));
             let points = template.trackTemplates[0].trackpoints.map((tp) => {
                 return tp.position.clone();
             });
