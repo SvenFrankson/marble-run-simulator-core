@@ -25,27 +25,42 @@ namespace MarbleRunSimulatorCore {
             template.s = s;
             template.sExtendable = true;
 
-            let r = (1 + 0.5 * h) * tileSize;
+            let r = 2 * tileSize;
             let r2 = r / Math.SQRT2;
-            let cX = (4 + h) * tileSize;
+            let cX = 4 * tileSize;
 
-            template.defaultAngle = Math.PI / 4 / 4 * template.s;
-            template.maxAngle = Math.PI / 4 / 2 * template.s;
+            template.maxAngle = Math.PI / 6;
+            template.defaultAngle = Math.PI / 8;
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, 0), Tools.V3Dir(90), Tools.V3Dir(0), undefined, 1.5),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, 0, 0), Tools.V3Dir(90), Tools.V3Dir(0)),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r2, tileHeight * 0.5, r2), new BABYLON.Vector3(1, 0, 1).normalize()),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, tileHeight * 0.5, r), Tools.V3Dir(90)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r2, tileHeight * 0.5, r2)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r, tileHeight * 0.5, 0)),
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r2, tileHeight * 0.5, -r2)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, tileHeight * 0.5, -r), Tools.V3Dir(-90)),
-                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, tileHeight, 0), Tools.V3Dir(- 90), Tools.V3Dir(0), 1.5, undefined),
+                new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, tileHeight * 0.5, -r), Tools.V3Dir(-90))
             ];
 
+            for (let h = 1; h < template.h; h++) {
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r2, tileHeight * 0.5, -r2)));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r, tileHeight * 0.5, 0)));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r2, tileHeight * 0.5, r2)));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, tileHeight * 0.5, r)));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r2, tileHeight * 0.5, r2)));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r, tileHeight * 0.5, 0)));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r2, tileHeight * 0.5, - r2)));
+                template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, tileHeight * 0.5, - r)));
+            }
+
+            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r2, tileHeight * 0.5, -r2), new BABYLON.Vector3(- 1, 0, 1).normalize()));
+            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileSize * 0.5, tileHeight, 0), Tools.V3Dir(- 90), Tools.V3Dir(0)));
+
             let hermite = (x: number) => {
-                return (3 * Math.pow(2 * x, 2) - Math.pow(2 * x, 3)) / 4;
+                let y = (3 * Math.pow(2 * x, 2) - Math.pow(2 * x, 3)) / 4;
+                return y;
             }
             let summedLength = [0];
             let trackpoints = template.trackTemplates[0].trackpoints;
@@ -56,7 +71,7 @@ namespace MarbleRunSimulatorCore {
 
             for (let n = 0; n < template.trackTemplates[0].trackpoints.length; n++) {
                 let f = summedLength[n] / totalLength;
-                f = hermite(f);
+                //f = hermite(f);
                 template.trackTemplates[0].trackpoints[n].position.y = f * template.h * tileHeight;
             }
 
