@@ -1308,12 +1308,21 @@ namespace MarbleRunSimulatorCore {
 
             let min = this.encloseStart.clone();
             let max = this.encloseEnd.clone();
-            if (this.machine.constructionMode === MachineConstructionMode.Mode2D) {
-                min.z = - tileSize * 0.5;
-                max.z = tileSize * 0.5;
+            let thickness = 0.001;
+            if (this.machine.constructionMode === MachineConstructionMode.Mode3D) {
+                let encloseMeshVertexData = Tools.Box9SliceVertexData(min, max, thickness);
+                encloseMeshVertexData.applyToMesh(this.encloseMesh);
             }
-            let encloseMeshVertexData = Tools.Box9SliceVertexData(min, max, 0.001);
-            encloseMeshVertexData.applyToMesh(this.encloseMesh);
+            else if (this.machine.constructionMode === MachineConstructionMode.Mode2D) {
+                let encloseMeshVertexData = Mummu.Create9SliceVertexData({
+                    width: max.x - min.x + tileSize * 0.2,
+                    height: max.y - min.y + tileSize * 0.2,
+                    margin: tileSize * 0.2
+                });
+                Mummu.TranslateVertexDataInPlace(encloseMeshVertexData, max.add(min).scale(0.5));
+                encloseMeshVertexData = Mummu.MergeVertexDatas(encloseMeshVertexData, Mummu.TriFlipVertexDataInPlace(Mummu.CloneVertexData(encloseMeshVertexData)));
+                encloseMeshVertexData.applyToMesh(this.encloseMesh);
+            }
 
             this.encloseMesh.material = this.game.materials.slice9Cutoff;
             this.encloseMesh.parent = this;
