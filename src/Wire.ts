@@ -3,6 +3,7 @@ namespace MarbleRunSimulatorCore {
         public static DEBUG_DISPLAY: boolean = false;
         public static DEBUG_SHOW_LENGTH: boolean = false;
 
+        public wireMesh: BABYLON.Mesh;
         public debugLengthTagMesh: BABYLON.Mesh;
         public path: BABYLON.Vector3[] = [];
         public normals: BABYLON.Vector3[] = [];
@@ -113,9 +114,9 @@ namespace MarbleRunSimulatorCore {
                     path.push(...tipPath);
                 }
 
-                let wire = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                wire.parent = this;
-                wire.material = this.part.game.materials.getMaterial(color, this.part.machine.materialQ);
+                this.wireMesh = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                this.wireMesh.parent = this;
+                this.wireMesh.material = this.part.game.materials.getMaterial(color, this.part.machine.materialQ);
             }
 
             if (Wire.DEBUG_DISPLAY) {
@@ -134,7 +135,6 @@ namespace MarbleRunSimulatorCore {
             }
 
             if (Wire.DEBUG_SHOW_LENGTH) {
-                
                 this.debugLengthTagMesh = new BABYLON.Mesh("wire-length-tag");
                 this.debugLengthTagMesh.parent = this;
                 this.debugLengthTagMesh.rotation.x = Math.PI * 0.5;

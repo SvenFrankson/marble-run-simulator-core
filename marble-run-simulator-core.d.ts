@@ -213,6 +213,7 @@ declare namespace MarbleRunSimulatorCore {
         part: MachinePart;
         static DEBUG_DISPLAY: boolean;
         static DEBUG_SHOW_LENGTH: boolean;
+        wireMesh: BABYLON.Mesh;
         debugLengthTagMesh: BABYLON.Mesh;
         path: BABYLON.Vector3[];
         normals: BABYLON.Vector3[];
@@ -665,6 +666,7 @@ declare namespace MarbleRunSimulatorCore {
         hover(): void;
         anhover(): void;
         updateSelectorMeshVisibility(): void;
+        setOutlineParams(renderOutline: boolean, outlineWidth: number, outlineColor: BABYLON.Color3): void;
         private _alignShadow;
         getDirAndUpAtWorldPos(worldPosition: BABYLON.Vector3): {
             dir: BABYLON.Vector3;

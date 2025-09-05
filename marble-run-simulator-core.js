@@ -849,7 +849,7 @@ var MarbleRunSimulatorCore;
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
                 this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 5) + 0.8);
-                this.marbleLoopSound.setVolume(48 * this.strReaction * f * this.game.mainVolume, 0.1);
+                this.marbleLoopSound.setVolume(20 * this.strReaction * f * this.game.mainVolume, 0.1);
                 if (!this.marbleLoopSound.isPlaying) {
                     this.marbleLoopSound.play();
                 }
@@ -1642,9 +1642,9 @@ var MarbleRunSimulatorCore;
                     }
                     path.push(...tipPath);
                 }
-                let wire = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                wire.parent = this;
-                wire.material = this.part.game.materials.getMaterial(color, this.part.machine.materialQ);
+                this.wireMesh = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                this.wireMesh.parent = this;
+                this.wireMesh.material = this.part.game.materials.getMaterial(color, this.part.machine.materialQ);
             }
             if (Wire.DEBUG_DISPLAY) {
                 for (let i = 0; i < this.path.length - 1; i++) {
@@ -3500,14 +3500,18 @@ var MarbleRunSimulatorCore;
         updateSelectorMeshVisibility() {
             if (this.selectorBodyDisplay) {
                 if (this._selected) {
+                    this.setOutlineParams(true, 0.0015, new BABYLON.Color3(0.8, 0.8, 0.8));
                     this.selectorBodyDisplay.visibility = 0.2;
                 }
                 else if (this._hovered) {
+                    this.setOutlineParams(true, 0.0015, new BABYLON.Color3(0.5, 0.5, 0.5));
                     this.selectorBodyDisplay.visibility = 0.1;
                 }
                 else {
+                    this.setOutlineParams(false, 0.0015, new BABYLON.Color3(0.7, 0.7, 0.7));
                     this.selectorBodyDisplay.visibility = 0;
                 }
+                this.selectorBodyDisplay.visibility = 0;
             }
             if (this.encloseMesh) {
                 if (this._selected) {
@@ -3533,6 +3537,33 @@ var MarbleRunSimulatorCore;
             this.endPoints.forEach(endpoint => {
                 endpoint.updateSelectorMeshVisibility();
             });
+        }
+        setOutlineParams(renderOutline, outlineWidth, outlineColor) {
+            //this.getChildMeshes(true).forEach(mesh => {
+            //    if (mesh && !mesh.isDisposed()) {
+            //        mesh.renderOutline = renderOutline;
+            //        mesh.outlineWidth = outlineWidth;
+            //        mesh.outlineColor = outlineColor;
+            //    }
+            //});
+            this.allWires.forEach(wire => {
+                if (wire.wireMesh && !wire.wireMesh.isDisposed()) {
+                    if (true) {
+                        wire.wireMesh.renderOutline = renderOutline;
+                        wire.wireMesh.outlineWidth = outlineWidth;
+                        wire.wireMesh.outlineColor = outlineColor;
+                    }
+                }
+            });
+            //this.sleepersMeshes.forEach(sleeperMesh => {
+            //    if (sleeperMesh && !sleeperMesh.isDisposed()) {
+            //        if (true) {
+            //            sleeperMesh.renderOutline = renderOutline;
+            //            sleeperMesh.outlineWidth = outlineWidth;
+            //            sleeperMesh.outlineColor = outlineColor;
+            //        }
+            //    }
+            //});
         }
         getDirAndUpAtWorldPos(worldPosition) {
             let dir = BABYLON.Vector3.Right();
@@ -3623,7 +3654,7 @@ var MarbleRunSimulatorCore;
                 let a = (i / 6) * 2 * Math.PI;
                 let cosa = Math.cos(a);
                 let sina = Math.sin(a);
-                selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
+                selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.01, sina * 0.01, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
             }
             let DEBUG_logicColliderVisibility = 0;
             let selectorMeshDisplayVertexDatas = [];
@@ -3802,9 +3833,9 @@ var MarbleRunSimulatorCore;
             }
             else if (this.machine.constructionMode === MarbleRunSimulatorCore.MachineConstructionMode.Mode2D) {
                 let encloseMeshVertexData = Mummu.Create9SliceVertexData({
-                    width: max.x - min.x + MarbleRunSimulatorCore.tileSize * 0.2,
-                    height: max.y - min.y + MarbleRunSimulatorCore.tileSize * 0.2,
-                    margin: MarbleRunSimulatorCore.tileSize * 0.2
+                    width: max.x - min.x + MarbleRunSimulatorCore.tileSize * 0.1,
+                    height: max.y - min.y + MarbleRunSimulatorCore.tileSize * 0.1,
+                    margin: MarbleRunSimulatorCore.tileSize * 0.1
                 });
                 Mummu.TranslateVertexDataInPlace(encloseMeshVertexData, max.add(min).scale(0.5));
                 encloseMeshVertexData = Mummu.MergeVertexDatas(encloseMeshVertexData, Mummu.TriFlipVertexDataInPlace(Mummu.CloneVertexData(encloseMeshVertexData)));
@@ -3920,8 +3951,9 @@ var MarbleRunSimulatorCore;
                     this._targetR = undefined;
                     this.targetUpdatePivot = undefined;
                     this.refreshWorldAABB();
-                    this.rebuildWireMeshesIfNeeded();
-                    this.updateSelectorMeshVisibility();
+                    this.rebuildWireMeshesIfNeeded().then(() => {
+                        this.updateSelectorMeshVisibility();
+                    });
                     this.machine.requestUpdateBaseMesh = true;
                     this.machine.requestUpdateShadow = true;
                 }

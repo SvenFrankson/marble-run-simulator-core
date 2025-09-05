@@ -881,14 +881,18 @@ namespace MarbleRunSimulatorCore {
         public updateSelectorMeshVisibility(): void {
             if (this.selectorBodyDisplay) {
                 if (this._selected) {
+                    this.setOutlineParams(true, 0.0015, new BABYLON.Color3(0.8, 0.8, 0.8));
                     this.selectorBodyDisplay.visibility = 0.2;
                 }
                 else if (this._hovered) {
+                    this.setOutlineParams(true, 0.0015, new BABYLON.Color3(0.5, 0.5, 0.5));
                     this.selectorBodyDisplay.visibility = 0.1;
                 }
                 else {
+                    this.setOutlineParams(false, 0.0015, new BABYLON.Color3(0.7, 0.7, 0.7));
                     this.selectorBodyDisplay.visibility = 0;
                 }
+                this.selectorBodyDisplay.visibility = 0;
             }
 
             if (this.encloseMesh) {
@@ -917,6 +921,34 @@ namespace MarbleRunSimulatorCore {
             this.endPoints.forEach(endpoint => {
                 endpoint.updateSelectorMeshVisibility();
             })
+        }
+
+        public setOutlineParams(renderOutline: boolean, outlineWidth: number, outlineColor: BABYLON.Color3): void {
+            //this.getChildMeshes(true).forEach(mesh => {
+            //    if (mesh && !mesh.isDisposed()) {
+            //        mesh.renderOutline = renderOutline;
+            //        mesh.outlineWidth = outlineWidth;
+            //        mesh.outlineColor = outlineColor;
+            //    }
+            //});
+            this.allWires.forEach(wire => {
+                if (wire.wireMesh && !wire.wireMesh.isDisposed()) {
+                    if (true) {
+                        wire.wireMesh.renderOutline = renderOutline;
+                        wire.wireMesh.outlineWidth = outlineWidth;
+                        wire.wireMesh.outlineColor = outlineColor;
+                    }
+                }
+            });
+            //this.sleepersMeshes.forEach(sleeperMesh => {
+            //    if (sleeperMesh && !sleeperMesh.isDisposed()) {
+            //        if (true) {
+            //            sleeperMesh.renderOutline = renderOutline;
+            //            sleeperMesh.outlineWidth = outlineWidth;
+            //            sleeperMesh.outlineColor = outlineColor;
+            //        }
+            //    }
+            //});
         }
 
         private _alignShadow = () => {
@@ -1105,7 +1137,7 @@ namespace MarbleRunSimulatorCore {
                 let a = (i / 6) * 2 * Math.PI;
                 let cosa = Math.cos(a);
                 let sina = Math.sin(a);
-                selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.009, sina * 0.009, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
+                selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.01, sina * 0.01, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
             }
 
             let DEBUG_logicColliderVisibility: number = 0;
@@ -1315,9 +1347,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (this.machine.constructionMode === MachineConstructionMode.Mode2D) {
                 let encloseMeshVertexData = Mummu.Create9SliceVertexData({
-                    width: max.x - min.x + tileSize * 0.2,
-                    height: max.y - min.y + tileSize * 0.2,
-                    margin: tileSize * 0.2
+                    width: max.x - min.x + tileSize * 0.1,
+                    height: max.y - min.y + tileSize * 0.1,
+                    margin: tileSize * 0.1
                 });
                 Mummu.TranslateVertexDataInPlace(encloseMeshVertexData, max.add(min).scale(0.5));
                 encloseMeshVertexData = Mummu.MergeVertexDatas(encloseMeshVertexData, Mummu.TriFlipVertexDataInPlace(Mummu.CloneVertexData(encloseMeshVertexData)));
@@ -1460,8 +1492,9 @@ namespace MarbleRunSimulatorCore {
                     this.targetUpdatePivot = undefined;
                     
                     this.refreshWorldAABB();
-                    this.rebuildWireMeshesIfNeeded();
-                    this.updateSelectorMeshVisibility();
+                    this.rebuildWireMeshesIfNeeded().then(() => {
+                        this.updateSelectorMeshVisibility();
+                    });
                     this.machine.requestUpdateBaseMesh = true;
                     this.machine.requestUpdateShadow = true;
                 }
