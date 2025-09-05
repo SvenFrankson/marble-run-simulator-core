@@ -930,7 +930,7 @@ namespace MarbleRunSimulatorCore {
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
                 this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 5) + 0.8);
-                this.marbleLoopSound.setVolume(48 * this.strReaction * f * this.game.mainVolume, 0.1);
+                this.marbleLoopSound.setVolume(20 * this.strReaction * f * this.game.mainVolume, 0.1);
                 if (!this.marbleLoopSound.isPlaying) {
                     this.marbleLoopSound.play();
                 }
