@@ -4540,9 +4540,7 @@ var MarbleRunSimulatorCore;
                 let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
-                    let s = parseInt(argStr.split(".")[1]);
                     prop.h = h;
-                    prop.s = s;
                 }
                 return new MarbleRunSimulatorCore.TeardropTurn(this.machine, prop);
             }
@@ -5831,8 +5829,7 @@ var MarbleRunSimulatorCore;
                 }
                 else if (partName.startsWith("teardropTurn_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
-                    let s = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = MarbleRunSimulatorCore.TeardropTurn.GenerateTemplate(h, s);
+                    data = MarbleRunSimulatorCore.TeardropTurn.GenerateTemplate(h);
                 }
                 datas[mirrorIndex] = data;
             }
@@ -12985,16 +12982,14 @@ var MarbleRunSimulatorCore;
             this.generateWires();
         }
         static PropToPartName(prop) {
-            return "teardropTurn_" + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
+            return "teardropTurn_" + prop.h.toFixed(0);
         }
-        static GenerateTemplate(h, s) {
+        static GenerateTemplate(h) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "teardropTurn_" + h.toFixed(0) + "." + s.toFixed(0);
+            template.partName = "teardropTurn_" + h.toFixed(0);
             template.h = h;
             template.hExtendableOnY = true;
             template.maxH = 4;
-            template.s = s;
-            template.sExtendable = true;
             let r = 2 * MarbleRunSimulatorCore.tileSize;
             let r2 = r / Math.SQRT2;
             let cX = 4 * MarbleRunSimulatorCore.tileSize;

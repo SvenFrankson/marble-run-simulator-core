@@ -564,8 +564,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName.startsWith("teardropTurn_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
-                    let s = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = TeardropTurn.GenerateTemplate(h, s);
+                    data = TeardropTurn.GenerateTemplate(h);
                 }
                 datas[mirrorIndex] = data;
             }

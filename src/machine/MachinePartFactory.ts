@@ -420,9 +420,7 @@ namespace MarbleRunSimulatorCore {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
                     let h = parseInt(argStr.split(".")[0]);
-                    let s = parseInt(argStr.split(".")[1]);
                     prop.h = h;
-                    prop.s = s;
                 }
                 return new TeardropTurn(this.machine, prop);
             }

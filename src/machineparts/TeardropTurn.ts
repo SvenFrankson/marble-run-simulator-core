@@ -12,18 +12,16 @@ namespace MarbleRunSimulatorCore {
         
 
         public static PropToPartName(prop: IMachinePartProp): string {
-            return "teardropTurn_" + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
+            return "teardropTurn_" + prop.h.toFixed(0);
         }
 
-        public static GenerateTemplate(h: number, s: number): MachinePartTemplate {
+        public static GenerateTemplate(h: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "teardropTurn_" + h.toFixed(0) + "." + s.toFixed(0);
+            template.partName = "teardropTurn_" + h.toFixed(0);
             template.h = h;
             template.hExtendableOnY = true;
             template.maxH = 4;
-            template.s = s;
-            template.sExtendable = true;
 
             let r = 2 * tileSize;
             let r2 = r / Math.SQRT2;
