@@ -678,6 +678,7 @@ declare namespace MarbleRunSimulatorCore {
         getBankAt(index: number, trackIndex?: number): number;
         getBarycenter(): BABYLON.Vector3;
         recomputeAbsolutePath(): void;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         instantiated: boolean;
         instantiate(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
@@ -1442,6 +1443,7 @@ declare namespace MarbleRunSimulatorCore {
         a: number;
         update(dt: number): void;
         onPositionChanged(): void;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {

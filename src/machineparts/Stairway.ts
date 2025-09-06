@@ -90,7 +90,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.vil = new BABYLON.Mesh("display-vil");
-            this.vil.position.y = -tileHeight * (this.h + 1.5) + tileHeight * this.h;
+            this.vil.position.y = - tileHeight * 1.5;
             this.vil.parent = this;
 
             this.outlinableMeshes = [];
@@ -366,6 +366,30 @@ namespace MarbleRunSimulatorCore {
 
         public onPositionChanged(): void {
             this.update(0);
+        }
+
+        public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
+            console.log("plouf !");
+            let p0 = new BABYLON.Vector3(-tileWidth * 0.5, 0, 0);
+            p0.x += tileSize * 0.5;
+            let p1 = new BABYLON.Vector3((this.l - 3) * tileSize + tileWidth * 0.5, tileHeight * this.h, 0);
+            p1.x -= tileSize * 0.5;
+            let l = BABYLON.Vector3.Distance(p0, p1);
+            let angle = Mummu.AngleFromToAround(BABYLON.Axis.X, p1.subtract(p0), BABYLON.Axis.Z);
+
+            let stairsSelector = BABYLON.CreateBoxVertexData({ width: l, height: 1.2 * tileSize, depth: 1.2 * tileSize });
+            Mummu.RotateAngleAxisVertexDataInPlace(stairsSelector, angle, BABYLON.Axis.Z);
+            Mummu.TranslateVertexDataInPlace(stairsSelector, p0.add(p1).scaleInPlace(0.5));
+
+            selectorMeshLogicVertexDatas.push(stairsSelector);
+
+            p0.y = - tileHeight * 1.5;
+            p1.y = - tileHeight * 1.5;
+            l = BABYLON.Vector3.Distance(p0, p1);
+            let vilSelector = BABYLON.CreateBoxVertexData({ width: l, height: 1.2 * tileSize, depth: 1.2 * tileSize });
+            Mummu.TranslateVertexDataInPlace(vilSelector, p0.add(p1).scaleInPlace(0.5));
+
+            selectorMeshLogicVertexDatas.push(vilSelector);
         }
     }
 }

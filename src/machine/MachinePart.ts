@@ -1118,6 +1118,8 @@ namespace MarbleRunSimulatorCore {
             });
         }
 
+        public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {}
+
         public instantiated = false;
         public async instantiate(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): Promise<void> {
             this.instantiated = false;
@@ -1130,7 +1132,7 @@ namespace MarbleRunSimulatorCore {
                 selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.01, sina * 0.01, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
             }
 
-            let DEBUG_logicColliderVisibility: number = 0;
+            let DEBUG_logicColliderVisibility: number = 0.5;
             let selectorMeshDisplayVertexDatas: BABYLON.VertexData[] = [];
             let selectorMeshLogicVertexDatas: BABYLON.VertexData[] = [];
 
@@ -1232,6 +1234,7 @@ namespace MarbleRunSimulatorCore {
             this.selectorBodyLogic = new MachinePartSelectorMesh(this);
             this.selectorBodyLogic.material = this.game.materials.whiteFullLitMaterial;
             this.selectorBodyLogic.parent = this;
+            this.onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas);
             if (selectorMeshLogicVertexDatas.length > 0) {
                 Mummu.MergeVertexDatas(...selectorMeshLogicVertexDatas).applyToMesh(this.selectorBodyLogic);
             }

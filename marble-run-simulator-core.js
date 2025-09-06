@@ -3637,6 +3637,7 @@ var MarbleRunSimulatorCore;
                 wire.recomputeAbsolutePath();
             });
         }
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas) { }
         async instantiate(rebuildNeighboursWireMeshes, skipSleepersAndSupport) {
             this.instantiated = false;
             let selectorHullShapeLogic = [];
@@ -3646,7 +3647,7 @@ var MarbleRunSimulatorCore;
                 let sina = Math.sin(a);
                 selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.01, sina * 0.01, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
             }
-            let DEBUG_logicColliderVisibility = 0;
+            let DEBUG_logicColliderVisibility = 0.5;
             let selectorMeshDisplayVertexDatas = [];
             let selectorMeshLogicVertexDatas = [];
             this.selectorEndpointsDisplay.forEach(selectorEndpoint => {
@@ -3737,6 +3738,7 @@ var MarbleRunSimulatorCore;
             this.selectorBodyLogic = new MachinePartSelectorMesh(this);
             this.selectorBodyLogic.material = this.game.materials.whiteFullLitMaterial;
             this.selectorBodyLogic.parent = this;
+            this.onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas);
             if (selectorMeshLogicVertexDatas.length > 0) {
                 Mummu.MergeVertexDatas(...selectorMeshLogicVertexDatas).applyToMesh(this.selectorBodyLogic);
             }
@@ -12462,7 +12464,7 @@ var MarbleRunSimulatorCore;
                 this.bielles[i] = new BABYLON.Mesh("bielle");
             }
             this.vil = new BABYLON.Mesh("display-vil");
-            this.vil.position.y = -MarbleRunSimulatorCore.tileHeight * (this.h + 1.5) + MarbleRunSimulatorCore.tileHeight * this.h;
+            this.vil.position.y = -MarbleRunSimulatorCore.tileHeight * 1.5;
             this.vil.parent = this;
             this.outlinableMeshes = [];
             this.outlinableMeshes.push(...this.boxesDisplayedMesh);
@@ -12725,6 +12727,25 @@ var MarbleRunSimulatorCore;
         }
         onPositionChanged() {
             this.update(0);
+        }
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas) {
+            console.log("plouf !");
+            let p0 = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0);
+            p0.x += MarbleRunSimulatorCore.tileSize * 0.5;
+            let p1 = new BABYLON.Vector3((this.l - 3) * MarbleRunSimulatorCore.tileSize + MarbleRunSimulatorCore.tileWidth * 0.5, MarbleRunSimulatorCore.tileHeight * this.h, 0);
+            p1.x -= MarbleRunSimulatorCore.tileSize * 0.5;
+            let l = BABYLON.Vector3.Distance(p0, p1);
+            let angle = Mummu.AngleFromToAround(BABYLON.Axis.X, p1.subtract(p0), BABYLON.Axis.Z);
+            let stairsSelector = BABYLON.CreateBoxVertexData({ width: l, height: 1.2 * MarbleRunSimulatorCore.tileSize, depth: 1.2 * MarbleRunSimulatorCore.tileSize });
+            Mummu.RotateAngleAxisVertexDataInPlace(stairsSelector, angle, BABYLON.Axis.Z);
+            Mummu.TranslateVertexDataInPlace(stairsSelector, p0.add(p1).scaleInPlace(0.5));
+            selectorMeshLogicVertexDatas.push(stairsSelector);
+            p0.y = -MarbleRunSimulatorCore.tileHeight * 1.5;
+            p1.y = -MarbleRunSimulatorCore.tileHeight * 1.5;
+            l = BABYLON.Vector3.Distance(p0, p1);
+            let vilSelector = BABYLON.CreateBoxVertexData({ width: l, height: 1.2 * MarbleRunSimulatorCore.tileSize, depth: 1.2 * MarbleRunSimulatorCore.tileSize });
+            Mummu.TranslateVertexDataInPlace(vilSelector, p0.add(p1).scaleInPlace(0.5));
+            selectorMeshLogicVertexDatas.push(vilSelector);
         }
     }
     MarbleRunSimulatorCore.Stairway = Stairway;
