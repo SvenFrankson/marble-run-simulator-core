@@ -3640,14 +3640,15 @@ var MarbleRunSimulatorCore;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas) { }
         async instantiate(rebuildNeighboursWireMeshes, skipSleepersAndSupport) {
             this.instantiated = false;
+            let selectorHullShapeLogicR = 0.012 * (IsTouchScreen === 1 ? 2 : 1);
             let selectorHullShapeLogic = [];
             for (let i = 0; i < 6; i++) {
                 let a = (i / 6) * 2 * Math.PI;
                 let cosa = Math.cos(a);
                 let sina = Math.sin(a);
-                selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * 0.01, sina * 0.01, 0)).scaleInPlace((IsTouchScreen === 1 ? 2 : 1));
+                selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * selectorHullShapeLogicR, sina * selectorHullShapeLogicR, 0));
             }
-            let DEBUG_logicColliderVisibility = 0.5;
+            let DEBUG_logicColliderVisibility = 0.2;
             let selectorMeshDisplayVertexDatas = [];
             let selectorMeshLogicVertexDatas = [];
             this.selectorEndpointsDisplay.forEach(selectorEndpoint => {
@@ -3685,7 +3686,7 @@ var MarbleRunSimulatorCore;
                         selectorOriginMeshLogic.position = endPoint.localPosition;
                         selectorOriginMeshLogic.parent = this;
                         selectorOriginMeshLogic.visibility = DEBUG_logicColliderVisibility;
-                        let endpointLogicVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 2 * 0.018 });
+                        let endpointLogicVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 2 * selectorHullShapeLogicR - 0.001 });
                         Mummu.ColorizeVertexDataInPlace(endpointLogicVertexData, BABYLON.Color3.Magenta());
                         endpointLogicVertexData.applyToMesh(selectorOriginMeshLogic);
                         this.selectorEndpointsLogic.push(selectorOriginMeshLogic);
@@ -3707,7 +3708,7 @@ var MarbleRunSimulatorCore;
                         selectorEndpointLogicMesh.position = endPoint.localPosition;
                         selectorEndpointLogicMesh.parent = this;
                         selectorEndpointLogicMesh.visibility = DEBUG_logicColliderVisibility;
-                        let endpointLogicVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 2 * 0.018 });
+                        let endpointLogicVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 2 * selectorHullShapeLogicR - 0.001 });
                         Mummu.ColorizeVertexDataInPlace(endpointLogicVertexData, BABYLON.Color3.Magenta());
                         endpointLogicVertexData.applyToMesh(selectorEndpointLogicMesh);
                         this.selectorEndpointsLogic.push(selectorEndpointLogicMesh);
