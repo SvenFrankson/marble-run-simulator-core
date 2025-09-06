@@ -2891,6 +2891,7 @@ var MarbleRunSimulatorCore;
             this.wires = [];
             this.allWires = [];
             this.colliders = [];
+            this.outlinableMeshes = [];
             this.wireSize = 0.0015;
             this.wireGauge = 0.014;
             this.colors = [0];
@@ -3539,31 +3540,20 @@ var MarbleRunSimulatorCore;
             });
         }
         setOutlineParams(renderOutline, outlineWidth, outlineColor) {
-            //this.getChildMeshes(true).forEach(mesh => {
-            //    if (mesh && !mesh.isDisposed()) {
-            //        mesh.renderOutline = renderOutline;
-            //        mesh.outlineWidth = outlineWidth;
-            //        mesh.outlineColor = outlineColor;
-            //    }
-            //});
             this.allWires.forEach(wire => {
                 if (wire.wireMesh && !wire.wireMesh.isDisposed()) {
-                    if (true) {
-                        wire.wireMesh.renderOutline = renderOutline;
-                        wire.wireMesh.outlineWidth = outlineWidth;
-                        wire.wireMesh.outlineColor = outlineColor;
-                    }
+                    wire.wireMesh.renderOutline = renderOutline;
+                    wire.wireMesh.outlineWidth = outlineWidth;
+                    wire.wireMesh.outlineColor = outlineColor;
                 }
             });
-            //this.sleepersMeshes.forEach(sleeperMesh => {
-            //    if (sleeperMesh && !sleeperMesh.isDisposed()) {
-            //        if (true) {
-            //            sleeperMesh.renderOutline = renderOutline;
-            //            sleeperMesh.outlineWidth = outlineWidth;
-            //            sleeperMesh.outlineColor = outlineColor;
-            //        }
-            //    }
-            //});
+            this.outlinableMeshes.forEach(mesh => {
+                if (mesh && !mesh.isDisposed()) {
+                    mesh.renderOutline = renderOutline;
+                    mesh.outlineWidth = outlineWidth;
+                    mesh.outlineColor = outlineColor;
+                }
+            });
         }
         getDirAndUpAtWorldPos(worldPosition) {
             let dir = BABYLON.Vector3.Right();
@@ -3761,6 +3751,7 @@ var MarbleRunSimulatorCore;
             this.instantiated = true;
         }
         async instantiateMachineSpecific() { }
+        onPositionChanged() { }
         refreshEncloseMeshAndLocalAABB() {
             if (this.encloseMesh) {
                 this.encloseMesh.dispose();
@@ -3999,6 +3990,7 @@ var MarbleRunSimulatorCore;
         update(dt) {
         }
         refreshWorldMatrix() {
+            this.onPositionChanged();
             this.freezeWorldMatrix();
             this.getChildMeshes().forEach((m) => {
                 m.freezeWorldMatrix();
@@ -12472,6 +12464,10 @@ var MarbleRunSimulatorCore;
             this.vil = new BABYLON.Mesh("display-vil");
             this.vil.position.y = -MarbleRunSimulatorCore.tileHeight * (this.h + 1.5) + MarbleRunSimulatorCore.tileHeight * this.h;
             this.vil.parent = this;
+            this.outlinableMeshes = [];
+            this.outlinableMeshes.push(...this.boxesDisplayedMesh);
+            this.outlinableMeshes.push(...this.bielles);
+            this.outlinableMeshes.push(this.vil);
             this.generateWires();
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);
@@ -12726,6 +12722,9 @@ var MarbleRunSimulatorCore;
                 let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].absolutePosition).addInPlaceFromFloats(0, this.stepH - 0.002, 0);
                 this.bielles[i].rotationQuaternion = Mummu.QuaternionFromYZAxis(dir, BABYLON.Axis.Z);
             }
+        }
+        onPositionChanged() {
+            this.update(0);
         }
     }
     MarbleRunSimulatorCore.Stairway = Stairway;

@@ -528,6 +528,7 @@ declare namespace MarbleRunSimulatorCore {
         wires: Wire[];
         allWires: Wire[];
         colliders: MachineCollider[];
+        outlinableMeshes: BABYLON.Mesh[];
         wireSize: number;
         wireGauge: number;
         colors: number[];
@@ -680,6 +681,7 @@ declare namespace MarbleRunSimulatorCore {
         instantiated: boolean;
         instantiate(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
+        protected onPositionChanged(): void;
         refreshEncloseMeshAndLocalAABB(): void;
         refreshWorldAABB(): void;
         dispose(): void;
@@ -1439,6 +1441,7 @@ declare namespace MarbleRunSimulatorCore {
         speed: number;
         a: number;
         update(dt: number): void;
+        onPositionChanged(): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {

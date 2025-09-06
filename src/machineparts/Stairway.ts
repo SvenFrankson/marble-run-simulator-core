@@ -93,6 +93,11 @@ namespace MarbleRunSimulatorCore {
             this.vil.position.y = -tileHeight * (this.h + 1.5) + tileHeight * this.h;
             this.vil.parent = this;
 
+            this.outlinableMeshes = [];
+            this.outlinableMeshes.push(...this.boxesDisplayedMesh);
+            this.outlinableMeshes.push(...this.bielles);
+            this.outlinableMeshes.push(this.vil);
+
             this.generateWires();
 
             this.machine.onStopCallbacks.remove(this.reset);
@@ -357,6 +362,10 @@ namespace MarbleRunSimulatorCore {
                 let dir = this.boxesColliders[i].absolutePosition.subtract(this.bielles[i].absolutePosition).addInPlaceFromFloats(0, this.stepH - 0.002, 0);
                 this.bielles[i].rotationQuaternion = Mummu.QuaternionFromYZAxis(dir, BABYLON.Axis.Z);
             }
+        }
+
+        public onPositionChanged(): void {
+            this.update(0);
         }
     }
 }

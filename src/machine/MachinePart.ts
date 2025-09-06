@@ -293,6 +293,7 @@ namespace MarbleRunSimulatorCore {
         public wires: Wire[] = [];
         public allWires: Wire[] = [];
         public colliders: MachineCollider[] = [];
+        public outlinableMeshes: BABYLON.Mesh[] = [];
 
         public wireSize: number = 0.0015;
         public wireGauge: number = 0.014;
@@ -924,31 +925,20 @@ namespace MarbleRunSimulatorCore {
         }
 
         public setOutlineParams(renderOutline: boolean, outlineWidth: number, outlineColor: BABYLON.Color3): void {
-            //this.getChildMeshes(true).forEach(mesh => {
-            //    if (mesh && !mesh.isDisposed()) {
-            //        mesh.renderOutline = renderOutline;
-            //        mesh.outlineWidth = outlineWidth;
-            //        mesh.outlineColor = outlineColor;
-            //    }
-            //});
             this.allWires.forEach(wire => {
                 if (wire.wireMesh && !wire.wireMesh.isDisposed()) {
-                    if (true) {
-                        wire.wireMesh.renderOutline = renderOutline;
-                        wire.wireMesh.outlineWidth = outlineWidth;
-                        wire.wireMesh.outlineColor = outlineColor;
-                    }
+                    wire.wireMesh.renderOutline = renderOutline;
+                    wire.wireMesh.outlineWidth = outlineWidth;
+                    wire.wireMesh.outlineColor = outlineColor;
                 }
             });
-            //this.sleepersMeshes.forEach(sleeperMesh => {
-            //    if (sleeperMesh && !sleeperMesh.isDisposed()) {
-            //        if (true) {
-            //            sleeperMesh.renderOutline = renderOutline;
-            //            sleeperMesh.outlineWidth = outlineWidth;
-            //            sleeperMesh.outlineColor = outlineColor;
-            //        }
-            //    }
-            //});
+            this.outlinableMeshes.forEach(mesh => {
+                if (mesh && !mesh.isDisposed()) {
+                    mesh.renderOutline = renderOutline;
+                    mesh.outlineWidth = outlineWidth;
+                    mesh.outlineColor = outlineColor;
+                }
+            });
         }
 
         private _alignShadow = () => {
@@ -1261,6 +1251,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         protected async instantiateMachineSpecific(): Promise<void> {}
+        protected onPositionChanged(): void {}
 
         public refreshEncloseMeshAndLocalAABB(): void {
             if (this.encloseMesh) {
@@ -1547,6 +1538,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public refreshWorldMatrix(): void {
+            this.onPositionChanged();
             this.freezeWorldMatrix();
             this.getChildMeshes().forEach((m) => {
                 m.freezeWorldMatrix();
