@@ -98,8 +98,6 @@ namespace MarbleRunSimulatorCore {
             template.minH = 2;
             template.downwardYExtendable = true;
 
-            template.nExtendable = true;
-
             let x0 = - tileSize * 0.5;
             let x1 = - tileSize * 0.5 + l * tileSize;
             let hole = 0.016;

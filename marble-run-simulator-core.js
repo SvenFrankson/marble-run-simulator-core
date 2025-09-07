@@ -3648,7 +3648,7 @@ var MarbleRunSimulatorCore;
                 let sina = Math.sin(a);
                 selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * selectorHullShapeLogicR, sina * selectorHullShapeLogicR, 0));
             }
-            let DEBUG_logicColliderVisibility = 0.2;
+            let DEBUG_logicColliderVisibility = 0;
             let selectorMeshDisplayVertexDatas = [];
             let selectorMeshLogicVertexDatas = [];
             this.selectorEndpointsDisplay.forEach(selectorEndpoint => {
@@ -10039,7 +10039,6 @@ var MarbleRunSimulatorCore;
             template.hExtendableOnY = true;
             template.minH = 2;
             template.downwardYExtendable = true;
-            template.nExtendable = true;
             let x0 = -MarbleRunSimulatorCore.tileSize * 0.5;
             let x1 = -MarbleRunSimulatorCore.tileSize * 0.5 + l * MarbleRunSimulatorCore.tileSize;
             let hole = 0.016;

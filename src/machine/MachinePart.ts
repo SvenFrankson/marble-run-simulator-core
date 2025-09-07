@@ -1133,7 +1133,7 @@ namespace MarbleRunSimulatorCore {
                 selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * selectorHullShapeLogicR, sina * selectorHullShapeLogicR, 0));
             }
 
-            let DEBUG_logicColliderVisibility: number = 0.2;
+            let DEBUG_logicColliderVisibility: number = 0;
             let selectorMeshDisplayVertexDatas: BABYLON.VertexData[] = [];
             let selectorMeshLogicVertexDatas: BABYLON.VertexData[] = [];
 
