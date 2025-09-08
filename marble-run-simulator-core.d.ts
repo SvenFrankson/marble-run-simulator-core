@@ -660,6 +660,7 @@ declare namespace MarbleRunSimulatorCore {
         set partVisibilityMode(v: PartVisibilityMode);
         private _selected;
         private _multiSelected;
+        get multiSelected(): boolean;
         get selected(): boolean;
         select(_multiSelected?: boolean): void;
         unselect(): void;

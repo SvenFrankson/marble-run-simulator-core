@@ -199,18 +199,24 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
  
-                if (this._hovered) {
-                    selectorMesh.isVisible = true;
-                    selectorMesh.visibility = 1;
-                    selectorMesh.outlineColor.copyFromFloats(1, 1, 1);
-                }
-                else if (this.machinePart.selected) {
-                    selectorMesh.isVisible = true;
-                    selectorMesh.visibility = 1;
-                }
-                else {
+                if (this.machinePart.multiSelected && this.connectedEndPoint) {
                     selectorMesh.isVisible = false;
                     selectorMesh.visibility = 0;
+                }
+                else {
+                    if (this._hovered) {
+                        selectorMesh.isVisible = true;
+                        selectorMesh.visibility = 1;
+                        selectorMesh.outlineColor.copyFromFloats(1, 1, 1);
+                    }
+                    else if (this.machinePart.selected) {
+                        selectorMesh.isVisible = true;
+                        selectorMesh.visibility = 1;
+                    }
+                    else {
+                        selectorMesh.isVisible = false;
+                        selectorMesh.visibility = 0;
+                    }
                 }
             }
         }
@@ -852,6 +858,9 @@ namespace MarbleRunSimulatorCore {
 
         private _selected: boolean = false;
         private _multiSelected: boolean = false;
+        public get multiSelected(): boolean {
+            return this._multiSelected;
+        }
         public get selected(): boolean {
             return this._selected;
         }

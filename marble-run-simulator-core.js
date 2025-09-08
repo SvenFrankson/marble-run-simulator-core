@@ -2808,18 +2808,24 @@ var MarbleRunSimulatorCore;
                         selectorMesh.material = this.machinePart.game.materials.selectorFullLitLightBlueMaterial;
                     }
                 }
-                if (this._hovered) {
-                    selectorMesh.isVisible = true;
-                    selectorMesh.visibility = 1;
-                    selectorMesh.outlineColor.copyFromFloats(1, 1, 1);
-                }
-                else if (this.machinePart.selected) {
-                    selectorMesh.isVisible = true;
-                    selectorMesh.visibility = 1;
-                }
-                else {
+                if (this.machinePart.multiSelected && this.connectedEndPoint) {
                     selectorMesh.isVisible = false;
                     selectorMesh.visibility = 0;
+                }
+                else {
+                    if (this._hovered) {
+                        selectorMesh.isVisible = true;
+                        selectorMesh.visibility = 1;
+                        selectorMesh.outlineColor.copyFromFloats(1, 1, 1);
+                    }
+                    else if (this.machinePart.selected) {
+                        selectorMesh.isVisible = true;
+                        selectorMesh.visibility = 1;
+                    }
+                    else {
+                        selectorMesh.isVisible = false;
+                        selectorMesh.visibility = 0;
+                    }
                 }
             }
         }
@@ -3476,6 +3482,9 @@ var MarbleRunSimulatorCore;
                     }
                 });
             }
+        }
+        get multiSelected() {
+            return this._multiSelected;
         }
         get selected() {
             return this._selected;
