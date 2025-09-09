@@ -40,7 +40,10 @@ namespace MarbleRunSimulatorCore {
         "trikeSkull",
         "controler",
         "ladder",
-        "teardropTurn"
+        "teardropTurn",
+        "tsplit",
+        "tjoin",
+        "cross2d"
     ];
 
     export interface IMachinePartProp {
@@ -424,6 +427,15 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new TeardropTurn(this.machine, prop);
             }
+            if (partName === "tsplit") {
+                return new TSplit(this.machine, prop);
+            }
+            if (partName === "tjoin") {
+                return new TJoin(this.machine, prop);
+            }
+            if (partName === "cross2d") {
+                return new Cross2D(this.machine, prop);
+            }
         }
 
         public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
@@ -555,6 +567,15 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "teardropTurn") {
                 return new TeardropTurn(this.machine, prop);
+            }
+            if (baseName === "tsplit") {
+                return new TSplit(this.machine, prop);
+            }
+            if (baseName === "tjoin") {
+                return new TJoin(this.machine, prop);
+            }
+            if (baseName === "cross2d") {
+                return new Cross2D(this.machine, prop);
             }
         }
     }

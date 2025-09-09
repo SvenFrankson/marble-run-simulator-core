@@ -566,6 +566,15 @@ namespace MarbleRunSimulatorCore {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     data = TeardropTurn.GenerateTemplate(h);
                 }
+                else if (partName === "tsplit") {
+                    data = TSplit.GenerateTemplate();
+                }
+                else if (partName === "tjoin") {
+                    data = TJoin.GenerateTemplate();
+                }
+                else if (partName === "cross2d") {
+                    data = Cross2D.GenerateTemplate();
+                }
                 datas[mirrorIndex] = data;
             }
 
@@ -694,6 +703,15 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "teardropTurn") {
                 partName = TeardropTurn.PropToPartName(prop);
+            }
+            else if (baseName === "tsplit") {
+                partName = TSplit.PropToPartName(prop);
+            }
+            else if (baseName === "tjoin") {
+                partName = TJoin.PropToPartName(prop);
+            }
+            else if (baseName === "cross2d") {
+                partName = Cross2D.PropToPartName(prop);
             }
 
             if (partName) {

@@ -1087,6 +1087,13 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Cross2D extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class Curb extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
@@ -1489,6 +1496,33 @@ declare namespace MarbleRunSimulatorCore {
         static GenerateTemplate(h: number, mirrorX: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class TJoin extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class TSplit extends MachinePart {
+        private _animatePivot;
+        anchor: BABYLON.Mesh;
+        pivot: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
+        clicSound: BABYLON.Sound;
+        static pivotL: number;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        private _exitLeft;
+        private _moving;
         update(dt: number): void;
     }
 }
