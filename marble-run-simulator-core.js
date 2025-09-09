@@ -179,25 +179,25 @@ var MarbleRunSimulatorCore;
                 this.renderOutline = false;
                 this.positionZeroGhost.visibility = 0.5;
                 this.positionZeroGhost.renderOutline = true;
-                this.positionZeroGhost.outlineWidth = 0.0005;
-                this.positionZeroGhost.outlineColor.copyFromFloats(0.6, 0.6, 0.6);
+                this.positionZeroGhost.outlineWidth = MarbleRunSimulatorCore.UI3DConstants.outlineWidth;
+                this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineBaseColor);
                 if (this._hovered) {
-                    this.positionZeroGhost.outlineColor.copyFromFloats(0.8, 0.8, 0.8);
+                    this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor);
                 }
                 if (this._selected) {
-                    this.positionZeroGhost.outlineColor.copyFromFloats(1, 1, 1);
+                    this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor);
                 }
             }
             else {
                 this.positionZeroGhost.visibility = 0;
                 this.renderOutline = true;
-                this.outlineWidth = 0.0005;
-                this.outlineColor.copyFromFloats(0.6, 0.6, 0.6);
+                this.outlineWidth = MarbleRunSimulatorCore.UI3DConstants.outlineWidth;
+                this.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineBaseColor);
                 if (this._hovered) {
-                    this.outlineColor.copyFromFloats(0.8, 0.8, 0.8);
+                    this.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor);
                 }
                 if (this._selected) {
-                    this.outlineColor.copyFromFloats(1, 1, 1);
+                    this.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor);
                 }
             }
         }
@@ -237,6 +237,15 @@ var MarbleRunSimulatorCore;
             this.positionZeroGhost.position.copyFrom(this.positionZero);
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
             this.updateSelectorMeshVisibility();
+            this.selectorMesh = new BallGhost(this);
+            if (IsTouchScreen) {
+                BABYLON.CreateSphereVertexData({ segments: 12, diameter: 6 * this.radius }).applyToMesh(this.selectorMesh);
+            }
+            else {
+                BABYLON.CreateSphereVertexData({ segments: 12, diameter: 4 * this.radius }).applyToMesh(this.selectorMesh);
+            }
+            this.selectorMesh.visibility = 0;
+            this.selectorMesh.parent = this.positionZeroGhost;
             this.updateFrozenStatus();
             if (!hotReload) {
                 this.reset();
@@ -3510,15 +3519,15 @@ var MarbleRunSimulatorCore;
         updateSelectorMeshVisibility() {
             if (this.selectorBodyDisplay) {
                 if (this._selected) {
-                    this.setOutlineParams(true, 0.0015, new BABYLON.Color3(0.8, 0.8, 0.8));
+                    this.setOutlineParams(true, MarbleRunSimulatorCore.UI3DConstants.outlineWidth, MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor);
                     this.selectorBodyDisplay.visibility = 0.2;
                 }
                 else if (this._hovered) {
-                    this.setOutlineParams(true, 0.0015, new BABYLON.Color3(0.5, 0.5, 0.5));
+                    this.setOutlineParams(true, MarbleRunSimulatorCore.UI3DConstants.outlineWidth, MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor);
                     this.selectorBodyDisplay.visibility = 0.1;
                 }
                 else {
-                    this.setOutlineParams(false, 0.0015, new BABYLON.Color3(0.7, 0.7, 0.7));
+                    this.setOutlineParams(false, MarbleRunSimulatorCore.UI3DConstants.outlineWidth, MarbleRunSimulatorCore.UI3DConstants.outlineBaseColor);
                     this.selectorBodyDisplay.visibility = 0;
                 }
                 this.selectorBodyDisplay.visibility = 0;
@@ -6040,6 +6049,16 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.TrackPoint = TrackPoint;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    class UI3DConstants {
+    }
+    UI3DConstants.outlineWidth = 0.0015;
+    UI3DConstants.outlineBaseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+    UI3DConstants.outlineHoverColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+    UI3DConstants.outlineSelectedColor = new BABYLON.Color3(1, 1, 1);
+    MarbleRunSimulatorCore.UI3DConstants = UI3DConstants;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 /// <reference path="Track.ts"/>
 var MarbleRunSimulatorCore;
@@ -12775,7 +12794,6 @@ var MarbleRunSimulatorCore;
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "start";
             template.h = 0;
-            template.xMirrorable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
@@ -13210,7 +13228,6 @@ var MarbleRunSimulatorCore;
             template.h = h;
             template.minH = 1;
             template.hExtendableOnY = true;
-            template.xMirrorable = true;
             template.maxAngle = Math.PI / 8;
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();

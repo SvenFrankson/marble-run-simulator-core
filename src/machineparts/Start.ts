@@ -18,8 +18,6 @@ namespace MarbleRunSimulatorCore {
             template.partName = "start";
             template.h = 0;
 
-            template.xMirrorable = true;
-
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),

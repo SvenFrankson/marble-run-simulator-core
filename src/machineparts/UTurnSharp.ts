@@ -29,7 +29,6 @@ namespace MarbleRunSimulatorCore {
             template.minH = 1;
 
             template.hExtendableOnY = true;
-            template.xMirrorable = true;
 
             template.maxAngle = Math.PI / 8;
 

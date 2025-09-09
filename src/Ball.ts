@@ -103,6 +103,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
         public positionZeroGhost: BABYLON.Mesh;
+        public selectorMesh: BABYLON.Mesh;
 
         public get materialIndex(): number {
             return this._materialIndex;
@@ -192,28 +193,28 @@ namespace MarbleRunSimulatorCore {
                 this.positionZeroGhost.visibility = 0.5;
 
                 this.positionZeroGhost.renderOutline = true;
-                this.positionZeroGhost.outlineWidth = 0.0005;
-                this.positionZeroGhost.outlineColor.copyFromFloats(0.6, 0.6, 0.6);
+                this.positionZeroGhost.outlineWidth = UI3DConstants.outlineWidth;
+                this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineBaseColor);
               
                 if (this._hovered) {
-                    this.positionZeroGhost.outlineColor.copyFromFloats(0.8, 0.8, 0.8);
+                    this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineHoverColor);
                 }
                 if (this._selected) {
-                    this.positionZeroGhost.outlineColor.copyFromFloats(1, 1, 1);
+                    this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineSelectedColor);
                 }
             }
             else {
                 this.positionZeroGhost.visibility = 0;
 
                 this.renderOutline = true;
-                this.outlineWidth = 0.0005;
-                this.outlineColor.copyFromFloats(0.6, 0.6, 0.6);
+                this.outlineWidth = UI3DConstants.outlineWidth;
+                this.outlineColor.copyFrom(UI3DConstants.outlineBaseColor);
               
                 if (this._hovered) {
-                    this.outlineColor.copyFromFloats(0.8, 0.8, 0.8);
+                    this.outlineColor.copyFrom(UI3DConstants.outlineHoverColor);
                 }
                 if (this._selected) {
-                    this.outlineColor.copyFromFloats(1, 1, 1);
+                    this.outlineColor.copyFrom(UI3DConstants.outlineSelectedColor);
                 }
             }
         }
@@ -257,6 +258,16 @@ namespace MarbleRunSimulatorCore {
             this.positionZeroGhost.position.copyFrom(this.positionZero);
             this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
             this.updateSelectorMeshVisibility();
+
+            this.selectorMesh = new BallGhost(this);
+            if (IsTouchScreen) {
+                BABYLON.CreateSphereVertexData({ segments: 12, diameter: 6 * this.radius }).applyToMesh(this.selectorMesh);
+            }
+            else {
+                BABYLON.CreateSphereVertexData({ segments: 12, diameter: 4 * this.radius }).applyToMesh(this.selectorMesh);
+            }
+            this.selectorMesh.visibility = 0;
+            this.selectorMesh.parent = this.positionZeroGhost;
 
             this.updateFrozenStatus();
 

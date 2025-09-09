@@ -891,15 +891,15 @@ namespace MarbleRunSimulatorCore {
         public updateSelectorMeshVisibility(): void {
             if (this.selectorBodyDisplay) {
                 if (this._selected) {
-                    this.setOutlineParams(true, 0.0015, new BABYLON.Color3(0.8, 0.8, 0.8));
+                    this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineSelectedColor);
                     this.selectorBodyDisplay.visibility = 0.2;
                 }
                 else if (this._hovered) {
-                    this.setOutlineParams(true, 0.0015, new BABYLON.Color3(0.5, 0.5, 0.5));
+                    this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineHoverColor);
                     this.selectorBodyDisplay.visibility = 0.1;
                 }
                 else {
-                    this.setOutlineParams(false, 0.0015, new BABYLON.Color3(0.7, 0.7, 0.7));
+                    this.setOutlineParams(false, UI3DConstants.outlineWidth, UI3DConstants.outlineBaseColor);
                     this.selectorBodyDisplay.visibility = 0;
                 }
                 this.selectorBodyDisplay.visibility = 0;

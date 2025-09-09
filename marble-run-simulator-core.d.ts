@@ -49,6 +49,7 @@ declare namespace MarbleRunSimulatorCore {
         get showPositionZeroGhost(): boolean;
         setShowPositionZeroGhost(v: boolean): void;
         positionZeroGhost: BABYLON.Mesh;
+        selectorMesh: BABYLON.Mesh;
         get materialIndex(): number;
         set materialIndex(v: number);
         setPositionZero(p: BABYLON.Vector3): void;
@@ -897,6 +898,14 @@ declare namespace MarbleRunSimulatorCore {
         constructor(template: TrackTemplate, position: BABYLON.Vector3, dir?: BABYLON.Vector3, normal?: BABYLON.Vector3, tangentIn?: number, tangentOut?: number);
         setDir(dir: BABYLON.Vector3): void;
         isFirstOrLast(): boolean;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class UI3DConstants {
+        static outlineWidth: number;
+        static outlineBaseColor: BABYLON.Color3;
+        static outlineHoverColor: BABYLON.Color3;
+        static outlineSelectedColor: BABYLON.Color3;
     }
 }
 declare namespace MarbleRunSimulatorCore {
