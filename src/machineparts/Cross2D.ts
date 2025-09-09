@@ -25,10 +25,6 @@ namespace MarbleRunSimulatorCore {
             let n = new BABYLON.Vector3(0, 1, 0);
             n.normalize();
 
-            let dirJoin = Tools.V3Dir(-120);
-            let nJoin = Tools.V3Dir(-30);
-            let pEnd = new BABYLON.Vector3(0.01, -tileHeight * 0.3, 0);
-
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].trackpoints = [
                 new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-tileWidth * 0.5, 0, 0), Tools.V3Dir(90)),
