@@ -288,9 +288,9 @@ namespace MarbleRunSimulatorCore {
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
-                    if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.05) {
+                    if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.02) {
                         let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivot.getWorldMatrix().clone().invert());
-                        if (local.y < ball.radius * 0.9) {
+                        if (local.y < ball.radius * 0.9 && Math.abs(local.z) < 0.001) {
                             if (this._exitLeft && local.x > ball.radius * 0.5 && local.x < Split.pivotL) {
                                 this._moving = true;
                                 setTimeout(() => {

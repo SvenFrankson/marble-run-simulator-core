@@ -13376,9 +13376,9 @@ var MarbleRunSimulatorCore;
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
-                    if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.05) {
+                    if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.02) {
                         let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivot.getWorldMatrix().clone().invert());
-                        if (local.y < ball.radius * 0.9) {
+                        if (local.y < ball.radius * 0.9 && Math.abs(local.z) < 0.001) {
                             if (this._exitLeft && local.x > ball.radius * 0.5 && local.x < MarbleRunSimulatorCore.Split.pivotL) {
                                 this._moving = true;
                                 setTimeout(() => {
@@ -13429,22 +13429,22 @@ var MarbleRunSimulatorCore;
             template.partName = "teardropTurn_" + h.toFixed(0);
             template.h = h;
             template.hExtendableOnY = true;
-            template.maxH = 4;
+            template.maxH = 8;
+            template.minH = 1;
             let r = 2 * MarbleRunSimulatorCore.tileSize;
             let r2 = r / Math.SQRT2;
-            let cX = 4 * MarbleRunSimulatorCore.tileSize;
+            let cX = 3 * MarbleRunSimulatorCore.tileSize;
             template.maxAngle = Math.PI / 6;
             template.defaultAngle = Math.PI / 8;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r2, MarbleRunSimulatorCore.tileHeight * 0.5, r2), new BABYLON.Vector3(1, 0, 1).normalize()),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, MarbleRunSimulatorCore.tileHeight * 0.5, r), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, MarbleRunSimulatorCore.tileHeight * 0.5, r), (new BABYLON.Vector3(1, 0.1, 0)).normalize()),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r2, MarbleRunSimulatorCore.tileHeight * 0.5, r2)),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r, MarbleRunSimulatorCore.tileHeight * 0.5, 0)),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r2, MarbleRunSimulatorCore.tileHeight * 0.5, -r2)),
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, MarbleRunSimulatorCore.tileHeight * 0.5, -r), MarbleRunSimulatorCore.Tools.V3Dir(-90))
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, MarbleRunSimulatorCore.tileHeight * 0.5, -r), (new BABYLON.Vector3(-1, 0.1, 0)).normalize())
             ];
             for (let h = 1; h < template.h; h++) {
                 template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r2, MarbleRunSimulatorCore.tileHeight * 0.5, -r2)));
@@ -13454,10 +13454,13 @@ var MarbleRunSimulatorCore;
                 template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r2, MarbleRunSimulatorCore.tileHeight * 0.5, r2)));
                 template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r, MarbleRunSimulatorCore.tileHeight * 0.5, 0)));
                 template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX + r2, MarbleRunSimulatorCore.tileHeight * 0.5, -r2)));
-                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, MarbleRunSimulatorCore.tileHeight * 0.5, -r)));
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX, MarbleRunSimulatorCore.tileHeight * 0.5, -r), (new BABYLON.Vector3(-1, 0.1, 0)).normalize()));
             }
-            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r2, MarbleRunSimulatorCore.tileHeight * 0.5, -r2), new BABYLON.Vector3(-1, 0, 1).normalize()));
-            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, MarbleRunSimulatorCore.tileHeight, 0), MarbleRunSimulatorCore.Tools.V3Dir(-90), MarbleRunSimulatorCore.Tools.V3Dir(0)));
+            //template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(cX - r2, tileHeight * 0.5, -r2), new BABYLON.Vector3(- 1, 0, 1).normalize()));
+            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, MarbleRunSimulatorCore.tileHeight, 0), MarbleRunSimulatorCore.Tools.V3Dir(-90)));
+            template.trackTemplates[0].onNormalEvaluated = (n) => {
+                n.copyFromFloats(0, 1, 0);
+            };
             let hermite = (x) => {
                 let y = (3 * Math.pow(2 * x, 2) - Math.pow(2 * x, 3)) / 4;
                 return y;
@@ -13470,7 +13473,9 @@ var MarbleRunSimulatorCore;
             let totalLength = summedLength[summedLength.length - 1];
             for (let n = 0; n < template.trackTemplates[0].trackpoints.length; n++) {
                 let f = summedLength[n] / totalLength;
-                //f = hermite(f);
+                if (template.h <= 2) {
+                    f = hermite(f);
+                }
                 template.trackTemplates[0].trackpoints[n].position.y = f * template.h * MarbleRunSimulatorCore.tileHeight;
             }
             template.initialize();
