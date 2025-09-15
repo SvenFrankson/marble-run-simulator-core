@@ -72,9 +72,9 @@ namespace MarbleRunSimulatorCore {
             template.partName = "end";
             template.l = 2;
 
-            template.mirrorX = mirrorX;
+            template.mirror = mirrorX;
 
-            template.xMirrorable = true;
+            template.mirrorable = true;
 
             template.maxAngle = Math.PI / 16;
 
@@ -102,7 +102,7 @@ namespace MarbleRunSimulatorCore {
                 new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + 0.012, y0, 0), Tools.V3Dir(90)),
                 new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w - r, y0, 0), Tools.V3Dir(90)),
                 new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w, y0 + r, 0), Tools.V3Dir(0)),
-                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w, y0 + 1.8 * r, 0), Tools.V3Dir(0), Tools.V3Dir(-90)),
+                new TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(x0 + w, 2 * tileHeight, 0), Tools.V3Dir(0), Tools.V3Dir(-90)),
             ];
             template.trackTemplates[1].drawStartTip = true;
             template.trackTemplates[1].drawEndTip = true;

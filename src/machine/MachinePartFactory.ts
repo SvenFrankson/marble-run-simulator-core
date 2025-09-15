@@ -43,7 +43,10 @@ namespace MarbleRunSimulatorCore {
         "teardropTurn",
         "tsplit",
         "tjoin",
-        "cross2d"
+        "cross2d",
+        "bitsplit",
+        "dropside",
+        "dropback"
     ];
 
     export interface IMachinePartProp {
@@ -436,6 +439,25 @@ namespace MarbleRunSimulatorCore {
             if (partName === "cross2d") {
                 return new Cross2D(this.machine, prop);
             }
+            if (partName === "bitsplit") {
+                return new BitSplit(this.machine, prop);
+            }
+            if (partName === "dropside" || partName.startsWith("dropside_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    prop.h = h;
+                }
+                return new DropSide(this.machine, prop);
+            }
+            if (partName === "dropback" || partName.startsWith("dropback_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    prop.h = h;
+                }
+                return new DropBack(this.machine, prop);
+            }
         }
 
         public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
@@ -576,6 +598,15 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "cross2d") {
                 return new Cross2D(this.machine, prop);
+            }
+            if (baseName === "bitsplit") {
+                return new BitSplit(this.machine, prop);
+            }
+            if (baseName === "dropside") {
+                return new DropSide(this.machine, prop);
+            }
+            if (baseName === "dropback") {
+                return new DropBack(this.machine, prop);
             }
         }
     }

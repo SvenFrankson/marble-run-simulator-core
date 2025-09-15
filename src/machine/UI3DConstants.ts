@@ -1,6 +1,8 @@
 namespace MarbleRunSimulatorCore {
     export class UI3DConstants {
 
+        public static logicColliderVisibility: number = 0.2;
+        public static logicColliderIsVisible: boolean = true;
         public static outlineWidth: number = 0.0015;
         public static outlineBaseColor: BABYLON.Color3 = new BABYLON.Color3(0.4, 0.4, 0.4);
         public static outlineHoverColor: BABYLON.Color3 = new BABYLON.Color3(0.6, 0.6, 0.6);

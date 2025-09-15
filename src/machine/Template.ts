@@ -292,7 +292,7 @@ namespace MarbleRunSimulatorCore {
         public d: number = 1;
         public n: number = 1;
         public s: number = TrackSpeed.Medium;
-        public mirrorX: boolean = false;
+        public mirror: boolean = false;
         public mirrorZ: boolean = false;
         public angleSmoothSteps: number = 30;
         public defaultAngle: number = 0;
@@ -323,7 +323,7 @@ namespace MarbleRunSimulatorCore {
         public maxN: number = 35;
         public minS: number = 0;
         public maxS: number = 3;
-        public xMirrorable: boolean = false;
+        public mirrorable: boolean = false;
         public zMirrorable: boolean = false;
         public hasOriginDestinationHandles: boolean = false;
         public getWidthForDepth: (d: number) => number;
@@ -362,8 +362,8 @@ namespace MarbleRunSimulatorCore {
 
         constructor(public machine: Machine) {}
 
-        public getTemplate(partName: string, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate {
-            let mirrorIndex = (mirrorX ? 0 : 1) + (mirrorZ ? 0 : 2);
+        public getTemplate(partName: string, mirror?: boolean, mirrorZ?: boolean): MachinePartTemplate {
+            let mirrorIndex = (mirror ? 0 : 1) + (mirrorZ ? 0 : 2);
             let data: MachinePartTemplate;
             let datas = this._dictionary.get(partName);
             if (datas && datas[mirrorIndex]) {
@@ -421,7 +421,7 @@ namespace MarbleRunSimulatorCore {
                     if (isNaN(s)) {
                         s = 2;
                     }
-                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, s, mirrorX, mirrorZ);
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, s, mirror, mirrorZ);
                 }
                 else if (partName.startsWith("rampv2_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
@@ -461,7 +461,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName.startsWith("steamelevator_")) {
                     let h = parseInt(partName.split("_")[1]);
-                    data = SteamElevator.GenerateTemplate(h, mirrorX);
+                    data = SteamElevator.GenerateTemplate(h, mirror);
                 }
                 else if (partName.startsWith("shooter_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
@@ -485,16 +485,16 @@ namespace MarbleRunSimulatorCore {
                     data = ForwardSplit.GenerateTemplate(mirrorZ);
                 }
                 else if (partName === "sort") {
-                    data = Sort.GenerateTemplate(mirrorX, mirrorZ);
+                    data = Sort.GenerateTemplate(mirror, mirrorZ);
                 }
                 else if (partName === "controlerLegacy") {
-                    data = Controler_Legacy.GenerateTemplate(mirrorX);
+                    data = Controler_Legacy.GenerateTemplate(mirror);
                 }
                 else if (partName === "controler") {
-                    data = Controler.GenerateTemplate(mirrorX);
+                    data = Controler.GenerateTemplate(mirror);
                 }
                 else if (partName === "spawner") {
-                    data = Spawner.GenerateTemplate(mirrorX);
+                    data = Spawner.GenerateTemplate(mirror);
                 }
                 else if (partName === "flatjoin") {
                     data = FlatJoin.GenerateTemplate();
@@ -504,7 +504,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (partName.startsWith("multiJoin_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
-                    data = MultiJoin.GenerateTemplate(l, mirrorX);
+                    data = MultiJoin.GenerateTemplate(l, mirror);
                 }
                 else if (partName.startsWith("loop_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
@@ -523,23 +523,23 @@ namespace MarbleRunSimulatorCore {
                     data = SpiralUTurn.GenerateTemplate(l, h);
                 }
                 else if (partName === "quarter") {
-                    data = QuarterNote.GenerateTemplate(mirrorX);
+                    data = QuarterNote.GenerateTemplate(mirror);
                 }
                 else if (partName === "double") {
-                    data = DoubleNote.GenerateTemplate(mirrorX);
+                    data = DoubleNote.GenerateTemplate(mirror);
                 }
                 else if (partName === "start") {
                     data = Start.GenerateTemplate();
                 }
                 else if (partName === "end") {
-                    data = End.GenerateTemplate(mirrorX);
+                    data = End.GenerateTemplate(mirror);
                 }
                 else if (partName.startsWith("jumper_")) {
                     let n = parseInt(partName.split("_")[1].split(".")[0]);
                     data = Jumper.GenerateTemplate(n);
                 }
                 else if (partName === "gravitywell") {
-                    data = GravityWell.GenerateTemplate(mirrorX);
+                    data = GravityWell.GenerateTemplate(mirror);
                 }
                 else if (partName === "screen") {
                     data = Screen.GenerateTemplate();
@@ -567,13 +567,24 @@ namespace MarbleRunSimulatorCore {
                     data = TeardropTurn.GenerateTemplate(h);
                 }
                 else if (partName === "tsplit") {
-                    data = TSplit.GenerateTemplate();
+                    data = TSplit.GenerateTemplate(mirror);
                 }
                 else if (partName === "tjoin") {
                     data = TJoin.GenerateTemplate();
                 }
                 else if (partName === "cross2d") {
                     data = Cross2D.GenerateTemplate();
+                }
+                else if (partName === "bitsplit") {
+                    data = BitSplit.GenerateTemplate(mirror);
+                }
+                else if (partName.startsWith("dropside_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = DropSide.GenerateTemplate(h, mirror);
+                }
+                else if (partName.startsWith("dropback_")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = DropBack.GenerateTemplate(h);
                 }
                 datas[mirrorIndex] = data;
             }
@@ -712,6 +723,15 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "cross2d") {
                 partName = Cross2D.PropToPartName(prop);
+            }
+            else if (baseName === "bitsplit") {
+                partName = BitSplit.PropToPartName(prop);
+            }
+            else if (baseName === "dropside") {
+                partName = DropSide.PropToPartName(prop);
+            }
+            else if (baseName === "dropback") {
+                partName = DropBack.PropToPartName(prop);
             }
 
             if (partName) {

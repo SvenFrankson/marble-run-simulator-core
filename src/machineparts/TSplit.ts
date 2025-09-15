@@ -16,7 +16,7 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
             this.setColorCount(5);
 
-            this.setTemplate(this.machine.templateManager.getTemplate(TSplit.PropToPartName(prop)));
+            this.setTemplate(this.machine.templateManager.getTemplate(TSplit.PropToPartName(prop), prop.mirrorX, prop.mirrorZ));
 
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -112,7 +112,7 @@ namespace MarbleRunSimulatorCore {
                 "z",
                 () => {
                     if (!this.machine.playing) {
-                        this.pivot.rotation.z = (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
+                        this.pivot.rotation.z = (this.mirrorX ? - 1 : 1) * Math.PI / 4;
                     }
                     this.pivot.freezeWorldMatrix();
                     this.pivot.getChildMeshes().forEach((child) => {
@@ -165,7 +165,7 @@ namespace MarbleRunSimulatorCore {
             this.pivot.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
         }
 
-        public static GenerateTemplate() {
+        public static GenerateTemplate(mirror: boolean) {
             let template = new MachinePartTemplate();
 
             template.partName = "tsplit";
@@ -173,6 +173,8 @@ namespace MarbleRunSimulatorCore {
             template.l = 1;
             template.h = 1;
             template.d = 3;
+            template.mirror = mirror;
+            template.mirrorable = true;
 
             template.maxAngle = Math.PI / 16;
 
@@ -268,17 +270,14 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
-            this._exitLeft = !this.mirrorX && !this.mirrorZ;
+            this._exitLeft = !this.mirrorX;
             this._moving = false;
-            if (this.mirrorX) {
-                this.pivot.rotation.z = - (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
-            } else {
-                this.pivot.rotation.z = (this.mirrorZ ? - 1 : 1) * Math.PI / 4;
-            }
+            this.pivot.rotation.z = (this.mirrorX ? - 1 : 1) * Math.PI / 4;
             this.pivot.freezeWorldMatrix();
             this.pivot.getChildMeshes().forEach((child) => {
                 child.freezeWorldMatrix();
             });
+            this.recomputeAbsolutePath();
         };
  
         private _exitLeft: boolean = true;
@@ -288,31 +287,34 @@ namespace MarbleRunSimulatorCore {
             if (!this._moving) {
                 for (let i = 0; i < this.machine.balls.length; i++) {
                     let ball = this.machine.balls[i];
-                    if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.02) {
+                    if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 2 * ball.radius) {
                         let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivot.getWorldMatrix().clone().invert());
-                        if (local.y < ball.radius * 0.9 && Math.abs(local.z) < 0.001) {
-                            if (this._exitLeft && local.x > ball.radius * 0.5 && local.x < Split.pivotL) {
-                                this._moving = true;
-                                setTimeout(() => {
-                                    this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
-                                        this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
-                                        this.clicSound.play()
-                                        this._moving = false;
-                                        this._exitLeft = false;
-                                    });
-                                }, 150 / this.game.currentTimeFactor)
-                                return;
-                            } else if (!this._exitLeft && local.x > -Split.pivotL && local.x < -ball.radius * 0.5) {
-                                this._moving = true;
-                                setTimeout(() => {
-                                    this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
-                                        this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
-                                        this.clicSound.play();
-                                        this._moving = false;
-                                        this._exitLeft = true;
-                                    });
-                                }, 150 / this.game.currentTimeFactor)
-                                return;
+                        if (local.y < ball.radius && Math.abs(local.z) < ball.radius) {
+                            if (ball.velocity.length() < 0.5) {
+                                if (this._exitLeft && local.x > 0) {
+                                    this._moving = true;
+                                    setTimeout(() => {
+                                        this._animatePivot(-Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                            this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
+                                            this.clicSound.play()
+                                            this._moving = false;
+                                            this._exitLeft = false;
+                                        });
+                                    }, 150 / this.game.currentTimeFactor)
+                                    return;
+                                } else if (!this._exitLeft && local.x < 0) {
+                                    console.log("d");
+                                    this._moving = true;
+                                    setTimeout(() => {
+                                        this._animatePivot(Math.PI / 4, 0.3 / this.game.currentTimeFactor).then(() => {
+                                            this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
+                                            this.clicSound.play();
+                                            this._moving = false;
+                                            this._exitLeft = true;
+                                        });
+                                    }, 150 / this.game.currentTimeFactor)
+                                    return;
+                                }
                             }
                         }
                     }

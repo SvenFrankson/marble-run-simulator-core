@@ -179,11 +179,11 @@ namespace MarbleRunSimulatorCore {
             template.partName = "steamelevator_" + h.toFixed(0);
             template.l = 2;
             template.h = h;
-            template.mirrorX = mirrorX;
+            template.mirror = mirrorX;
 
             template.minH = 3;
             template.yExtendable = true;
-            template.xMirrorable = true;
+            template.mirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();

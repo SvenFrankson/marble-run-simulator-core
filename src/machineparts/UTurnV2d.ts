@@ -31,7 +31,7 @@ namespace MarbleRunSimulatorCore {
             template.h = h;
             template.d = d;
             template.s = s;
-            template.mirrorX = mirrorX; 
+            template.mirror = mirrorX; 
             template.mirrorZ = mirrorZ;
 
             template.yExtendable = true;
@@ -40,7 +40,7 @@ namespace MarbleRunSimulatorCore {
                 template.sExtendable = true;
             }
             template.minD = 2;
-            template.xMirrorable = true;
+            template.mirrorable = true;
             template.zMirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);

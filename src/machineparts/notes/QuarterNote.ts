@@ -51,9 +51,9 @@ namespace MarbleRunSimulatorCore {
             template.partName = "quarter";
             template.h = 1;
 
-            template.mirrorX = mirrorX;
+            template.mirror = mirrorX;
 
-            template.xMirrorable = true;
+            template.mirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();
@@ -159,9 +159,9 @@ namespace MarbleRunSimulatorCore {
             template.partName = "double";
             template.h = 1;
 
-            template.mirrorX = mirrorX;
+            template.mirror = mirrorX;
 
-            template.xMirrorable = true;
+            template.mirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();

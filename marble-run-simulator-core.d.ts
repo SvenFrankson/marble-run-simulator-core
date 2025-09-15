@@ -615,7 +615,7 @@ declare namespace MarbleRunSimulatorCore {
         get maxN(): number;
         get minS(): number;
         get maxS(): number;
-        get xMirrorable(): boolean;
+        get mirrorable(): boolean;
         get zMirrorable(): boolean;
         get hasOriginDestinationHandles(): boolean;
         getIsNaNOrValidWHD(w?: number, h?: number, d?: number): boolean;
@@ -830,7 +830,7 @@ declare namespace MarbleRunSimulatorCore {
         d: number;
         n: number;
         s: number;
-        mirrorX: boolean;
+        mirror: boolean;
         mirrorZ: boolean;
         angleSmoothSteps: number;
         defaultAngle: number;
@@ -859,7 +859,7 @@ declare namespace MarbleRunSimulatorCore {
         maxN: number;
         minS: number;
         maxS: number;
-        xMirrorable: boolean;
+        mirrorable: boolean;
         zMirrorable: boolean;
         hasOriginDestinationHandles: boolean;
         getWidthForDepth: (d: number) => number;
@@ -878,7 +878,7 @@ declare namespace MarbleRunSimulatorCore {
         machine: Machine;
         private _dictionary;
         constructor(machine: Machine);
-        getTemplate(partName: string, mirrorX?: boolean, mirrorZ?: boolean): MachinePartTemplate;
+        getTemplate(partName: string, mirror?: boolean, mirrorZ?: boolean): MachinePartTemplate;
         getTemplateByProp(baseName: string, prop: IMachinePartProp): MachinePartTemplate;
     }
 }
@@ -902,6 +902,8 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class UI3DConstants {
+        static logicColliderVisibility: number;
+        static logicColliderIsVisible: boolean;
         static outlineWidth: number;
         static outlineBaseColor: BABYLON.Color3;
         static outlineHoverColor: BABYLON.Color3;
@@ -1041,6 +1043,26 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class BitSplit extends MachinePart {
+        private _animatePivot;
+        pivot: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
+        clicSound: BABYLON.Sound;
+        static pivotL: number;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(mirror: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        onPositionChanged(): void;
+        private _exitLeft;
+        private _moving;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class Controler extends MachinePart {
         private _animatePivot;
         pivotPass: BABYLON.Mesh;
@@ -1098,6 +1120,26 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class DropBack extends MachinePart {
+        shieldConnector: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(h: number): MachinePartTemplate;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class DropSide extends MachinePart {
+        shieldConnector: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(h: number, mirror: boolean): MachinePartTemplate;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1428,6 +1470,7 @@ declare namespace MarbleRunSimulatorCore {
         static GenerateTemplate(mirror: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
+        onPositionChanged(): void;
         private _exitLeft;
         private _moving;
         update(dt: number): void;
@@ -1518,7 +1561,7 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
-        static GenerateTemplate(): MachinePartTemplate;
+        static GenerateTemplate(mirror: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;
         private _exitLeft;

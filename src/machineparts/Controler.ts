@@ -152,9 +152,9 @@ namespace MarbleRunSimulatorCore {
             template.l = 1;
             template.h = 1;
             template.d = 2;
-            template.mirrorX = mirrorX;
+            template.mirror = mirrorX;
 
-            template.xMirrorable = true;
+            template.mirrorable = true;
 
             let dir = new BABYLON.Vector3(1, 0, 0);
             dir.normalize();

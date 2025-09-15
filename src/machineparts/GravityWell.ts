@@ -63,9 +63,9 @@ namespace MarbleRunSimulatorCore {
             template.d = 3;
             template.partName = "gravitywell";
 
-            template.mirrorX = mirrorX;
+            template.mirror = mirrorX;
 
-            template.xMirrorable = true;
+            template.mirrorable = true;
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;

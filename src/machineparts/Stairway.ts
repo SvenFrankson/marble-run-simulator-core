@@ -369,7 +369,6 @@ namespace MarbleRunSimulatorCore {
         }
 
         public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
-            console.log("plouf !");
             let p0 = new BABYLON.Vector3(-tileWidth * 0.5, 0, 0);
             p0.x += tileSize * 0.5;
             let p1 = new BABYLON.Vector3((this.l - 3) * tileSize + tileWidth * 0.5, tileHeight * this.h, 0);

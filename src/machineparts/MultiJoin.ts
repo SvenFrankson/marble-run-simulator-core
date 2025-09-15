@@ -21,7 +21,7 @@ namespace MarbleRunSimulatorCore {
 
             template.l = l;
             template.lExtendableOnX = true;
-            template.mirrorX = mirrorX;
+            template.mirror = mirrorX;
 
             let xLeft = - tileSize * 1.5;
             let xRight = tileSize * l + 0.01;
