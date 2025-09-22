@@ -1181,13 +1181,15 @@ namespace MarbleRunSimulatorCore {
                             Mummu.TranslateVertexDataInPlace(endpointDisplayVertexData, dir.scale(- 0.009));
                         }
                         endpointDisplayVertexData.applyToMesh(selectorEndpoint);
-                        selectorEndpoint.visibility = 0;
+                        selectorEndpoint.isVisible = UI3DConstants.logicColliderIsVisible;
+                        selectorEndpoint.visibility = UI3DConstants.logicColliderVisibility;
                         this.selectorEndpointsDisplay.push(selectorEndpoint);
                         
                         let selectorOriginMeshLogic = new EndpointSelectorMesh(endPoint);
                         selectorOriginMeshLogic.material = this.game.materials.whiteFullLitMaterial;
                         selectorOriginMeshLogic.position = endPoint.localPosition;
                         selectorOriginMeshLogic.parent = this;
+                        selectorOriginMeshLogic.isVisible = UI3DConstants.logicColliderIsVisible;
                         selectorOriginMeshLogic.visibility = UI3DConstants.logicColliderVisibility;
                         let endpointLogicVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 2 * selectorHullShapeLogicR - 0.001, arc: 1 });
                         if (this.visibleWidth <= 1 && this.visibleDepth <= 1) {
@@ -1212,13 +1214,15 @@ namespace MarbleRunSimulatorCore {
                             Mummu.TranslateVertexDataInPlace(endpointDisplayVertexData, dir.scale(- 0.009));
                         }
                         endpointDisplayVertexData.applyToMesh(selectorEndpoint);
-                        selectorEndpoint.visibility = 0;
+                        selectorEndpoint.isVisible = UI3DConstants.logicColliderIsVisible;
+                        selectorEndpoint.visibility = UI3DConstants.logicColliderVisibility;
                         this.selectorEndpointsDisplay.push(selectorEndpoint);
                         
                         let selectorEndpointLogicMesh = new EndpointSelectorMesh(endPoint);
                         selectorEndpointLogicMesh.material = this.game.materials.whiteFullLitMaterial;
                         selectorEndpointLogicMesh.position = endPoint.localPosition;
                         selectorEndpointLogicMesh.parent = this;
+                        selectorEndpointLogicMesh.isVisible = UI3DConstants.logicColliderIsVisible;
                         selectorEndpointLogicMesh.visibility = UI3DConstants.logicColliderVisibility;
                         let endpointLogicVertexData = BABYLON.CreateSphereVertexData({ segments: 12, diameter: 2 * selectorHullShapeLogicR - 0.001 });
                         if (this.visibleWidth <= 1 && this.visibleDepth <= 1) {
@@ -1263,6 +1267,7 @@ namespace MarbleRunSimulatorCore {
             if (selectorMeshLogicVertexDatas.length > 0) {
                 Mummu.MergeVertexDatas(...selectorMeshLogicVertexDatas).applyToMesh(this.selectorBodyLogic);
             }
+            this.selectorBodyLogic.isVisible = UI3DConstants.logicColliderIsVisible;
             this.selectorBodyLogic.visibility = UI3DConstants.logicColliderVisibility;
 
             if (this.machine.geometryQ > GeometryQuality.Proxy) {
