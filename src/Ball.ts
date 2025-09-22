@@ -569,6 +569,14 @@ namespace MarbleRunSimulatorCore {
                                     this.bumpSurfaceIsRail = false;
                                 }
                             }
+                            if (part instanceof DropBack || part instanceof DropSide) {
+                                let dy = this.position.y - part.position.y;
+                                if (dy > - 0.005 && dy < 0) {
+                                    this.velocity.x *= 0.5;
+                                    this.velocity.z *= 0.5;
+                                }
+                                console.log(dy.toFixed(3));
+                            }
                             if (part instanceof Stairway) {
                                 part.boxesColliders.forEach((box) => {
                                     let col = Mummu.SphereMeshIntersection(this.position, this.radius, box);

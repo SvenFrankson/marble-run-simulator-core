@@ -10,8 +10,8 @@ namespace MarbleRunSimulatorCore {
 
             this.setTemplate(this.machine.templateManager.getTemplate(DropBack.PropToPartName(prop)));
 
-            let rShield = 0.009;
-            let hShield = 0.007;
+            let rShield = 0.0095;
+            let hShield = 0.008;
 
             let shieldWire = new Wire(this);
             shieldWire.colorIndex = 0;
@@ -76,7 +76,7 @@ namespace MarbleRunSimulatorCore {
             template.minH = 1;
             template.maxH = 4;
 
-            let r = 0.008;
+            let r = 0.009;
 
             template.trackTemplates[0] = new TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
@@ -99,8 +99,8 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[1].trackpoints = [
                 new TrackPoint(
                     template.trackTemplates[1],
-                    new BABYLON.Vector3(r, - tileHeight * template.h + 0.002, 0),
-                    (new BABYLON.Vector3(-1, -0.2, 0)).normalize()
+                    new BABYLON.Vector3(r, - tileHeight * template.h + 0.004, 0),
+                    (new BABYLON.Vector3(-1, -0.4, 0)).normalize()
                 ),
                 new TrackPoint(
                     template.trackTemplates[1],

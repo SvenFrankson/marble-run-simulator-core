@@ -505,6 +505,14 @@ var MarbleRunSimulatorCore;
                                     this.bumpSurfaceIsRail = false;
                                 }
                             }
+                            if (part instanceof MarbleRunSimulatorCore.DropBack || part instanceof MarbleRunSimulatorCore.DropSide) {
+                                let dy = this.position.y - part.position.y;
+                                if (dy > -0.005 && dy < 0) {
+                                    this.velocity.x *= 0.5;
+                                    this.velocity.z *= 0.5;
+                                }
+                                console.log(dy.toFixed(3));
+                            }
                             if (part instanceof MarbleRunSimulatorCore.Stairway) {
                                 part.boxesColliders.forEach((box) => {
                                     let col = Mummu.SphereMeshIntersection(this.position, this.radius, box);
@@ -9556,8 +9564,8 @@ var MarbleRunSimulatorCore;
             super(machine, prop);
             this.setColorCount(2);
             this.setTemplate(this.machine.templateManager.getTemplate(DropBack.PropToPartName(prop)));
-            let rShield = 0.009;
-            let hShield = 0.007;
+            let rShield = 0.0095;
+            let hShield = 0.008;
             let shieldWire = new MarbleRunSimulatorCore.Wire(this);
             shieldWire.colorIndex = 0;
             shieldWire.path = [];
@@ -9610,7 +9618,7 @@ var MarbleRunSimulatorCore;
             template.downwardYExtendable = true;
             template.minH = 1;
             template.maxH = 4;
-            let r = 0.008;
+            let r = 0.009;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[0].colorIndex = 0;
             template.trackTemplates[0].trackpoints = [
@@ -9620,7 +9628,7 @@ var MarbleRunSimulatorCore;
             template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
             template.trackTemplates[1].colorIndex = 1;
             template.trackTemplates[1].trackpoints = [
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(r, -MarbleRunSimulatorCore.tileHeight * template.h + 0.002, 0), (new BABYLON.Vector3(-1, -0.2, 0)).normalize()),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(r, -MarbleRunSimulatorCore.tileHeight * template.h + 0.004, 0), (new BABYLON.Vector3(-1, -0.4, 0)).normalize()),
                 new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileSize * 0.5, -MarbleRunSimulatorCore.tileHeight * template.h, 0), new BABYLON.Vector3(-1, 0, 0))
             ];
             template.trackTemplates[1].drawStartTip = true;
