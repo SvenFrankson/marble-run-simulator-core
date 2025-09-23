@@ -101,8 +101,8 @@ namespace MarbleRunSimulatorCore {
             template.trackTemplates[1].trackpoints = [
                 new TrackPoint(
                     template.trackTemplates[1],
-                    new BABYLON.Vector3(0, - tileHeight * template.h + 0.002, - r),
-                    (new BABYLON.Vector3(0, -0.2, 1)).normalize()
+                    new BABYLON.Vector3(0, - tileHeight * template.h + 0.004, - r),
+                    (new BABYLON.Vector3(0, -0.4, 1)).normalize()
                 ),
                 new TrackPoint(
                     template.trackTemplates[1],
