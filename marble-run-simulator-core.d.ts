@@ -356,6 +356,7 @@ declare namespace MarbleRunSimulatorCore {
         baseFPS: BABYLON.Mesh;
         fpsMaterial: BABYLON.StandardMaterial;
         fpsTexture: BABYLON.DynamicTexture;
+        limitsMesh: BABYLON.Mesh;
         baseAxis: BABYLON.Mesh;
         parts: MachinePart[];
         decors: MachineDecor[];
@@ -408,6 +409,7 @@ declare namespace MarbleRunSimulatorCore {
         baseMeshMinZ: number;
         baseMeshMaxZ: number;
         generateBaseMesh(): Promise<void>;
+        generateLimitsMesh(): void;
         regenerateBaseAxis(): void;
         setBaseIsVisible(v: boolean): void;
         getBankAt(pos: BABYLON.Vector3, exclude: MachinePart): {

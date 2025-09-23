@@ -155,6 +155,8 @@ namespace MarbleRunSimulatorCore {
         public baseFPS: BABYLON.Mesh;
         public fpsMaterial: BABYLON.StandardMaterial;
         public fpsTexture: BABYLON.DynamicTexture;
+        public limitsMesh: BABYLON.Mesh;
+
         public baseAxis: BABYLON.Mesh;
         public parts: MachinePart[] = [];
         public decors: MachineDecor[] = [];
@@ -748,6 +750,9 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 this.regenerateBaseAxis();
+                if (this.limitsMesh) {
+                    this.limitsMesh.dispose();
+                }
             }
 
             if (previousBaseMinY != this.baseMeshMinY) {
@@ -794,6 +799,22 @@ namespace MarbleRunSimulatorCore {
 
             this.ready = true;
             this.requestUpdateBaseMesh = false;
+        }
+
+        public generateLimitsMesh(): void {
+            if (this.limitsMesh) {
+                this.limitsMesh.dispose();
+            }
+            if (isFinite(this.game.gridIMin)) {
+                let min = new BABYLON.Vector3(this.game.gridIMin * tileSize, this.game.gridKMin * tileHeight, this.game.gridJMin * tileSize);
+                let max = new BABYLON.Vector3(this.game.gridIMax * tileSize, this.game.gridKMax * tileHeight, this.game.gridJMax * tileSize);
+                this.limitsMesh = Mummu.CreateLineBox("limitMesh", {
+                    width: max.x - min.x + tileSize,
+                    height: max.y - min.y + tileHeight,
+                    depth: max.z - min.z + tileSize,
+                })
+                this.limitsMesh.position.copyFrom(min).addInPlace(max).scaleInPlace(0.5);
+            }
         }
 
         public regenerateBaseAxis(): void {

@@ -2312,6 +2312,9 @@ var MarbleRunSimulatorCore;
                     this.baseFPS.material = this.fpsMaterial;
                 }
                 this.regenerateBaseAxis();
+                if (this.limitsMesh) {
+                    this.limitsMesh.dispose();
+                }
             }
             if (previousBaseMinY != this.baseMeshMinY) {
                 for (let i = 0; i < this.parts.length; i++) {
@@ -2353,6 +2356,21 @@ var MarbleRunSimulatorCore;
             }
             this.ready = true;
             this.requestUpdateBaseMesh = false;
+        }
+        generateLimitsMesh() {
+            if (this.limitsMesh) {
+                this.limitsMesh.dispose();
+            }
+            if (isFinite(this.game.gridIMin)) {
+                let min = new BABYLON.Vector3(this.game.gridIMin * MarbleRunSimulatorCore.tileSize, this.game.gridKMin * MarbleRunSimulatorCore.tileHeight, this.game.gridJMin * MarbleRunSimulatorCore.tileSize);
+                let max = new BABYLON.Vector3(this.game.gridIMax * MarbleRunSimulatorCore.tileSize, this.game.gridKMax * MarbleRunSimulatorCore.tileHeight, this.game.gridJMax * MarbleRunSimulatorCore.tileSize);
+                this.limitsMesh = Mummu.CreateLineBox("limitMesh", {
+                    width: max.x - min.x + MarbleRunSimulatorCore.tileSize,
+                    height: max.y - min.y + MarbleRunSimulatorCore.tileHeight,
+                    depth: max.z - min.z + MarbleRunSimulatorCore.tileSize,
+                });
+                this.limitsMesh.position.copyFrom(min).addInPlace(max).scaleInPlace(0.5);
+            }
         }
         regenerateBaseAxis() {
             if (this.baseAxis) {
