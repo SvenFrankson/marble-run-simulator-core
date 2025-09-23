@@ -321,5 +321,11 @@ namespace MarbleRunSimulatorCore {
                 }
             }
         }
+
+        public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
+            let stairsSelector = BABYLON.CreateBoxVertexData({ width: 0.02, height: 0.02, depth: 0.02 });
+            Mummu.TranslateVertexDataInPlace(stairsSelector, new BABYLON.Vector3(0, - tileHeight * 0.5, 0));
+            selectorMeshLogicVertexDatas.push(stairsSelector);
+        }
     }
 }

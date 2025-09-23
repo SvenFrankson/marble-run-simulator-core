@@ -1201,6 +1201,7 @@ declare namespace MarbleRunSimulatorCore {
         private _exitLeft;
         private _moving;
         update(dt: number): void;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1474,6 +1475,7 @@ declare namespace MarbleRunSimulatorCore {
         private _exitLeft;
         private _moving;
         update(dt: number): void;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1567,6 +1569,7 @@ declare namespace MarbleRunSimulatorCore {
         private _exitLeft;
         private _moving;
         update(dt: number): void;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
