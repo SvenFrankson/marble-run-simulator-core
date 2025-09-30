@@ -6190,7 +6190,7 @@ var MarbleRunSimulatorCore;
     class UI3DConstants {
     }
     UI3DConstants.logicColliderVisibility = 0.2;
-    UI3DConstants.logicColliderIsVisible = true;
+    UI3DConstants.logicColliderIsVisible = false;
     UI3DConstants.outlineWidth = 0.0015;
     UI3DConstants.outlineBaseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
     UI3DConstants.outlineHoverColor = new BABYLON.Color3(0.6, 0.6, 0.6);
