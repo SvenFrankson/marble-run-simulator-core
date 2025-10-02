@@ -255,6 +255,7 @@ namespace MarbleRunSimulatorCore {
                         version: data.v,
                         partsCount: partCount,
                         ballsCount: ballCount,
+                        mode: data.mode
                     },
                     miniatureProps
                 );

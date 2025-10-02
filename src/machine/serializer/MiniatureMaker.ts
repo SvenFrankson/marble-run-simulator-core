@@ -5,6 +5,7 @@ namespace MarbleRunSimulatorCore {
         ballsCount?: number;
         partsCount?: number;
         backgroundColor?: string;
+        mode?: MachineConstructionMode;
     }
 
     export interface IMiniatureProps {
@@ -147,6 +148,12 @@ namespace MarbleRunSimulatorCore {
         let xProjAxis = new BABYLON.Vector2(Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
         let yProjAxis = new BABYLON.Vector2(0, 1);
         let zProjAxis = new BABYLON.Vector2(- Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
+        
+        if (data.mode === MachineConstructionMode.Mode2D) {
+            xProjAxis.copyFromFloats(1, 0);
+            zProjAxis.copyFromFloats(0, 0.2);
+            showGround = false;
+        }
 
         let vToX = (v: BABYLON.Vector3) => {
             let x = xProjAxis.x * v.x + yProjAxis.x * v.y + zProjAxis.x * v.z;
@@ -228,9 +235,11 @@ namespace MarbleRunSimulatorCore {
             let dist03 = BABYLON.Vector3.Distance(framePoints[0], framePoints[3]);
             let count01 = 10;
             let count03 = 10;
+            
             if (dist01 > dist03) {
                 count03 = Math.round(dist03 / (dist01 / count01));
             }
+
             if (dist03 > dist01) {
                 count01 = Math.round(dist01 / (dist03 / count03));
             }

@@ -6644,6 +6644,11 @@ var MarbleRunSimulatorCore;
         let xProjAxis = new BABYLON.Vector2(Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
         let yProjAxis = new BABYLON.Vector2(0, 1);
         let zProjAxis = new BABYLON.Vector2(-Math.cos(Math.PI / 6), Math.sin(Math.PI / 6));
+        if (data.mode === MarbleRunSimulatorCore.MachineConstructionMode.Mode2D) {
+            xProjAxis.copyFromFloats(1, 0);
+            zProjAxis.copyFromFloats(0, 0.2);
+            showGround = false;
+        }
         let vToX = (v) => {
             let x = xProjAxis.x * v.x + yProjAxis.x * v.y + zProjAxis.x * v.z;
             return x;
@@ -7636,6 +7641,7 @@ var MarbleRunSimulatorCore;
                     version: data.v,
                     partsCount: partCount,
                     ballsCount: ballCount,
+                    mode: data.mode
                 }, miniatureProps);
             }
             else if (machine) {

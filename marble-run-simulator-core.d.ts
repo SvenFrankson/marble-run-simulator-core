@@ -944,6 +944,7 @@ declare namespace MarbleRunSimulatorCore {
         ballsCount?: number;
         partsCount?: number;
         backgroundColor?: string;
+        mode?: MachineConstructionMode;
     }
     interface IMiniatureProps {
         size?: number;
