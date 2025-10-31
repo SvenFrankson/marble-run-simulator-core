@@ -18,7 +18,6 @@ namespace MarbleRunSimulatorCore {
 
         constructor(part: MachinePart) {
             super(part);
-            this.wires = [new Wire(this.part), new Wire(this.part)];
         }
 
         public get trackIndex(): number {

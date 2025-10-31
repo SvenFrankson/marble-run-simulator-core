@@ -941,6 +941,13 @@ namespace MarbleRunSimulatorCore {
                     wire.wireMesh.outlineColor = outlineColor;
                 }
             });
+            this.tracks.forEach(track => {
+                if (track instanceof PipeTrack && track.mesh) {
+                    track.mesh.renderOutline = renderOutline;
+                    track.mesh.outlineWidth = outlineWidth;
+                    track.mesh.outlineColor = outlineColor;
+                }
+            });
             this.outlinableMeshes.forEach(mesh => {
                 if (mesh && !mesh.isDisposed()) {
                     mesh.renderOutline = renderOutline;

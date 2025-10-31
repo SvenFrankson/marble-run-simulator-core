@@ -3591,6 +3591,13 @@ var MarbleRunSimulatorCore;
                     wire.wireMesh.outlineColor = outlineColor;
                 }
             });
+            this.tracks.forEach(track => {
+                if (track instanceof MarbleRunSimulatorCore.PipeTrack && track.mesh) {
+                    track.mesh.renderOutline = renderOutline;
+                    track.mesh.outlineWidth = outlineWidth;
+                    track.mesh.outlineColor = outlineColor;
+                }
+            });
             this.outlinableMeshes.forEach(mesh => {
                 if (mesh && !mesh.isDisposed()) {
                     mesh.renderOutline = renderOutline;
@@ -4258,8 +4265,6 @@ var MarbleRunSimulatorCore;
             }
             props.fullPartName = trackname; // hacky but work
             trackname = trackname.split("_")[0];
-            console.log("createTrackWHDN " + trackname);
-            console.log(props);
             return this.createTrack(trackname, props);
         }
         createTrack(partName, prop) {
@@ -4417,10 +4422,10 @@ var MarbleRunSimulatorCore;
             if (partName === "wooduturn" || partName.startsWith("wooduturn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let h = parseInt(argStr.split(".")[0]);
-                    let d = parseInt(argStr.split(".")[1]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
                     prop.h = h;
-                    prop.d = d;
                 }
                 prop.woodVersion = true;
                 return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
@@ -4712,7 +4717,6 @@ var MarbleRunSimulatorCore;
                 return new MarbleRunSimulatorCore.FlatJoin(this.machine, prop);
             }
             if (baseName === "split") {
-                console.log("new split " + prop.mirrorX + " " + prop.mirrorZ);
                 return new MarbleRunSimulatorCore.Split(this.machine, prop);
             }
             if (baseName === "forwardSplit") {
@@ -5034,7 +5038,6 @@ var MarbleRunSimulatorCore;
             this.tubePath = [];
             this.AABBMin = BABYLON.Vector3.Zero();
             this.AABBMax = BABYLON.Vector3.Zero();
-            this.wires = [new MarbleRunSimulatorCore.Wire(this.part), new MarbleRunSimulatorCore.Wire(this.part)];
         }
         get preferedStartBank() {
             return 0;
@@ -13332,8 +13335,8 @@ var MarbleRunSimulatorCore;
                 }
                 let box = this.boxesColliders[i];
                 let fY = (i + 0.5) / this.boxesCount;
-                box.position.y = (1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.5;
-                box.position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.5);
+                box.position.y = (1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.7;
+                box.position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.7);
                 this.boxesColliders[i].freezeWorldMatrix();
                 this.boxesColliders[i].getChildMeshes().forEach((child) => {
                     child.freezeWorldMatrix();

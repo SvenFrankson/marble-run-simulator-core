@@ -78,8 +78,6 @@ namespace MarbleRunSimulatorCore {
 
             trackname = trackname.split("_")[0];
 
-            console.log("createTrackWHDN " + trackname)
-            console.log(props);
             return this.createTrack(trackname, props);
         }
 
@@ -239,10 +237,10 @@ namespace MarbleRunSimulatorCore {
             if (partName === "wooduturn" || partName.startsWith("wooduturn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let h = parseInt(argStr.split(".")[0]);
-                    let d = parseInt(argStr.split(".")[1]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
                     prop.h = h;
-                    prop.d = d;
                 }
                 prop.woodVersion = true;
                 return new UTurn(this.machine, prop);
@@ -536,7 +534,6 @@ namespace MarbleRunSimulatorCore {
                 return new FlatJoin(this.machine, prop);
             }
             if (baseName === "split") {
-                console.log("new split " + prop.mirrorX + " " + prop.mirrorZ);
                 return new Split(this.machine, prop);
             }
             if (baseName === "forwardSplit") {
