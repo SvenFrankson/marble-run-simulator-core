@@ -346,8 +346,8 @@ namespace MarbleRunSimulatorCore {
                 let box = this.boxesColliders[i];
 
                 let fY = (i + 0.5) / this.boxesCount;
-                box.position.y = (1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.5;
-                box.position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.5);
+                box.position.y = (1 - fY) * this.y0 + fY * this.y1 - this.stepH - this.dH * 0.7;
+                box.position.y += Math.cos(a) * (this.stepH * 0.5 + this.dH * 0.7);
                 this.boxesColliders[i].freezeWorldMatrix();
                 this.boxesColliders[i].getChildMeshes().forEach((child) => {
                     child.freezeWorldMatrix();
