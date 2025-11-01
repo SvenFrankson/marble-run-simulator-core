@@ -8,13 +8,26 @@ namespace MarbleRunSimulatorCore {
         public static async BuildPipeTrackMesh(track: PipeTrack, props: IPipeTrackMeshProps): Promise<void> {
             let vertexDataLoader = track.part.game.vertexDataLoader;
 
-            if (track.mesh) {
-                track.mesh.dispose();
+            if (track.ringsMesh) {
+                track.ringsMesh.dispose();
+            }
+            if (track.tubeMesh) {
+                track.tubeMesh.dispose();
             }
 
-            track.mesh = new BABYLON.Mesh("track-mesh");
-            track.mesh.parent = track.part;
-            track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
+            track.ringsMesh = new BABYLON.Mesh("pipetrack-rings-mesh");
+            track.ringsMesh.parent = track.part;
+            track.ringsMesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
+            
+            track.tubeMesh = new BABYLON.Mesh("pipetrack-tube-mesh");
+            track.tubeMesh.parent = track.part;
+            let tubeMaterial = track.part.game.materials.getPlexiglasMaterial(track.part.getColor(0), track.part.machine.materialQ);
+            if (tubeMaterial) {
+                track.tubeMesh.material = tubeMaterial;
+            }
+            else {
+                track.tubeMesh.material = track.ringsMesh.material;
+            }
 
             let ringIn = await vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/steampunk-pipe.babylon", 0);
             ringIn = Mummu.CloneVertexData(ringIn);
@@ -62,15 +75,14 @@ namespace MarbleRunSimulatorCore {
             let flip = Mummu.CloneVertexData(pipeData);
             Mummu.TriFlipVertexDataInPlace(flip);
 
-            let allDatas = [ringIn, ringOut, pipeData, flip];
-
             //for (let i = 0; i < points.length; i++) {
             //    let cube = BABYLON.CreateBoxVertexData({ size: 0.001 });
             //    Mummu.TranslateVertexDataInPlace(cube, points[i]);
             //    allDatas.push(cube);
             //}
 
-            Mummu.MergeVertexDatas(...allDatas).applyToMesh(track.mesh);
+            Mummu.MergeVertexDatas(ringIn, ringOut).applyToMesh(track.ringsMesh);
+            Mummu.MergeVertexDatas(pipeData, flip).applyToMesh(track.tubeMesh);
         }
     }
 }

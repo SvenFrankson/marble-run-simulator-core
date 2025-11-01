@@ -118,7 +118,8 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     enum MaterialType {
         Plastic = 0,
-        Metal = 1
+        Metal = 1,
+        Plexiglas = 2
     }
     enum BallMaterialType {
         Metal = 0,
@@ -128,7 +129,10 @@ declare namespace MarbleRunSimulatorCore {
         game: IGame;
         private _materialsPBR;
         private _materialsSTD;
+        private _plexiglasMaterialsPBR;
+        private _plexiglasMaterialsSTD;
         getMaterial(colorIndex: number, materialQ: number): BABYLON.Material;
+        getPlexiglasMaterial(colorIndex: number, materialQ: number): BABYLON.Material;
         getMaterialType(colorIndex: number): MaterialType;
         getBallMaterialType(colorIndex: number): BallMaterialType;
         getMaterialHexBaseColor(colorIndex: number, materialQ: number): string;
@@ -181,6 +185,8 @@ declare namespace MarbleRunSimulatorCore {
         private _makePlasticSTD;
         private _makeMetalPBR;
         private _makeMetalSTD;
+        private _makePlexiglasPBR;
+        private _makePlexiglasSTD;
         private _generateMaterials;
     }
 }
@@ -754,7 +760,8 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class PipeTrack extends Track {
-        mesh: BABYLON.Mesh;
+        ringsMesh: BABYLON.Mesh;
+        tubeMesh: BABYLON.Mesh;
         tubePath: BABYLON.Vector3[];
         get preferedStartBank(): number;
         get preferedEndBank(): number;
@@ -1122,7 +1129,7 @@ declare namespace MarbleRunSimulatorCore {
     class Curb extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number, s?: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1602,7 +1609,7 @@ declare namespace MarbleRunSimulatorCore {
     class UTurnSharp extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(h: number): MachinePartTemplate;
+        static GenerateTemplate(h: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

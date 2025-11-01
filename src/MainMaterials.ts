@@ -1,7 +1,8 @@
 namespace MarbleRunSimulatorCore {
     export enum MaterialType {
         Plastic,
-        Metal
+        Metal,
+        Plexiglas
     }
     
     export enum BallMaterialType {
@@ -12,11 +13,21 @@ namespace MarbleRunSimulatorCore {
     export class MainMaterials {
         private _materialsPBR: BABYLON.Material[] = [];
         private _materialsSTD: BABYLON.Material[] = [];
+        private _plexiglasMaterialsPBR: BABYLON.Material[] = [];
+        private _plexiglasMaterialsSTD: BABYLON.Material[] = [];
         public getMaterial(colorIndex: number, materialQ: number): BABYLON.Material {
             if (materialQ === MaterialQuality.PBR) {
                 return this._materialsPBR[colorIndex % this._materialsPBR.length];
             }
             return this._materialsSTD[colorIndex % this._materialsSTD.length];
+        }
+        public getPlexiglasMaterial(colorIndex: number, materialQ: number): BABYLON.Material {
+            let baseMaterial = this.getMaterial(colorIndex, materialQ);
+            let plexiglasMaterialName = baseMaterial.name.replace("plastic", "plexiglas");
+            if (materialQ === MaterialQuality.PBR) {
+                return this._plexiglasMaterialsPBR.find(mat => { return mat.name === plexiglasMaterialName; });
+            }
+            return this._plexiglasMaterialsSTD.find(mat => { return mat.name === plexiglasMaterialName; });
         }
         public getMaterialType(colorIndex: number): MaterialType {
             if (colorIndex >= 6 && colorIndex <= 14) {
@@ -477,6 +488,27 @@ namespace MarbleRunSimulatorCore {
             return metalMaterial;
         }
 
+        private _makePlexiglasPBR(name: string, color: BABYLON.Color3, envTexture: BABYLON.CubeTexture): BABYLON.Material {
+            let plexiglas = new BABYLON.PBRSpecularGlossinessMaterial(name, this.game.scene);
+            plexiglas.diffuseColor = color;
+            plexiglas.specularColor = BABYLON.Color3.Lerp(color, BABYLON.Color3.White(), 0.3);
+            plexiglas.glossiness = 0.8;
+            plexiglas.environmentTexture = envTexture;
+            plexiglas.alpha = 0.3;
+
+            return plexiglas;
+        }
+
+        private _makePlexiglasSTD(name: string, color: BABYLON.Color3): BABYLON.StandardMaterial {
+            let plexiglas = new BABYLON.StandardMaterial(name, this.game.scene);
+            plexiglas.diffuseColor = color;
+            plexiglas.emissiveColor = plexiglas.diffuseColor.scale(0.4).add(new BABYLON.Color3(0.1, 0.1, 0.1));
+            plexiglas.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            plexiglas.alpha = 0.5;
+
+            return plexiglas;
+        }
+
         private _generateMaterials(envTexture: BABYLON.CubeTexture): void {
             this._materialsPBR = [];
             this._materialsSTD = [];
@@ -577,6 +609,30 @@ namespace MarbleRunSimulatorCore {
 
             this._materialsPBR.push(this._makeMetalPBR("white-steel-pbr", BABYLON.Color3.FromHexString("#FAFFD8"), envTexture));
             this._materialsSTD.push(this._makeMetalSTD("white-steel-std", BABYLON.Color3.FromHexString("#FAFFD8")));
+
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("red-plexiglas-pbr", BABYLON.Color3.FromHexString("#e6261f"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("red-plexiglas-std", BABYLON.Color3.FromHexString("#e6261f")));
+            
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("orange-plexiglas-pbr", BABYLON.Color3.FromHexString("#eb7532"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("orange-plexiglas-std", BABYLON.Color3.FromHexString("#eb7532")));
+            
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("yellow-plexiglas-pbr", BABYLON.Color3.FromHexString("#f7d038"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("yellow-plexiglas-std", BABYLON.Color3.FromHexString("#f7d038")));
+            
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("green-plexiglas-pbr", BABYLON.Color3.FromHexString("#7de048"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("green-plexiglas-std", BABYLON.Color3.FromHexString("#7de048")));
+            
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("eucalyptus-plexiglas-pbr", BABYLON.Color3.FromHexString("#49da9a"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("eucalyptus-plexiglas-std", BABYLON.Color3.FromHexString("#49da9a")));
+            
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("blue-plexiglas-pbr", BABYLON.Color3.FromHexString("#34bbe6"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("blue-plexiglas-std", BABYLON.Color3.FromHexString("#34bbe6")));
+            
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("royal-blue-plexiglas-pbr", BABYLON.Color3.FromHexString("#4355db"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("royal-blue-plexiglas-std", BABYLON.Color3.FromHexString("#4355db")));
+            
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("pink-plexiglas-pbr", BABYLON.Color3.FromHexString("#d23be7"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("pink-plexiglas-std", BABYLON.Color3.FromHexString("#d23be7")));
         }
     }
 }

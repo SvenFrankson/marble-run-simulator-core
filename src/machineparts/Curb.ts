@@ -10,14 +10,20 @@ namespace MarbleRunSimulatorCore {
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            if (!prop.pipeVersion && !prop.woodVersion) {
+                partName += "." + prop.s.toFixed(0);
+            }
             return partName;
         }
 
-        public static GenerateTemplate(l: number, h: number, s: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
+        public static GenerateTemplate(l: number, h: number, s?: number, pipeVersion?: boolean, woodVersion?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb_" + l.toFixed(0) + "." + h.toFixed(0) + "." + s.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb_" + l.toFixed(0) + "." + h.toFixed(0);
+            if (!pipeVersion && !woodVersion) {
+                template.partName += "." + s.toFixed(0);
+            }
 
             template.l = l;
             template.h = h;

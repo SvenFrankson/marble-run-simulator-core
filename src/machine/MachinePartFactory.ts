@@ -46,7 +46,9 @@ namespace MarbleRunSimulatorCore {
         "cross2d",
         "bitsplit",
         "dropside",
-        "dropback"
+        "dropback",
+        "pipecurb",
+        "pipeuturnsharp"
     ];
 
     export interface IMachinePartProp {
@@ -189,6 +191,17 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Curb(this.machine, prop);
             }
+            if (partName === "pipecurb" || partName.startsWith("pipecurb_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
+                    prop.h = h;
+                }
+                prop.pipeVersion = true;
+                return new Curb(this.machine, prop);
+            }
             if (partName === "uturn" || partName.startsWith("uturn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
@@ -261,6 +274,15 @@ namespace MarbleRunSimulatorCore {
                     let h = parseInt(argStr.split(".")[0]);
                     prop.h = h;
                 }
+                return new UTurnSharp(this.machine, prop);
+            }
+            if (partName === "pipeuturnsharp" || partName.startsWith("pipeuturnsharp_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    prop.h = h;
+                }
+                prop.pipeVersion = true;
                 return new UTurnSharp(this.machine, prop);
             }
             if (partName === "start") {
@@ -486,6 +508,9 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "curb") {
                 return new Curb(this.machine, prop);
             }
+            if (baseName === "pipecurb") {
+                return new Curb(this.machine, prop);
+            }
             if (baseName === "uturn") {
                 return new UTurn(this.machine, prop);
             }
@@ -501,6 +526,10 @@ namespace MarbleRunSimulatorCore {
                 return new Wall(this.machine, prop);
             }
             if (baseName === "uturnsharp") {
+                return new UTurnSharp(this.machine, prop);
+            }
+            if (baseName === "pipeuturnsharp") {
+                prop.pipeVersion = true;
                 return new UTurnSharp(this.machine, prop);
             }
             if (baseName === "start") {

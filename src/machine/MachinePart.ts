@@ -942,10 +942,15 @@ namespace MarbleRunSimulatorCore {
                 }
             });
             this.tracks.forEach(track => {
-                if (track instanceof PipeTrack && track.mesh) {
-                    track.mesh.renderOutline = renderOutline;
-                    track.mesh.outlineWidth = outlineWidth;
-                    track.mesh.outlineColor = outlineColor;
+                if (track instanceof PipeTrack && track.ringsMesh) {
+                    track.ringsMesh.renderOutline = renderOutline;
+                    track.ringsMesh.outlineWidth = outlineWidth;
+                    track.ringsMesh.outlineColor = outlineColor;
+                }
+                if (track instanceof PipeTrack && track.tubeMesh) {
+                    track.tubeMesh.renderOutline = renderOutline;
+                    track.tubeMesh.outlineWidth = outlineWidth;
+                    track.tubeMesh.outlineColor = outlineColor;
                 }
             });
             this.outlinableMeshes.forEach(mesh => {

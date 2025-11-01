@@ -957,6 +957,7 @@ var MarbleRunSimulatorCore;
     (function (MaterialType) {
         MaterialType[MaterialType["Plastic"] = 0] = "Plastic";
         MaterialType[MaterialType["Metal"] = 1] = "Metal";
+        MaterialType[MaterialType["Plexiglas"] = 2] = "Plexiglas";
     })(MaterialType = MarbleRunSimulatorCore.MaterialType || (MarbleRunSimulatorCore.MaterialType = {}));
     let BallMaterialType;
     (function (BallMaterialType) {
@@ -968,6 +969,8 @@ var MarbleRunSimulatorCore;
             this.game = game;
             this._materialsPBR = [];
             this._materialsSTD = [];
+            this._plexiglasMaterialsPBR = [];
+            this._plexiglasMaterialsSTD = [];
             this._ballMaterialsPBR = [];
             this._ballMaterialsSTD = [];
             this.baseMaterialToBallMaterialTable = [
@@ -1240,6 +1243,14 @@ var MarbleRunSimulatorCore;
             }
             return this._materialsSTD[colorIndex % this._materialsSTD.length];
         }
+        getPlexiglasMaterial(colorIndex, materialQ) {
+            let baseMaterial = this.getMaterial(colorIndex, materialQ);
+            let plexiglasMaterialName = baseMaterial.name.replace("plastic", "plexiglas");
+            if (materialQ === MarbleRunSimulatorCore.MaterialQuality.PBR) {
+                return this._plexiglasMaterialsPBR.find(mat => { return mat.name === plexiglasMaterialName; });
+            }
+            return this._plexiglasMaterialsSTD.find(mat => { return mat.name === plexiglasMaterialName; });
+        }
         getMaterialType(colorIndex) {
             if (colorIndex >= 6 && colorIndex <= 14) {
                 return MaterialType.Plastic;
@@ -1340,6 +1351,23 @@ var MarbleRunSimulatorCore;
             metalMaterial.roughness = 0.25;
             return metalMaterial;
         }
+        _makePlexiglasPBR(name, color, envTexture) {
+            let plexiglas = new BABYLON.PBRSpecularGlossinessMaterial(name, this.game.scene);
+            plexiglas.diffuseColor = color;
+            plexiglas.specularColor = BABYLON.Color3.Lerp(color, BABYLON.Color3.White(), 0.3);
+            plexiglas.glossiness = 0.8;
+            plexiglas.environmentTexture = envTexture;
+            plexiglas.alpha = 0.3;
+            return plexiglas;
+        }
+        _makePlexiglasSTD(name, color) {
+            let plexiglas = new BABYLON.StandardMaterial(name, this.game.scene);
+            plexiglas.diffuseColor = color;
+            plexiglas.emissiveColor = plexiglas.diffuseColor.scale(0.4).add(new BABYLON.Color3(0.1, 0.1, 0.1));
+            plexiglas.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            plexiglas.alpha = 0.5;
+            return plexiglas;
+        }
         _generateMaterials(envTexture) {
             this._materialsPBR = [];
             this._materialsSTD = [];
@@ -1414,6 +1442,22 @@ var MarbleRunSimulatorCore;
             this._materialsSTD.push(this._makeMetalSTD("yellow-steel-std", BABYLON.Color3.FromHexString("#f7d038")));
             this._materialsPBR.push(this._makeMetalPBR("white-steel-pbr", BABYLON.Color3.FromHexString("#FAFFD8"), envTexture));
             this._materialsSTD.push(this._makeMetalSTD("white-steel-std", BABYLON.Color3.FromHexString("#FAFFD8")));
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("red-plexiglas-pbr", BABYLON.Color3.FromHexString("#e6261f"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("red-plexiglas-std", BABYLON.Color3.FromHexString("#e6261f")));
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("orange-plexiglas-pbr", BABYLON.Color3.FromHexString("#eb7532"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("orange-plexiglas-std", BABYLON.Color3.FromHexString("#eb7532")));
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("yellow-plexiglas-pbr", BABYLON.Color3.FromHexString("#f7d038"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("yellow-plexiglas-std", BABYLON.Color3.FromHexString("#f7d038")));
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("green-plexiglas-pbr", BABYLON.Color3.FromHexString("#7de048"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("green-plexiglas-std", BABYLON.Color3.FromHexString("#7de048")));
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("eucalyptus-plexiglas-pbr", BABYLON.Color3.FromHexString("#49da9a"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("eucalyptus-plexiglas-std", BABYLON.Color3.FromHexString("#49da9a")));
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("blue-plexiglas-pbr", BABYLON.Color3.FromHexString("#34bbe6"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("blue-plexiglas-std", BABYLON.Color3.FromHexString("#34bbe6")));
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("royal-blue-plexiglas-pbr", BABYLON.Color3.FromHexString("#4355db"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("royal-blue-plexiglas-std", BABYLON.Color3.FromHexString("#4355db")));
+            this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("pink-plexiglas-pbr", BABYLON.Color3.FromHexString("#d23be7"), envTexture));
+            this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("pink-plexiglas-std", BABYLON.Color3.FromHexString("#d23be7")));
         }
     }
     MarbleRunSimulatorCore.MainMaterials = MainMaterials;
@@ -3592,10 +3636,15 @@ var MarbleRunSimulatorCore;
                 }
             });
             this.tracks.forEach(track => {
-                if (track instanceof MarbleRunSimulatorCore.PipeTrack && track.mesh) {
-                    track.mesh.renderOutline = renderOutline;
-                    track.mesh.outlineWidth = outlineWidth;
-                    track.mesh.outlineColor = outlineColor;
+                if (track instanceof MarbleRunSimulatorCore.PipeTrack && track.ringsMesh) {
+                    track.ringsMesh.renderOutline = renderOutline;
+                    track.ringsMesh.outlineWidth = outlineWidth;
+                    track.ringsMesh.outlineColor = outlineColor;
+                }
+                if (track instanceof MarbleRunSimulatorCore.PipeTrack && track.tubeMesh) {
+                    track.tubeMesh.renderOutline = renderOutline;
+                    track.tubeMesh.outlineWidth = outlineWidth;
+                    track.tubeMesh.outlineColor = outlineColor;
                 }
             });
             this.outlinableMeshes.forEach(mesh => {
@@ -4253,7 +4302,9 @@ var MarbleRunSimulatorCore;
         "cross2d",
         "bitsplit",
         "dropside",
-        "dropback"
+        "dropback",
+        "pipecurb",
+        "pipeuturnsharp"
     ];
     class MachinePartFactory {
         constructor(machine) {
@@ -4374,6 +4425,17 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Curb(this.machine, prop);
             }
+            if (partName === "pipecurb" || partName.startsWith("pipecurb_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = l;
+                    prop.h = h;
+                }
+                prop.pipeVersion = true;
+                return new MarbleRunSimulatorCore.Curb(this.machine, prop);
+            }
             if (partName === "uturn" || partName.startsWith("uturn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
@@ -4446,6 +4508,15 @@ var MarbleRunSimulatorCore;
                     let h = parseInt(argStr.split(".")[0]);
                     prop.h = h;
                 }
+                return new MarbleRunSimulatorCore.UTurnSharp(this.machine, prop);
+            }
+            if (partName === "pipeuturnsharp" || partName.startsWith("pipeuturnsharp_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let h = parseInt(argStr.split(".")[0]);
+                    prop.h = h;
+                }
+                prop.pipeVersion = true;
                 return new MarbleRunSimulatorCore.UTurnSharp(this.machine, prop);
             }
             if (partName === "start") {
@@ -4669,6 +4740,9 @@ var MarbleRunSimulatorCore;
             if (baseName === "curb") {
                 return new MarbleRunSimulatorCore.Curb(this.machine, prop);
             }
+            if (baseName === "pipecurb") {
+                return new MarbleRunSimulatorCore.Curb(this.machine, prop);
+            }
             if (baseName === "uturn") {
                 return new MarbleRunSimulatorCore.UTurn(this.machine, prop);
             }
@@ -4684,6 +4758,10 @@ var MarbleRunSimulatorCore;
                 return new MarbleRunSimulatorCore.Wall(this.machine, prop);
             }
             if (baseName === "uturnsharp") {
+                return new MarbleRunSimulatorCore.UTurnSharp(this.machine, prop);
+            }
+            if (baseName === "pipeuturnsharp") {
+                prop.pipeVersion = true;
                 return new MarbleRunSimulatorCore.UTurnSharp(this.machine, prop);
             }
             if (baseName === "start") {
@@ -5184,12 +5262,24 @@ var MarbleRunSimulatorCore;
     class PipeTrackMeshBuilder {
         static async BuildPipeTrackMesh(track, props) {
             let vertexDataLoader = track.part.game.vertexDataLoader;
-            if (track.mesh) {
-                track.mesh.dispose();
+            if (track.ringsMesh) {
+                track.ringsMesh.dispose();
             }
-            track.mesh = new BABYLON.Mesh("track-mesh");
-            track.mesh.parent = track.part;
-            track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
+            if (track.tubeMesh) {
+                track.tubeMesh.dispose();
+            }
+            track.ringsMesh = new BABYLON.Mesh("pipetrack-rings-mesh");
+            track.ringsMesh.parent = track.part;
+            track.ringsMesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
+            track.tubeMesh = new BABYLON.Mesh("pipetrack-tube-mesh");
+            track.tubeMesh.parent = track.part;
+            let tubeMaterial = track.part.game.materials.getPlexiglasMaterial(track.part.getColor(0), track.part.machine.materialQ);
+            if (tubeMaterial) {
+                track.tubeMesh.material = tubeMaterial;
+            }
+            else {
+                track.tubeMesh.material = track.ringsMesh.material;
+            }
             let ringIn = await vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/steampunk-pipe.babylon", 0);
             ringIn = Mummu.CloneVertexData(ringIn);
             let ringOut = Mummu.CloneVertexData(ringIn);
@@ -5228,13 +5318,13 @@ var MarbleRunSimulatorCore;
             let pipeData = Mummu.CreateWireVertexData({ path: points, pathUps: normals, tesselation: 12, radius: 0.011, color: new BABYLON.Color4(1, 1, 1, 1), closed: false, textureRatio: 4 });
             let flip = Mummu.CloneVertexData(pipeData);
             Mummu.TriFlipVertexDataInPlace(flip);
-            let allDatas = [ringIn, ringOut, pipeData, flip];
             //for (let i = 0; i < points.length; i++) {
             //    let cube = BABYLON.CreateBoxVertexData({ size: 0.001 });
             //    Mummu.TranslateVertexDataInPlace(cube, points[i]);
             //    allDatas.push(cube);
             //}
-            Mummu.MergeVertexDatas(...allDatas).applyToMesh(track.mesh);
+            Mummu.MergeVertexDatas(ringIn, ringOut).applyToMesh(track.ringsMesh);
+            Mummu.MergeVertexDatas(pipeData, flip).applyToMesh(track.tubeMesh);
         }
     }
     MarbleRunSimulatorCore.PipeTrackMeshBuilder = PipeTrackMeshBuilder;
@@ -5763,6 +5853,11 @@ var MarbleRunSimulatorCore;
                     }
                     data = MarbleRunSimulatorCore.Curb.GenerateTemplate(l, h, s, false, false);
                 }
+                else if (partName.startsWith("pipecurb_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = MarbleRunSimulatorCore.Curb.GenerateTemplate(l, h, undefined, true, false);
+                }
                 else if (partName.startsWith("uturn_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
@@ -5790,6 +5885,10 @@ var MarbleRunSimulatorCore;
                 else if (partName.startsWith("uturnsharp")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     data = MarbleRunSimulatorCore.UTurnSharp.GenerateTemplate(h);
+                }
+                else if (partName.startsWith("pipeuturnsharp")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = MarbleRunSimulatorCore.UTurnSharp.GenerateTemplate(h, true);
                 }
                 else if (partName.startsWith("ramp_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
@@ -5973,6 +6072,9 @@ var MarbleRunSimulatorCore;
             if (baseName === "curb") {
                 partName = MarbleRunSimulatorCore.Curb.PropToPartName(prop);
             }
+            else if (baseName === "pipecurb") {
+                partName = MarbleRunSimulatorCore.Curb.PropToPartName(prop);
+            }
             else if (baseName === "uturn") {
                 partName = MarbleRunSimulatorCore.UTurn.PropToPartName(prop);
             }
@@ -5986,6 +6088,9 @@ var MarbleRunSimulatorCore;
                 partName = MarbleRunSimulatorCore.Wall.PropToPartName(prop);
             }
             else if (baseName === "uturnsharp") {
+                partName = MarbleRunSimulatorCore.UTurnSharp.PropToPartName(prop);
+            }
+            else if (baseName === "pipeuturnsharp") {
                 partName = MarbleRunSimulatorCore.UTurnSharp.PropToPartName(prop);
             }
             else if (baseName === "ramp") {
@@ -9545,12 +9650,18 @@ var MarbleRunSimulatorCore;
             this.generateWires();
         }
         static PropToPartName(prop) {
-            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.s.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "curb_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            if (!prop.pipeVersion && !prop.woodVersion) {
+                partName += "." + prop.s.toFixed(0);
+            }
             return partName;
         }
         static GenerateTemplate(l, h, s, pipeVersion, woodVersion) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb_" + l.toFixed(0) + "." + h.toFixed(0) + "." + s.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "curb_" + l.toFixed(0) + "." + h.toFixed(0);
+            if (!pipeVersion && !woodVersion) {
+                template.partName += "." + s.toFixed(0);
+            }
             template.l = l;
             template.h = h;
             template.s = s;
@@ -14117,7 +14228,12 @@ var MarbleRunSimulatorCore;
     class UTurnSharp extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            this.setColorCount(2);
+            if (prop.pipeVersion) {
+                this.setColorCount(1);
+            }
+            else {
+                this.setColorCount(2);
+            }
             if (isNaN(prop.h)) {
                 prop.h = 1;
             }
@@ -14125,15 +14241,15 @@ var MarbleRunSimulatorCore;
             this.generateWires();
         }
         static PropToPartName(prop) {
-            let partName = "uturnsharp_" + prop.h.toFixed(0);
+            let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "uturnsharp_" + prop.h.toFixed(0);
             return partName;
         }
-        static GenerateTemplate(h) {
+        static GenerateTemplate(h, pipeVersion, woodVersion) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             if (isNaN(h)) {
                 h = 1;
             }
-            template.partName = "uturnsharp_" + h.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "uturnsharp_" + h.toFixed(0);
             template.h = h;
             template.minH = 1;
             template.hExtendableOnY = true;
@@ -14150,45 +14266,68 @@ var MarbleRunSimulatorCore;
             let rBottom = Math.abs(yBottom - cY);
             let aMaxTop = Math.PI * 0.5 + 0.02 / (rTop);
             aMaxTop = Nabu.MinMax(aMaxTop, 0, Math.PI);
-            template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[0].trackpoints = [
-                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0))
-            ];
-            template.trackTemplates[0].colorIndex = 1;
-            template.trackTemplates[0].drawEndTip = true;
-            for (let a = 4; a > 0; a--) {
-                let f = a / 4;
-                let angle = Math.PI * f;
-                let cosa = Math.cos(angle);
-                let sina = Math.sin(angle);
-                let dir = MarbleRunSimulatorCore.Tools.V3Dir(angle / Math.PI * 180 - 90);
-                let norm = MarbleRunSimulatorCore.Tools.V3Dir(-angle / Math.PI * 180);
-                let p = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY, 0);
-                p.x += sina * rBottom;
-                p.y += cosa * rBottom;
-                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], p, dir, norm));
-            }
-            template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY + rBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(-90), MarbleRunSimulatorCore.Tools.V3Dir(-180)));
-            template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
-            template.trackTemplates[1].colorIndex = 0;
-            template.trackTemplates[1].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yTop, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0))];
-            template.trackTemplates[1].drawEndTip = true;
-            template.trackTemplates[1].noMiniatureRender = true;
-            for (let a = 0; a <= 4; a++) {
-                let f = a / 4;
-                let angle = Math.PI * f;
-                let cosa = Math.cos(angle);
-                let sina = Math.sin(angle);
-                let dir = MarbleRunSimulatorCore.Tools.V3Dir(angle / Math.PI * 180 + 90);
-                let norm = MarbleRunSimulatorCore.Tools.V3Dir(angle / Math.PI * 180);
-                if (angle < aMaxTop) {
+            if (pipeVersion) {
+                template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[0].trackpoints = [
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0))
+                ];
+                template.trackTemplates[0].colorIndex = 1;
+                template.trackTemplates[0].isPipe = true;
+                for (let a = 4; a > 0; a--) {
+                    let f = a / 4;
+                    let angle = Math.PI * f;
+                    let cosa = Math.cos(angle);
+                    let sina = Math.sin(angle);
+                    let dir = MarbleRunSimulatorCore.Tools.V3Dir(angle / Math.PI * 180 - 90);
+                    let norm = MarbleRunSimulatorCore.Tools.V3Dir(-angle / Math.PI * 180);
                     let p = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY, 0);
-                    p.x += sina * rTop;
-                    p.y += cosa * rTop;
-                    template.trackTemplates[1].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], p, dir, norm));
+                    p.x += sina * rBottom;
+                    p.y += cosa * rBottom;
+                    template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], p, dir, norm));
                 }
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, cY + rBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(-90), MarbleRunSimulatorCore.Tools.V3Dir(-180)));
             }
-            template.trackTemplates[1].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY + Math.sin(aMaxTop) * rTop, cY + Math.cos(aMaxTop) * rTop, 0), MarbleRunSimulatorCore.Tools.V3Dir(aMaxTop / Math.PI * 180 + 90), MarbleRunSimulatorCore.Tools.V3Dir(aMaxTop / Math.PI * 180)));
+            else {
+                template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[0].trackpoints = [
+                    new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0))
+                ];
+                template.trackTemplates[0].colorIndex = 1;
+                template.trackTemplates[0].drawEndTip = true;
+                for (let a = 4; a > 0; a--) {
+                    let f = a / 4;
+                    let angle = Math.PI * f;
+                    let cosa = Math.cos(angle);
+                    let sina = Math.sin(angle);
+                    let dir = MarbleRunSimulatorCore.Tools.V3Dir(angle / Math.PI * 180 - 90);
+                    let norm = MarbleRunSimulatorCore.Tools.V3Dir(-angle / Math.PI * 180);
+                    let p = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY, 0);
+                    p.x += sina * rBottom;
+                    p.y += cosa * rBottom;
+                    template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], p, dir, norm));
+                }
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY + rBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(-90), MarbleRunSimulatorCore.Tools.V3Dir(-180)));
+                template.trackTemplates[1] = new MarbleRunSimulatorCore.TrackTemplate(template);
+                template.trackTemplates[1].colorIndex = 0;
+                template.trackTemplates[1].trackpoints = [new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yTop, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0))];
+                template.trackTemplates[1].drawEndTip = true;
+                template.trackTemplates[1].noMiniatureRender = true;
+                for (let a = 0; a <= 4; a++) {
+                    let f = a / 4;
+                    let angle = Math.PI * f;
+                    let cosa = Math.cos(angle);
+                    let sina = Math.sin(angle);
+                    let dir = MarbleRunSimulatorCore.Tools.V3Dir(angle / Math.PI * 180 + 90);
+                    let norm = MarbleRunSimulatorCore.Tools.V3Dir(angle / Math.PI * 180);
+                    if (angle < aMaxTop) {
+                        let p = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY, 0);
+                        p.x += sina * rTop;
+                        p.y += cosa * rTop;
+                        template.trackTemplates[1].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], p, dir, norm));
+                    }
+                }
+                template.trackTemplates[1].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[1], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY + Math.sin(aMaxTop) * rTop, cY + Math.cos(aMaxTop) * rTop, 0), MarbleRunSimulatorCore.Tools.V3Dir(aMaxTop / Math.PI * 180 + 90), MarbleRunSimulatorCore.Tools.V3Dir(aMaxTop / Math.PI * 180)));
+            }
             template.initialize();
             return template;
         }

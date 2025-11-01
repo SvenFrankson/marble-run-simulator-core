@@ -2,7 +2,8 @@
 
 namespace MarbleRunSimulatorCore {
     export class PipeTrack extends Track {
-        public mesh: BABYLON.Mesh;
+        public ringsMesh: BABYLON.Mesh;
+        public tubeMesh: BABYLON.Mesh;
         public tubePath: BABYLON.Vector3[] = [];
 
         public get preferedStartBank(): number {

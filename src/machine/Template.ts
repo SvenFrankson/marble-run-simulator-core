@@ -385,6 +385,11 @@ namespace MarbleRunSimulatorCore {
                     }
                     data = Curb.GenerateTemplate(l, h, s, false, false);
                 }
+                else if (partName.startsWith("pipecurb_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = Curb.GenerateTemplate(l, h, undefined, true, false);
+                }
                 else if (partName.startsWith("uturn_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
@@ -412,6 +417,10 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("uturnsharp")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     data = UTurnSharp.GenerateTemplate(h);
+                }
+                else if (partName.startsWith("pipeuturnsharp")) {
+                    let h = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = UTurnSharp.GenerateTemplate(h, true);
                 }
                 else if (partName.startsWith("ramp_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
@@ -598,6 +607,9 @@ namespace MarbleRunSimulatorCore {
             if (baseName === "curb") {
                 partName = Curb.PropToPartName(prop);
             }
+            else if (baseName === "pipecurb") {
+                partName = Curb.PropToPartName(prop);
+            }
             else if (baseName === "uturn") {
                 partName = UTurn.PropToPartName(prop);
             }
@@ -611,6 +623,9 @@ namespace MarbleRunSimulatorCore {
                 partName = Wall.PropToPartName(prop);
             }
             else if (baseName === "uturnsharp") {
+                partName = UTurnSharp.PropToPartName(prop);
+            }
+            else if (baseName === "pipeuturnsharp") {
                 partName = UTurnSharp.PropToPartName(prop);
             }
             else if (baseName === "ramp") {
