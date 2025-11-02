@@ -22,6 +22,10 @@ namespace MarbleRunSimulatorCore {
             for (let t = 0; t < template.trackTemplates.length; t++) {
                 let trackTemplate = template.trackTemplates[t];
                 let miniatureTrack: MiniatureTrack = new MiniatureTrack();
+                console.log(baseName + " " + trackTemplate.isPipe);
+                if (trackTemplate.isPipe) {
+                    miniatureTrack.isPipe = true;
+                }
                 
                 let materialIndex = prop.c[trackTemplate.colorIndex];
                 let mat = machine.game.materials.getMaterial(materialIndex, MaterialQuality.Standard);
@@ -135,7 +139,7 @@ namespace MarbleRunSimulatorCore {
 
         let picMargin = size / 20;
         let picSizeNoMargin = size - 2 * picMargin;
-        let lineWidth = 1;
+        let lineWidth = 2;
         canvas.width = size;
         canvas.height = size;
 
@@ -285,6 +289,9 @@ namespace MarbleRunSimulatorCore {
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
             context.lineWidth = 5 * lineWidth;
+            if (line instanceof MiniatureTrack && line.isPipe) {
+                context.lineWidth += 4;
+            }
             let normalizedH = 0;
             context.beginPath();
             let p0 = line.points[0];
@@ -317,7 +324,14 @@ namespace MarbleRunSimulatorCore {
                 context.stroke();
             
                 context.lineWidth = 3 * lineWidth;
-                context.strokeStyle = backGroundColorHexNoAlpha;
+                if (line.isPipe) {
+                    context.lineWidth += 2;
+                    let c = BABYLON.Color4.Lerp(backGroundColor, line.color ? line.color : color4White, 0.3 * f);
+                    context.strokeStyle = c.toHexString();
+                }
+                else {
+                    context.strokeStyle = backGroundColorHexNoAlpha;
+                }
                 context.stroke();
             }
             else if (line instanceof MiniatureShape) {

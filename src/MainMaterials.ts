@@ -494,7 +494,8 @@ namespace MarbleRunSimulatorCore {
             plexiglas.specularColor = BABYLON.Color3.Lerp(color, BABYLON.Color3.White(), 0.3);
             plexiglas.glossiness = 0.8;
             plexiglas.environmentTexture = envTexture;
-            plexiglas.alpha = 0.3;
+            plexiglas.alpha = 0.5;
+            plexiglas.needDepthPrePass = true;
 
             return plexiglas;
         }

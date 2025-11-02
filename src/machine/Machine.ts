@@ -61,7 +61,6 @@ namespace MarbleRunSimulatorCore {
         currentTimeFactor: number;
         physicDT: number;
         timeFactor: number;
-        mainVolume: number;
         averagedFPS: number;
     }
 

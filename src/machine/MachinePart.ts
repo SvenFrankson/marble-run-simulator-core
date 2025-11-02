@@ -892,17 +892,26 @@ namespace MarbleRunSimulatorCore {
             if (this.selectorBodyDisplay) {
                 if (this._selected) {
                     this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineSelectedColor);
-                    this.selectorBodyDisplay.visibility = 0.2;
                 }
                 else if (this._hovered) {
                     this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineHoverColor);
-                    this.selectorBodyDisplay.visibility = 0.1;
                 }
                 else {
                     this.setOutlineParams(false, UI3DConstants.outlineWidth, UI3DConstants.outlineBaseColor);
-                    this.selectorBodyDisplay.visibility = 0;
                 }
+
                 this.selectorBodyDisplay.visibility = 0;
+                if (this.tracks[0].template.isPipe) {
+                    if (this._selected) {
+                        this.selectorBodyDisplay.visibility = 0.6;
+                    }
+                    else if (this._hovered) {
+                        this.selectorBodyDisplay.visibility = 0.3;
+                    }
+                    else {
+                        this.selectorBodyDisplay.visibility = 0;
+                    }
+                }
             }
 
             if (this.encloseMesh) {
@@ -948,9 +957,9 @@ namespace MarbleRunSimulatorCore {
                     track.ringsMesh.outlineColor = outlineColor;
                 }
                 if (track instanceof PipeTrack && track.tubeMesh) {
-                    track.tubeMesh.renderOutline = renderOutline;
-                    track.tubeMesh.outlineWidth = outlineWidth;
-                    track.tubeMesh.outlineColor = outlineColor;
+                    //track.tubeMesh.renderOutline = renderOutline;
+                    //track.tubeMesh.outlineWidth = outlineWidth;
+                    //track.tubeMesh.outlineColor = outlineColor;
                 }
             });
             this.outlinableMeshes.forEach(mesh => {
@@ -1174,9 +1183,16 @@ namespace MarbleRunSimulatorCore {
                 });
                 if (this.tracks[n].template.isPipeOrWood) {
                     let normals = this.tracks[n].trackInterpolatedNormals;
-                    points = points.map((pt, i) => {
-                        return pt.add(normals[i].scale(0.008));
-                    });
+                    if (this.tracks[n].template.pipeIgnoresTrackNormals) {
+                        points.forEach(pt => {
+                            pt.y += PipeTrack.PIPE_OFFSET_OVER_BASETRACK;
+                        })
+                    }
+                    else {
+                        points.forEach((pt, i) => {
+                            pt.addInPlace(normals[i].scale(PipeTrack.PIPE_OFFSET_OVER_BASETRACK));
+                        })
+                    }
                 }
                 Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI);
 
@@ -1250,7 +1266,7 @@ namespace MarbleRunSimulatorCore {
                     let shape = this.tracks[n].template.isPipeOrWood ? selectorHullPipeShapeDisplay : selectorHullShapeDisplay;
 
                     let dataDisplay = Mummu.CreateExtrudeShapeVertexData({ shape: shape, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                    Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#00FFFF"));
+                    Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#FFFFFF"));
                     selectorMeshDisplayVertexDatas.push(dataDisplay);
                     
                     let dataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });

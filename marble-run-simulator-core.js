@@ -14,6 +14,7 @@ var MarbleRunSimulatorCore;
         Surface[Surface["Velvet"] = 2] = "Velvet";
         Surface[Surface["Metal"] = 3] = "Metal";
         Surface[Surface["Plastic"] = 4] = "Plastic";
+        Surface[Surface["Plexiglas"] = 5] = "Plexiglas";
     })(Surface = MarbleRunSimulatorCore.Surface || (MarbleRunSimulatorCore.Surface = {}));
     let CollisionState;
     (function (CollisionState) {
@@ -65,6 +66,7 @@ var MarbleRunSimulatorCore;
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./lib/marble-run-simulator-core/datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop-2.wav", this.getScene(), undefined, { loop: true, autoplay: false, volume: 0 });
             this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: false, volume: 0 });
+            this.marblePlexiglasTubeLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop-plexiglas.wav", this.getScene(), undefined, { loop: true, autoplay: false, volume: 0 });
             this.marbleInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.marbleInsideSound.setVolume(0.2);
             this.animatePosition = Mummu.AnimationFactory.CreateVector3(this, this, "position");
@@ -436,7 +438,7 @@ var MarbleRunSimulatorCore;
                                             let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
                                             reactions.addInPlace(reaction);
                                             reactionsCount++;
-                                            this.surface = Surface.Bowl;
+                                            this.surface = Surface.Plexiglas;
                                         }
                                     }
                                 }
@@ -463,7 +465,7 @@ var MarbleRunSimulatorCore;
                                     let v = Math.abs(BABYLON.Vector3.Dot(this.velocity, col.normal));
                                     if (v > 0.15) {
                                         if (!this.marbleChocSound.isPlaying) {
-                                            this.marbleChocSound.setVolume(((v - 0.15) / 0.85) * this.game.mainVolume);
+                                            this.marbleChocSound.setVolume(((v - 0.15) / 0.85));
                                             if (this.surface === Surface.Metal) {
                                                 this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.8);
                                             }
@@ -755,7 +757,7 @@ var MarbleRunSimulatorCore;
                                 let v = this.velocity.length();
                                 if (v > 0.15) {
                                     if (!this.marbleChocSound.isPlaying) {
-                                        this.marbleChocSound.setVolume(((v - 0.15) / 0.85) * this.game.mainVolume);
+                                        this.marbleChocSound.setVolume(((v - 0.15) / 0.85));
                                         this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.marbleChocSound.play();
                                     }
@@ -865,20 +867,31 @@ var MarbleRunSimulatorCore;
             }
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
-                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 5) + 0.8);
-                this.marbleLoopSound.setVolume(20 * this.strReaction * f * this.game.mainVolume, 0.1);
+                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 2) + 0.5);
+                this.marbleLoopSound.setVolume(6 * this.strReaction * f, 0.1);
                 if (!this.marbleLoopSound.isPlaying) {
                     this.marbleLoopSound.play();
                 }
-                this.marbleBowlLoopSound.setVolume(0, 0.5);
+                this.marbleBowlLoopSound.setVolume(0, 0.2);
+                this.marblePlexiglasTubeLoopSound.setVolume(0, 0.2);
+            }
+            else if (this.surface === Surface.Plexiglas) {
+                this.marblePlexiglasTubeLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 4) + 0.75);
+                this.marblePlexiglasTubeLoopSound.setVolume(40 * this.strReaction * f, 0.1);
+                if (!this.marblePlexiglasTubeLoopSound.isPlaying) {
+                    this.marblePlexiglasTubeLoopSound.play();
+                }
+                this.marbleLoopSound.setVolume(0, 0.2);
+                this.marbleBowlLoopSound.setVolume(0, 0.2);
             }
             else if (this.surface === Surface.Bowl) {
                 this.marbleBowlLoopSound.setPlaybackRate(this.game.currentTimeFactor);
-                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume, 0.1);
+                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f, 0.1);
                 if (!this.marbleBowlLoopSound.isPlaying) {
                     this.marbleBowlLoopSound.play();
                 }
-                this.marbleLoopSound.setVolume(0, 0.5);
+                this.marbleLoopSound.setVolume(0, 0.2);
+                this.marblePlexiglasTubeLoopSound.setVolume(0, 0.2);
             }
             let sign2 = Math.sign(this.velocity.y);
             if (sign != sign2 && this.debugNextYFlip) {
@@ -1357,7 +1370,8 @@ var MarbleRunSimulatorCore;
             plexiglas.specularColor = BABYLON.Color3.Lerp(color, BABYLON.Color3.White(), 0.3);
             plexiglas.glossiness = 0.8;
             plexiglas.environmentTexture = envTexture;
-            plexiglas.alpha = 0.3;
+            plexiglas.alpha = 0.5;
+            plexiglas.needDepthPrePass = true;
             return plexiglas;
         }
         _makePlexiglasSTD(name, color) {
@@ -1467,6 +1481,7 @@ var MarbleRunSimulatorCore;
     class MiniatureTrack {
         constructor() {
             this.points = [];
+            this.isPipe = false;
             this.dist = Infinity;
         }
     }
@@ -3590,17 +3605,25 @@ var MarbleRunSimulatorCore;
             if (this.selectorBodyDisplay) {
                 if (this._selected) {
                     this.setOutlineParams(true, MarbleRunSimulatorCore.UI3DConstants.outlineWidth, MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor);
-                    this.selectorBodyDisplay.visibility = 0.2;
                 }
                 else if (this._hovered) {
                     this.setOutlineParams(true, MarbleRunSimulatorCore.UI3DConstants.outlineWidth, MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor);
-                    this.selectorBodyDisplay.visibility = 0.1;
                 }
                 else {
                     this.setOutlineParams(false, MarbleRunSimulatorCore.UI3DConstants.outlineWidth, MarbleRunSimulatorCore.UI3DConstants.outlineBaseColor);
-                    this.selectorBodyDisplay.visibility = 0;
                 }
                 this.selectorBodyDisplay.visibility = 0;
+                if (this.tracks[0].template.isPipe) {
+                    if (this._selected) {
+                        this.selectorBodyDisplay.visibility = 0.6;
+                    }
+                    else if (this._hovered) {
+                        this.selectorBodyDisplay.visibility = 0.3;
+                    }
+                    else {
+                        this.selectorBodyDisplay.visibility = 0;
+                    }
+                }
             }
             if (this.encloseMesh) {
                 if (this._selected) {
@@ -3642,9 +3665,9 @@ var MarbleRunSimulatorCore;
                     track.ringsMesh.outlineColor = outlineColor;
                 }
                 if (track instanceof MarbleRunSimulatorCore.PipeTrack && track.tubeMesh) {
-                    track.tubeMesh.renderOutline = renderOutline;
-                    track.tubeMesh.outlineWidth = outlineWidth;
-                    track.tubeMesh.outlineColor = outlineColor;
+                    //track.tubeMesh.renderOutline = renderOutline;
+                    //track.tubeMesh.outlineWidth = outlineWidth;
+                    //track.tubeMesh.outlineColor = outlineColor;
                 }
             });
             this.outlinableMeshes.forEach(mesh => {
@@ -3765,9 +3788,16 @@ var MarbleRunSimulatorCore;
                 });
                 if (this.tracks[n].template.isPipeOrWood) {
                     let normals = this.tracks[n].trackInterpolatedNormals;
-                    points = points.map((pt, i) => {
-                        return pt.add(normals[i].scale(0.008));
-                    });
+                    if (this.tracks[n].template.pipeIgnoresTrackNormals) {
+                        points.forEach(pt => {
+                            pt.y += MarbleRunSimulatorCore.PipeTrack.PIPE_OFFSET_OVER_BASETRACK;
+                        });
+                    }
+                    else {
+                        points.forEach((pt, i) => {
+                            pt.addInPlace(normals[i].scale(MarbleRunSimulatorCore.PipeTrack.PIPE_OFFSET_OVER_BASETRACK));
+                        });
+                    }
                 }
                 Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI);
                 if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[0])) {
@@ -3835,7 +3865,7 @@ var MarbleRunSimulatorCore;
                 if (points.length >= 2) {
                     let shape = this.tracks[n].template.isPipeOrWood ? selectorHullPipeShapeDisplay : selectorHullShapeDisplay;
                     let dataDisplay = Mummu.CreateExtrudeShapeVertexData({ shape: shape, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                    Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#00FFFF"));
+                    Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#FFFFFF"));
                     selectorMeshDisplayVertexDatas.push(dataDisplay);
                     let dataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                     Mummu.ColorizeVertexDataInPlace(dataLogic, BABYLON.Color3.FromHexString("#FFFFFF"));
@@ -4304,7 +4334,9 @@ var MarbleRunSimulatorCore;
         "dropside",
         "dropback",
         "pipecurb",
-        "pipeuturnsharp"
+        "pipeuturnsharp",
+        "pipeloop",
+        "pipeunderloop"
     ];
     class MachinePartFactory {
         constructor(machine) {
@@ -4548,6 +4580,32 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.Loop(this.machine, prop);
             }
+            if (partName === "pipeloop" || partName.startsWith("pipeloop_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    let n = parseInt(argStr.split(".")[2]);
+                    prop.l = w;
+                    prop.d = d;
+                    prop.n = n;
+                }
+                prop.pipeVersion = true;
+                return new MarbleRunSimulatorCore.Loop(this.machine, prop);
+            }
+            if (partName === "pipeunderloop" || partName.startsWith("pipeunderloop_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    let n = parseInt(argStr.split(".")[2]);
+                    prop.l = w;
+                    prop.d = d;
+                    prop.n = n;
+                }
+                prop.pipeVersion = true;
+                return new MarbleRunSimulatorCore.Loop(this.machine, prop, true);
+            }
             if (partName === "spiral" || partName.startsWith("spiral_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
@@ -4778,6 +4836,14 @@ var MarbleRunSimulatorCore;
             }
             if (baseName === "loop") {
                 return new MarbleRunSimulatorCore.Loop(this.machine, prop);
+            }
+            if (baseName === "pipeloop") {
+                prop.pipeVersion = true;
+                return new MarbleRunSimulatorCore.Loop(this.machine, prop);
+            }
+            if (baseName === "pipeunderloop") {
+                prop.pipeVersion = true;
+                return new MarbleRunSimulatorCore.Loop(this.machine, prop, true);
             }
             if (baseName === "spiral") {
                 return new MarbleRunSimulatorCore.Spiral(this.machine, prop);
@@ -5244,17 +5310,24 @@ var MarbleRunSimulatorCore;
             let points = [...this.templateInterpolatedPoints].map((p) => {
                 return p.clone();
             });
-            let normals = [...this.trackInterpolatedNormals].map((p) => {
-                return p.clone();
-            });
-            this.tubePath = points.map((pt, i) => {
-                return pt.add(normals[i].scale(0.008));
-            });
+            if (this.template.pipeIgnoresTrackNormals) {
+                this.tubePath = points;
+                points.forEach((pt, i) => {
+                    return pt.y += PipeTrack.PIPE_OFFSET_OVER_BASETRACK;
+                });
+            }
+            else {
+                this.tubePath = points;
+                points.forEach((pt, i) => {
+                    pt.addInPlace(this.trackInterpolatedNormals[i].scale(PipeTrack.PIPE_OFFSET_OVER_BASETRACK));
+                });
+            }
             for (let i = 0; i < this.tubePath.length; i++) {
                 BABYLON.Vector3.TransformCoordinatesToRef(this.tubePath[i], this.part.getWorldMatrix(), this.tubePath[i]);
             }
         }
     }
+    PipeTrack.PIPE_OFFSET_OVER_BASETRACK = 0.0085;
     MarbleRunSimulatorCore.PipeTrack = PipeTrack;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
@@ -5312,10 +5385,17 @@ var MarbleRunSimulatorCore;
             Mummu.RemoveFromStartForDistanceInPlace(points, 0.001);
             Mummu.RemoveFromEndForDistanceInPlace(points, 0.001);
             Mummu.DecimatePathInPlace(points, (2 / 180) * Math.PI, normals);
-            points = points.map((pt, i) => {
-                return pt.add(normals[i].scale(0.008));
-            });
-            let pipeData = Mummu.CreateWireVertexData({ path: points, pathUps: normals, tesselation: 12, radius: 0.011, color: new BABYLON.Color4(1, 1, 1, 1), closed: false, textureRatio: 4 });
+            if (track.template.pipeIgnoresTrackNormals) {
+                points = points.map((pt, i) => {
+                    return pt.add(BABYLON.Vector3.Up().scale(0.0085));
+                });
+            }
+            else {
+                points = points.map((pt, i) => {
+                    return pt.add(normals[i].scale(0.0085));
+                });
+            }
+            let pipeData = Mummu.CreateWireVertexData({ path: points, pathUps: track.template.pipeIgnoresTrackNormals ? undefined : normals, tesselation: 12, radius: 0.011, color: new BABYLON.Color4(1, 1, 1, 1), closed: false, textureRatio: 4 });
             let flip = Mummu.CloneVertexData(pipeData);
             Mummu.TriFlipVertexDataInPlace(flip);
             //for (let i = 0; i < points.length; i++) {
@@ -5540,6 +5620,7 @@ var MarbleRunSimulatorCore;
             this.preferedEndBank = 0;
             this.colorIndex = 0;
             this.isPipe = false;
+            this.pipeIgnoresTrackNormals = false;
             this.isWood = false;
             this.summedLength = [0];
             this.totalLength = 0;
@@ -5989,6 +6070,18 @@ var MarbleRunSimulatorCore;
                     let n = parseInt(partName.split("_")[1].split(".")[2]);
                     data = MarbleRunSimulatorCore.Loop.GenerateTemplate(l, d, n);
                 }
+                else if (partName.startsWith("pipeloop_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let n = parseInt(partName.split("_")[1].split(".")[2]);
+                    data = MarbleRunSimulatorCore.Loop.GenerateTemplate(l, d, n, true);
+                }
+                else if (partName.startsWith("pipeunderloop_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let n = parseInt(partName.split("_")[1].split(".")[2]);
+                    data = MarbleRunSimulatorCore.Loop.GenerateTemplate(l, d, n, true, true);
+                }
                 else if (partName.startsWith("spiral_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
@@ -6073,12 +6166,14 @@ var MarbleRunSimulatorCore;
                 partName = MarbleRunSimulatorCore.Curb.PropToPartName(prop);
             }
             else if (baseName === "pipecurb") {
+                prop.pipeVersion = true;
                 partName = MarbleRunSimulatorCore.Curb.PropToPartName(prop);
             }
             else if (baseName === "uturn") {
                 partName = MarbleRunSimulatorCore.UTurn.PropToPartName(prop);
             }
             else if (baseName === "pipeuturn") {
+                prop.pipeVersion = true;
                 partName = MarbleRunSimulatorCore.UTurn.PropToPartName(prop);
             }
             else if (baseName === "wooduturn") {
@@ -6091,6 +6186,7 @@ var MarbleRunSimulatorCore;
                 partName = MarbleRunSimulatorCore.UTurnSharp.PropToPartName(prop);
             }
             else if (baseName === "pipeuturnsharp") {
+                prop.pipeVersion = true;
                 partName = MarbleRunSimulatorCore.UTurnSharp.PropToPartName(prop);
             }
             else if (baseName === "ramp") {
@@ -6100,6 +6196,7 @@ var MarbleRunSimulatorCore;
                 partName = MarbleRunSimulatorCore.Ramp.PropToPartName(prop);
             }
             else if (baseName === "piperamp") {
+                prop.pipeVersion = true;
                 partName = MarbleRunSimulatorCore.Ramp.PropToPartName(prop);
             }
             else if (baseName === "woodramp") {
@@ -6155,6 +6252,14 @@ var MarbleRunSimulatorCore;
             }
             else if (baseName === "loop") {
                 partName = MarbleRunSimulatorCore.Loop.PropToPartName(prop);
+            }
+            else if (baseName === "pipeloop") {
+                prop.pipeVersion = true;
+                partName = MarbleRunSimulatorCore.Loop.PropToPartName(prop);
+            }
+            else if (baseName === "pipeunderloop") {
+                prop.pipeVersion = true;
+                partName = MarbleRunSimulatorCore.Loop.PropToPartName(prop, true);
             }
             else if (baseName === "spiral") {
                 partName = MarbleRunSimulatorCore.Spiral.PropToPartName(prop);
@@ -6637,6 +6742,10 @@ var MarbleRunSimulatorCore;
             for (let t = 0; t < template.trackTemplates.length; t++) {
                 let trackTemplate = template.trackTemplates[t];
                 let miniatureTrack = new MarbleRunSimulatorCore.MiniatureTrack();
+                console.log(baseName + " " + trackTemplate.isPipe);
+                if (trackTemplate.isPipe) {
+                    miniatureTrack.isPipe = true;
+                }
                 let materialIndex = prop.c[trackTemplate.colorIndex];
                 let mat = machine.game.materials.getMaterial(materialIndex, MarbleRunSimulatorCore.MaterialQuality.Standard);
                 if (mat instanceof BABYLON.StandardMaterial) {
@@ -6741,7 +6850,7 @@ var MarbleRunSimulatorCore;
         let showInfo = miniatureProps.showInfoBox;
         let picMargin = size / 20;
         let picSizeNoMargin = size - 2 * picMargin;
-        let lineWidth = 1;
+        let lineWidth = 2;
         canvas.width = size;
         canvas.height = size;
         let backGroundColorHex = backGroundColor.toHexString();
@@ -6869,6 +6978,9 @@ var MarbleRunSimulatorCore;
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
             context.lineWidth = 5 * lineWidth;
+            if (line instanceof MarbleRunSimulatorCore.MiniatureTrack && line.isPipe) {
+                context.lineWidth += 4;
+            }
             let normalizedH = 0;
             context.beginPath();
             let p0 = line.points[0];
@@ -6899,7 +7011,14 @@ var MarbleRunSimulatorCore;
                 context.strokeStyle = c.toHexString();
                 context.stroke();
                 context.lineWidth = 3 * lineWidth;
-                context.strokeStyle = backGroundColorHexNoAlpha;
+                if (line.isPipe) {
+                    context.lineWidth += 2;
+                    let c = BABYLON.Color4.Lerp(backGroundColor, line.color ? line.color : color4White, 0.3 * f);
+                    context.strokeStyle = c.toHexString();
+                }
+                else {
+                    context.strokeStyle = backGroundColorHexNoAlpha;
+                }
                 context.stroke();
             }
             else if (line instanceof MarbleRunSimulatorCore.MiniatureShape) {
@@ -10909,7 +11028,7 @@ var MarbleRunSimulatorCore;
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
     class Loop extends MarbleRunSimulatorCore.MachinePart {
-        constructor(machine, prop) {
+        constructor(machine, prop, underLoop) {
             super(machine, prop);
             this.setColorCount(1);
             if (!isFinite(prop.n)) {
@@ -10917,16 +11036,19 @@ var MarbleRunSimulatorCore;
             }
             prop.n = Math.min(prop.n, 2 * Math.abs(prop.d));
             prop.n = Math.max(prop.n, 1);
-            this.setTemplate(this.machine.templateManager.getTemplate(Loop.PropToPartName(prop)));
+            if (prop.pipeVersion) {
+                prop.n = Math.min(prop.n, 2);
+            }
+            this.setTemplate(this.machine.templateManager.getTemplate(Loop.PropToPartName(prop, underLoop)));
             this.generateWires();
         }
-        static PropToPartName(prop) {
-            let partName = "loop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
+        static PropToPartName(prop, underLoop) {
+            let partName = (prop.pipeVersion ? "pipe" : "") + (underLoop ? "under" : "") + "loop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
             return partName;
         }
-        static GenerateTemplate(l, d, n) {
+        static GenerateTemplate(l, d, n, pipeVersion, underLoop) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
-            template.partName = "loop_" + l.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (underLoop ? "under" : "") + "loop_" + l.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
             template.l = l;
             template.d = d;
             template.n = n;
@@ -10937,6 +11059,7 @@ var MarbleRunSimulatorCore;
             template.maxD = 32;
             template.nExtendable = true;
             template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+            template.trackTemplates[0].isPipe = pipeVersion;
             template.trackTemplates[0].onNormalEvaluated = (n) => {
                 n.z = 0;
                 n.normalize();
@@ -10949,8 +11072,14 @@ var MarbleRunSimulatorCore;
             let depthStart = 0;
             let depthEnd = MarbleRunSimulatorCore.tileSize * template.d;
             if (template.d === 0) {
-                depthStart = -MarbleRunSimulatorCore.tileSize * 0.3;
-                depthEnd = MarbleRunSimulatorCore.tileSize * 0.3;
+                if (pipeVersion) {
+                    depthStart = -MarbleRunSimulatorCore.tileSize * 0.3;
+                    depthEnd = MarbleRunSimulatorCore.tileSize * 0.3;
+                }
+                else {
+                    depthStart = -MarbleRunSimulatorCore.tileSize * 0.3;
+                    depthEnd = MarbleRunSimulatorCore.tileSize * 0.3;
+                }
             }
             for (let nLoop = 0; nLoop < loopsCount; nLoop++) {
                 for (let n = 0; n <= 8; n++) {
@@ -10969,7 +11098,13 @@ var MarbleRunSimulatorCore;
                             let c = new BABYLON.Vector3(0.5 * (xStart + xEnd), 0, 0);
                             p.subtractInPlace(c);
                             Mummu.RotateInPlace(p, BABYLON.Axis.Y, Math.PI / 12);
+                            if (pipeVersion) {
+                                Mummu.RotateInPlace(p, BABYLON.Axis.Y, Math.PI / 12);
+                            }
                             p.addInPlace(c);
+                        }
+                        if (underLoop) {
+                            p.y = -p.y;
                         }
                         template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], p));
                     }
@@ -12025,14 +12160,14 @@ var MarbleRunSimulatorCore;
                         let tPeak = v0 / 9.8;
                         ballArmed.flyBackDuration = tPeak * 1.7;
                         ballArmed.collisionState = MarbleRunSimulatorCore.CollisionState.Flyback;
-                        ballArmed.marbleChocSound.setVolume(2);
+                        ballArmed.marbleChocSound.setVolume(0.7);
                         ballArmed.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                         ballArmed.marbleChocSound.play();
                         this.currentShootState = 4;
                     }
                     else {
                         ballArmed.velocity.copyFromFloats(0, this.velocityKick, 0);
-                        ballArmed.marbleChocSound.setVolume(2);
+                        ballArmed.marbleChocSound.setVolume(0.7);
                         ballArmed.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                         ballArmed.marbleChocSound.play();
                         this.currentShootState = 4;
@@ -12771,7 +12906,11 @@ var MarbleRunSimulatorCore;
                 let dZ = ball.position.z - this.base.absolutePosition.z;
                 if (Math.abs(dY) < 0.01) {
                     if ((dX * dX + dZ * dZ) < 0.02 * 0.02) {
-                        if (ball.velocity.length() < 1) {
+                        let v = ball.velocity.length();
+                        if (v < 0.01) {
+                            ball.velocity.copyFrom(this.right);
+                        }
+                        else if (v < 1) {
                             ball.velocity.normalize().scaleInPlace(1);
                         }
                         this._rotationSpeed = 20 * Math.sign(ball.velocity.x);
@@ -14267,25 +14406,29 @@ var MarbleRunSimulatorCore;
             let aMaxTop = Math.PI * 0.5 + 0.02 / (rTop);
             aMaxTop = Nabu.MinMax(aMaxTop, 0, Math.PI);
             if (pipeVersion) {
+                let r = (yTop - yBottom) * 0.5;
+                let cY = (yTop + yBottom) * 0.5;
                 template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
                 template.trackTemplates[0].trackpoints = [
                     new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(90), MarbleRunSimulatorCore.Tools.V3Dir(0))
                 ];
                 template.trackTemplates[0].colorIndex = 1;
                 template.trackTemplates[0].isPipe = true;
-                for (let a = 4; a > 0; a--) {
-                    let f = a / 4;
+                template.trackTemplates[0].pipeIgnoresTrackNormals = true;
+                for (let a = 1; a < 8; a++) {
+                    let f = a / 8;
                     let angle = Math.PI * f;
                     let cosa = Math.cos(angle);
                     let sina = Math.sin(angle);
-                    let dir = MarbleRunSimulatorCore.Tools.V3Dir(angle / Math.PI * 180 - 90);
-                    let norm = MarbleRunSimulatorCore.Tools.V3Dir(-angle / Math.PI * 180);
-                    let p = new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5 + dY, cY, 0);
-                    p.x += sina * rBottom;
-                    p.y += cosa * rBottom;
+                    let dir = MarbleRunSimulatorCore.Tools.V3Dir(90 - angle / Math.PI * 180);
+                    let norm = new BABYLON.Vector3(0, 0, 1);
+                    let p = new BABYLON.Vector3(0, -r, 0);
+                    Mummu.RotateInPlace(p, BABYLON.Axis.Z, angle);
+                    p.x += -MarbleRunSimulatorCore.tileWidth * 0.5 + 0.005;
+                    p.y += cY;
                     template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], p, dir, norm));
                 }
-                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, cY + rBottom, 0), MarbleRunSimulatorCore.Tools.V3Dir(-90), MarbleRunSimulatorCore.Tools.V3Dir(-180)));
+                template.trackTemplates[0].trackpoints.push(new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(-MarbleRunSimulatorCore.tileWidth * 0.5, yTop, 0), MarbleRunSimulatorCore.Tools.V3Dir(-90), MarbleRunSimulatorCore.Tools.V3Dir(0)));
             }
             else {
                 template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);

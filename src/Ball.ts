@@ -10,7 +10,8 @@ namespace MarbleRunSimulatorCore {
         Bowl,
         Velvet,
         Metal,
-        Plastic
+        Plastic,
+        Plexiglas
     }
 
     export enum CollisionState {
@@ -139,6 +140,7 @@ namespace MarbleRunSimulatorCore {
         public railBumpSound: BABYLON.Sound;
         public marbleLoopSound: BABYLON.Sound;
         public marbleBowlLoopSound: BABYLON.Sound;
+        public marblePlexiglasTubeLoopSound: BABYLON.Sound;
         public marbleInsideSound: BABYLON.Sound;
 
         public flybackOrigin: BABYLON.Vector3;
@@ -156,6 +158,7 @@ namespace MarbleRunSimulatorCore {
             this.railBumpSound = new BABYLON.Sound("rail-bump-sound", "./lib/marble-run-simulator-core/datas/sounds/rail-bump.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.marbleLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop-2.wav", this.getScene(), undefined, { loop: true, autoplay: false, volume: 0 });
             this.marbleBowlLoopSound = new BABYLON.Sound("marble-bowl-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-bowl-loop.wav", this.getScene(), undefined, { loop: true, autoplay: false, volume: 0 });
+            this.marblePlexiglasTubeLoopSound = new BABYLON.Sound("marble-loop-sound", "./lib/marble-run-simulator-core/datas/sounds/marble-loop-plexiglas.wav", this.getScene(), undefined, { loop: true, autoplay: false, volume: 0 });
             this.marbleInsideSound = new BABYLON.Sound("marble-bowl-inside-sound", "./lib/marble-run-simulator-core/datas/sounds/ball_roll_wood_noloop.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.marbleInsideSound.setVolume(0.2);
 
@@ -496,7 +499,7 @@ namespace MarbleRunSimulatorCore {
                                             reactions.addInPlace(reaction);
                                             reactionsCount++;
             
-                                            this.surface = Surface.Bowl;
+                                            this.surface = Surface.Plexiglas;
                                         }
                                     }
                                 }
@@ -525,7 +528,7 @@ namespace MarbleRunSimulatorCore {
                                     let v = Math.abs(BABYLON.Vector3.Dot(this.velocity, col.normal));
                                     if (v > 0.15) {
                                         if (!this.marbleChocSound.isPlaying) {
-                                            this.marbleChocSound.setVolume(((v - 0.15) / 0.85) * this.game.mainVolume);
+                                            this.marbleChocSound.setVolume(((v - 0.15) / 0.85));
                                             if (this.surface === Surface.Metal) {
                                                 this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.8);
                                             }
@@ -827,7 +830,7 @@ namespace MarbleRunSimulatorCore {
                                 let v = this.velocity.length();
                                 if (v > 0.15) {
                                     if (!this.marbleChocSound.isPlaying) {
-                                        this.marbleChocSound.setVolume(((v - 0.15) / 0.85) * this.game.mainVolume);
+                                        this.marbleChocSound.setVolume(((v - 0.15) / 0.85));
                                         this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.marbleChocSound.play();
                                     }
@@ -948,19 +951,31 @@ namespace MarbleRunSimulatorCore {
 
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
-                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 5) + 0.8);
-                this.marbleLoopSound.setVolume(20 * this.strReaction * f * this.game.mainVolume, 0.1);
+                this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 2) + 0.5);
+                this.marbleLoopSound.setVolume(6 * this.strReaction * f, 0.1);
                 if (!this.marbleLoopSound.isPlaying) {
                     this.marbleLoopSound.play();
                 }
-                this.marbleBowlLoopSound.setVolume(0, 0.5);
-            } else if (this.surface === Surface.Bowl) {
+                this.marbleBowlLoopSound.setVolume(0, 0.2);
+                this.marblePlexiglasTubeLoopSound.setVolume(0, 0.2);
+            }
+            else if (this.surface === Surface.Plexiglas) {
+                this.marblePlexiglasTubeLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 4) + 0.75);
+                this.marblePlexiglasTubeLoopSound.setVolume(40 * this.strReaction * f, 0.1);
+                if (!this.marblePlexiglasTubeLoopSound.isPlaying) {
+                    this.marblePlexiglasTubeLoopSound.play();
+                }
+                this.marbleLoopSound.setVolume(0, 0.2);
+                this.marbleBowlLoopSound.setVolume(0, 0.2);
+            }
+            else if (this.surface === Surface.Bowl) {
                 this.marbleBowlLoopSound.setPlaybackRate(this.game.currentTimeFactor);
-                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f * this.game.mainVolume, 0.1);
+                this.marbleBowlLoopSound.setVolume(8 * this.strReaction * f, 0.1);
                 if (!this.marbleBowlLoopSound.isPlaying) {
                     this.marbleBowlLoopSound.play();
                 }
-                this.marbleLoopSound.setVolume(0, 0.5);
+                this.marbleLoopSound.setVolume(0, 0.2);
+                this.marblePlexiglasTubeLoopSound.setVolume(0, 0.2);
             }
             let sign2 = Math.sign(this.velocity.y);
 

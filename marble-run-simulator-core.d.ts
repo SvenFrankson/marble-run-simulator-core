@@ -11,7 +11,8 @@ declare namespace MarbleRunSimulatorCore {
         Bowl = 1,
         Velvet = 2,
         Metal = 3,
-        Plastic = 4
+        Plastic = 4,
+        Plexiglas = 5
     }
     enum CollisionState {
         Normal = 0,
@@ -60,6 +61,7 @@ declare namespace MarbleRunSimulatorCore {
         railBumpSound: BABYLON.Sound;
         marbleLoopSound: BABYLON.Sound;
         marbleBowlLoopSound: BABYLON.Sound;
+        marblePlexiglasTubeLoopSound: BABYLON.Sound;
         marbleInsideSound: BABYLON.Sound;
         flybackOrigin: BABYLON.Vector3;
         flybackDestination: BABYLON.Vector3;
@@ -194,6 +196,7 @@ declare namespace MarbleRunSimulatorCore {
     class MiniatureTrack {
         points: BABYLON.Vector3[];
         color: BABYLON.Color4;
+        isPipe: boolean;
         dist: number;
     }
     class MiniatureShape {
@@ -285,7 +288,6 @@ declare namespace MarbleRunSimulatorCore {
         currentTimeFactor: number;
         physicDT: number;
         timeFactor: number;
-        mainVolume: number;
         averagedFPS: number;
     }
     enum GameMode {
@@ -760,6 +762,7 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class PipeTrack extends Track {
+        static PIPE_OFFSET_OVER_BASETRACK: number;
         ringsMesh: BABYLON.Mesh;
         tubeMesh: BABYLON.Mesh;
         tubePath: BABYLON.Vector3[];
@@ -818,6 +821,7 @@ declare namespace MarbleRunSimulatorCore {
         cutOutSleeper: (n: number) => boolean;
         colorIndex: number;
         isPipe: boolean;
+        pipeIgnoresTrackNormals: boolean;
         isWood: boolean;
         get isPipeOrWood(): boolean;
         summedLength: number[];
@@ -1264,9 +1268,9 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class Loop extends MachinePart {
-        constructor(machine: Machine, prop: IMachinePartProp);
-        static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(l: number, d: number, n: number): MachinePartTemplate;
+        constructor(machine: Machine, prop: IMachinePartProp, underLoop?: boolean);
+        static PropToPartName(prop: IMachinePartProp, underLoop?: boolean): string;
+        static GenerateTemplate(l: number, d: number, n: number, pipeVersion?: boolean, underLoop?: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

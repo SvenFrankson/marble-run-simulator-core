@@ -2,7 +2,7 @@
 
 namespace MarbleRunSimulatorCore {
     export class Loop extends MachinePart {
-        constructor(machine: Machine, prop: IMachinePartProp) {
+        constructor(machine: Machine, prop: IMachinePartProp, underLoop?: boolean) {
             super(machine, prop);
             this.setColorCount(1);
 
@@ -11,20 +11,23 @@ namespace MarbleRunSimulatorCore {
             }
             prop.n = Math.min(prop.n, 2 * Math.abs(prop.d));
             prop.n = Math.max(prop.n, 1);
+            if (prop.pipeVersion) {
+                prop.n = Math.min(prop.n, 2);
+            }
 
-            this.setTemplate(this.machine.templateManager.getTemplate(Loop.PropToPartName(prop)));
+            this.setTemplate(this.machine.templateManager.getTemplate(Loop.PropToPartName(prop, underLoop)));
             this.generateWires();
         }
 
-        public static PropToPartName(prop: IMachinePartProp): string {
-            let partName = "loop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
+        public static PropToPartName(prop: IMachinePartProp, underLoop?: boolean): string {
+            let partName = (prop.pipeVersion ? "pipe" : "") + (underLoop ? "under" : "") + "loop_" + prop.l.toFixed(0) + "." + prop.d.toFixed(0) + "." + prop.n.toFixed(0);
             return partName;
         }
 
-        public static GenerateTemplate(l: number, d: number, n: number): MachinePartTemplate {
+        public static GenerateTemplate(l: number, d: number, n: number, pipeVersion?: boolean, underLoop?: boolean): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "loop_" + l.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
+            template.partName = (pipeVersion ? "pipe" : "") + (underLoop ? "under" : "") + "loop_" + l.toFixed(0) + "." + d.toFixed(0) + "." + n.toFixed(0);
 
             template.l = l;
             template.d = d;
@@ -38,6 +41,7 @@ namespace MarbleRunSimulatorCore {
             template.nExtendable = true;
 
             template.trackTemplates[0] = new TrackTemplate(template);
+            template.trackTemplates[0].isPipe = pipeVersion;
             template.trackTemplates[0].onNormalEvaluated = (n) => {
                 n.z = 0;
                 n.normalize();
@@ -51,8 +55,14 @@ namespace MarbleRunSimulatorCore {
             let depthStart = 0;
             let depthEnd = tileSize * template.d;
             if (template.d === 0) {
-                depthStart = - tileSize * 0.3;
-                depthEnd = tileSize * 0.3;
+                if (pipeVersion) {
+                    depthStart = - tileSize * 0.3;
+                    depthEnd = tileSize * 0.3;
+                }
+                else {
+                    depthStart = - tileSize * 0.3;
+                    depthEnd = tileSize * 0.3;
+                }
             }
 
             for (let nLoop = 0; nLoop < loopsCount; nLoop++) {
@@ -74,7 +84,13 @@ namespace MarbleRunSimulatorCore {
                             let c = new BABYLON.Vector3(0.5 * (xStart + xEnd), 0, 0);
                             p.subtractInPlace(c);
                             Mummu.RotateInPlace(p, BABYLON.Axis.Y, Math.PI / 12);
+                            if (pipeVersion) {
+                                Mummu.RotateInPlace(p, BABYLON.Axis.Y, Math.PI / 12);
+                            }
                             p.addInPlace(c);
+                        }
+                        if (underLoop) {
+                            p.y = - p.y;
                         }
                         template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], p));
                     }

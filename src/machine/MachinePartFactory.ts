@@ -48,7 +48,9 @@ namespace MarbleRunSimulatorCore {
         "dropside",
         "dropback",
         "pipecurb",
-        "pipeuturnsharp"
+        "pipeuturnsharp",
+        "pipeloop",
+        "pipeunderloop"
     ];
 
     export interface IMachinePartProp {
@@ -314,6 +316,32 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Loop(this.machine, prop);
             }
+            if (partName === "pipeloop" || partName.startsWith("pipeloop_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    let n = parseInt(argStr.split(".")[2]);
+                    prop.l = w;
+                    prop.d = d;
+                    prop.n = n;
+                }
+                prop.pipeVersion = true;
+                return new Loop(this.machine, prop);
+            }
+            if (partName === "pipeunderloop" || partName.startsWith("pipeunderloop_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let d = parseInt(argStr.split(".")[1]);
+                    let n = parseInt(argStr.split(".")[2]);
+                    prop.l = w;
+                    prop.d = d;
+                    prop.n = n;
+                }
+                prop.pipeVersion = true;
+                return new Loop(this.machine, prop, true);
+            }
             if (partName === "spiral" || partName.startsWith("spiral_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
@@ -546,6 +574,14 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "loop") {
                 return new Loop(this.machine, prop);
+            }
+            if (baseName === "pipeloop") {
+                prop.pipeVersion = true;
+                return new Loop(this.machine, prop);
+            }
+            if (baseName === "pipeunderloop") {
+                prop.pipeVersion = true;
+                return new Loop(this.machine, prop, true);
             }
             if (baseName === "spiral") {
                 return new Spiral(this.machine, prop);

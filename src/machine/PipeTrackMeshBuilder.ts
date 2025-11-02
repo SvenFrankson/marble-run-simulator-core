@@ -67,11 +67,18 @@ namespace MarbleRunSimulatorCore {
             Mummu.RemoveFromEndForDistanceInPlace(points, 0.001);
             Mummu.DecimatePathInPlace(points, (2 / 180) * Math.PI, normals);
 
-            points = points.map((pt, i) => {
-                return pt.add(normals[i].scale(0.008));
-            });
+            if (track.template.pipeIgnoresTrackNormals) {
+                points = points.map((pt, i) => {
+                    return pt.add(BABYLON.Vector3.Up().scale(0.0085));
+                });
+            }
+            else {
+                points = points.map((pt, i) => {
+                    return pt.add(normals[i].scale(0.0085));
+                });
+            }
             
-            let pipeData = Mummu.CreateWireVertexData({ path: points, pathUps: normals, tesselation: 12, radius: 0.011, color: new BABYLON.Color4(1, 1, 1, 1), closed: false, textureRatio: 4 });
+            let pipeData = Mummu.CreateWireVertexData({ path: points, pathUps: track.template.pipeIgnoresTrackNormals ? undefined : normals, tesselation: 12, radius: 0.011, color: new BABYLON.Color4(1, 1, 1, 1), closed: false, textureRatio: 4 });
             let flip = Mummu.CloneVertexData(pipeData);
             Mummu.TriFlipVertexDataInPlace(flip);
 

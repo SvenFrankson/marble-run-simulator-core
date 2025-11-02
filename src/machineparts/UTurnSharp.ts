@@ -54,34 +54,40 @@ namespace MarbleRunSimulatorCore {
             aMaxTop = Nabu.MinMax(aMaxTop, 0, Math.PI);
 
             if (pipeVersion) {
+                let r = (yTop - yBottom) * 0.5;
+                let cY = (yTop + yBottom) * 0.5;
+
                 template.trackTemplates[0] = new TrackTemplate(template);
                 template.trackTemplates[0].trackpoints = [
                     new TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(- tileWidth * 0.5, yBottom, 0), Tools.V3Dir(90), Tools.V3Dir(0))
                 ];
                 template.trackTemplates[0].colorIndex = 1;
                 template.trackTemplates[0].isPipe = true;
+                template.trackTemplates[0].pipeIgnoresTrackNormals = true;
 
-                for (let a = 4; a > 0; a--) {
-                    let f = a / 4;
+                for (let a = 1; a < 8; a++) {
+                    let f = a / 8;
                     let angle = Math.PI * f;
                     let cosa = Math.cos(angle);
                     let sina = Math.sin(angle);
 
-                    let dir = Tools.V3Dir(angle / Math.PI * 180 - 90);
-                    let norm = Tools.V3Dir(- angle / Math.PI * 180);
+                    let dir = Tools.V3Dir(90 - angle / Math.PI * 180);
+                    let norm = new BABYLON.Vector3(0, 0, 1);
 
-                    let p = new BABYLON.Vector3(- tileWidth * 0.5 + dY, cY, 0);
-                    p.x += sina * rBottom;
-                    p.y += cosa * rBottom;
+                    let p = new BABYLON.Vector3(0, -r, 0);
+                    Mummu.RotateInPlace(p, BABYLON.Axis.Z, angle);
+                    p.x += - tileWidth * 0.5 + 0.005;
+                    p.y += cY;
+
                     template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], p, dir, norm));
                 }
 
                 template.trackTemplates[0].trackpoints.push(
                     new TrackPoint(
                         template.trackTemplates[0],
-                        new BABYLON.Vector3(- tileWidth * 0.5, cY + rBottom, 0),
+                        new BABYLON.Vector3(- tileWidth * 0.5, yTop, 0),
                         Tools.V3Dir(-90),
-                        Tools.V3Dir(-180)
+                        Tools.V3Dir(0)
                     )
                 );
             }

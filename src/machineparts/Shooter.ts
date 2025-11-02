@@ -437,14 +437,14 @@ namespace MarbleRunSimulatorCore {
                         let tPeak = v0 / 9.8;
                         ballArmed.flyBackDuration = tPeak * 1.7;
                         ballArmed.collisionState = CollisionState.Flyback;
-                        ballArmed.marbleChocSound.setVolume(2);
+                        ballArmed.marbleChocSound.setVolume(0.7);
                         ballArmed.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                         ballArmed.marbleChocSound.play();
                         this.currentShootState = 4;
                     }
                     else {
                         ballArmed.velocity.copyFromFloats(0, this.velocityKick, 0);
-                        ballArmed.marbleChocSound.setVolume(2);
+                        ballArmed.marbleChocSound.setVolume(0.7);
                         ballArmed.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                         ballArmed.marbleChocSound.play();
                         this.currentShootState = 4;

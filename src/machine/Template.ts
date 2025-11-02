@@ -30,6 +30,7 @@ namespace MarbleRunSimulatorCore {
 
         public colorIndex: number = 0;
         public isPipe: boolean = false;
+        public pipeIgnoresTrackNormals: boolean = false;
         public isWood: boolean = false;
         public get isPipeOrWood(): boolean {
             return this.isPipe || this.isWood;
@@ -521,6 +522,18 @@ namespace MarbleRunSimulatorCore {
                     let n = parseInt(partName.split("_")[1].split(".")[2]);
                     data = Loop.GenerateTemplate(l, d, n);
                 }
+                else if (partName.startsWith("pipeloop_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let n = parseInt(partName.split("_")[1].split(".")[2]);
+                    data = Loop.GenerateTemplate(l, d, n, true);
+                }
+                else if (partName.startsWith("pipeunderloop_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let d = parseInt(partName.split("_")[1].split(".")[1]);
+                    let n = parseInt(partName.split("_")[1].split(".")[2]);
+                    data = Loop.GenerateTemplate(l, d, n, true, true);
+                }
                 else if (partName.startsWith("spiral_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
@@ -608,12 +621,14 @@ namespace MarbleRunSimulatorCore {
                 partName = Curb.PropToPartName(prop);
             }
             else if (baseName === "pipecurb") {
+                prop.pipeVersion = true;
                 partName = Curb.PropToPartName(prop);
             }
             else if (baseName === "uturn") {
                 partName = UTurn.PropToPartName(prop);
             }
             else if (baseName === "pipeuturn") {
+                prop.pipeVersion = true;
                 partName = UTurn.PropToPartName(prop);
             }
             else if (baseName === "wooduturn") {
@@ -626,6 +641,7 @@ namespace MarbleRunSimulatorCore {
                 partName = UTurnSharp.PropToPartName(prop);
             }
             else if (baseName === "pipeuturnsharp") {
+                prop.pipeVersion = true;
                 partName = UTurnSharp.PropToPartName(prop);
             }
             else if (baseName === "ramp") {
@@ -635,6 +651,7 @@ namespace MarbleRunSimulatorCore {
                 partName = Ramp.PropToPartName(prop);
             }
             else if (baseName === "piperamp") {
+                prop.pipeVersion = true;
                 partName = Ramp.PropToPartName(prop);
             }
             else if (baseName === "woodramp") {
@@ -690,6 +707,14 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "loop") {
                 partName = Loop.PropToPartName(prop);
+            }
+            else if (baseName === "pipeloop") {
+                prop.pipeVersion = true;
+                partName = Loop.PropToPartName(prop);
+            }
+            else if (baseName === "pipeunderloop") {
+                prop.pipeVersion = true;
+                partName = Loop.PropToPartName(prop, true);
             }
             else if (baseName === "spiral") {
                 partName = Spiral.PropToPartName(prop);

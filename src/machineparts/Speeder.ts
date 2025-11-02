@@ -94,7 +94,11 @@ namespace MarbleRunSimulatorCore {
                 let dZ = ball.position.z - this.base.absolutePosition.z;
                 if (Math.abs(dY) < 0.01) {
                     if ((dX * dX + dZ * dZ) < 0.02 * 0.02) {
-                        if (ball.velocity.length() < 1) {
+                        let v = ball.velocity.length();
+                        if (v < 0.01) {
+                            ball.velocity.copyFrom(this.right);
+                        }
+                        else if (v < 1) {
                             ball.velocity.normalize().scaleInPlace(1);
                         }
                         this._rotationSpeed = 20 * Math.sign(ball.velocity.x);

@@ -2,6 +2,8 @@
 
 namespace MarbleRunSimulatorCore {
     export class PipeTrack extends Track {
+        public static PIPE_OFFSET_OVER_BASETRACK: number = 0.0085;
+
         public ringsMesh: BABYLON.Mesh;
         public tubeMesh: BABYLON.Mesh;
         public tubePath: BABYLON.Vector3[] = [];
@@ -158,13 +160,19 @@ namespace MarbleRunSimulatorCore {
             let points = [...this.templateInterpolatedPoints].map((p) => {
                 return p.clone();
             });
-            let normals = [...this.trackInterpolatedNormals].map((p) => {
-                return p.clone();
-            });
 
-            this.tubePath = points.map((pt, i) => {
-                return pt.add(normals[i].scale(0.008));
-            });
+            if (this.template.pipeIgnoresTrackNormals) {
+                this.tubePath = points;
+                points.forEach((pt, i) => {
+                    return pt.y += PipeTrack.PIPE_OFFSET_OVER_BASETRACK;
+                });
+            }
+            else {
+                this.tubePath = points;
+                points.forEach((pt, i) => {
+                    pt.addInPlace(this.trackInterpolatedNormals[i].scale(PipeTrack.PIPE_OFFSET_OVER_BASETRACK));
+                });
+            }
 
             for (let i = 0; i < this.tubePath.length; i++) {
                 BABYLON.Vector3.TransformCoordinatesToRef(this.tubePath[i], this.part.getWorldMatrix(), this.tubePath[i]);
