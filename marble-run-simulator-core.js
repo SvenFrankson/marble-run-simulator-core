@@ -6742,7 +6742,6 @@ var MarbleRunSimulatorCore;
             for (let t = 0; t < template.trackTemplates.length; t++) {
                 let trackTemplate = template.trackTemplates[t];
                 let miniatureTrack = new MarbleRunSimulatorCore.MiniatureTrack();
-                console.log(baseName + " " + trackTemplate.isPipe);
                 if (trackTemplate.isPipe) {
                     miniatureTrack.isPipe = true;
                 }
