@@ -118,6 +118,7 @@ namespace MarbleRunSimulatorCore {
                         machine.sleepersMeshProp = data.sp;
                     }
                 }
+                machine.constructionMode = MachineConstructionMode.Mode3D;
             
                 machine.balls = [];
                 machine.parts = [];

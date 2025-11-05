@@ -179,19 +179,23 @@ var MarbleRunSimulatorCore;
             }
             if (this.machine.playing || this.machine.paused || (this.frozen && this.machine.stopped)) {
                 this.renderOutline = false;
-                this.positionZeroGhost.visibility = 0.5;
-                this.positionZeroGhost.renderOutline = true;
-                this.positionZeroGhost.outlineWidth = MarbleRunSimulatorCore.UI3DConstants.outlineWidth;
-                this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineBaseColor);
-                if (this._hovered) {
-                    this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor);
-                }
-                if (this._selected) {
-                    this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor);
+                if (this.positionZeroGhost) {
+                    this.positionZeroGhost.visibility = 0.5;
+                    this.positionZeroGhost.renderOutline = true;
+                    this.positionZeroGhost.outlineWidth = MarbleRunSimulatorCore.UI3DConstants.outlineWidth;
+                    this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineBaseColor);
+                    if (this._hovered) {
+                        this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor);
+                    }
+                    if (this._selected) {
+                        this.positionZeroGhost.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor);
+                    }
                 }
             }
             else {
-                this.positionZeroGhost.visibility = 0;
+                if (this.positionZeroGhost) {
+                    this.positionZeroGhost.visibility = 0;
+                }
                 this.renderOutline = true;
                 this.outlineWidth = MarbleRunSimulatorCore.UI3DConstants.outlineWidth;
                 this.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineBaseColor);
@@ -7092,6 +7096,7 @@ var MarbleRunSimulatorCore;
         if (data.author) {
             machine.author = data.author;
         }
+        machine.constructionMode = MarbleRunSimulatorCore.MachineConstructionMode.Mode3D;
         machine.balls = [];
         machine.parts = [];
         for (let i = 0; i < data.balls.length; i++) {
@@ -7528,6 +7533,7 @@ var MarbleRunSimulatorCore;
                 if (data.author) {
                     machine.author = data.author;
                 }
+                machine.constructionMode = MarbleRunSimulatorCore.MachineConstructionMode.Mode3D;
                 machine.balls = [];
                 machine.parts = [];
             }
@@ -7961,6 +7967,7 @@ var MarbleRunSimulatorCore;
                 if (data.a) {
                     machine.author = data.a;
                 }
+                machine.constructionMode = MarbleRunSimulatorCore.MachineConstructionMode.Mode3D;
                 machine.balls = [];
                 machine.parts = [];
             }
@@ -8137,6 +8144,7 @@ var MarbleRunSimulatorCore;
                 else {
                     machine._roomIndex = 0;
                 }
+                machine.constructionMode = MarbleRunSimulatorCore.MachineConstructionMode.Mode3D;
                 machine.balls = [];
                 machine.parts = [];
             }
@@ -8338,6 +8346,7 @@ var MarbleRunSimulatorCore;
                 if (data.author) {
                     machine.author = data.author;
                 }
+                machine.constructionMode = MarbleRunSimulatorCore.MachineConstructionMode.Mode3D;
                 machine.balls = [];
                 machine.parts = [];
             }
@@ -8557,6 +8566,7 @@ var MarbleRunSimulatorCore;
                         machine.sleepersMeshProp = data.sp;
                     }
                 }
+                machine.constructionMode = MarbleRunSimulatorCore.MachineConstructionMode.Mode3D;
                 machine.balls = [];
                 machine.parts = [];
             }
@@ -11360,7 +11370,7 @@ var MarbleRunSimulatorCore;
             this._lastCamRotZ = 0;
             this._visibleAngularSpeed = 0;
             this.setColorCount(2);
-            if (machine.version < 11) {
+            if (machine.version < 11 || machine.dbId === 354) {
                 this.anteV11Case = true;
             }
             this.setTemplate(this.machine.templateManager.getTemplate(Screen.PropToPartName(prop)));

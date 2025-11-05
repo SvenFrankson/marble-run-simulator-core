@@ -193,21 +193,25 @@ namespace MarbleRunSimulatorCore {
             }
             if (this.machine.playing || this.machine.paused || (this.frozen && this.machine.stopped)) {
                 this.renderOutline = false;
-                this.positionZeroGhost.visibility = 0.5;
+                if (this.positionZeroGhost) {
+                    this.positionZeroGhost.visibility = 0.5;
 
-                this.positionZeroGhost.renderOutline = true;
-                this.positionZeroGhost.outlineWidth = UI3DConstants.outlineWidth;
-                this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineBaseColor);
-              
-                if (this._hovered) {
-                    this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineHoverColor);
-                }
-                if (this._selected) {
-                    this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineSelectedColor);
+                    this.positionZeroGhost.renderOutline = true;
+                    this.positionZeroGhost.outlineWidth = UI3DConstants.outlineWidth;
+                    this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineBaseColor);
+                
+                    if (this._hovered) {
+                        this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineHoverColor);
+                    }
+                    if (this._selected) {
+                        this.positionZeroGhost.outlineColor.copyFrom(UI3DConstants.outlineSelectedColor);
+                    }
                 }
             }
             else {
-                this.positionZeroGhost.visibility = 0;
+                if (this.positionZeroGhost) {
+                    this.positionZeroGhost.visibility = 0;
+                }
 
                 this.renderOutline = true;
                 this.outlineWidth = UI3DConstants.outlineWidth;

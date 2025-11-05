@@ -102,6 +102,7 @@ namespace MarbleRunSimulatorCore {
                 else {
                     machine._roomIndex = 0;
                 }
+                machine.constructionMode = MachineConstructionMode.Mode3D;
             
                 machine.balls = [];
                 machine.parts = [];

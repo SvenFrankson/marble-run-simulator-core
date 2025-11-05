@@ -107,6 +107,7 @@ namespace MarbleRunSimulatorCore {
                 if (data.author) {
                     machine.author = data.author;
                 }
+                machine.constructionMode = MachineConstructionMode.Mode3D;
             
                 machine.balls = [];
                 machine.parts = [];

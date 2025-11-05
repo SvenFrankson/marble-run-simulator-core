@@ -23,7 +23,7 @@ namespace MarbleRunSimulatorCore {
             super(machine, prop);
             this.setColorCount(2);
 
-            if (machine.version < 11) {
+            if (machine.version < 11 || machine.dbId === 354) {
                 this.anteV11Case = true;
             }
 
