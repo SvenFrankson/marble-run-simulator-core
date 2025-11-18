@@ -50,7 +50,8 @@ namespace MarbleRunSimulatorCore {
         "pipecurb",
         "pipeuturnsharp",
         "pipeloop",
-        "pipeunderloop"
+        "pipeunderloop",
+        "coil"
     ];
 
     export interface IMachinePartProp {
@@ -362,6 +363,16 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new SpiralUTurn(this.machine, prop);
             }
+            if (partName === "coil" || partName.startsWith("coil_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = w;
+                    prop.h = h;
+                }
+                return new Coil(this.machine, prop);
+            }
             if (partName === "join") {
                 return new Join(this.machine, prop);
             }
@@ -588,6 +599,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "spiralUTurn") {
                 return new SpiralUTurn(this.machine, prop);
+            }
+            if (baseName === "coil") {
+                return new Coil(this.machine, prop);
             }
             if (baseName === "join") {
                 return new Join(this.machine, prop);

@@ -19,6 +19,8 @@ namespace MarbleRunSimulatorCore {
             return this.size * 0.5;
         }
 
+        public doubleContactPoints: boolean = false;
+
         public colorIndex: number;
         public startTipCenter: BABYLON.Vector3;
         public startTipNormal: BABYLON.Vector3;

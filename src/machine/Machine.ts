@@ -132,6 +132,7 @@ namespace MarbleRunSimulatorCore {
         content?: string; // v12
         state?: MachineDBState; // v12
         likes?: number; // v12
+        creation?: string;
         mode?: MachineConstructionMode;
     }
 
@@ -947,7 +948,7 @@ namespace MarbleRunSimulatorCore {
                     this.dbState = data.state;
                 }
                 if (isFinite(data.likes)) {
-                    this.dbLikes = data.likes;
+                    this.dbLikes = data.likes + Machine.CreationStringToExtraLikes(data.creation);
                 }
 
                 if (isFinite(data.id)) {
@@ -976,6 +977,24 @@ namespace MarbleRunSimulatorCore {
                     return DeserializeV12(this, data, makeMiniature);
                 }
             }
+        }
+
+        public static CreationStringToExtraLikes(creationString: string): number {
+            return 0;
+            if (creationString) {
+                try {
+                    let creationDate = new Date(creationString);
+                    let creationMinute = creationDate.getMinutes();
+                    let max = 5 + creationMinute % 5;
+                    let age = new Date().getTime() - creationDate.getTime();
+                    let hours = Math.floor(age / 1000 / 3600);
+                    return Nabu.MinMax(hours, 0, max);
+                }
+                catch (e) {
+                    console.error(e);
+                }
+            }
+            return 0;
         }
 
         public getEncloseStart(): BABYLON.Vector3 {

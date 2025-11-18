@@ -1366,6 +1366,27 @@ namespace MarbleRunSimulatorCore {
                     z1 = Math.max(tZ1, z1);
                 }
             }
+            this.wires.forEach(wire => {
+                wire.path.forEach(pt => {
+                    let tX0 = pt.x;
+                    x0 = Math.min(tX0, x0);
+
+                    let tX1 = pt.x;
+                    x1 = Math.max(tX1, x1);
+
+                    let tY0 = pt.y;
+                    y0 = Math.min(tY0, y0);
+
+                    let tY1 = pt.y;
+                    y1 = Math.max(tY1, y1);
+
+                    let tZ0 = pt.z;
+                    z0 = Math.min(tZ0, z0);
+
+                    let tZ1 = pt.z;
+                    z1 = Math.max(tZ1, z1);
+                });
+            })
 
             x0 = Math.round((x0 - tileSize * 0.5) / tileSize) * tileSize + tileSize * 0.5;
             x1 = Math.round((x1 + tileSize * 0.5) / tileSize) * tileSize - tileSize * 0.5;

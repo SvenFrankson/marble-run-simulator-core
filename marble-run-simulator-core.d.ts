@@ -231,6 +231,7 @@ declare namespace MarbleRunSimulatorCore {
         wireSize: number;
         get size(): number;
         get radius(): number;
+        doubleContactPoints: boolean;
         colorIndex: number;
         startTipCenter: BABYLON.Vector3;
         startTipNormal: BABYLON.Vector3;
@@ -343,6 +344,7 @@ declare namespace MarbleRunSimulatorCore {
         content?: string;
         state?: MachineDBState;
         likes?: number;
+        creation?: string;
         mode?: MachineConstructionMode;
     }
     class Machine {
@@ -431,6 +433,7 @@ declare namespace MarbleRunSimulatorCore {
         static MakeMiniature(machine: Machine, data: IMachineData, miniatureProps?: IMiniatureProps): HTMLCanvasElement;
         lastDeserializedData: IMachineData;
         deserialize(data: IMachineData, makeMiniature?: boolean): void;
+        static CreationStringToExtraLikes(creationString: string): number;
         getEncloseStart(): BABYLON.Vector3;
         getEncloseEnd(): BABYLON.Vector3;
         requestUpdateBaseMesh: boolean;
@@ -1074,6 +1077,13 @@ declare namespace MarbleRunSimulatorCore {
         private _exitLeft;
         private _moving;
         update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class Coil extends MachinePart {
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

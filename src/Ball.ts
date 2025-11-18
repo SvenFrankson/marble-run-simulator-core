@@ -474,6 +474,28 @@ namespace MarbleRunSimulatorCore {
                                     reactionsCount++;
     
                                     this.surface = Surface.Rail;
+
+                                    if (wire.doubleContactPoints) {
+                                        col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.8, true, index, range, col.point, part.wireGauge * 0.9);
+                                        //}
+                                        if (col.hit) {
+                                            //this.setLastHit(wire, col.index);
+                                            let colDig = col.normal.scale(-1);
+                                            // Move away from collision
+                                            forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                            // Cancel depth component of speed
+                                            let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                            if (depthSpeed > 0) {
+                                                canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                            }
+                                            // Add ground reaction
+                                            let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                            reactions.addInPlace(reaction);
+                                            reactionsCount++;
+            
+                                            this.surface = Surface.Rail;
+                                        }
+                                    }
                                 }
                             });
                             part.tracks.forEach(track => {

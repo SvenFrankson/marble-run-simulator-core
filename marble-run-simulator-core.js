@@ -415,6 +415,26 @@ var MarbleRunSimulatorCore;
                                     reactions.addInPlace(reaction);
                                     reactionsCount++;
                                     this.surface = Surface.Rail;
+                                    if (wire.doubleContactPoints) {
+                                        col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.8, true, index, range, col.point, part.wireGauge * 0.9);
+                                        //}
+                                        if (col.hit) {
+                                            //this.setLastHit(wire, col.index);
+                                            let colDig = col.normal.scale(-1);
+                                            // Move away from collision
+                                            forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                            // Cancel depth component of speed
+                                            let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                            if (depthSpeed > 0) {
+                                                canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                            }
+                                            // Add ground reaction
+                                            let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                            reactions.addInPlace(reaction);
+                                            reactionsCount++;
+                                            this.surface = Surface.Rail;
+                                        }
+                                    }
                                 }
                             });
                             part.tracks.forEach(track => {
@@ -1638,6 +1658,7 @@ var MarbleRunSimulatorCore;
             this.path = [];
             this.normals = [];
             this.absolutePath = [];
+            this.doubleContactPoints = false;
             this.parent = this.part;
             this.rotationQuaternion = BABYLON.Quaternion.Identity();
         }
@@ -2559,7 +2580,7 @@ var MarbleRunSimulatorCore;
                     this.dbState = data.state;
                 }
                 if (isFinite(data.likes)) {
-                    this.dbLikes = data.likes;
+                    this.dbLikes = data.likes + Machine.CreationStringToExtraLikes(data.creation);
                 }
                 if (isFinite(data.id)) {
                     this.dbId = data.id;
@@ -2586,6 +2607,23 @@ var MarbleRunSimulatorCore;
                     return MarbleRunSimulatorCore.DeserializeV12(this, data, makeMiniature);
                 }
             }
+        }
+        static CreationStringToExtraLikes(creationString) {
+            return 0;
+            if (creationString) {
+                try {
+                    let creationDate = new Date(creationString);
+                    let creationMinute = creationDate.getMinutes();
+                    let max = 5 + creationMinute % 5;
+                    let age = new Date().getTime() - creationDate.getTime();
+                    let hours = Math.floor(age / 1000 / 3600);
+                    return Nabu.MinMax(hours, 0, max);
+                }
+                catch (e) {
+                    console.error(e);
+                }
+            }
+            return 0;
         }
         getEncloseStart() {
             let encloseStart = new BABYLON.Vector3(Infinity, -Infinity, -Infinity);
@@ -3952,6 +3990,22 @@ var MarbleRunSimulatorCore;
                     z1 = Math.max(tZ1, z1);
                 }
             }
+            this.wires.forEach(wire => {
+                wire.path.forEach(pt => {
+                    let tX0 = pt.x;
+                    x0 = Math.min(tX0, x0);
+                    let tX1 = pt.x;
+                    x1 = Math.max(tX1, x1);
+                    let tY0 = pt.y;
+                    y0 = Math.min(tY0, y0);
+                    let tY1 = pt.y;
+                    y1 = Math.max(tY1, y1);
+                    let tZ0 = pt.z;
+                    z0 = Math.min(tZ0, z0);
+                    let tZ1 = pt.z;
+                    z1 = Math.max(tZ1, z1);
+                });
+            });
             x0 = Math.round((x0 - MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize) * MarbleRunSimulatorCore.tileSize + MarbleRunSimulatorCore.tileSize * 0.5;
             x1 = Math.round((x1 + MarbleRunSimulatorCore.tileSize * 0.5) / MarbleRunSimulatorCore.tileSize) * MarbleRunSimulatorCore.tileSize - MarbleRunSimulatorCore.tileSize * 0.5;
             y0 = Math.round((y0 - MarbleRunSimulatorCore.tileHeight * 0.5) / MarbleRunSimulatorCore.tileHeight) * MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * 0.5;
@@ -4340,7 +4394,8 @@ var MarbleRunSimulatorCore;
         "pipecurb",
         "pipeuturnsharp",
         "pipeloop",
-        "pipeunderloop"
+        "pipeunderloop",
+        "coil"
     ];
     class MachinePartFactory {
         constructor(machine) {
@@ -4630,6 +4685,16 @@ var MarbleRunSimulatorCore;
                 }
                 return new MarbleRunSimulatorCore.SpiralUTurn(this.machine, prop);
             }
+            if (partName === "coil" || partName.startsWith("coil_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let w = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.l = w;
+                    prop.h = h;
+                }
+                return new MarbleRunSimulatorCore.Coil(this.machine, prop);
+            }
             if (partName === "join") {
                 return new MarbleRunSimulatorCore.Join(this.machine, prop);
             }
@@ -4854,6 +4919,9 @@ var MarbleRunSimulatorCore;
             }
             if (baseName === "spiralUTurn") {
                 return new MarbleRunSimulatorCore.SpiralUTurn(this.machine, prop);
+            }
+            if (baseName === "coil") {
+                return new MarbleRunSimulatorCore.Coil(this.machine, prop);
             }
             if (baseName === "join") {
                 return new MarbleRunSimulatorCore.Join(this.machine, prop);
@@ -6096,6 +6164,11 @@ var MarbleRunSimulatorCore;
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = MarbleRunSimulatorCore.SpiralUTurn.GenerateTemplate(l, h);
                 }
+                else if (partName.startsWith("coil_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = MarbleRunSimulatorCore.Coil.GenerateTemplate(l, h);
+                }
                 else if (partName === "quarter") {
                     data = MarbleRunSimulatorCore.QuarterNote.GenerateTemplate(mirror);
                 }
@@ -6270,6 +6343,9 @@ var MarbleRunSimulatorCore;
             }
             else if (baseName === "spiralUTurn") {
                 partName = MarbleRunSimulatorCore.SpiralUTurn.PropToPartName(prop);
+            }
+            else if (baseName === "coil") {
+                partName = MarbleRunSimulatorCore.Coil.PropToPartName(prop);
             }
             else if (baseName === "quarter") {
                 partName = MarbleRunSimulatorCore.QuarterNote.PropToPartName(prop);
@@ -9202,6 +9278,86 @@ var MarbleRunSimulatorCore;
     }
     BitSplit.pivotL = 0.013;
     MarbleRunSimulatorCore.BitSplit = BitSplit;
+})(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
+/// <reference path="../machine/MachinePart.ts"/>
+var MarbleRunSimulatorCore;
+(function (MarbleRunSimulatorCore) {
+    class Coil extends MarbleRunSimulatorCore.MachinePart {
+        constructor(machine, prop) {
+            super(machine, prop);
+            this.setColorCount(1);
+            this.setTemplate(this.machine.templateManager.getTemplate(Coil.PropToPartName(prop), prop.mirrorX, prop.mirrorZ));
+            let coilWire = new MarbleRunSimulatorCore.Wire(this);
+            coilWire.doubleContactPoints = true;
+            coilWire.colorIndex = 0;
+            coilWire.path = [];
+            let x0 = -MarbleRunSimulatorCore.tileSize * 0.5;
+            let x1 = MarbleRunSimulatorCore.tileSize * (this.l - 0.5);
+            let s = this.l * 0.5 * MarbleRunSimulatorCore.tileSize;
+            let h = this.h * MarbleRunSimulatorCore.tileHeight;
+            let yMin = -(h - h * (this.wireGauge * 0.7) / s);
+            let tanB = h / s;
+            let bank = Math.atan(tanB);
+            let cosB = Math.cos(bank);
+            let sinB = Math.sin(bank);
+            let length = Math.sqrt(s * s + h * h);
+            let count = Math.floor(length / this.wireGauge);
+            let r0 = s;
+            for (let n = 0; n <= count + 1; n++) {
+                for (let i = 0; i < 64; i++) {
+                    let r = r0 - (n + i / 64) * this.wireGauge * cosB;
+                    let clampedR = Math.max(this.wireGauge * 0.7, r);
+                    let a = i / 64 * 2 * Math.PI;
+                    let z = Math.cos(a) * clampedR;
+                    let x = Math.sin(a) * clampedR;
+                    let y = -(n + i / 64) * this.wireGauge * sinB;
+                    let drop = Math.abs(r - clampedR);
+                    drop = Math.min(drop, MarbleRunSimulatorCore.tileHeight * 0.5);
+                    y = Math.max(y, yMin) - drop;
+                    coilWire.path.push(new BABYLON.Vector3(0.5 * (x0 + x1) + x, y, -r0 + this.wireGauge * 0.5 + z));
+                }
+            }
+            this.wires.push(coilWire);
+            this.generateWires();
+        }
+        static PropToPartName(prop) {
+            return "coil_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+        }
+        static GenerateTemplate(l, h) {
+            let template = new MarbleRunSimulatorCore.MachinePartTemplate();
+            template.partName = "coil_" + l.toFixed(0) + "." + h.toFixed(0);
+            template.l = l;
+            template.h = h;
+            template.n = h;
+            template.lExtendableOnX = true;
+            template.minLAbsolute = 1;
+            template.minL = -32;
+            template.maxL = 32;
+            template.hExtendableOnY = true;
+            template.minH = 0;
+            template.downwardYExtendable = true;
+            template.maxAngle = 0;
+            let x0 = -MarbleRunSimulatorCore.tileSize * 0.5;
+            let x1 = MarbleRunSimulatorCore.tileSize * (template.l - 0.5);
+            if (template.l < 0) {
+                x0 = MarbleRunSimulatorCore.tileSize * (Math.abs(template.l) - 0.5);
+                x1 = -MarbleRunSimulatorCore.tileSize * 0.5;
+            }
+            let tanB = (template.h * MarbleRunSimulatorCore.tileHeight) / (template.l * MarbleRunSimulatorCore.tileSize * 0.5);
+            let bank = Math.atan(tanB);
+            let cosB = Math.cos(bank);
+            let sinB = Math.sin(bank);
+            let n = new BABYLON.Vector3(0, cosB, -sinB);
+            template.trackTemplates[0] = new MarbleRunSimulatorCore.TrackTemplate(template);
+            template.trackTemplates[0].trackpoints = [
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3(x0, 0, 0), MarbleRunSimulatorCore.Tools.V3Dir(template.l > 0 ? 90 : -90)),
+                new MarbleRunSimulatorCore.TrackPoint(template.trackTemplates[0], new BABYLON.Vector3((x0 + x1) * 0.5, -0.007 * sinB, 0.007 * (1 - cosB)), MarbleRunSimulatorCore.Tools.V3Dir(template.l > 0 ? 90 : -90), n)
+            ];
+            template.initialize();
+            return template;
+        }
+    }
+    MarbleRunSimulatorCore.Coil = Coil;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {

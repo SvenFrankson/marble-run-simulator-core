@@ -544,6 +544,11 @@ namespace MarbleRunSimulatorCore {
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     data = SpiralUTurn.GenerateTemplate(l, h);
                 }
+                else if (partName.startsWith("coil_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = Coil.GenerateTemplate(l, h);
+                }
                 else if (partName === "quarter") {
                     data = QuarterNote.GenerateTemplate(mirror);
                 }
@@ -721,6 +726,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "spiralUTurn") {
                 partName = SpiralUTurn.PropToPartName(prop);
+            }
+            else if (baseName === "coil") {
+                partName = Coil.PropToPartName(prop);
             }
             else if (baseName === "quarter") {
                 partName = QuarterNote.PropToPartName(prop);
