@@ -161,6 +161,7 @@ namespace MarbleRunSimulatorCore {
         public parts: MachinePart[] = [];
         public decors: MachineDecor[] = [];
         public balls: Ball[] = [];
+        public blocks: Block[] = [];
         public debugAxis: BABYLON.LinesMesh;
         public sleepersMeshProp: ISleeperMeshProps;
 
@@ -374,6 +375,10 @@ namespace MarbleRunSimulatorCore {
                 await this.decors[i].instantiate(hotReload);
             }
 
+            for (let i = 0; i < this.blocks.length; i++) {
+                await this.blocks[i].instantiate();
+            }
+
             return new Promise<void>((resolve) => {
                 requestAnimationFrame(() => {
                     for (let i = 0; i < this.parts.length; i++) {
@@ -408,6 +413,9 @@ namespace MarbleRunSimulatorCore {
             }
             while (this.decors.length > 0) {
                 this.decors[0].dispose();
+            }
+            while (this.blocks.length > 0) {
+                this.blocks[0].dispose();
             }
             this.instantiated = false;
             this.hasBeenOpenedInEditor = false;
@@ -894,7 +902,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public serialize(): IMachineData {
-            return SerializeV12(this);
+            return SerializeV13(this);
         }
 
         public static MakeMiniature(machine: Machine, data: IMachineData, miniatureProps?: IMiniatureProps): HTMLCanvasElement {
@@ -926,6 +934,11 @@ namespace MarbleRunSimulatorCore {
             if (data && (data.v === 12)) {
                 let canvas = document.createElement("canvas");
                 DeserializeV12(machine, data, true, canvas, miniatureProps);
+                return canvas;
+            }
+            if (data && (data.v === 13)) {
+                let canvas = document.createElement("canvas");
+                DeserializeV13(machine, data, true, canvas, miniatureProps);
                 return canvas;
             }
             return undefined;
@@ -975,6 +988,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (version === 12) {
                     return DeserializeV12(this, data, makeMiniature);
+                }
+                else if (version === 13) {
+                    return DeserializeV13(this, data, makeMiniature);
                 }
             }
         }

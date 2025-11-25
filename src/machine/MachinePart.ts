@@ -1763,6 +1763,15 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        public intersectsAnyBlock(dI?: number, dJ?: number, dK?: number): boolean {
+            for (let i = 0; i < this.machine.blocks.length; i++) {
+                if (this.machine.blocks[i].intersectsMachinePart(this, dI, dJ, dK)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public getTriCount(): number {
             let triCount = this.getIndices().length / 3;
             let children = this.getChildMeshes();

@@ -118,6 +118,26 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class Block extends BABYLON.Mesh {
+        machine: Machine;
+        line: BABYLON.Vector3[];
+        boxColliders: Mummu.IBox[];
+        constructor(machine: Machine);
+        dispose(): void;
+        private _selected;
+        get selected(): boolean;
+        select(_multiSelected?: boolean): void;
+        unselect(): void;
+        updateSelectorMeshVisibility(): void;
+        initialize(): void;
+        instantiate(): Promise<void>;
+        clean(): void;
+        worldPosToIndex(worldPos: BABYLON.Vector3): number;
+        splitAtIndex(n: number): void;
+        intersectsMachinePart(part: MachinePart, i?: number, j?: number, k?: number): boolean;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     enum MaterialType {
         Plastic = 0,
         Metal = 1,
@@ -371,6 +391,7 @@ declare namespace MarbleRunSimulatorCore {
         parts: MachinePart[];
         decors: MachineDecor[];
         balls: Ball[];
+        blocks: Block[];
         debugAxis: BABYLON.LinesMesh;
         sleepersMeshProp: ISleeperMeshProps;
         trackFactory: MachinePartFactory;
@@ -708,6 +729,7 @@ declare namespace MarbleRunSimulatorCore {
         rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): void;
         rebuildWireMeshesIfNeeded(): Promise<void>;
         doSleepersMeshUpdate(): void;
+        intersectsAnyBlock(dI?: number, dJ?: number, dK?: number): boolean;
         getTriCount(): number;
     }
 }
@@ -985,6 +1007,10 @@ declare namespace MarbleRunSimulatorCore {
     function DeserializeV12(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
 }
 declare namespace MarbleRunSimulatorCore {
+    function SerializeV13(machine: Machine): IMachineData;
+    function DeserializeV13(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
+}
+declare namespace MarbleRunSimulatorCore {
     function SerializeV2(machine: Machine): IMachineData;
     function DeserializeV2(machine: Machine, data: IMachineData, makeMiniature?: boolean, canvas?: HTMLCanvasElement, miniatureProps?: IMiniatureProps): void;
 }
@@ -1083,7 +1109,7 @@ declare namespace MarbleRunSimulatorCore {
     class Coil extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number, mirror: boolean): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

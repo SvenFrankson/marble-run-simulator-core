@@ -547,7 +547,7 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("coil_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = Coil.GenerateTemplate(l, h);
+                    data = Coil.GenerateTemplate(l, h, mirror);
                 }
                 else if (partName === "quarter") {
                     data = QuarterNote.GenerateTemplate(mirror);

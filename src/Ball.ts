@@ -756,6 +756,29 @@ namespace MarbleRunSimulatorCore {
                         }
                     });
                 }
+
+                for (let i = 0; i < this.machine.blocks.length; i++) {
+                    let block = this.machine.blocks[i];
+                    for (let j = 0; j < block.boxColliders.length; j++) {
+                        let col = Mummu.SphereBoxIntersection(this.position, this.radius, block.boxColliders[j]);
+                        //}
+                        if (col.hit) {
+                            //this.setLastHit(wire, col.index);
+                            let colDig = col.normal.scale(-1);
+                            // Move away from collision
+                            forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                            // Cancel depth component of speed
+                            let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                            if (depthSpeed > 0) {
+                                canceledSpeed.addInPlace(colDig.scale(depthSpeed * 1.5));
+                            }
+                            // Add ground reaction
+                            let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                            reactions.addInPlace(reaction);
+                            reactionsCount++;
+                        }
+                    }
+                }
                 
                 // Collide with playground limits
                 if (this.collisionState === CollisionState.Normal) {
