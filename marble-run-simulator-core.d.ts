@@ -134,7 +134,7 @@ declare namespace MarbleRunSimulatorCore {
         clean(): void;
         worldPosToIndex(worldPos: BABYLON.Vector3): number;
         splitAtIndex(n: number): void;
-        intersectsMachinePart(part: MachinePart, i?: number, j?: number, k?: number): boolean;
+        intersectsMachinePart(part: MachinePart, i?: number, j?: number, k?: number): number;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -729,7 +729,7 @@ declare namespace MarbleRunSimulatorCore {
         rebuildWireMeshes(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): void;
         rebuildWireMeshesIfNeeded(): Promise<void>;
         doSleepersMeshUpdate(): void;
-        intersectsAnyBlock(dI?: number, dJ?: number, dK?: number): boolean;
+        intersectsAnyBlock(dI?: number, dJ?: number, dK?: number): number;
         getTriCount(): number;
     }
 }

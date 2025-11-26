@@ -130,7 +130,7 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public intersectsMachinePart(part: MachinePart, i?: number, j?: number, k?: number): boolean {
+        public intersectsMachinePart(part: MachinePart, i?: number, j?: number, k?: number): number {
             let pos = part.position;
             let d = BABYLON.Vector3.Zero();
             if (isFinite(i) && isFinite(j) && isFinite(k)) {
@@ -141,7 +141,7 @@ namespace MarbleRunSimulatorCore {
                 d = pos.subtract(part.position);
             }
             if (!Mummu.AABBAABBCheck(this.getBoundingInfo().minimum, this.getBoundingInfo().maximum, part.localAABBMin.add(pos), part.localAABBMax.add(pos))) {
-                return false;
+                return 0;
             }
             for (let i = 0; i < this.line.length - 1; i++) {
                 let pt0 = this.line[i];
@@ -152,10 +152,20 @@ namespace MarbleRunSimulatorCore {
                 let pick = ray.intersectsMesh(part.selectorBodyLogic);
                 if (pick && pick.hit) {
                     Mummu.DrawDebugPoint(pick.pickedPoint, 600, BABYLON.Color3.Red(), 0.05);
-                    return true;
+                    let axis = pick.pickedPoint.subtract(part.getBarycenter().add(d));
+                    axis.x = Math.abs(axis.x);
+                    axis.y = Math.abs(axis.y);
+                    axis.z = Math.abs(axis.z);
+                    if (axis.x >= axis.y && axis.x >= axis.y) {
+                        return 1;
+                    }
+                    if (axis.z >= axis.y) {
+                        return 2;
+                    }
+                    return 3;
                 }
             }
-            return false;
+            return 0;
         }
     }
 }

@@ -1763,13 +1763,14 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public intersectsAnyBlock(dI?: number, dJ?: number, dK?: number): boolean {
+        public intersectsAnyBlock(dI?: number, dJ?: number, dK?: number): number {
             for (let i = 0; i < this.machine.blocks.length; i++) {
-                if (this.machine.blocks[i].intersectsMachinePart(this, dI, dJ, dK)) {
-                    return true;
+                let intersectionValue = this.machine.blocks[i].intersectsMachinePart(this, dI, dJ, dK)
+                if (intersectionValue > 0) {
+                    return intersectionValue;
                 }
             }
-            return false;
+            return 0;
         }
 
         public getTriCount(): number {

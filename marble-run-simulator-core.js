@@ -1133,7 +1133,7 @@ var MarbleRunSimulatorCore;
                 d = pos.subtract(part.position);
             }
             if (!Mummu.AABBAABBCheck(this.getBoundingInfo().minimum, this.getBoundingInfo().maximum, part.localAABBMin.add(pos), part.localAABBMax.add(pos))) {
-                return false;
+                return 0;
             }
             for (let i = 0; i < this.line.length - 1; i++) {
                 let pt0 = this.line[i];
@@ -1144,10 +1144,20 @@ var MarbleRunSimulatorCore;
                 let pick = ray.intersectsMesh(part.selectorBodyLogic);
                 if (pick && pick.hit) {
                     Mummu.DrawDebugPoint(pick.pickedPoint, 600, BABYLON.Color3.Red(), 0.05);
-                    return true;
+                    let axis = pick.pickedPoint.subtract(part.getBarycenter().add(d));
+                    axis.x = Math.abs(axis.x);
+                    axis.y = Math.abs(axis.y);
+                    axis.z = Math.abs(axis.z);
+                    if (axis.x >= axis.y && axis.x >= axis.y) {
+                        return 1;
+                    }
+                    if (axis.z >= axis.y) {
+                        return 2;
+                    }
+                    return 3;
                 }
             }
-            return false;
+            return 0;
         }
     }
     MarbleRunSimulatorCore.Block = Block;
@@ -4512,11 +4522,12 @@ var MarbleRunSimulatorCore;
         }
         intersectsAnyBlock(dI, dJ, dK) {
             for (let i = 0; i < this.machine.blocks.length; i++) {
-                if (this.machine.blocks[i].intersectsMachinePart(this, dI, dJ, dK)) {
-                    return true;
+                let intersectionValue = this.machine.blocks[i].intersectsMachinePart(this, dI, dJ, dK);
+                if (intersectionValue > 0) {
+                    return intersectionValue;
                 }
             }
-            return false;
+            return 0;
         }
         getTriCount() {
             let triCount = this.getIndices().length / 3;
