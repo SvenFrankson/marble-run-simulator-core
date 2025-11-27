@@ -15,7 +15,7 @@ namespace MarbleRunSimulatorCore {
     ];
 
     export class TrackTemplate {
-        public trackpoints: TrackPoint[] = ([] = []);
+        public trackpoints: TrackPoint[] = [];
         public interpolatedPoints: BABYLON.Vector3[] = [];
         public interpolatedNormals: BABYLON.Vector3[] = [];
         public angles: number[] = [];
@@ -561,6 +561,9 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "end") {
                     data = End.GenerateTemplate(mirror);
                 }
+                else if (partName === "blackboard") {
+                    data = BlackBoard.GenerateTemplate();
+                }
                 else if (partName.startsWith("jumper_")) {
                     let n = parseInt(partName.split("_")[1].split(".")[0]);
                     data = Jumper.GenerateTemplate(n);
@@ -741,6 +744,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "end") {
                 partName = End.PropToPartName(prop);
+            }
+            else if (baseName === "blackboard") {
+                partName = BlackBoard.PropToPartName(prop);
             }
             else if (baseName === "jumper") {
                 partName = Jumper.PropToPartName(prop);

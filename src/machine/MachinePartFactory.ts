@@ -51,7 +51,8 @@ namespace MarbleRunSimulatorCore {
         "pipeuturnsharp",
         "pipeloop",
         "pipeunderloop",
-        "coil"
+        "coil",
+        "blackboard"
     ];
 
     export interface IMachinePartProp {
@@ -293,6 +294,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (partName === "end") {
                 return new End(this.machine, prop);
+            }
+            if (partName === "blackboard") {
+                return new BlackBoard(this.machine, prop);
             }
             if (partName === "jumper" || partName.startsWith("jumper_")) {
                 let argStr = partName.split("_")[1];
@@ -576,6 +580,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "end") {
                 return new End(this.machine, prop);
+            }
+            if (baseName === "blackboard") {
+                return new BlackBoard(this.machine, prop);
             }
             if (baseName === "jumper") {
                 return new Jumper(this.machine, prop);

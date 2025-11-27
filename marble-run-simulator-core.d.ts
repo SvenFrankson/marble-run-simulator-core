@@ -1106,6 +1106,20 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class BlackBoard extends MachinePart {
+        private static _BoardThickness;
+        rawLines: BABYLON.Vector3[][];
+        board: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        static GenerateTemplate(): MachinePartTemplate;
+        protected instantiateMachineSpecific(): Promise<void>;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        regenerateTemplate(): void;
+        addRawPointLine(points: BABYLON.Vector3[]): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class Coil extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;

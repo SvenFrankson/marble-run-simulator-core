@@ -591,6 +591,17 @@ namespace MarbleRunSimulatorCore {
                 minJ = Math.min(minJ, track.j - track.d * 3);
                 minK = Math.min(minK, track.k);
             }
+            for (let i = 0; i < this.blocks.length; i++) {
+                let block = this.blocks[i];
+                for (let n = 0; n < block.line.length; n++) {
+                    this.baseMeshMinX = Math.min(this.baseMeshMinX, block.line[n].x);
+                    this.baseMeshMaxX = Math.max(this.baseMeshMaxX, block.line[n].x);
+                    //this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
+                    this.baseMeshMaxY = Math.max(this.baseMeshMaxY, block.line[n].y);
+                    this.baseMeshMinZ = Math.min(this.baseMeshMinZ, block.line[n].z);
+                    this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, block.line[n].z);
+                }
+            }
 
             if (false) {
 

@@ -901,7 +901,7 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 this.selectorBodyDisplay.visibility = 0;
-                if (this.tracks[0].template.isPipe) {
+                if (this.tracks[0] && this.tracks[0].template.isPipe) {
                     if (this._selected) {
                         this.selectorBodyDisplay.visibility = 0.6;
                     }
@@ -1326,6 +1326,11 @@ namespace MarbleRunSimulatorCore {
             let x1 = this.wireGauge * 0.5;
             let y1 = this.wireGauge * 0.5;
             let z1 = this.wireGauge * 0.5;
+
+            if (this instanceof BlackBoard) {
+                x1 = x0 + 20 * tileSize;
+                y1 = y0 + 20 * tileHeight;
+            }
 
             for (let i = 0; i < this.tracks.length; i++) {
                 let track = this.tracks[i];
