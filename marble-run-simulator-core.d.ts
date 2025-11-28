@@ -465,6 +465,7 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class MachineCollider {
         baseCollider: Mummu.Collider;
+        bouncyness: number;
         constructor(baseCollider: Mummu.Collider);
         getSurface: () => Surface;
     }
@@ -584,6 +585,8 @@ declare namespace MarbleRunSimulatorCore {
         globalSlope: number;
         localBarycenter: BABYLON.Vector3;
         localBarycenterIJK: BABYLON.Vector3;
+        localAABBBaseMin: BABYLON.Vector3;
+        localAABBBaseMax: BABYLON.Vector3;
         localAABBMin: BABYLON.Vector3;
         localAABBMax: BABYLON.Vector3;
         localRotatedAABBMin: BABYLON.Vector3;
@@ -1107,6 +1110,8 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class BlackBoard extends MachinePart {
+        static BlackBoardW: number;
+        static BlackBoardH: number;
         private static _BoardThickness;
         rawLines: BABYLON.Vector3[][];
         board: BABYLON.Mesh;
@@ -1117,6 +1122,7 @@ declare namespace MarbleRunSimulatorCore {
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;
         addRawPointLine(points: BABYLON.Vector3[]): void;
+        getProjection(worldPosition: BABYLON.Vector3, outProj: BABYLON.Vector3, outDir: BABYLON.Vector3, outUp: BABYLON.Vector3): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1241,6 +1247,16 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class EndBasket extends MachinePart {
+        base: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        static GenerateTemplate(): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class FlatJoin extends MachinePart {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
@@ -1328,6 +1344,24 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, mirrorX: boolean): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class Diamond extends MachinePart {
+        body: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        static GenerateTemplate(l: number): MachinePartTemplate;
+    }
+    class Bumper extends MachinePart {
+        body: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        static GenerateTemplate(l: number): MachinePartTemplate;
     }
 }
 declare namespace MarbleRunSimulatorCore {

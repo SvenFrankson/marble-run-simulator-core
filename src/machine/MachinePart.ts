@@ -335,6 +335,8 @@ namespace MarbleRunSimulatorCore {
         public globalSlope: number = 0;
         public localBarycenter: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public localBarycenterIJK: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public localAABBBaseMin: BABYLON.Vector3 = new BABYLON.Vector3(- tileSize * 0.5, - tileHeight * 0.5, - tileSize * 0.5);
+        public localAABBBaseMax: BABYLON.Vector3 = new BABYLON.Vector3(tileSize * 0.5, tileHeight * 0.5, tileSize * 0.5);
         public localAABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public localAABBMax: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public localRotatedAABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
@@ -1320,16 +1322,17 @@ namespace MarbleRunSimulatorCore {
                 this.gridRectMesh.dispose();
             }
 
-            let x0 = - this.wireGauge * 0.5;
-            let y0 = - this.wireGauge * 0.5;
-            let z0 = - this.wireGauge * 0.5;
-            let x1 = this.wireGauge * 0.5;
-            let y1 = this.wireGauge * 0.5;
-            let z1 = this.wireGauge * 0.5;
+            let x0 = this.localAABBBaseMin.x;
+            let y0 = this.localAABBBaseMin.y;
+            let z0 = this.localAABBBaseMin.z;
+
+            let x1 = this.localAABBBaseMax.x;
+            let y1 = this.localAABBBaseMax.y;
+            let z1 = this.localAABBBaseMax.z;
 
             if (this instanceof BlackBoard) {
-                x1 = x0 + 20 * tileSize;
-                y1 = y0 + 20 * tileHeight;
+                x1 = x0 + BlackBoard.BlackBoardW * tileSize;
+                y1 = y0 + BlackBoard.BlackBoardH * tileHeight;
             }
 
             for (let i = 0; i < this.tracks.length; i++) {

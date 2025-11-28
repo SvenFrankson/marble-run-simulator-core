@@ -561,6 +561,9 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "end") {
                     data = End.GenerateTemplate(mirror);
                 }
+                else if (partName === "endbasket") {
+                    data = EndBasket.GenerateTemplate();
+                }
                 else if (partName === "blackboard") {
                     data = BlackBoard.GenerateTemplate();
                 }
@@ -615,6 +618,14 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("dropback_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     data = DropBack.GenerateTemplate(h);
+                }
+                else if (partName.startsWith("diamond_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = Diamond.GenerateTemplate(l);
+                }
+                else if (partName.startsWith("bumper_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = Bumper.GenerateTemplate(l);
                 }
                 datas[mirrorIndex] = data;
             }
@@ -745,6 +756,9 @@ namespace MarbleRunSimulatorCore {
             else if (baseName === "end") {
                 partName = End.PropToPartName(prop);
             }
+            else if (baseName === "endbasket") {
+                partName = EndBasket.PropToPartName(prop);
+            }
             else if (baseName === "blackboard") {
                 partName = BlackBoard.PropToPartName(prop);
             }
@@ -786,6 +800,12 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "dropback") {
                 partName = DropBack.PropToPartName(prop);
+            }
+            else if (baseName === "diamond") {
+                partName = Diamond.PropToPartName(prop);
+            }
+            else if (baseName === "bumper") {
+                partName = Bumper.PropToPartName(prop);
             }
 
             if (partName) {

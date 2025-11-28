@@ -52,7 +52,10 @@ namespace MarbleRunSimulatorCore {
         "pipeloop",
         "pipeunderloop",
         "coil",
-        "blackboard"
+        "blackboard",
+        "diamond",
+        "bumper",
+        "endbasket"
     ];
 
     export interface IMachinePartProp {
@@ -295,6 +298,9 @@ namespace MarbleRunSimulatorCore {
             if (partName === "end") {
                 return new End(this.machine, prop);
             }
+            if (partName === "endbasket") {
+                return new EndBasket(this.machine, prop);
+            }
             if (partName === "blackboard") {
                 return new BlackBoard(this.machine, prop);
             }
@@ -521,6 +527,22 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new DropBack(this.machine, prop);
             }
+            if (partName === "diamond" || partName.startsWith("diamond_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    prop.l = l;
+                }
+                return new Diamond(this.machine, prop);
+            }
+            if (partName === "bumper" || partName.startsWith("bumper_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    prop.l = l;
+                }
+                return new Bumper(this.machine, prop);
+            }
         }
 
         public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
@@ -580,6 +602,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "end") {
                 return new End(this.machine, prop);
+            }
+            if (baseName === "endbasket") {
+                return new EndBasket(this.machine, prop);
             }
             if (baseName === "blackboard") {
                 return new BlackBoard(this.machine, prop);
@@ -690,6 +715,12 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "dropback") {
                 return new DropBack(this.machine, prop);
+            }
+            if (baseName === "diamond") {
+                return new Diamond(this.machine, prop);
+            }
+            if (baseName === "bumper") {
+                return new Bumper(this.machine, prop);
             }
         }
     }
