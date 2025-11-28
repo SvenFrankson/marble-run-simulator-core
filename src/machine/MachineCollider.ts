@@ -1,6 +1,8 @@
 namespace MarbleRunSimulatorCore {
     export class MachineCollider {
 
+        public bouncyness: number = 0.5;
+
         constructor(public baseCollider: Mummu.Collider) {
 
         }

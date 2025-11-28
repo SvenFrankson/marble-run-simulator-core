@@ -433,7 +433,7 @@ namespace MarbleRunSimulatorCore {
                 f = Math.max(Math.min(f, 1), 0.4);
                 this._timer -= physicDT / f;
 
-                let weight = new BABYLON.Vector3(0, -9 * m, 0);
+                let weight = new BABYLON.Vector3(0, -2 * m, 0);
                 let reactions = BABYLON.Vector3.Zero();
                 let reactionsCount = 0;
 
@@ -542,7 +542,7 @@ namespace MarbleRunSimulatorCore {
                                     // Cancel depth component of speed
                                     let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
                                     if (depthSpeed > 0) {
-                                        canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                        canceledSpeed.addInPlace(colDig.scale(depthSpeed * (1 + collider.bouncyness)));
                                     }
                                     // Add ground reaction
                                     let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
