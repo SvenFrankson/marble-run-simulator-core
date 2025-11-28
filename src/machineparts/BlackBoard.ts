@@ -32,7 +32,7 @@ namespace MarbleRunSimulatorCore {
             this.board.parent = this;
             this.board.position.x = (BlackBoard.BlackBoardW - 1) * 0.5 * tileSize;
             this.board.position.y = (BlackBoard.BlackBoardH - 1) * 0.5 * tileSize;
-            this.board.position.z = BlackBoard._BoardThickness * 0.5 + this.wireGauge;
+            this.board.position.z = BlackBoard._BoardThickness * 0.5 + 2 * this.wireGauge;
 
             let boardCollider = new Mummu.BoxCollider(this.board._worldMatrix);
             boardCollider.width = BlackBoard.BlackBoardW * tileSize;
@@ -82,7 +82,7 @@ namespace MarbleRunSimulatorCore {
                 height: BlackBoard.BlackBoardH * tileHeight,
                 depth: BlackBoard._BoardThickness
             });
-            Mummu.TranslateVertexDataInPlace(boardSelector, new BABYLON.Vector3((BlackBoard.BlackBoardW - 1) * 0.5 * tileSize, (BlackBoard.BlackBoardH - 1) * 0.5 * tileHeight, 0));
+            Mummu.TranslateVertexDataInPlace(boardSelector, this.board.position);
             selectorMeshLogicVertexDatas.push(boardSelector);
         }
 
@@ -92,6 +92,7 @@ namespace MarbleRunSimulatorCore {
             for (let n = 0; n < this.rawLines.length; n++) {
                 let rawLine = this.rawLines[n];
                 let trackTemplate = new TrackTemplate(this.template);
+                trackTemplate.isDouble = true;
                 let dirStart = rawLine[1].subtract(rawLine[0]).normalize();
                 let prevDir = dirStart.clone();
                 let normStart = Mummu.Rotate(dirStart, BABYLON.Axis.Z, Math.PI * 0.5);

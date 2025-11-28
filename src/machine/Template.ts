@@ -32,8 +32,9 @@ namespace MarbleRunSimulatorCore {
         public isPipe: boolean = false;
         public pipeIgnoresTrackNormals: boolean = false;
         public isWood: boolean = false;
+        public isDouble: boolean = false;
         public get isPipeOrWood(): boolean {
-            return this.isPipe || this.isWood;
+            return this.isPipe || this.isWood || this.isDouble;
         }
 
         public summedLength: number[] = [0];

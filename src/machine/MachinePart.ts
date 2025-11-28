@@ -301,7 +301,7 @@ namespace MarbleRunSimulatorCore {
         public colliders: MachineCollider[] = [];
         public outlinableMeshes: BABYLON.Mesh[] = [];
 
-        public wireSize: number = 0.0015;
+        public wireSize: number = 0.006;
         public wireGauge: number = 0.014;
 
         public colors: number[] = [0];
@@ -1526,6 +1526,9 @@ namespace MarbleRunSimulatorCore {
                         else if (this.template.trackTemplates[i].isWood) {
                             track = new WoodTrack(this);
                         }
+                        else if (this.template.trackTemplates[i].isDouble) {
+                            track = new DoubleTrack(this);
+                        }
                         else {
                             track = new Track(this);
                         }
@@ -1657,6 +1660,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (track instanceof WoodTrack) {
                     WoodTrackMeshBuilder.BuildWoodTrackMesh(track, {});
+                }
+                else if (track instanceof DoubleTrack) {
+                    DoubleTrackMeshBuilder.BuildDoubleTrackMesh(track, {});
                 }
                 else {
                     track.wires.forEach((wire) => {

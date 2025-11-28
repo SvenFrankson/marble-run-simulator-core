@@ -104,6 +104,10 @@ namespace MarbleRunSimulatorCore {
         }
 
         public recomputeWiresPath(forceDisconnexion?: boolean): void {
+            if (this instanceof DoubleTrack) {
+                console.log(this.trackInterpolatedNormals);
+            }
+
             let N = this.templateInterpolatedPoints.length;
 
             let angles = [...this.template.angles];

@@ -5,13 +5,14 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-            this.setColorCount(3);
+            this.setColorCount(2);
 
             this.setTemplate(this.machine.templateManager.getTemplate(EndBasket.PropToPartName(prop)));
 
+            let d = 3.5 * tileSize;
             this.base = new BABYLON.Mesh("base");
             this.base.parent = this;
-            let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: 4 * tileSize, height: 0.005 });
+            let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: d, height: 0.005 });
             bodyVertexData.applyToMesh(this.base);
 
             for (let n = 0; n < 2; n++) {
@@ -22,8 +23,8 @@ namespace MarbleRunSimulatorCore {
 
                 for (let i = 0; i < 32; i++) {
                     let a = i / 32 * 2 * Math.PI;
-                    let x = Math.cos(a) * 2 * tileSize;
-                    let z = Math.sin(a) * 2 * tileSize;
+                    let x = Math.cos(a) * 0.5 * d;
+                    let z = Math.sin(a) * 0.5 * d;
                     shieldWire.path.push(new BABYLON.Vector3(x, tileHeight * 0.5 * (n + 1), z));
                 }
                 shieldWire.path.push(shieldWire.path[0].clone());
@@ -32,9 +33,9 @@ namespace MarbleRunSimulatorCore {
             }
 
             let bodyCollider = new Mummu.BoxCollider(this.base._worldMatrix);
-            bodyCollider.width = 4 * tileSize;
+            bodyCollider.width = d;
             bodyCollider.height = 0.005;
-            bodyCollider.depth = 4 * tileSize;
+            bodyCollider.depth = d;
             
             let bodyMachineCollider = new MachineCollider(bodyCollider);
             bodyMachineCollider.bouncyness = 0.2;

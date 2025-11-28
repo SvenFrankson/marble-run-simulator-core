@@ -266,6 +266,44 @@ declare namespace MarbleRunSimulatorCore {
         instantiate(color?: number): Promise<void>;
     }
 }
+declare namespace MarbleRunSimulatorCore {
+    class Track {
+        part: MachinePart;
+        wires: Wire[];
+        get templateInterpolatedPoints(): BABYLON.Vector3[];
+        trackInterpolatedNormals: BABYLON.Vector3[];
+        get preferedStartBank(): number;
+        private _startWorldPosition;
+        get startWorldPosition(): BABYLON.Vector3;
+        get preferedEndBank(): number;
+        private _endWorldPosition;
+        get endWorldPosition(): BABYLON.Vector3;
+        refreshStartEndWorldPosition(): void;
+        AABBMin: BABYLON.Vector3;
+        AABBMax: BABYLON.Vector3;
+        template: TrackTemplate;
+        constructor(part: MachinePart);
+        get trackIndex(): number;
+        getSlopeAt(index: number): number;
+        getBankAt(index: number): number;
+        initialize(template: TrackTemplate): void;
+        recomputeWiresPath(forceDisconnexion?: boolean): void;
+        recomputeAbsolutePath(): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class DoubleTrack extends Track {
+        mesh: BABYLON.Mesh;
+        constructor(part: MachinePart);
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    interface IDoubleTrackMeshProps {
+    }
+    class DoubleTrackMeshBuilder {
+        static BuildDoubleTrackMesh(track: DoubleTrack, props: IDoubleTrackMeshProps): Promise<void>;
+    }
+}
 declare var THE_ORIGIN_OF_TIME_ms: any;
 declare var IsTouchScreen: number;
 declare namespace MarbleRunSimulatorCore {
@@ -764,31 +802,6 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
-    class Track {
-        part: MachinePart;
-        wires: Wire[];
-        get templateInterpolatedPoints(): BABYLON.Vector3[];
-        trackInterpolatedNormals: BABYLON.Vector3[];
-        get preferedStartBank(): number;
-        private _startWorldPosition;
-        get startWorldPosition(): BABYLON.Vector3;
-        get preferedEndBank(): number;
-        private _endWorldPosition;
-        get endWorldPosition(): BABYLON.Vector3;
-        refreshStartEndWorldPosition(): void;
-        AABBMin: BABYLON.Vector3;
-        AABBMax: BABYLON.Vector3;
-        template: TrackTemplate;
-        constructor(part: MachinePart);
-        get trackIndex(): number;
-        getSlopeAt(index: number): number;
-        getBankAt(index: number): number;
-        initialize(template: TrackTemplate): void;
-        recomputeWiresPath(forceDisconnexion?: boolean): void;
-        recomputeAbsolutePath(): void;
-    }
-}
-declare namespace MarbleRunSimulatorCore {
     class PipeTrack extends Track {
         static PIPE_OFFSET_OVER_BASETRACK: number;
         ringsMesh: BABYLON.Mesh;
@@ -851,6 +864,7 @@ declare namespace MarbleRunSimulatorCore {
         isPipe: boolean;
         pipeIgnoresTrackNormals: boolean;
         isWood: boolean;
+        isDouble: boolean;
         get isPipeOrWood(): boolean;
         summedLength: number[];
         totalLength: number;
