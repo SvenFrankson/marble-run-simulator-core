@@ -49,6 +49,14 @@ namespace MarbleRunSimulatorCore {
             selectorMeshLogicVertexDatas.push(bodySelector);
         }
 
+        public recomputeAbsolutePath(): void {
+            let collider = this.colliders[0];
+            if (collider.baseCollider instanceof Mummu.BoxCollider) {
+                collider.baseCollider.worldMatrix = this.body._worldMatrix;
+            }
+            super.recomputeAbsolutePath();
+        }
+
         public static GenerateTemplate(l: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
@@ -78,7 +86,6 @@ namespace MarbleRunSimulatorCore {
             let s = prop.l * tileSize;
             this.body = new BABYLON.Mesh("body");
             this.body.parent = this;
-            this.body.rotation.z = Math.PI / 4;
             let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: s, height: tileSize });
             Mummu.RotateAngleAxisVertexDataInPlace(bodyVertexData, Math.PI * 0.5, BABYLON.Axis.X);
             bodyVertexData.applyToMesh(this.body);
@@ -86,8 +93,7 @@ namespace MarbleRunSimulatorCore {
             let bodyCollider = new Mummu.CapsuleCollider(
                 new BABYLON.Vector3(0, 0, - tileSize * 0.5),
                 new BABYLON.Vector3(0, 0, tileSize * 0.5),
-                s * 0.5,
-                this.body._worldMatrix
+                s * 0.5
             );
             
             let bodyMachineCollider = new MachineCollider(bodyCollider);
@@ -114,6 +120,18 @@ namespace MarbleRunSimulatorCore {
         public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
             let bodySelector = BABYLON.VertexData.ExtractFromMesh(this.body);
             selectorMeshLogicVertexDatas.push(bodySelector);
+        }
+
+        public recomputeAbsolutePath(): void {
+            super.recomputeAbsolutePath();
+            let collider = this.colliders[0];
+            if (collider.baseCollider instanceof Mummu.CapsuleCollider) {
+                collider.baseCollider.c1.copyFrom(this.position);
+                collider.baseCollider.c1.z -= tileSize * 0.5;
+                collider.baseCollider.c2.copyFrom(this.position);
+                collider.baseCollider.c2.z += tileSize * 0.5;
+            }
+            super.recomputeAbsolutePath();
         }
 
         public static GenerateTemplate(l: number): MachinePartTemplate {
