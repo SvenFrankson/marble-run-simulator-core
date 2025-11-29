@@ -1129,6 +1129,7 @@ declare namespace MarbleRunSimulatorCore {
         private static _BoardThickness;
         rawLines: BABYLON.Vector3[][];
         board: BABYLON.Mesh;
+        borders: BABYLON.Mesh[];
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(): MachinePartTemplate;
@@ -1136,6 +1137,14 @@ declare namespace MarbleRunSimulatorCore {
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;
         addRawPointLine(points: BABYLON.Vector3[]): void;
+        setI(v: number, doNotCheckGridLimits?: boolean): void;
+        setJ(v: number, doNotCheckGridLimits?: boolean): void;
+        setK(v: number, doNotCheckGridLimits?: boolean): void;
+        setR(v: number, doNotCheckGridLimits?: boolean): void;
+        setTargetI(v: number, doNotCheckGridLimits?: boolean): void;
+        setTargetJ(v: number, doNotCheckGridLimits?: boolean): void;
+        setTargetK(v: number, doNotCheckGridLimits?: boolean): void;
+        setTargetR(v: number): void;
         getProjection(worldPosition: BABYLON.Vector3, outProj: BABYLON.Vector3, outDir: BABYLON.Vector3, outUp: BABYLON.Vector3): void;
     }
 }
@@ -1367,6 +1376,7 @@ declare namespace MarbleRunSimulatorCore {
         static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        recomputeAbsolutePath(): void;
         static GenerateTemplate(l: number): MachinePartTemplate;
     }
     class Bumper extends MachinePart {
@@ -1375,6 +1385,7 @@ declare namespace MarbleRunSimulatorCore {
         static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        recomputeAbsolutePath(): void;
         static GenerateTemplate(l: number): MachinePartTemplate;
     }
 }

@@ -6,10 +6,11 @@ namespace MarbleRunSimulatorCore {
         private static _BoardThickness: number = 0.005;
         public rawLines: BABYLON.Vector3[][] = [];
         public board: BABYLON.Mesh;
+        public borders: BABYLON.Mesh[] = [];
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-            this.setColorCount(2);
+            this.setColorCount(3);
 
             this.setTemplate(this.machine.templateManager.getTemplate(BlackBoard.PropToPartName(prop)));
 
@@ -23,16 +24,16 @@ namespace MarbleRunSimulatorCore {
             this.regenerateTemplate();
 
             this.board = new BABYLON.Mesh("board");
+            this.board.parent = this;
+            this.board.position.x = (BlackBoard.BlackBoardW - 1) * 0.5 * tileSize;
+            this.board.position.y = (BlackBoard.BlackBoardH - 1) * 0.5 * tileSize;
+            this.board.position.z = BlackBoard._BoardThickness * 0.5 + 2 * this.wireGauge;
             let boardVertexData = Mummu.CreateBeveledBoxVertexData({
                 width: BlackBoard.BlackBoardW * tileSize,
                 height: BlackBoard.BlackBoardH * tileHeight,
                 depth: BlackBoard._BoardThickness
             });
             boardVertexData.applyToMesh(this.board);
-            this.board.parent = this;
-            this.board.position.x = (BlackBoard.BlackBoardW - 1) * 0.5 * tileSize;
-            this.board.position.y = (BlackBoard.BlackBoardH - 1) * 0.5 * tileSize;
-            this.board.position.z = BlackBoard._BoardThickness * 0.5 + 2 * this.wireGauge;
 
             let boardCollider = new Mummu.BoxCollider(this.board._worldMatrix);
             boardCollider.width = BlackBoard.BlackBoardW * tileSize;
@@ -41,7 +42,86 @@ namespace MarbleRunSimulatorCore {
             
             let boardMachineCollider = new MachineCollider(boardCollider);
 
-            this.colliders = [boardMachineCollider];
+            let borderThickness = 3 * BlackBoard._BoardThickness;
+            let borderDepth = 3 * tileSize;
+
+            this.borders[0] = new BABYLON.Mesh("top-border");
+            this.borders[0].parent = this;
+            this.borders[0].position.x = (BlackBoard.BlackBoardW - 1) * 0.5 * tileSize;
+            this.borders[0].position.y = (BlackBoard.BlackBoardH - 0.5) * tileSize + 0.5 * borderThickness;
+            //this.borders[0].position.z = BlackBoard._BoardThickness * 0.5 + 2 * this.wireGauge;
+            let topVertexData = Mummu.CreateBeveledBoxVertexData({
+                width: BlackBoard.BlackBoardW * tileSize + 2 * borderThickness,
+                height: borderThickness,
+                depth: borderDepth
+            });
+            topVertexData.applyToMesh(this.borders[0]);
+            
+            let topCollider = new Mummu.BoxCollider(this.borders[0]._worldMatrix);
+            topCollider.width = BlackBoard.BlackBoardW * tileSize;
+            topCollider.height = borderThickness;
+            topCollider.depth = borderDepth;
+            
+            let topMachineCollider = new MachineCollider(topCollider);
+            
+            this.borders[1] = new BABYLON.Mesh("right-border");
+            this.borders[1].parent = this;
+            this.borders[1].position.x = (BlackBoard.BlackBoardW - 0.5) * tileSize + 0.5 * borderThickness;
+            this.borders[1].position.y = (BlackBoard.BlackBoardH - 1) * 0.5 * tileSize;
+            //this.borders[1].position.z = BlackBoard._BoardThickness * 0.5 + 2 * this.wireGauge;
+            let rightVertexData = Mummu.CreateBeveledBoxVertexData({
+                width: borderThickness,
+                height: BlackBoard.BlackBoardH * tileSize,
+                depth: borderDepth
+            });
+            rightVertexData.applyToMesh(this.borders[1]);
+            
+            let rightCollider = new Mummu.BoxCollider(this.borders[1]._worldMatrix);
+            rightCollider.width = borderThickness;
+            rightCollider.height = BlackBoard.BlackBoardH * tileSize;
+            rightCollider.depth = borderDepth;
+            
+            let rightMachineCollider = new MachineCollider(rightCollider);
+            
+            this.borders[2] = new BABYLON.Mesh("bottom-border");
+            this.borders[2].parent = this;
+            this.borders[2].position.x = (BlackBoard.BlackBoardW - 1) * 0.5 * tileSize;
+            this.borders[2].position.y = - 0.5 * tileSize - 0.5 * borderThickness;
+            //this.borders[2].position.z = BlackBoard._BoardThickness * 0.5 + 2 * this.wireGauge;
+            let bottomVertexData = Mummu.CreateBeveledBoxVertexData({
+                width: BlackBoard.BlackBoardW * tileSize + 2 * borderThickness,
+                height: borderThickness,
+                depth: borderDepth
+            });
+            bottomVertexData.applyToMesh(this.borders[2]);
+            
+            let bottomCollider = new Mummu.BoxCollider(this.borders[2]._worldMatrix);
+            bottomCollider.width = BlackBoard.BlackBoardW * tileSize;
+            bottomCollider.height = borderThickness;
+            bottomCollider.depth = borderDepth;
+            
+            let bottomMachineCollider = new MachineCollider(bottomCollider);
+            
+            this.borders[3] = new BABYLON.Mesh("left-border");
+            this.borders[3].parent = this;
+            this.borders[3].position.x = - 0.5 * tileSize - 0.5 * borderThickness;
+            this.borders[3].position.y = (BlackBoard.BlackBoardH - 1) * 0.5 * tileSize;
+            //this.borders[3].position.z = BlackBoard._BoardThickness * 0.5 + 2 * this.wireGauge;
+            let leftVertexData = Mummu.CreateBeveledBoxVertexData({
+                width: borderThickness,
+                height: BlackBoard.BlackBoardH * tileSize,
+                depth: borderDepth
+            });
+            leftVertexData.applyToMesh(this.borders[3]);
+            
+            let leftCollider = new Mummu.BoxCollider(this.borders[3]._worldMatrix);
+            leftCollider.width = borderThickness;
+            leftCollider.height = BlackBoard.BlackBoardH * tileSize;
+            leftCollider.depth = borderDepth;
+            
+            let leftMachineCollider = new MachineCollider(leftCollider);
+
+            this.colliders = [boardMachineCollider, topMachineCollider, rightMachineCollider, bottomMachineCollider, leftMachineCollider];
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
@@ -74,6 +154,9 @@ namespace MarbleRunSimulatorCore {
         
         protected async instantiateMachineSpecific(): Promise<void> {
             this.board.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
+            this.borders.forEach(border => {
+                border.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
+            })
         }
 
         public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
@@ -140,14 +223,21 @@ namespace MarbleRunSimulatorCore {
 
         public addRawPointLine(points: BABYLON.Vector3[]): void {
             if (points.length > 0) {
-                let filteredPoints = [points[0]];
+                let filteredPoints = [];
                 let d = this.wireGauge;
-                for (let i = 1; i < points.length; i++) {
+                for (let i = 0; i < points.length; i++) {
                     let pt = points[i];
-                    let last = filteredPoints[filteredPoints.length - 1];
-                    let sqrDist = BABYLON.Vector3.DistanceSquared(last, pt);
-                    if (sqrDist > d * d) {
-                        filteredPoints.push(pt);
+                    if (pt.x > this.worldAABBMin.x && pt.x < this.worldAABBMax.x) {
+                        if (pt.y > this.worldAABBMin.y && pt.y < this.worldAABBMax.y) {
+                            let last = filteredPoints[filteredPoints.length - 1];
+                            let sqrDist = Infinity;
+                            if (last) {
+                                sqrDist = BABYLON.Vector3.DistanceSquared(last, pt);
+                            }
+                            if (sqrDist > d * d) {
+                                filteredPoints.push(pt);
+                            }
+                        }
                     }
                 }
 
@@ -159,6 +249,37 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        public setI(v: number, doNotCheckGridLimits?: boolean): void {
+            super.setI(0, true);
+        }
+
+        public setJ(v: number, doNotCheckGridLimits?: boolean): void {
+            super.setJ(0, true);
+        }
+
+        public setK(v: number, doNotCheckGridLimits?: boolean): void {
+            super.setK(1, true);
+        }
+
+        public setR(v: number, doNotCheckGridLimits?: boolean): void {
+            super.setR(0, true);
+        }
+
+        public setTargetI(v: number, doNotCheckGridLimits?: boolean): void {
+            super.setTargetI(0, true);
+        }
+
+        public setTargetJ(v: number, doNotCheckGridLimits?: boolean): void {
+            super.setTargetJ(0, true);
+        }
+
+        public setTargetK(v: number, doNotCheckGridLimits?: boolean): void {
+            super.setTargetK(1, true);
+        }
+
+        public setTargetR(v: number): void {
+            super.setTargetR(0);
+        }
         
         public getProjection(worldPosition: BABYLON.Vector3, outProj: BABYLON.Vector3, outDir: BABYLON.Vector3, outUp: BABYLON.Vector3): void {
             let invWorldMatrix = this.getWorldMatrix().clone().invert();
