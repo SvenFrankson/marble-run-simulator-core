@@ -565,8 +565,9 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "endbasket") {
                     data = EndBasket.GenerateTemplate();
                 }
-                else if (partName === "blackboard") {
-                    data = BlackBoard.GenerateTemplate();
+                else if (partName.startsWith("blackboard_")) {
+                    let n = parseInt(partName.split("_")[1].split(".")[0]);
+                    data = BlackBoard.GenerateTemplate(n);
                 }
                 else if (partName.startsWith("jumper_")) {
                     let n = parseInt(partName.split("_")[1].split(".")[0]);
@@ -623,6 +624,11 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("diamond_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     data = Diamond.GenerateTemplate(l);
+                }
+                else if (partName.startsWith("box_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    data = Box.GenerateTemplate(l, h);
                 }
                 else if (partName.startsWith("bumper_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
@@ -804,6 +810,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "diamond") {
                 partName = Diamond.PropToPartName(prop);
+            }
+            else if (baseName === "box") {
+                partName = Box.PropToPartName(prop);
             }
             else if (baseName === "bumper") {
                 partName = Bumper.PropToPartName(prop);

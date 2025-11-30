@@ -448,6 +448,7 @@ declare namespace MarbleRunSimulatorCore {
         exitHolePath: BABYLON.Vector3[];
         exitHoleOut: BABYLON.Mesh;
         baseColor: string;
+        gravity: number;
         _roomIndex: number;
         get roomIndex(): number;
         setRoomIndex(roomIndex: number): void;
@@ -1123,16 +1124,24 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class BlackBoardPiece extends BABYLON.Mesh {
+        blackboard: BlackBoard;
+        wFactor: number;
+        hFactor: number;
+        constructor(blackboard: BlackBoard, wFactor: number, hFactor: number);
+    }
     class BlackBoard extends MachinePart {
         static BlackBoardW: number;
         static BlackBoardH: number;
-        private static _BoardThickness;
+        static BoardThickness: number;
         rawLines: BABYLON.Vector3[][];
-        board: BABYLON.Mesh;
+        boards: BlackBoardPiece[];
         borders: BABYLON.Mesh[];
+        boardColliders: MachineCollider[];
+        private _addBoard;
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(): MachinePartTemplate;
+        static GenerateTemplate(n: number): MachinePartTemplate;
         protected instantiateMachineSpecific(): Promise<void>;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;
@@ -1378,6 +1387,15 @@ declare namespace MarbleRunSimulatorCore {
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         recomputeAbsolutePath(): void;
         static GenerateTemplate(l: number): MachinePartTemplate;
+    }
+    class Box extends MachinePart {
+        body: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        recomputeAbsolutePath(): void;
+        static GenerateTemplate(l: number, h: number): MachinePartTemplate;
     }
     class Bumper extends MachinePart {
         body: BABYLON.Mesh;

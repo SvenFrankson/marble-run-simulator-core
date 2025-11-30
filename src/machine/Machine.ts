@@ -187,6 +187,8 @@ namespace MarbleRunSimulatorCore {
 
         public baseColor: string = "#ffffff";
 
+        public gravity: number = 9;
+
         public _roomIndex: number = 0;
         public get roomIndex(): number {
             return this._roomIndex;
@@ -346,6 +348,7 @@ namespace MarbleRunSimulatorCore {
                 this.exitTrack.isPlaced = true;
             }
 
+            this.gravity = 9;
             this.parts = this.parts.sort((a, b) => {
                 return a.k - b.k;
             });
@@ -354,6 +357,9 @@ namespace MarbleRunSimulatorCore {
                 if (!(hotReload && !part.isPlaced)) {
                     await part.instantiate(undefined, true);
                     part.isPlaced = true;
+                    if (part instanceof BlackBoard) {
+                        this.gravity = 2;
+                    }
                     await Nabu.Wait(1);
                 }
             }

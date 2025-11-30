@@ -1,15 +1,58 @@
 namespace MarbleRunSimulatorCore {
+
+    export class BlackBoardPiece extends BABYLON.Mesh {
+        constructor(
+            public blackboard: BlackBoard,
+            public wFactor: number,
+            public hFactor: number
+        ) {
+            super("blackboard-piece");
+            let boardVertexData = Mummu.CreateBeveledBoxVertexData({
+                width: BlackBoard.BlackBoardW * tileSize * wFactor,
+                height: BlackBoard.BlackBoardH * tileHeight * hFactor,
+                depth: BlackBoard.BoardThickness
+            });
+            boardVertexData.applyToMesh(this);
+        }
+    }
+
     export class BlackBoard extends MachinePart {
         
         public static BlackBoardW: number = 32;
         public static BlackBoardH: number = 32;
-        private static _BoardThickness: number = 0.005;
+        public static BoardThickness: number = 0.005;
         public rawLines: BABYLON.Vector3[][] = [];
-        public board: BABYLON.Mesh;
+        public boards: BlackBoardPiece[] = [];
         public borders: BABYLON.Mesh[] = [];
+        public boardColliders: MachineCollider[] = [];
+
+        private _addBoard(x0: number, x1: number, y0: number, y1: number): void {
+            let wFactor = x1 - x0;
+            let hFactor = y1 - y0;
+            let board = new BlackBoardPiece(this, wFactor, hFactor);
+            board.parent = this;
+            board.position.x = (BlackBoard.BlackBoardW - 1) * 0.5 * tileSize;
+            board.position.x += BlackBoard.BlackBoardW * tileSize * (x0 + x1 - 1) * 0.5;
+            board.position.y = (BlackBoard.BlackBoardH - 1) * 0.5 * tileSize;
+            board.position.y += BlackBoard.BlackBoardH * tileSize * (y0 + y1 - 1) * 0.5;
+            board.position.z = BlackBoard.BoardThickness * 0.5 + 2 * this.wireGauge;
+
+            let boardCollider = new Mummu.BoxCollider(board._worldMatrix);
+            boardCollider.width = BlackBoard.BlackBoardW * tileSize * wFactor;
+            boardCollider.height = BlackBoard.BlackBoardH * tileHeight * hFactor;
+            boardCollider.depth = BlackBoard.BoardThickness;
+            
+            let boardMachineCollider = new MachineCollider(boardCollider);
+
+            this.boards.push(board);
+            this.colliders.push(boardMachineCollider);
+            this.boardColliders.push(boardMachineCollider);
+        }
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
+            this.wireSize = 0.006;
+
             this.setColorCount(3);
 
             this.setTemplate(this.machine.templateManager.getTemplate(BlackBoard.PropToPartName(prop)));
@@ -23,26 +66,62 @@ namespace MarbleRunSimulatorCore {
             //this.addRawPointLine(rawPoints);
             this.regenerateTemplate();
 
-            this.board = new BABYLON.Mesh("board");
-            this.board.parent = this;
-            this.board.position.x = (BlackBoard.BlackBoardW - 1) * 0.5 * tileSize;
-            this.board.position.y = (BlackBoard.BlackBoardH - 1) * 0.5 * tileSize;
-            this.board.position.z = BlackBoard._BoardThickness * 0.5 + 2 * this.wireGauge;
-            let boardVertexData = Mummu.CreateBeveledBoxVertexData({
-                width: BlackBoard.BlackBoardW * tileSize,
-                height: BlackBoard.BlackBoardH * tileHeight,
-                depth: BlackBoard._BoardThickness
-            });
-            boardVertexData.applyToMesh(this.board);
+            this.colliders = [];
+            if (prop.n === 2) {
+                // left
+                this._addBoard(0, 0.5, 0, 1);
+            }
+            else if (prop.n === 3) {
+                // right
+                this._addBoard(0.5, 1, 0, 1);
+            }
+            else if (prop.n === 4) {
+                // top
+                this._addBoard(0, 1, 0.5, 1);
+            }
+            else if (prop.n === 5) {
+                // bottom
+                this._addBoard(0, 1, 0, 0.5);
+            }
+            else if (prop.n === 6) {
+                // vertical hole
+                this._addBoard(0, 1 / 3, 0, 1);
+                this._addBoard(2 / 3, 1, 0, 1);
+            }
+            else if (prop.n === 7) {
+                // horizontal hole
+                this._addBoard(0, 1, 0, 1 / 3);
+                this._addBoard(0, 1, 2 / 3, 1);
+            }
+            else if (prop.n === 8) {
+                // diagonal 2
+                this._addBoard(0, 0.5, 0.5, 1);
+                this._addBoard(0.5, 1, 0, 0.5);
+            }
+            else if (prop.n === 9) {
+                // diagonal 3
+                this._addBoard(0, 1 / 3, 2 / 3, 1);
+                this._addBoard(1 / 3, 2 / 3, 1 / 3, 2 / 3);
+                this._addBoard(2 / 3, 1, 0, 1 / 3);
+            }
+            else if (prop.n === 10) {
+                // diagonal corners
+                this._addBoard(0, 1 / 3, 2 / 3, 1);
+                this._addBoard(2 / 3, 1, 0, 1 / 3);
+            }
+            else if (prop.n === 11) {
+                // full corners
+                this._addBoard(0, 1 / 3, 2 / 3, 1);
+                this._addBoard(2 / 3, 1, 2 / 3, 1);
+                this._addBoard(0, 1 / 3, 0, 1 / 3);
+                this._addBoard(2 / 3, 1, 0, 1 / 3);
+            }
+            else {
+                // full
+                this._addBoard(0, 1, 0, 1);
+            }
 
-            let boardCollider = new Mummu.BoxCollider(this.board._worldMatrix);
-            boardCollider.width = BlackBoard.BlackBoardW * tileSize;
-            boardCollider.height = BlackBoard.BlackBoardH * tileHeight;
-            boardCollider.depth = BlackBoard._BoardThickness;
-            
-            let boardMachineCollider = new MachineCollider(boardCollider);
-
-            let borderThickness = 3 * BlackBoard._BoardThickness;
+            let borderThickness = 3 * BlackBoard.BoardThickness;
             let borderDepth = 3 * tileSize;
 
             this.borders[0] = new BABYLON.Mesh("top-border");
@@ -63,6 +142,7 @@ namespace MarbleRunSimulatorCore {
             topCollider.depth = borderDepth;
             
             let topMachineCollider = new MachineCollider(topCollider);
+            topMachineCollider.bouncyness = 0.8;
             
             this.borders[1] = new BABYLON.Mesh("right-border");
             this.borders[1].parent = this;
@@ -82,6 +162,7 @@ namespace MarbleRunSimulatorCore {
             rightCollider.depth = borderDepth;
             
             let rightMachineCollider = new MachineCollider(rightCollider);
+            rightMachineCollider.bouncyness = 1;
             
             this.borders[2] = new BABYLON.Mesh("bottom-border");
             this.borders[2].parent = this;
@@ -101,6 +182,7 @@ namespace MarbleRunSimulatorCore {
             bottomCollider.depth = borderDepth;
             
             let bottomMachineCollider = new MachineCollider(bottomCollider);
+            bottomMachineCollider.bouncyness = 0.8;
             
             this.borders[3] = new BABYLON.Mesh("left-border");
             this.borders[3].parent = this;
@@ -120,32 +202,22 @@ namespace MarbleRunSimulatorCore {
             leftCollider.depth = borderDepth;
             
             let leftMachineCollider = new MachineCollider(leftCollider);
+            leftMachineCollider.bouncyness = 1;
 
-            this.colliders = [boardMachineCollider, topMachineCollider, rightMachineCollider, bottomMachineCollider, leftMachineCollider];
+            this.colliders.push(topMachineCollider, rightMachineCollider, bottomMachineCollider, leftMachineCollider);
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
-            let partName = "blackboard";
+            let partName = "blackboard_" + prop.n;
             return partName;
         }
 
-        public static GenerateTemplate(): MachinePartTemplate {
+        public static GenerateTemplate(n: number): MachinePartTemplate {
             let template = new MachinePartTemplate();
 
-            template.partName = "blackboard";
-
-            let dir = new BABYLON.Vector3(1, 0, 0);
-            dir.normalize();
-            let n = new BABYLON.Vector3(0, 1, 0);
-            n.normalize();
-
-            template.trackTemplates[0] = new TrackTemplate(template);
-
-            let start = new BABYLON.Vector3(- tileSize * 0.5, 0, 0);
-            let end = new BABYLON.Vector3(tileSize * 0.5, 0, 0);
-
-            template.trackTemplates[0].trackpoints = [new TrackPoint(template.trackTemplates[0], start, dir, undefined, undefined, 1)];
-            template.trackTemplates[0].trackpoints.push(new TrackPoint(template.trackTemplates[0], end, dir, undefined, 1));
+            template.partName = "blackboard_" + n;
+            template.n = n;
+            template.nExtendable = true;
 
             template.initialize();
 
@@ -153,20 +225,25 @@ namespace MarbleRunSimulatorCore {
         }
         
         protected async instantiateMachineSpecific(): Promise<void> {
-            this.board.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
+            this.boards.forEach(board => {
+                board.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
+            });
+
             this.borders.forEach(border => {
                 border.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
-            })
+            });
         }
 
         public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
-            let boardSelector = BABYLON.CreateBoxVertexData({
-                width: BlackBoard.BlackBoardW * tileSize,
-                height: BlackBoard.BlackBoardH * tileHeight,
-                depth: BlackBoard._BoardThickness
-            });
-            Mummu.TranslateVertexDataInPlace(boardSelector, this.board.position);
-            selectorMeshLogicVertexDatas.push(boardSelector);
+            this.boards.forEach(boardPiece => {
+                let boardSelector = BABYLON.CreateBoxVertexData({
+                    width: BlackBoard.BlackBoardW * tileSize * boardPiece.wFactor,
+                    height: BlackBoard.BlackBoardH * tileHeight * boardPiece.hFactor,
+                    depth: BlackBoard.BoardThickness
+                });
+                Mummu.TranslateVertexDataInPlace(boardSelector, boardPiece.position);
+                selectorMeshLogicVertexDatas.push(boardSelector);
+            })
         }
 
         public regenerateTemplate(): void {
@@ -214,7 +291,10 @@ namespace MarbleRunSimulatorCore {
                         trackpoint.normal.scaleInPlace(-1);
                     })
                 }
-                this.template.trackTemplates.push(trackTemplate);
+
+                if (trackTemplate.trackpoints.length > 0) {
+                    this.template.trackTemplates.push(trackTemplate);
+                }
             }
 
             this.template.initialize();
@@ -234,7 +314,7 @@ namespace MarbleRunSimulatorCore {
                             if (last) {
                                 sqrDist = BABYLON.Vector3.DistanceSquared(last, pt);
                             }
-                            if (sqrDist > d * d) {
+                            if (sqrDist > d * d || i === points.length - 1) {
                                 filteredPoints.push(pt);
                             }
                         }

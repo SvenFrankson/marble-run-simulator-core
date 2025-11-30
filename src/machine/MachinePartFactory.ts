@@ -55,7 +55,8 @@ namespace MarbleRunSimulatorCore {
         "blackboard",
         "diamond",
         "bumper",
-        "endbasket"
+        "endbasket",
+        "box"
     ];
 
     export interface IMachinePartProp {
@@ -302,6 +303,11 @@ namespace MarbleRunSimulatorCore {
                 return new EndBasket(this.machine, prop);
             }
             if (partName === "blackboard") {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let n = parseInt(argStr.split(".")[0]);
+                    prop.n = n;
+                }
                 return new BlackBoard(this.machine, prop);
             }
             if (partName === "jumper" || partName.startsWith("jumper_")) {
@@ -535,6 +541,16 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Diamond(this.machine, prop);
             }
+            if (partName === "box" || partName.startsWith("box_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    prop.l = l;
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                }
+                return new Box(this.machine, prop);
+            }
             if (partName === "bumper" || partName.startsWith("bumper_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
@@ -718,6 +734,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "diamond") {
                 return new Diamond(this.machine, prop);
+            }
+            if (baseName === "box") {
+                return new Box(this.machine, prop);
             }
             if (baseName === "bumper") {
                 return new Bumper(this.machine, prop);

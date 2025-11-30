@@ -73,6 +73,83 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
+    export class Box extends MachinePart {
+
+        public body: BABYLON.Mesh;
+
+        constructor(machine: Machine, prop: IMachinePartProp) {
+            super(machine, prop);
+            this.setColorCount(1);
+
+            this.setTemplate(this.machine.templateManager.getTemplate(Box.PropToPartName(prop), prop.mirrorX));
+
+            let w = prop.l * tileSize;
+            let h = prop.h * tileHeight;
+            this.body = new BABYLON.Mesh("body");
+            this.body.parent = this;
+            let bodyVertexData = Mummu.CreateBeveledBoxVertexData({ width: w, height: h, depth: tileSize });
+            bodyVertexData.applyToMesh(this.body);
+
+            let bodyCollider = new Mummu.BoxCollider(this.body._worldMatrix);
+            bodyCollider.width = w;
+            bodyCollider.height = h;
+            bodyCollider.depth = tileSize;
+            
+            let bodyMachineCollider = new MachineCollider(bodyCollider);
+
+            this.colliders = [bodyMachineCollider];
+
+            this.localAABBBaseMin.x = - (prop.l + 0.5) * 0.5 * tileSize;
+            this.localAABBBaseMin.y = - (prop.h + 0.5) * 0.5 * tileHeight;
+            this.localAABBBaseMax.x = (prop.l + 0.5) * 0.5 * tileSize;
+            this.localAABBBaseMax.y = (prop.h + 0.5) * 0.5 * tileHeight;
+
+            this.generateWires();
+        }
+
+        public static PropToPartName(prop: IMachinePartProp): string {
+            let partName = "box_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0);
+            return partName;
+        }
+        
+        protected async instantiateMachineSpecific(): Promise<void> {
+            this.body.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
+        }
+
+        public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
+            let bodySelector = BABYLON.VertexData.ExtractFromMesh(this.body);
+            Mummu.RotateAngleAxisVertexDataInPlace(bodySelector, Math.PI / 4, BABYLON.Axis.Z);
+            selectorMeshLogicVertexDatas.push(bodySelector);
+        }
+
+        public recomputeAbsolutePath(): void {
+            let collider = this.colliders[0];
+            if (collider.baseCollider instanceof Mummu.BoxCollider) {
+                collider.baseCollider.worldMatrix = this.body._worldMatrix;
+            }
+            super.recomputeAbsolutePath();
+        }
+
+        public static GenerateTemplate(l: number, h: number): MachinePartTemplate {
+            let template = new MachinePartTemplate();
+
+            template.partName = "box_" + l.toFixed(0) + "." + h.toFixed(0);
+
+            template.l = l;
+            template.xExtendable = true;
+            template.h = h;
+            template.yExtendable = true;
+            template.minL = 1;
+            template.maxL = 32;
+            template.minH = 1;
+            template.maxH = 32;
+
+            template.initialize();
+
+            return template;
+        }
+    }
+
     export class Bumper extends MachinePart {
 
         public body: BABYLON.Mesh;

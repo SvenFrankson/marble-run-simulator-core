@@ -433,7 +433,7 @@ namespace MarbleRunSimulatorCore {
                 f = Math.max(Math.min(f, 1), 0.4);
                 this._timer -= physicDT / f;
 
-                let weight = new BABYLON.Vector3(0, -2 * m, 0);
+                let weight = new BABYLON.Vector3(0, - (this.machine.gravity) * m, 0);
                 let reactions = BABYLON.Vector3.Zero();
                 let reactionsCount = 0;
 

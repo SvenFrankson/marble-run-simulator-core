@@ -17,7 +17,7 @@ namespace MarbleRunSimulatorCore {
 
             for (let n = 0; n < 2; n++) {
                 let shieldWire = new Wire(this);
-                shieldWire.wireSize = 0.004;
+                shieldWire.wireSize = 0.006;
                 shieldWire.colorIndex = 1;
                 shieldWire.path = [];
 

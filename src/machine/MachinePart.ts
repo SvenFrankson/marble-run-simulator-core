@@ -301,7 +301,7 @@ namespace MarbleRunSimulatorCore {
         public colliders: MachineCollider[] = [];
         public outlinableMeshes: BABYLON.Mesh[] = [];
 
-        public wireSize: number = 0.006;
+        public wireSize: number = 0.002;
         public wireGauge: number = 0.014;
 
         public colors: number[] = [0];
