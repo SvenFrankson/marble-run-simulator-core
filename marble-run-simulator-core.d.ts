@@ -1145,6 +1145,7 @@ declare namespace MarbleRunSimulatorCore {
         protected instantiateMachineSpecific(): Promise<void>;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;
+        isPointOnBoard(pt: BABYLON.Vector3): boolean;
         addRawPointLine(points: BABYLON.Vector3[]): void;
         setI(v: number, doNotCheckGridLimits?: boolean): void;
         setJ(v: number, doNotCheckGridLimits?: boolean): void;

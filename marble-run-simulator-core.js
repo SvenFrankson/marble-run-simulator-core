@@ -10283,22 +10283,38 @@ var MarbleRunSimulatorCore;
             this.template.initialize();
             this.generateWires();
         }
+        isPointOnBoard(pt) {
+            for (let i = 0; i < this.boardColliders.length; i++) {
+                let board = this.boards[i];
+                if (board) {
+                    let boardCollider = this.boardColliders[i];
+                    if (boardCollider.baseCollider instanceof Mummu.BoxCollider) {
+                        let hW = boardCollider.baseCollider.width * 0.5;
+                        let hH = boardCollider.baseCollider.height * 0.5;
+                        if (pt.x > board.position.x - hW && pt.x < board.position.x + hW) {
+                            if (pt.y > board.position.y - hH && pt.y < board.position.y + hH) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
         addRawPointLine(points) {
             if (points.length > 0) {
                 let filteredPoints = [];
                 let d = this.wireGauge;
                 for (let i = 0; i < points.length; i++) {
                     let pt = points[i];
-                    if (pt.x > this.worldAABBMin.x && pt.x < this.worldAABBMax.x) {
-                        if (pt.y > this.worldAABBMin.y && pt.y < this.worldAABBMax.y) {
-                            let last = filteredPoints[filteredPoints.length - 1];
-                            let sqrDist = Infinity;
-                            if (last) {
-                                sqrDist = BABYLON.Vector3.DistanceSquared(last, pt);
-                            }
-                            if (sqrDist > d * d || i === points.length - 1) {
-                                filteredPoints.push(pt);
-                            }
+                    if (this.isPointOnBoard(pt)) {
+                        let last = filteredPoints[filteredPoints.length - 1];
+                        let sqrDist = Infinity;
+                        if (last) {
+                            sqrDist = BABYLON.Vector3.DistanceSquared(last, pt);
+                        }
+                        if (sqrDist > d * d || i === points.length - 1) {
+                            filteredPoints.push(pt);
                         }
                     }
                 }
