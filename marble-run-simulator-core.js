@@ -35,6 +35,7 @@ var MarbleRunSimulatorCore;
             this.frozen = false;
             this.saveTrajectory = false;
             this.currentTrajectory = [];
+            this.lastTrajectory = [];
             this._hasBoostMaterial = false;
             this._boostColor = new BABYLON.Color3(0.9, 0.1, 0.3);
             this._boosting = false;
@@ -302,6 +303,7 @@ var MarbleRunSimulatorCore;
             this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
+            this.lastTrajectory = this.currentTrajectory;
             this.currentTrajectory = [];
             this.animatePosition(this.positionZero.add(this.machine.root.position), 0);
         }
@@ -2013,6 +2015,10 @@ var MarbleRunSimulatorCore;
             BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[0], this.part.getWorldMatrix(), this._startWorldPosition);
             BABYLON.Vector3.TransformCoordinatesToRef(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1], this.part.getWorldMatrix(), this._endWorldPosition);
         }
+        dispose() {
+            this.wires[0].dispose();
+            this.wires[1].dispose();
+        }
         get trackIndex() {
             return this.part.tracks.indexOf(this);
         }
@@ -2225,6 +2231,12 @@ var MarbleRunSimulatorCore;
             super(part);
             this.wires = [new MarbleRunSimulatorCore.Wire(this.part), new MarbleRunSimulatorCore.Wire(this.part)];
         }
+        dispose() {
+            super.dispose();
+            if (this.mesh) {
+                this.mesh.dispose();
+            }
+        }
     }
     MarbleRunSimulatorCore.DoubleTrack = DoubleTrack;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
@@ -2374,6 +2386,9 @@ var MarbleRunSimulatorCore;
             doubleData.indices = indices;
             BABYLON.VertexData.ComputeNormals(positions, indices, normals);
             doubleData.normals = normals;
+            if (track.mesh.isDisposed()) {
+                return;
+            }
             Mummu.MergeVertexDatas(doubleData, startCapData, endCapData).applyToMesh(track.mesh);
         }
     }
@@ -4766,6 +4781,9 @@ var MarbleRunSimulatorCore;
                     track.initialize(this.template.trackTemplates[i]);
                     track.refreshStartEndWorldPosition();
                     this.allWires.push(track.wires[0], track.wires[1]);
+                }
+                while (this.tracks.length > this.template.trackTemplates.length) {
+                    this.tracks.pop().dispose();
                 }
             }
             else {
@@ -10076,7 +10094,7 @@ var MarbleRunSimulatorCore;
     class BlackBoard extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            this.rawLines = [];
+            this.lines = [];
             this.boards = [];
             this.borders = [];
             this.boardColliders = [];
@@ -10269,8 +10287,8 @@ var MarbleRunSimulatorCore;
         }
         regenerateTemplate() {
             this.template.trackTemplates = [];
-            for (let n = 0; n < this.rawLines.length; n++) {
-                let rawLine = this.rawLines[n];
+            for (let n = 0; n < this.lines.length; n++) {
+                let rawLine = this.lines[n];
                 let trackTemplate = new MarbleRunSimulatorCore.TrackTemplate(this.template);
                 trackTemplate.isDouble = true;
                 let dirStart = rawLine[1].subtract(rawLine[0]).normalize();
@@ -10310,7 +10328,10 @@ var MarbleRunSimulatorCore;
                 }
             }
             this.template.initialize();
+            console.log("template has " + this.template.trackTemplates.length + " trackTemplates.");
+            console.log("this has " + this.tracks.length + " tracks.");
             this.generateWires();
+            console.log("this has " + this.tracks.length + " tracks.");
         }
         isPointOnBoard(pt) {
             for (let i = 0; i < this.boardColliders.length; i++) {
@@ -10330,12 +10351,18 @@ var MarbleRunSimulatorCore;
             }
             return false;
         }
-        addRawPointLine(points) {
+        addLine(points) {
+            this.lines.push(points);
+        }
+        addRawLine(points) {
             if (points.length > 0) {
                 let filteredPoints = [];
                 let d = this.wireGauge;
                 for (let i = 0; i < points.length; i++) {
-                    let pt = points[i];
+                    let pt = points[i].clone();
+                    pt.x = Math.floor(pt.x * 10000) / 10000;
+                    pt.y = Math.floor(pt.y * 10000) / 10000;
+                    pt.z = Math.floor(pt.z * 10000) / 10000;
                     if (this.isPointOnBoard(pt)) {
                         let last = filteredPoints[filteredPoints.length - 1];
                         let sqrDist = Infinity;
@@ -10353,8 +10380,11 @@ var MarbleRunSimulatorCore;
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
-                this.rawLines.push(filteredPoints);
+                this.lines.push(filteredPoints);
             }
+        }
+        removeLastLine() {
+            this.lines.pop();
         }
         setI(v, doNotCheckGridLimits) {
             super.setI(0, true);

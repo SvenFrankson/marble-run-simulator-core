@@ -36,6 +36,7 @@ declare namespace MarbleRunSimulatorCore {
         frozen: boolean;
         saveTrajectory: boolean;
         currentTrajectory: BABYLON.Vector3[];
+        lastTrajectory: BABYLON.Vector3[];
         private _boostAnimation;
         private _hasBoostMaterial;
         private _baseColor;
@@ -285,6 +286,7 @@ declare namespace MarbleRunSimulatorCore {
         AABBMax: BABYLON.Vector3;
         template: TrackTemplate;
         constructor(part: MachinePart);
+        dispose(): void;
         get trackIndex(): number;
         getSlopeAt(index: number): number;
         getBankAt(index: number): number;
@@ -297,6 +299,7 @@ declare namespace MarbleRunSimulatorCore {
     class DoubleTrack extends Track {
         mesh: BABYLON.Mesh;
         constructor(part: MachinePart);
+        dispose(): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -1138,7 +1141,7 @@ declare namespace MarbleRunSimulatorCore {
         static BlackBoardW: number;
         static BlackBoardH: number;
         static BoardThickness: number;
-        rawLines: BABYLON.Vector3[][];
+        lines: BABYLON.Vector3[][];
         boards: BlackBoardPiece[];
         borders: BABYLON.Mesh[];
         boardColliders: MachineCollider[];
@@ -1150,7 +1153,9 @@ declare namespace MarbleRunSimulatorCore {
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;
         isPointOnBoard(pt: BABYLON.Vector3): boolean;
-        addRawPointLine(points: BABYLON.Vector3[]): void;
+        addLine(points: BABYLON.Vector3[]): void;
+        addRawLine(points: BABYLON.Vector3[]): void;
+        removeLastLine(): void;
         setI(v: number, doNotCheckGridLimits?: boolean): void;
         setJ(v: number, doNotCheckGridLimits?: boolean): void;
         setK(v: number, doNotCheckGridLimits?: boolean): void;

@@ -8,5 +8,12 @@ namespace MarbleRunSimulatorCore {
             super(part);
             this.wires = [new Wire(this.part), new Wire(this.part)];
         }
+        
+        public dispose(): void {
+            super.dispose();
+            if (this.mesh) {
+                this.mesh.dispose();
+            }
+        }
     }
 }

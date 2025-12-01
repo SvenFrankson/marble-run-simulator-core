@@ -178,6 +178,9 @@ namespace MarbleRunSimulatorCore {
             BABYLON.VertexData.ComputeNormals(positions, indices, normals);
             doubleData.normals = normals;
 
+            if (track.mesh.isDisposed()) {
+                return;
+            }
             Mummu.MergeVertexDatas(doubleData, startCapData, endCapData).applyToMesh(track.mesh);
         }
     }

@@ -1538,7 +1538,11 @@ namespace MarbleRunSimulatorCore {
                     track.refreshStartEndWorldPosition();
                     this.allWires.push(track.wires[0], track.wires[1]);
                 }
-            } else {
+                while (this.tracks.length > this.template.trackTemplates.length) {
+                    this.tracks.pop().dispose();
+                }
+            }
+            else {
                 console.error("Can't generate wires, no template provided for " + this.partName);
                 console.log(this);
             }

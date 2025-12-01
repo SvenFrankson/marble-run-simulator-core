@@ -48,6 +48,7 @@ namespace MarbleRunSimulatorCore {
 
         public saveTrajectory: boolean = false;
         public currentTrajectory: BABYLON.Vector3[] = [];
+        public lastTrajectory: BABYLON.Vector3[] = [];
 
         private _boostAnimation: BallBoostAnimation;
         private _hasBoostMaterial: boolean = false;
@@ -332,6 +333,7 @@ namespace MarbleRunSimulatorCore {
             this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
+            this.lastTrajectory = this.currentTrajectory;
             this.currentTrajectory = [];
             this.animatePosition(this.positionZero.add(this.machine.root.position), 0);
         }

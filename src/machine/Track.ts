@@ -43,6 +43,11 @@ namespace MarbleRunSimulatorCore {
             this.wires = [new Wire(this.part), new Wire(this.part)];
         }
 
+        public dispose(): void {
+            this.wires[0].dispose();
+            this.wires[1].dispose();
+        }
+
         public get trackIndex(): number {
             return this.part.tracks.indexOf(this);
         }
