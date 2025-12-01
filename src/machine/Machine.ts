@@ -145,6 +145,7 @@ namespace MarbleRunSimulatorCore {
         public author: string = "Anonymous";
         public country: string = "";
         public isChallengeMachine: boolean = false;
+        public isDrawBlackboardMachine: boolean = false;
         public constructionMode: MachineConstructionMode = MachineConstructionMode.Mode3D;
 
         public root: BABYLON.Mesh;
@@ -184,6 +185,7 @@ namespace MarbleRunSimulatorCore {
         public exitHoleIn: BABYLON.Mesh;
         public exitHolePath: BABYLON.Vector3[];
         public exitHoleOut: BABYLON.Mesh;
+        public ballsTrajectoryMeshes: BABYLON.Mesh[] = [];
 
         public baseColor: string = "#ffffff";
 
@@ -358,6 +360,7 @@ namespace MarbleRunSimulatorCore {
                     await part.instantiate(undefined, true);
                     part.isPlaced = true;
                     if (part instanceof BlackBoard) {
+                        this.isDrawBlackboardMachine = true;
                         this.gravity = 2;
                     }
                     await Nabu.Wait(1);
@@ -375,6 +378,9 @@ namespace MarbleRunSimulatorCore {
 
             for (let i = 0; i < this.balls.length; i++) {
                 await this.balls[i].instantiate(hotReload);
+                if (this.isDrawBlackboardMachine) {
+                    this.balls[i].saveTrajectory = true;
+                }
             }
 
             for (let i = 0; i < this.decors.length; i++) {
@@ -404,6 +410,7 @@ namespace MarbleRunSimulatorCore {
 
         public reset(): void {
             this.isChallengeMachine = false;
+            this.isDrawBlackboardMachine = false;
             this.name = MachineName.GetRandom();
             this.author = "Anonymous";
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
@@ -536,6 +543,9 @@ namespace MarbleRunSimulatorCore {
             this.onPlayCallbacks.forEach((callback) => {
                 callback();
             });
+            while (this.ballsTrajectoryMeshes.length > 0) {
+                this.ballsTrajectoryMeshes.pop().dispose();
+            }
         }
 
         private _paused: boolean = false;
@@ -552,7 +562,20 @@ namespace MarbleRunSimulatorCore {
             return !this.playing && !this.paused;
         }
         public stop(): void {
+            while (this.ballsTrajectoryMeshes.length > 0) {
+                this.ballsTrajectoryMeshes.pop().dispose();
+            }
             for (let i = 0; i < this.balls.length; i++) {
+                if (this.balls[i].saveTrajectory && this.balls[i].currentTrajectory.length >= 2) {
+                    this.ballsTrajectoryMeshes.push(
+                        BABYLON.MeshBuilder.CreateLines(
+                            "ball-trajectory",
+                            {
+                                points: this.balls[i].currentTrajectory
+                            }
+                        )
+                    );
+                }
                 this.balls[i].reset();
             }
             this.onStopCallbacks.forEach((callback) => {

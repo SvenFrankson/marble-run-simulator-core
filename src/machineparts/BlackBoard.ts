@@ -336,6 +336,9 @@ namespace MarbleRunSimulatorCore {
                             filteredPoints.push(pt);
                         }
                     }
+                    else if (filteredPoints.length > 0) {
+                        break;
+                    }
                 }
 
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);

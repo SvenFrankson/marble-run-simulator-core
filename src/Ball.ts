@@ -46,6 +46,9 @@ namespace MarbleRunSimulatorCore {
 
         public frozen: boolean = false;
 
+        public saveTrajectory: boolean = false;
+        public currentTrajectory: BABYLON.Vector3[] = [];
+
         private _boostAnimation: BallBoostAnimation;
         private _hasBoostMaterial: boolean = false;
         private _baseColor: BABYLON.Color3;
@@ -329,6 +332,7 @@ namespace MarbleRunSimulatorCore {
             this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
+            this.currentTrajectory = [];
             this.animatePosition(this.positionZero.add(this.machine.root.position), 0);
         }
 
@@ -1030,6 +1034,15 @@ namespace MarbleRunSimulatorCore {
             if (sign != sign2 && this.debugNextYFlip) {
                 this.debugNextYFlip();
                 this.debugNextYFlip = undefined;
+            }
+
+            if (this.saveTrajectory) {
+                if (this.currentTrajectory.length < 10000) {
+                    let lastTrajectoryPoint = this.currentTrajectory[this.currentTrajectory.length - 1];
+                    if (!lastTrajectoryPoint || BABYLON.Vector3.DistanceSquared(this.position, lastTrajectoryPoint) > 0.005 * 0.005) {
+                        this.currentTrajectory.push(this.position.clone());
+                    }
+                }
             }
         }
     }

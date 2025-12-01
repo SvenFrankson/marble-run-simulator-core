@@ -34,6 +34,8 @@ declare namespace MarbleRunSimulatorCore {
         get sectionArea(): number;
         velocity: BABYLON.Vector3;
         frozen: boolean;
+        saveTrajectory: boolean;
+        currentTrajectory: BABYLON.Vector3[];
         private _boostAnimation;
         private _hasBoostMaterial;
         private _baseColor;
@@ -415,6 +417,7 @@ declare namespace MarbleRunSimulatorCore {
         author: string;
         country: string;
         isChallengeMachine: boolean;
+        isDrawBlackboardMachine: boolean;
         constructionMode: MachineConstructionMode;
         root: BABYLON.Mesh;
         pedestalTop: BABYLON.Mesh;
@@ -447,6 +450,7 @@ declare namespace MarbleRunSimulatorCore {
         exitHoleIn: BABYLON.Mesh;
         exitHolePath: BABYLON.Vector3[];
         exitHoleOut: BABYLON.Mesh;
+        ballsTrajectoryMeshes: BABYLON.Mesh[];
         baseColor: string;
         gravity: number;
         _roomIndex: number;

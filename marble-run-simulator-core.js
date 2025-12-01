@@ -33,6 +33,8 @@ var MarbleRunSimulatorCore;
             this.size = 0.016;
             this.velocity = BABYLON.Vector3.Zero();
             this.frozen = false;
+            this.saveTrajectory = false;
+            this.currentTrajectory = [];
             this._hasBoostMaterial = false;
             this._boostColor = new BABYLON.Color3(0.9, 0.1, 0.3);
             this._boosting = false;
@@ -300,6 +302,7 @@ var MarbleRunSimulatorCore;
             this.collisionState = CollisionState.Normal;
             this.marbleLoopSound.setVolume(0, 0.1);
             this.marbleBowlLoopSound.setVolume(0, 0.1);
+            this.currentTrajectory = [];
             this.animatePosition(this.positionZero.add(this.machine.root.position), 0);
         }
         getLastIndex(wire) {
@@ -942,6 +945,14 @@ var MarbleRunSimulatorCore;
             if (sign != sign2 && this.debugNextYFlip) {
                 this.debugNextYFlip();
                 this.debugNextYFlip = undefined;
+            }
+            if (this.saveTrajectory) {
+                if (this.currentTrajectory.length < 10000) {
+                    let lastTrajectoryPoint = this.currentTrajectory[this.currentTrajectory.length - 1];
+                    if (!lastTrajectoryPoint || BABYLON.Vector3.DistanceSquared(this.position, lastTrajectoryPoint) > 0.005 * 0.005) {
+                        this.currentTrajectory.push(this.position.clone());
+                    }
+                }
             }
         }
     }
@@ -2452,6 +2463,7 @@ var MarbleRunSimulatorCore;
             this.author = "Anonymous";
             this.country = "";
             this.isChallengeMachine = false;
+            this.isDrawBlackboardMachine = false;
             this.constructionMode = MachineConstructionMode.Mode3D;
             this.TEST_USE_BASE_FPS = false; // only for Poki playtest
             this.parts = [];
@@ -2465,6 +2477,7 @@ var MarbleRunSimulatorCore;
             this.updatingMachinePartCoordinates = false;
             this.playing = false;
             this.hasExitHole = false;
+            this.ballsTrajectoryMeshes = [];
             this.baseColor = "#ffffff";
             this.gravity = 9;
             this._roomIndex = 0;
@@ -2623,6 +2636,7 @@ var MarbleRunSimulatorCore;
                     await part.instantiate(undefined, true);
                     part.isPlaced = true;
                     if (part instanceof MarbleRunSimulatorCore.BlackBoard) {
+                        this.isDrawBlackboardMachine = true;
                         this.gravity = 2;
                     }
                     await Nabu.Wait(1);
@@ -2637,6 +2651,9 @@ var MarbleRunSimulatorCore;
             }
             for (let i = 0; i < this.balls.length; i++) {
                 await this.balls[i].instantiate(hotReload);
+                if (this.isDrawBlackboardMachine) {
+                    this.balls[i].saveTrajectory = true;
+                }
             }
             for (let i = 0; i < this.decors.length; i++) {
                 await this.decors[i].instantiate(hotReload);
@@ -2662,6 +2679,7 @@ var MarbleRunSimulatorCore;
         }
         reset() {
             this.isChallengeMachine = false;
+            this.isDrawBlackboardMachine = false;
             this.name = MachineName.GetRandom();
             this.author = "Anonymous";
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
@@ -2786,6 +2804,9 @@ var MarbleRunSimulatorCore;
             this.onPlayCallbacks.forEach((callback) => {
                 callback();
             });
+            while (this.ballsTrajectoryMeshes.length > 0) {
+                this.ballsTrajectoryMeshes.pop().dispose();
+            }
         }
         get paused() {
             return this._paused;
@@ -2798,7 +2819,15 @@ var MarbleRunSimulatorCore;
             return !this.playing && !this.paused;
         }
         stop() {
+            while (this.ballsTrajectoryMeshes.length > 0) {
+                this.ballsTrajectoryMeshes.pop().dispose();
+            }
             for (let i = 0; i < this.balls.length; i++) {
+                if (this.balls[i].saveTrajectory && this.balls[i].currentTrajectory.length >= 2) {
+                    this.ballsTrajectoryMeshes.push(BABYLON.MeshBuilder.CreateLines("ball-trajectory", {
+                        points: this.balls[i].currentTrajectory
+                    }));
+                }
                 this.balls[i].reset();
             }
             this.onStopCallbacks.forEach((callback) => {
@@ -10316,6 +10345,9 @@ var MarbleRunSimulatorCore;
                         if (sqrDist > d * d || i === points.length - 1) {
                             filteredPoints.push(pt);
                         }
+                    }
+                    else if (filteredPoints.length > 0) {
+                        break;
                     }
                 }
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
