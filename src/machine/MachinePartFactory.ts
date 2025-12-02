@@ -305,7 +305,11 @@ namespace MarbleRunSimulatorCore {
             if (partName === "blackboard") {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
-                    let n = parseInt(argStr.split(".")[0]);
+                    let l = parseInt(argStr.split(".")[0]);
+                    prop.l = l;
+                    let h = parseInt(argStr.split(".")[1]);
+                    prop.h = h;
+                    let n = parseInt(argStr.split(".")[2]);
                     prop.n = n;
                 }
                 return new BlackBoard(this.machine, prop);

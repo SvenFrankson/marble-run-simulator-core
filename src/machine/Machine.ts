@@ -70,8 +70,8 @@ namespace MarbleRunSimulatorCore {
         Page,
         Create,
         Challenge,
-        Demo,
-        GravityControl
+        BBPuzzle,
+        Demo
     }
 
     export enum MachineDBState {
@@ -185,7 +185,6 @@ namespace MarbleRunSimulatorCore {
         public exitHoleIn: BABYLON.Mesh;
         public exitHolePath: BABYLON.Vector3[];
         public exitHoleOut: BABYLON.Mesh;
-        public ballsTrajectoryMeshes: BABYLON.Mesh[] = [];
 
         public baseColor: string = "#ffffff";
 
@@ -543,9 +542,6 @@ namespace MarbleRunSimulatorCore {
             this.onPlayCallbacks.forEach((callback) => {
                 callback();
             });
-            while (this.ballsTrajectoryMeshes.length > 0) {
-                this.ballsTrajectoryMeshes.pop().dispose();
-            }
         }
 
         private _paused: boolean = false;
@@ -562,20 +558,7 @@ namespace MarbleRunSimulatorCore {
             return !this.playing && !this.paused;
         }
         public stop(): void {
-            while (this.ballsTrajectoryMeshes.length > 0) {
-                this.ballsTrajectoryMeshes.pop().dispose();
-            }
             for (let i = 0; i < this.balls.length; i++) {
-                if (this.balls[i].saveTrajectory && this.balls[i].currentTrajectory.length >= 2) {
-                    this.ballsTrajectoryMeshes.push(
-                        BABYLON.MeshBuilder.CreateLines(
-                            "ball-trajectory",
-                            {
-                                points: this.balls[i].currentTrajectory
-                            }
-                        )
-                    );
-                }
                 this.balls[i].reset();
             }
             this.onStopCallbacks.forEach((callback) => {

@@ -359,8 +359,8 @@ declare namespace MarbleRunSimulatorCore {
         Page = 1,
         Create = 2,
         Challenge = 3,
-        Demo = 4,
-        GravityControl = 5
+        BBPuzzle = 4,
+        Demo = 5
     }
     enum MachineDBState {
         Pending = 0,
@@ -453,7 +453,6 @@ declare namespace MarbleRunSimulatorCore {
         exitHoleIn: BABYLON.Mesh;
         exitHolePath: BABYLON.Vector3[];
         exitHoleOut: BABYLON.Mesh;
-        ballsTrajectoryMeshes: BABYLON.Mesh[];
         baseColor: string;
         gravity: number;
         _roomIndex: number;
@@ -1139,8 +1138,6 @@ declare namespace MarbleRunSimulatorCore {
         constructor(blackboard: BlackBoard, wFactor: number, hFactor: number);
     }
     class BlackBoard extends MachinePart {
-        static BlackBoardW: number;
-        static BlackBoardH: number;
         static BoardThickness: number;
         lines: BABYLON.Vector3[][];
         boards: BlackBoardPiece[];
@@ -1149,7 +1146,7 @@ declare namespace MarbleRunSimulatorCore {
         private _addBoard;
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
-        static GenerateTemplate(n: number): MachinePartTemplate;
+        static GenerateTemplate(l: number, h: number, n: number): MachinePartTemplate;
         protected instantiateMachineSpecific(): Promise<void>;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;

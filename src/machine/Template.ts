@@ -566,8 +566,10 @@ namespace MarbleRunSimulatorCore {
                     data = EndBasket.GenerateTemplate();
                 }
                 else if (partName.startsWith("blackboard_")) {
-                    let n = parseInt(partName.split("_")[1].split(".")[0]);
-                    data = BlackBoard.GenerateTemplate(n);
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let n = parseInt(partName.split("_")[1].split(".")[2]);
+                    data = BlackBoard.GenerateTemplate(l, h, n);
                 }
                 else if (partName.startsWith("jumper_")) {
                     let n = parseInt(partName.split("_")[1].split(".")[0]);
