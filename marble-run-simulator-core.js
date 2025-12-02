@@ -483,7 +483,7 @@ var MarbleRunSimulatorCore;
                                     // Cancel depth component of speed
                                     let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
                                     if (depthSpeed > 0) {
-                                        canceledSpeed.addInPlace(colDig.scale(depthSpeed * (1 + collider.bouncyness * (0.9 + 0.2 * Math.random()))));
+                                        canceledSpeed.addInPlace(colDig.scale(depthSpeed * (1 + collider.bouncyness * (1 + collider.randomness * (Math.random() * 2 - 1)))));
                                     }
                                     // Add ground reaction
                                     let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
@@ -1204,6 +1204,15 @@ var MarbleRunSimulatorCore;
                 { baseIndex: 4, ballIndex: 3 },
                 { baseIndex: 5, ballIndex: 4 },
                 { baseIndex: 2, ballIndex: 11 },
+                { baseIndex: 6, ballIndex: 16 },
+                { baseIndex: 7, ballIndex: 17 },
+                { baseIndex: 8, ballIndex: 18 },
+                { baseIndex: 9, ballIndex: 19 },
+                { baseIndex: 10, ballIndex: 20 },
+                { baseIndex: 11, ballIndex: 21 },
+                { baseIndex: 12, ballIndex: 22 },
+                { baseIndex: 13, ballIndex: 23 },
+                { baseIndex: 14, ballIndex: 24 }
             ];
             this._wallpapers = [];
             let envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
@@ -1404,7 +1413,16 @@ var MarbleRunSimulatorCore;
                 this._materialsPBR[3],
                 this._materialsPBR[16],
                 this._materialsPBR[4],
-                this._materialsPBR[5]
+                this._materialsPBR[5],
+                this._materialsPBR[6],
+                this._materialsPBR[7],
+                this._materialsPBR[8],
+                this._materialsPBR[9],
+                this._materialsPBR[10],
+                this._materialsPBR[11],
+                this._materialsPBR[12],
+                this._materialsPBR[13],
+                this._materialsPBR[14]
             ];
             this._ballMaterialsSTD = [
                 this._materialsSTD[0],
@@ -1422,7 +1440,16 @@ var MarbleRunSimulatorCore;
                 this._materialsSTD[3],
                 this._materialsSTD[16],
                 this._materialsSTD[4],
-                this._materialsSTD[5]
+                this._materialsSTD[5],
+                this._materialsSTD[6],
+                this._materialsSTD[7],
+                this._materialsSTD[8],
+                this._materialsSTD[9],
+                this._materialsSTD[10],
+                this._materialsSTD[11],
+                this._materialsSTD[12],
+                this._materialsSTD[13],
+                this._materialsSTD[14]
             ];
             let parkourBallColor = BABYLON.Color3.FromHexString("#0c0c18");
             let parkourBallMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("parkour-ball-pbr", this.game.scene);
@@ -2250,9 +2277,9 @@ var MarbleRunSimulatorCore;
             track.mesh = new BABYLON.Mesh("track-mesh");
             track.mesh.parent = track.part;
             track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
-            let y0 = 0.004;
-            let y1 = 0.0018;
-            let y2 = 0.0006;
+            let y0 = 0.0026;
+            let y1 = 0.0012;
+            let y2 = 0.0004;
             let x0 = 0.01;
             let x1 = 0.0066;
             let x2 = 0.0044;
@@ -2652,7 +2679,7 @@ var MarbleRunSimulatorCore;
                     part.isPlaced = true;
                     if (part instanceof MarbleRunSimulatorCore.BlackBoard) {
                         this.isDrawBlackboardMachine = true;
-                        this.gravity = 2;
+                        this.gravity = 3;
                     }
                     await Nabu.Wait(1);
                 }
@@ -3326,6 +3353,7 @@ var MarbleRunSimulatorCore;
         constructor(baseCollider) {
             this.baseCollider = baseCollider;
             this.bouncyness = 0.5;
+            this.randomness = 0;
             this.getSurface = () => {
                 return MarbleRunSimulatorCore.Surface.Rail;
             };
@@ -11654,17 +11682,17 @@ var MarbleRunSimulatorCore;
     class EndBasket extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
-            this.setColorCount(2);
+            this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(EndBasket.PropToPartName(prop)));
             let d = 3.5 * MarbleRunSimulatorCore.tileSize;
             this.base = new BABYLON.Mesh("base");
             this.base.parent = this;
-            let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: d, height: 0.005 });
+            let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: d - 0.5 * MarbleRunSimulatorCore.tileSize, height: 0.005 });
             bodyVertexData.applyToMesh(this.base);
             for (let n = 0; n < 2; n++) {
                 let shieldWire = new MarbleRunSimulatorCore.Wire(this);
                 shieldWire.wireSize = 0.006;
-                shieldWire.colorIndex = 1;
+                shieldWire.colorIndex = 0;
                 shieldWire.path = [];
                 for (let i = 0; i < 32; i++) {
                     let a = i / 32 * 2 * Math.PI;

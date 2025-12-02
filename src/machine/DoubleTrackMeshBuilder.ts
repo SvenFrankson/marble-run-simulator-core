@@ -14,9 +14,9 @@ namespace MarbleRunSimulatorCore {
             track.mesh.parent = track.part;
             track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
             
-            let y0 = 0.004
-            let y1 = 0.0018
-            let y2 = 0.0006
+            let y0 = 0.0026
+            let y1 = 0.0012
+            let y2 = 0.0004
 
             let x0 = 0.01;
             let x1 = 0.0066;

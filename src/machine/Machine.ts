@@ -361,7 +361,7 @@ namespace MarbleRunSimulatorCore {
                     part.isPlaced = true;
                     if (part instanceof BlackBoard) {
                         this.isDrawBlackboardMachine = true;
-                        this.gravity = 2;
+                        this.gravity = 3;
                     }
                     await Nabu.Wait(1);
                 }

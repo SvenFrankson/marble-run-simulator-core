@@ -5,20 +5,20 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-            this.setColorCount(2);
+            this.setColorCount(1);
 
             this.setTemplate(this.machine.templateManager.getTemplate(EndBasket.PropToPartName(prop)));
 
             let d = 3.5 * tileSize;
             this.base = new BABYLON.Mesh("base");
             this.base.parent = this;
-            let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: d, height: 0.005 });
+            let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: d - 0.5 * tileSize, height: 0.005 });
             bodyVertexData.applyToMesh(this.base);
 
             for (let n = 0; n < 2; n++) {
                 let shieldWire = new Wire(this);
                 shieldWire.wireSize = 0.006;
-                shieldWire.colorIndex = 1;
+                shieldWire.colorIndex = 0;
                 shieldWire.path = [];
 
                 for (let i = 0; i < 32; i++) {

@@ -93,6 +93,15 @@ namespace MarbleRunSimulatorCore {
             { baseIndex: 4, ballIndex: 3 },
             { baseIndex: 5, ballIndex: 4 },
             { baseIndex: 2, ballIndex: 11 },
+            { baseIndex: 6, ballIndex: 16 },
+            { baseIndex: 7, ballIndex: 17 },
+            { baseIndex: 8, ballIndex: 18 },
+            { baseIndex: 9, ballIndex: 19 },
+            { baseIndex: 10, ballIndex: 20 },
+            { baseIndex: 11, ballIndex: 21 },
+            { baseIndex: 12, ballIndex: 22 },
+            { baseIndex: 13, ballIndex: 23 },
+            { baseIndex: 14, ballIndex: 24 }
         ];
         public ballMaterialIndexToBaseMaterialIndex(ballMaterialIndex: number): number {
             let e = this.baseMaterialToBallMaterialTable.find(e => { return e.ballIndex === ballMaterialIndex });
@@ -387,7 +396,16 @@ namespace MarbleRunSimulatorCore {
                 this._materialsPBR[3],
                 this._materialsPBR[16],
                 this._materialsPBR[4],
-                this._materialsPBR[5]
+                this._materialsPBR[5],
+                this._materialsPBR[6],
+                this._materialsPBR[7],
+                this._materialsPBR[8],
+                this._materialsPBR[9],
+                this._materialsPBR[10],
+                this._materialsPBR[11],
+                this._materialsPBR[12],
+                this._materialsPBR[13],
+                this._materialsPBR[14]
             ]
 
             this._ballMaterialsSTD = [
@@ -406,7 +424,16 @@ namespace MarbleRunSimulatorCore {
                 this._materialsSTD[3],
                 this._materialsSTD[16],
                 this._materialsSTD[4],
-                this._materialsSTD[5]
+                this._materialsSTD[5],
+                this._materialsSTD[6],
+                this._materialsSTD[7],
+                this._materialsSTD[8],
+                this._materialsSTD[9],
+                this._materialsSTD[10],
+                this._materialsSTD[11],
+                this._materialsSTD[12],
+                this._materialsSTD[13],
+                this._materialsSTD[14]
             ]
 
             let parkourBallColor = BABYLON.Color3.FromHexString("#0c0c18");
