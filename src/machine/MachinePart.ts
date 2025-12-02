@@ -624,7 +624,7 @@ namespace MarbleRunSimulatorCore {
             this.parent = this.machine.root;
             this.tracks = [];
 
-            this.refreshEncloseMeshAndLocalAABB();
+            //this.refreshEncloseMeshAndLocalAABB();
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
@@ -1331,8 +1331,8 @@ namespace MarbleRunSimulatorCore {
             let z1 = this.localAABBBaseMax.z;
 
             if (this instanceof BlackBoard) {
-                x1 = x0 + BlackBoard.BlackBoardW * tileSize;
-                y1 = y0 + BlackBoard.BlackBoardH * tileHeight;
+                x1 = x0 + this.l * tileSize;
+                y1 = y0 + this.h * tileHeight;
             }
 
             for (let i = 0; i < this.tracks.length; i++) {
