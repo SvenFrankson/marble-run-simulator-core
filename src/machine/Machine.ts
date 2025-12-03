@@ -615,8 +615,16 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (false) {
-
+            if (this.game.mode === GameMode.BBPuzzle) {
+                if (this.baseFrame) {
+                    this.baseFrame.dispose();
+                }
+                if (this.pedestalTop) {
+                    this.pedestalTop.dispose();
+                }
+                if (this.baseLogo) {
+                    this.baseLogo.dispose();
+                }
             } else {
                 let w = this.baseMeshMaxX - this.baseMeshMinX;
                 let d = this.baseMeshMaxZ - this.baseMeshMinZ;
