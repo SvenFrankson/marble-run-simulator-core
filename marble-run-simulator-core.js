@@ -205,8 +205,11 @@ var MarbleRunSimulatorCore;
                 if (this._hovered) {
                     this.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor);
                 }
-                if (this._selected) {
+                else if (this._selected) {
                     this.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor);
+                }
+                else {
+                    this.renderOutline = false;
                 }
             }
         }
@@ -541,7 +544,6 @@ var MarbleRunSimulatorCore;
                                     this.velocity.x *= 0.5;
                                     this.velocity.z *= 0.5;
                                 }
-                                console.log(dy.toFixed(3));
                             }
                             if (part instanceof MarbleRunSimulatorCore.Stairway) {
                                 part.boxesColliders.forEach((box) => {
@@ -767,7 +769,7 @@ var MarbleRunSimulatorCore;
                                 floorCollide = false;
                             }
                         }
-                        if (floorCollide) {
+                        if (floorCollide && this.machine.pedestalTop) {
                             let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
                             if (col.hit) {
                                 //this.setLastHit(wire, col.index);
@@ -2900,7 +2902,16 @@ var MarbleRunSimulatorCore;
                     this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, block.line[n].z);
                 }
             }
-            if (false) {
+            if (this.game.mode === GameMode.BBPuzzle) {
+                if (this.baseFrame) {
+                    this.baseFrame.dispose();
+                }
+                if (this.pedestalTop) {
+                    this.pedestalTop.dispose();
+                }
+                if (this.baseLogo) {
+                    this.baseLogo.dispose();
+                }
             }
             else {
                 let w = this.baseMeshMaxX - this.baseMeshMinX;
@@ -10203,7 +10214,7 @@ var MarbleRunSimulatorCore;
             topCollider.height = borderThickness;
             topCollider.depth = borderDepth;
             let topMachineCollider = new MarbleRunSimulatorCore.MachineCollider(topCollider);
-            topMachineCollider.bouncyness = 0.8;
+            topMachineCollider.bouncyness = 0.3;
             this.borders[1] = new BABYLON.Mesh("right-border");
             this.borders[1].parent = this;
             this.borders[1].position.x = (this.w - 0.5) * MarbleRunSimulatorCore.tileSize + 0.5 * borderThickness;
@@ -10220,7 +10231,7 @@ var MarbleRunSimulatorCore;
             rightCollider.height = this.h * MarbleRunSimulatorCore.tileSize;
             rightCollider.depth = borderDepth;
             let rightMachineCollider = new MarbleRunSimulatorCore.MachineCollider(rightCollider);
-            rightMachineCollider.bouncyness = 1;
+            rightMachineCollider.bouncyness = 0.5;
             this.borders[2] = new BABYLON.Mesh("bottom-border");
             this.borders[2].parent = this;
             this.borders[2].position.x = (this.w - 1) * 0.5 * MarbleRunSimulatorCore.tileSize;
@@ -10237,7 +10248,7 @@ var MarbleRunSimulatorCore;
             bottomCollider.height = borderThickness;
             bottomCollider.depth = borderDepth;
             let bottomMachineCollider = new MarbleRunSimulatorCore.MachineCollider(bottomCollider);
-            bottomMachineCollider.bouncyness = 0.8;
+            bottomMachineCollider.bouncyness = 0.3;
             this.borders[3] = new BABYLON.Mesh("left-border");
             this.borders[3].parent = this;
             this.borders[3].position.x = -0.5 * MarbleRunSimulatorCore.tileSize - 0.5 * borderThickness;
@@ -10254,7 +10265,7 @@ var MarbleRunSimulatorCore;
             leftCollider.height = this.h * MarbleRunSimulatorCore.tileSize;
             leftCollider.depth = borderDepth;
             let leftMachineCollider = new MarbleRunSimulatorCore.MachineCollider(leftCollider);
-            leftMachineCollider.bouncyness = 1;
+            leftMachineCollider.bouncyness = 0.5;
             this.colliders.push(topMachineCollider, rightMachineCollider, bottomMachineCollider, leftMachineCollider);
         }
         _addBoard(x0, x1, y0, y1) {
@@ -16616,8 +16627,8 @@ var MarbleRunSimulatorCore;
                 }
                 else if (this._currentRoomIndex >= 2 && this._currentRoomIndex < 7) {
                     let f = (this._currentRoomIndex - 2) / 6;
-                    let groundColor = BABYLON.Color3.FromHSV(Math.floor(f * 360), 0.3, 1);
-                    let wallColor = BABYLON.Color3.FromHSV((Math.floor(f * 360) + 180) % 360, 0.3, 1);
+                    let groundColor = BABYLON.Color3.FromHSV(Math.floor(f * 360), 0.4, 1);
+                    let wallColor = BABYLON.Color3.FromHSV((Math.floor(f * 360) + 180) % 360, 0.4, 1);
                     console.log("GroundColor " + groundColor.toHexString());
                     console.log("WallColor " + wallColor.toHexString());
                     await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4(), this._currentRoomIndex % 2);

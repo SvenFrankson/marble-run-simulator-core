@@ -224,8 +224,11 @@ namespace MarbleRunSimulatorCore {
                 if (this._hovered) {
                     this.outlineColor.copyFrom(UI3DConstants.outlineHoverColor);
                 }
-                if (this._selected) {
+                else if (this._selected) {
                     this.outlineColor.copyFrom(UI3DConstants.outlineSelectedColor);
+                }
+                else {
+                    this.renderOutline = false;
                 }
             }
         }
@@ -609,7 +612,6 @@ namespace MarbleRunSimulatorCore {
                                     this.velocity.x *= 0.5;
                                     this.velocity.z *= 0.5;
                                 }
-                                console.log(dy.toFixed(3));
                             }
                             if (part instanceof Stairway) {
                                 part.boxesColliders.forEach((box) => {
@@ -841,7 +843,7 @@ namespace MarbleRunSimulatorCore {
                                 floorCollide = false;
                             }
                         }
-                        if (floorCollide) {
+                        if (floorCollide && this.machine.pedestalTop) {
                             let col = Mummu.SpherePlaneIntersection(this.position, this.radius, this.machine.pedestalTop.position, BABYLON.Vector3.Up());
                             if (col.hit) {
                                 //this.setLastHit(wire, col.index);

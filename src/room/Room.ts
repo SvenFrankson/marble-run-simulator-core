@@ -106,8 +106,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 else if (this._currentRoomIndex >= 2 && this._currentRoomIndex < 7) {
                     let f = (this._currentRoomIndex - 2) / 6;
-                    let groundColor = BABYLON.Color3.FromHSV(Math.floor(f * 360), 0.3, 1);
-                    let wallColor = BABYLON.Color3.FromHSV((Math.floor(f * 360) + 180) % 360, 0.3, 1);
+                    let groundColor = BABYLON.Color3.FromHSV(Math.floor(f * 360), 0.4, 1);
+                    let wallColor = BABYLON.Color3.FromHSV((Math.floor(f * 360) + 180) % 360, 0.4, 1);
                     console.log("GroundColor " + groundColor.toHexString());
                     console.log("WallColor " + wallColor.toHexString());
                     await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4(), this._currentRoomIndex % 2);
