@@ -140,7 +140,7 @@ namespace MarbleRunSimulatorCore {
             topCollider.depth = borderDepth;
             
             let topMachineCollider = new MachineCollider(topCollider);
-            topMachineCollider.bouncyness = 0.8;
+            topMachineCollider.bouncyness = 0.3;
             
             this.borders[1] = new BABYLON.Mesh("right-border");
             this.borders[1].parent = this;
@@ -160,7 +160,7 @@ namespace MarbleRunSimulatorCore {
             rightCollider.depth = borderDepth;
             
             let rightMachineCollider = new MachineCollider(rightCollider);
-            rightMachineCollider.bouncyness = 1;
+            rightMachineCollider.bouncyness = 0.5;
             
             this.borders[2] = new BABYLON.Mesh("bottom-border");
             this.borders[2].parent = this;
@@ -180,7 +180,7 @@ namespace MarbleRunSimulatorCore {
             bottomCollider.depth = borderDepth;
             
             let bottomMachineCollider = new MachineCollider(bottomCollider);
-            bottomMachineCollider.bouncyness = 0.8;
+            bottomMachineCollider.bouncyness = 0.3;
             
             this.borders[3] = new BABYLON.Mesh("left-border");
             this.borders[3].parent = this;
@@ -200,7 +200,7 @@ namespace MarbleRunSimulatorCore {
             leftCollider.depth = borderDepth;
             
             let leftMachineCollider = new MachineCollider(leftCollider);
-            leftMachineCollider.bouncyness = 1;
+            leftMachineCollider.bouncyness = 0.5;
 
             this.colliders.push(topMachineCollider, rightMachineCollider, bottomMachineCollider, leftMachineCollider);
         }
