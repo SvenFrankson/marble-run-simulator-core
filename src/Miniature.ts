@@ -38,5 +38,15 @@ namespace MarbleRunSimulatorCore {
             
             return shape;
         }
+
+        public updateCenter(): void {
+            if (this.points.length > 0) {
+                this.center.copyFromFloats(0, 0, 0);
+                this.points.forEach(pt => {
+                    this.center.addInPlace(pt);
+                });
+                this.center.scaleInPlace(1 / this.points.length);
+            }
+        }
     }
 }

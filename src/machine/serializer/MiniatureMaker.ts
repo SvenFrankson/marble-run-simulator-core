@@ -110,8 +110,15 @@ namespace MarbleRunSimulatorCore {
         x -= 0.01;
         y += 0.01;
         z -= 0.01;  
-        let ballShape = MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, new BABYLON.Vector3(-1, 1, -1), 16, false);
-        ballShape.dist = x + z - y;
+        let ballShape: MiniatureShape;
+        if (machine.constructionMode === MachineConstructionMode.Mode3D) {
+            ballShape = MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, new BABYLON.Vector3(-1, 1, -1), 16, false);
+            ballShape.dist = x + z - y;
+        }
+        else {
+            ballShape = MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, BABYLON.Axis.Z, 16, false);
+            ballShape.dist = z;
+        }
         ballShape.fill = true;
 
         let mat = machine.game.materials.getBallMaterial(materialIndex, MaterialQuality.Standard);
@@ -320,6 +327,9 @@ namespace MarbleRunSimulatorCore {
             normalizedH = normalizedH / line.points.length;
             normalizedH = (normalizedH - aabbMin.y) / (aabbMax.y - aabbMin.y);
             let f = normalizedH * 0.5 + 0.5;
+            if (data.mode === MachineConstructionMode.Mode2D) {
+                f = 1;
+            }
             if (line.color) {
                 line.color.r *= 1.3;
                 line.color.g *= 1.3;

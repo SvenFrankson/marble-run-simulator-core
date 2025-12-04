@@ -68,6 +68,7 @@ namespace MarbleRunSimulatorCore {
                 new BABYLON.Vector3(x - w_m * 0.5, y + h_m * 0.5, BlackBoard.BoardThickness),
             ];
             shape.colorSlot = 1;
+            shape.updateCenter();
 
             return shape;
         }
@@ -253,6 +254,14 @@ namespace MarbleRunSimulatorCore {
             template.initialize();
 
             let frameShape = BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1);
+            frameShape.points[0].x -= BlackBoard.BoardThickness * 2;
+            frameShape.points[0].y -= BlackBoard.BoardThickness * 2;
+            frameShape.points[1].x += BlackBoard.BoardThickness * 2;
+            frameShape.points[1].y -= BlackBoard.BoardThickness * 2;
+            frameShape.points[2].x += BlackBoard.BoardThickness * 2;
+            frameShape.points[2].y += BlackBoard.BoardThickness * 2;
+            frameShape.points[3].x -= BlackBoard.BoardThickness * 2;
+            frameShape.points[3].y += BlackBoard.BoardThickness * 2;
             frameShape.fill = false;
             template.miniatureShapes.push(frameShape);
             if (n === 2) {

@@ -173,6 +173,7 @@ namespace MarbleRunSimulatorCore {
                 new BABYLON.Vector3(xMin, yMax, 0),
             ];
             shape.colorSlot = 0;
+            shape.updateCenter();
             template.miniatureShapes.push(shape);
 
             return template;

@@ -230,6 +230,7 @@ declare namespace MarbleRunSimulatorCore {
         dist: number;
         fill: boolean;
         static MakeNGon(c: BABYLON.Vector3, r: number, axis: BABYLON.Vector3, n: number, fill: boolean): MiniatureShape;
+        updateCenter(): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {

@@ -1753,6 +1753,15 @@ var MarbleRunSimulatorCore;
             shape.fill = fill;
             return shape;
         }
+        updateCenter() {
+            if (this.points.length > 0) {
+                this.center.copyFromFloats(0, 0, 0);
+                this.points.forEach(pt => {
+                    this.center.addInPlace(pt);
+                });
+                this.center.scaleInPlace(1 / this.points.length);
+            }
+        }
     }
     MarbleRunSimulatorCore.MiniatureShape = MiniatureShape;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
@@ -7470,8 +7479,15 @@ var MarbleRunSimulatorCore;
         x -= 0.01;
         y += 0.01;
         z -= 0.01;
-        let ballShape = MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, new BABYLON.Vector3(-1, 1, -1), 16, false);
-        ballShape.dist = x + z - y;
+        let ballShape;
+        if (machine.constructionMode === MarbleRunSimulatorCore.MachineConstructionMode.Mode3D) {
+            ballShape = MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, new BABYLON.Vector3(-1, 1, -1), 16, false);
+            ballShape.dist = x + z - y;
+        }
+        else {
+            ballShape = MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(x, y, z), 0.011, BABYLON.Axis.Z, 16, false);
+            ballShape.dist = z;
+        }
         ballShape.fill = true;
         let mat = machine.game.materials.getBallMaterial(materialIndex, MarbleRunSimulatorCore.MaterialQuality.Standard);
         if (mat instanceof BABYLON.StandardMaterial) {
@@ -7653,6 +7669,9 @@ var MarbleRunSimulatorCore;
             normalizedH = normalizedH / line.points.length;
             normalizedH = (normalizedH - aabbMin.y) / (aabbMax.y - aabbMin.y);
             let f = normalizedH * 0.5 + 0.5;
+            if (data.mode === MarbleRunSimulatorCore.MachineConstructionMode.Mode2D) {
+                f = 1;
+            }
             if (line.color) {
                 line.color.r *= 1.3;
                 line.color.g *= 1.3;
@@ -10318,6 +10337,7 @@ var MarbleRunSimulatorCore;
                 new BABYLON.Vector3(x - w_m * 0.5, y + h_m * 0.5, BlackBoard.BoardThickness),
             ];
             shape.colorSlot = 1;
+            shape.updateCenter();
             return shape;
         }
         static PropToPartName(prop) {
@@ -10335,6 +10355,14 @@ var MarbleRunSimulatorCore;
             template.nExtendable = true;
             template.initialize();
             let frameShape = BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1);
+            frameShape.points[0].x -= BlackBoard.BoardThickness * 2;
+            frameShape.points[0].y -= BlackBoard.BoardThickness * 2;
+            frameShape.points[1].x += BlackBoard.BoardThickness * 2;
+            frameShape.points[1].y -= BlackBoard.BoardThickness * 2;
+            frameShape.points[2].x += BlackBoard.BoardThickness * 2;
+            frameShape.points[2].y += BlackBoard.BoardThickness * 2;
+            frameShape.points[3].x -= BlackBoard.BoardThickness * 2;
+            frameShape.points[3].y += BlackBoard.BoardThickness * 2;
             frameShape.fill = false;
             template.miniatureShapes.push(frameShape);
             if (n === 2) {
@@ -12892,6 +12920,7 @@ var MarbleRunSimulatorCore;
                 new BABYLON.Vector3(xMin, yMax, 0),
             ];
             shape.colorSlot = 0;
+            shape.updateCenter();
             template.miniatureShapes.push(shape);
             return template;
         }
