@@ -40,7 +40,12 @@ namespace MarbleRunSimulatorCore {
                             point.x += prop.i * tileSize;
                             point.y += prop.k * tileHeight;
                             point.z += prop.j * tileSize;
-                            miniatureTrack.dist = Math.min(miniatureTrack.dist, point.x + point.z - point.y);
+                            if (machine.constructionMode === MachineConstructionMode.Mode3D) {
+                                miniatureTrack.dist = Math.min(miniatureTrack.dist, point.x + point.z - point.y);
+                            }
+                            else {
+                                miniatureTrack.dist = Math.min(miniatureTrack.dist, point.z);
+                            }
                             if (Mummu.IsFinite(point)) {
                                 miniatureTrack.points.push(point);
                             }
@@ -85,7 +90,12 @@ namespace MarbleRunSimulatorCore {
                     center.x += prop.i * tileSize;
                     center.y += prop.k * tileHeight;
                     center.z += prop.j * tileSize;
-                    drawnShape.dist = center.x + center.z - center.y;
+                    if (machine.constructionMode === MachineConstructionMode.Mode3D) {
+                        drawnShape.dist = center.x + center.z - center.y;
+                    }
+                    else {
+                        drawnShape.dist = center.z;
+                    }
 
                     lines.push(drawnShape);
                 }

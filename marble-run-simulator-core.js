@@ -7402,7 +7402,12 @@ var MarbleRunSimulatorCore;
                             point.x += prop.i * MarbleRunSimulatorCore.tileSize;
                             point.y += prop.k * MarbleRunSimulatorCore.tileHeight;
                             point.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                            miniatureTrack.dist = Math.min(miniatureTrack.dist, point.x + point.z - point.y);
+                            if (machine.constructionMode === MarbleRunSimulatorCore.MachineConstructionMode.Mode3D) {
+                                miniatureTrack.dist = Math.min(miniatureTrack.dist, point.x + point.z - point.y);
+                            }
+                            else {
+                                miniatureTrack.dist = Math.min(miniatureTrack.dist, point.z);
+                            }
                             if (Mummu.IsFinite(point)) {
                                 miniatureTrack.points.push(point);
                             }
@@ -7446,7 +7451,12 @@ var MarbleRunSimulatorCore;
                     center.x += prop.i * MarbleRunSimulatorCore.tileSize;
                     center.y += prop.k * MarbleRunSimulatorCore.tileHeight;
                     center.z += prop.j * MarbleRunSimulatorCore.tileSize;
-                    drawnShape.dist = center.x + center.z - center.y;
+                    if (machine.constructionMode === MarbleRunSimulatorCore.MachineConstructionMode.Mode3D) {
+                        drawnShape.dist = center.x + center.z - center.y;
+                    }
+                    else {
+                        drawnShape.dist = center.z;
+                    }
                     lines.push(drawnShape);
                 }
             }
