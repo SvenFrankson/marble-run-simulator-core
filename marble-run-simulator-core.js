@@ -10516,9 +10516,24 @@ var MarbleRunSimulatorCore;
                         break;
                     }
                 }
+                let p0 = filteredPoints[0].clone();
+                let p1 = filteredPoints[1].clone();
+                let p1n = filteredPoints[filteredPoints.length - 2].clone();
+                let p0n = filteredPoints[filteredPoints.length - 1].clone();
+                let forceEndDir = (f) => {
+                    if (filteredPoints.length >= 2) {
+                        BABYLON.Vector3.LerpToRef(filteredPoints[0], p0, f, filteredPoints[0]);
+                        BABYLON.Vector3.LerpToRef(filteredPoints[1], p1, f, filteredPoints[1]);
+                        BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 2], p1n, f, filteredPoints[filteredPoints.length - 2]);
+                        BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 1], p0n, f, filteredPoints[filteredPoints.length - 1]);
+                    }
+                };
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
+                forceEndDir(1);
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
+                forceEndDir(0.5);
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
+                forceEndDir(0.2);
                 this.lines.push(filteredPoints);
             }
         }
@@ -11835,6 +11850,10 @@ var MarbleRunSimulatorCore;
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
             template.partName = "endbasket";
             template.initialize();
+            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(0, -MarbleRunSimulatorCore.tileHeight * 0.2, 0), 1.5 * MarbleRunSimulatorCore.tileSize, BABYLON.Axis.Y, 24, true));
+            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(0, 0, 0), 1.5 * MarbleRunSimulatorCore.tileSize, BABYLON.Axis.Y, 24, true));
+            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(0, MarbleRunSimulatorCore.tileHeight * 0.5, 0), 2 * MarbleRunSimulatorCore.tileSize, BABYLON.Axis.Y, 24, false));
+            template.miniatureShapes.push(MarbleRunSimulatorCore.MiniatureShape.MakeNGon(new BABYLON.Vector3(0, MarbleRunSimulatorCore.tileHeight, 0), 2 * MarbleRunSimulatorCore.tileSize, BABYLON.Axis.Y, 24, false));
             return template;
         }
     }

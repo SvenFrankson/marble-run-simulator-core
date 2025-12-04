@@ -479,9 +479,25 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
 
+                let p0 = filteredPoints[0].clone();
+                let p1 = filteredPoints[1].clone();
+                let p1n = filteredPoints[filteredPoints.length - 2].clone();
+                let p0n = filteredPoints[filteredPoints.length - 1].clone();
+
+                let forceEndDir = (f: number) => {
+                    if (filteredPoints.length >= 2) {
+                        BABYLON.Vector3.LerpToRef(filteredPoints[0], p0, f, filteredPoints[0]);
+                        BABYLON.Vector3.LerpToRef(filteredPoints[1], p1, f, filteredPoints[1]);
+                        BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 2], p1n, f, filteredPoints[filteredPoints.length - 2]);
+                        BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 1], p0n, f, filteredPoints[filteredPoints.length - 1]);
+                    }
+                }
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
+                forceEndDir(1);
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
+                forceEndDir(0.5);
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
+                forceEndDir(0.2);
 
                 this.lines.push(filteredPoints);
             }

@@ -65,6 +65,38 @@ namespace MarbleRunSimulatorCore {
 
             template.initialize();
 
+            template.miniatureShapes.push(MiniatureShape.MakeNGon(
+                new BABYLON.Vector3(0, - tileHeight * 0.2, 0),
+                1.5 * tileSize,
+                BABYLON.Axis.Y,
+                24,
+                true
+            ));
+
+            template.miniatureShapes.push(MiniatureShape.MakeNGon(
+                new BABYLON.Vector3(0, 0, 0),
+                1.5 * tileSize,
+                BABYLON.Axis.Y,
+                24,
+                true
+            ));
+            
+            template.miniatureShapes.push(MiniatureShape.MakeNGon(
+                new BABYLON.Vector3(0, tileHeight * 0.5, 0),
+                2 * tileSize,
+                BABYLON.Axis.Y,
+                24,
+                false
+            ));
+            
+            template.miniatureShapes.push(MiniatureShape.MakeNGon(
+                new BABYLON.Vector3(0, tileHeight, 0),
+                2 * tileSize,
+                BABYLON.Axis.Y,
+                24,
+                false
+            ));
+
             return template;
         }
     }
