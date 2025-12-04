@@ -87,6 +87,12 @@ namespace MarbleRunSimulatorCore {
             let h = prop.h * tileHeight;
             this.body = new BABYLON.Mesh("body");
             this.body.parent = this;
+            if (prop.l % 2 === 0) {
+                this.body.position.x = tileSize * 0.5;
+            }
+            if (prop.h % 2 === 0) {
+                this.body.position.y = tileHeight * 0.5;
+            }
             let bodyVertexData = Mummu.CreateBeveledBoxVertexData({ width: w, height: h, depth: tileSize });
             bodyVertexData.applyToMesh(this.body);
 
@@ -99,10 +105,10 @@ namespace MarbleRunSimulatorCore {
 
             this.colliders = [bodyMachineCollider];
 
-            this.localAABBBaseMin.x = - (prop.l + 0.5) * 0.5 * tileSize;
-            this.localAABBBaseMin.y = - (prop.h + 0.5) * 0.5 * tileHeight;
-            this.localAABBBaseMax.x = (prop.l + 0.5) * 0.5 * tileSize;
-            this.localAABBBaseMax.y = (prop.h + 0.5) * 0.5 * tileHeight;
+            this.localAABBBaseMin.x = - (prop.l) * 0.5 * tileSize + this.body.position.x;
+            this.localAABBBaseMin.y = - (prop.h) * 0.5 * tileHeight + this.body.position.y;
+            this.localAABBBaseMax.x = (prop.l) * 0.5 * tileSize + this.body.position.x;
+            this.localAABBBaseMax.y = (prop.h) * 0.5 * tileHeight + this.body.position.y;
 
             this.generateWires();
         }
@@ -118,7 +124,7 @@ namespace MarbleRunSimulatorCore {
 
         public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
             let bodySelector = BABYLON.VertexData.ExtractFromMesh(this.body);
-            Mummu.RotateAngleAxisVertexDataInPlace(bodySelector, Math.PI / 4, BABYLON.Axis.Z);
+            Mummu.TranslateVertexDataInPlace(bodySelector, this.body.position);
             selectorMeshLogicVertexDatas.push(bodySelector);
         }
 
