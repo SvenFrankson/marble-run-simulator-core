@@ -23,6 +23,7 @@ namespace MarbleRunSimulatorCore {
         public boards: BlackBoardPiece[] = [];
         public borders: BABYLON.Mesh[] = [];
         public boardColliders: MachineCollider[] = [];
+        public editorGrid: BABYLON.Mesh;
 
         private _addBoard(x0: number, x1: number, y0: number, y1: number): void {
             let wFactor = x1 - x0;
@@ -235,6 +236,45 @@ namespace MarbleRunSimulatorCore {
             this.borders.forEach(border => {
                 border.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             });
+            
+            if (this.editorGrid) {
+                this.editorGrid.dispose();
+            }
+            if (this.game.mode === GameMode.Create) {
+                let lines = [];
+                let colors = [];
+                let c = new BABYLON.Color4(1, 1, 1, 0.5);
+                for (let i = 0; i < this.w - 1; i++) {
+                    let p0 = new BABYLON.Vector3(
+                        - 0.5 * tileSize + tileSize * (i + 1),
+                        (this.h - 0.5) * tileSize,
+                        0
+                    );
+                    let p1 = new BABYLON.Vector3(
+                        - 0.5 * tileSize + tileSize * (i + 1),
+                        - 0.5 * tileSize,
+                        0
+                    );
+                    lines.push([p0, p1]);
+                    colors.push([c, c]);
+                }
+                for (let i = 0; i < this.h - 1; i++) {
+                    let p0 = new BABYLON.Vector3(
+                        (this.w - 0.5) * tileSize,
+                        - 0.5 * tileHeight + tileHeight * (i + 1),
+                        0
+                    );
+                    let p1 = new BABYLON.Vector3(
+                        - 0.5 * tileSize,
+                        - 0.5 * tileHeight + tileHeight * (i + 1),
+                        0
+                    );
+                    lines.push([p0, p1]);
+                    colors.push([c, c]);
+                }
+                this.editorGrid = BABYLON.MeshBuilder.CreateLineSystem("blackboard-editor-grid", { lines: lines, colors: colors });
+                this.editorGrid.parent = this;
+            }
         }
 
         public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
