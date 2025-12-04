@@ -152,6 +152,29 @@ namespace MarbleRunSimulatorCore {
 
             template.initialize();
 
+            let xMin = - l * tileSize * 0.5;
+            let xMax = l * tileSize * 0.5;
+            let yMin = - h * tileHeight * 0.5;
+            let yMax = h * tileHeight * 0.5;
+            if (l % 2 === 0) {
+                xMin += tileSize * 0.5;
+                xMax += tileSize * 0.5;
+            }
+            if (h % 2 === 0) {
+                yMin += tileHeight * 0.5;
+                yMax += tileHeight * 0.5;
+            }
+
+            let shape = new MiniatureShape();
+            shape.points = [
+                new BABYLON.Vector3(xMin, yMin, 0),
+                new BABYLON.Vector3(xMax, yMin, 0),
+                new BABYLON.Vector3(xMax, yMax, 0),
+                new BABYLON.Vector3(xMin, yMax, 0),
+            ];
+            shape.colorSlot = 0;
+            template.miniatureShapes.push(shape);
+
             return template;
         }
     }

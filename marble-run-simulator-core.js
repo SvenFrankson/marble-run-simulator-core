@@ -5326,7 +5326,7 @@ var MarbleRunSimulatorCore;
             if (partName === "endbasket") {
                 return new MarbleRunSimulatorCore.EndBasket(this.machine, prop);
             }
-            if (partName === "blackboard") {
+            if (partName === "blackboard" || partName.startsWith("blackboard_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
                     let l = parseInt(argStr.split(".")[0]);
@@ -10192,6 +10192,10 @@ var MarbleRunSimulatorCore;
                 this._addBoard(0, 1 / 3, 0, 1 / 3);
                 this._addBoard(2 / 3, 1, 0, 1 / 3);
             }
+            else if (prop.n === 12) {
+                // large bottom
+                this._addBoard(0, 1, 0, 2 / 3);
+            }
             else {
                 // full
                 this._addBoard(0, 1, 0, 1);
@@ -10287,6 +10291,25 @@ var MarbleRunSimulatorCore;
             this.colliders.push(boardMachineCollider);
             this.boardColliders.push(boardMachineCollider);
         }
+        static _createMiniatureShape(w, h, x0, x1, y0, y1) {
+            let wFactor = x1 - x0;
+            let hFactor = y1 - y0;
+            let x = (w - 1) * 0.5 * MarbleRunSimulatorCore.tileSize;
+            x += w * MarbleRunSimulatorCore.tileSize * (x0 + x1 - 1) * 0.5;
+            let y = (h - 1) * 0.5 * MarbleRunSimulatorCore.tileSize;
+            y += h * MarbleRunSimulatorCore.tileSize * (y0 + y1 - 1) * 0.5;
+            let w_m = w * MarbleRunSimulatorCore.tileSize * wFactor;
+            let h_m = h * MarbleRunSimulatorCore.tileHeight * hFactor;
+            let shape = new MarbleRunSimulatorCore.MiniatureShape();
+            shape.points = [
+                new BABYLON.Vector3(x - w_m * 0.5, y - h_m * 0.5, BlackBoard.BoardThickness),
+                new BABYLON.Vector3(x + w_m * 0.5, y - h_m * 0.5, BlackBoard.BoardThickness),
+                new BABYLON.Vector3(x + w_m * 0.5, y + h_m * 0.5, BlackBoard.BoardThickness),
+                new BABYLON.Vector3(x - w_m * 0.5, y + h_m * 0.5, BlackBoard.BoardThickness),
+            ];
+            shape.colorSlot = 1;
+            return shape;
+        }
         static PropToPartName(prop) {
             let partName = "blackboard_" + prop.l + "." + prop.h + "." + prop.n;
             return partName;
@@ -10301,6 +10324,66 @@ var MarbleRunSimulatorCore;
             template.n = n;
             template.nExtendable = true;
             template.initialize();
+            let frameShape = BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1);
+            frameShape.fill = false;
+            template.miniatureShapes.push(frameShape);
+            if (n === 2) {
+                // left
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 0.5, 0, 1));
+            }
+            else if (n === 3) {
+                // right
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0.5, 1, 0, 1));
+            }
+            else if (n === 4) {
+                // top
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0.5, 1));
+            }
+            else if (n === 5) {
+                // bottom
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 0.5));
+            }
+            else if (n === 6) {
+                // vertical hole
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 0, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 0, 1));
+            }
+            else if (n === 7) {
+                // horizontal hole
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1 / 3));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 2 / 3, 1));
+            }
+            else if (n === 8) {
+                // diagonal 2
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 0.5, 0.5, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0.5, 1, 0, 0.5));
+            }
+            else if (n === 9) {
+                // diagonal 3
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 2 / 3, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 1 / 3, 2 / 3, 1 / 3, 2 / 3));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 0, 1 / 3));
+            }
+            else if (n === 10) {
+                // diagonal corners
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 2 / 3, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 0, 1 / 3));
+            }
+            else if (n === 11) {
+                // full corners
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 2 / 3, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 2 / 3, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 0, 1 / 3));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 0, 1 / 3));
+            }
+            else if (n === 12) {
+                // large bottom
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 2 / 3));
+            }
+            else {
+                // left
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1));
+            }
             return template;
         }
         async instantiateMachineSpecific() {
@@ -12760,6 +12843,27 @@ var MarbleRunSimulatorCore;
             template.minH = 1;
             template.maxH = 32;
             template.initialize();
+            let xMin = -l * MarbleRunSimulatorCore.tileSize * 0.5;
+            let xMax = l * MarbleRunSimulatorCore.tileSize * 0.5;
+            let yMin = -h * MarbleRunSimulatorCore.tileHeight * 0.5;
+            let yMax = h * MarbleRunSimulatorCore.tileHeight * 0.5;
+            if (l % 2 === 0) {
+                xMin += MarbleRunSimulatorCore.tileSize * 0.5;
+                xMax += MarbleRunSimulatorCore.tileSize * 0.5;
+            }
+            if (h % 2 === 0) {
+                yMin += MarbleRunSimulatorCore.tileHeight * 0.5;
+                yMax += MarbleRunSimulatorCore.tileHeight * 0.5;
+            }
+            let shape = new MarbleRunSimulatorCore.MiniatureShape();
+            shape.points = [
+                new BABYLON.Vector3(xMin, yMin, 0),
+                new BABYLON.Vector3(xMax, yMin, 0),
+                new BABYLON.Vector3(xMax, yMax, 0),
+                new BABYLON.Vector3(xMin, yMax, 0),
+            ];
+            shape.colorSlot = 0;
+            template.miniatureShapes.push(shape);
             return template;
         }
     }

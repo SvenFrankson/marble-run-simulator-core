@@ -302,7 +302,7 @@ namespace MarbleRunSimulatorCore {
             if (partName === "endbasket") {
                 return new EndBasket(this.machine, prop);
             }
-            if (partName === "blackboard") {
+            if (partName === "blackboard" || partName.startsWith("blackboard_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
                     let l = parseInt(argStr.split(".")[0]);

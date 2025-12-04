@@ -48,6 +48,30 @@ namespace MarbleRunSimulatorCore {
             this.boardColliders.push(boardMachineCollider);
         }
 
+        private static _createMiniatureShape(w: number, h: number, x0: number, x1: number, y0: number, y1: number): MiniatureShape {
+            let wFactor = x1 - x0;
+            let hFactor = y1 - y0;
+
+            let x = (w - 1) * 0.5 * tileSize;
+            x += w * tileSize * (x0 + x1 - 1) * 0.5;
+            let y = (h - 1) * 0.5 * tileSize;
+            y += h * tileSize * (y0 + y1 - 1) * 0.5;
+            
+            let w_m = w * tileSize * wFactor;
+            let h_m = h * tileHeight * hFactor;
+
+            let shape = new MiniatureShape();
+            shape.points = [
+                new BABYLON.Vector3(x - w_m * 0.5, y - h_m * 0.5, BlackBoard.BoardThickness),
+                new BABYLON.Vector3(x + w_m * 0.5, y - h_m * 0.5, BlackBoard.BoardThickness),
+                new BABYLON.Vector3(x + w_m * 0.5, y + h_m * 0.5, BlackBoard.BoardThickness),
+                new BABYLON.Vector3(x - w_m * 0.5, y + h_m * 0.5, BlackBoard.BoardThickness),
+            ];
+            shape.colorSlot = 1;
+
+            return shape;
+        }
+
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
             this.wireSize = 0.006;
@@ -114,6 +138,10 @@ namespace MarbleRunSimulatorCore {
                 this._addBoard(2 / 3, 1, 2 / 3, 1);
                 this._addBoard(0, 1 / 3, 0, 1 / 3);
                 this._addBoard(2 / 3, 1, 0, 1 / 3);
+            }
+            else if (prop.n === 12) {
+                // large bottom
+                this._addBoard(0, 1, 0, 2 / 3);
             }
             else {
                 // full
@@ -223,6 +251,67 @@ namespace MarbleRunSimulatorCore {
             template.nExtendable = true;
 
             template.initialize();
+
+            let frameShape = BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1);
+            frameShape.fill = false;
+            template.miniatureShapes.push(frameShape);
+            if (n === 2) {
+                // left
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 0.5, 0, 1));
+            }
+            else if (n === 3) {
+                // right
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0.5, 1, 0, 1));
+            }
+            else if (n === 4) {
+                // top
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0.5, 1));
+            }
+            else if (n === 5) {
+                // bottom
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 0.5));
+            }
+            else if (n === 6) {
+                // vertical hole
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 0, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 0, 1));
+            }
+            else if (n === 7) {
+                // horizontal hole
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1 / 3));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 2 / 3, 1));
+            }
+            else if (n === 8) {
+                // diagonal 2
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 0.5, 0.5, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0.5, 1, 0, 0.5));
+            }
+            else if (n === 9) {
+                // diagonal 3
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 2 / 3, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 1 / 3, 2 / 3, 1 / 3, 2 / 3));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 0, 1 / 3));
+            }
+            else if (n === 10) {
+                // diagonal corners
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 2 / 3, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 0, 1 / 3));
+            }
+            else if (n === 11) {
+                // full corners
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 2 / 3, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 2 / 3, 1));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1 / 3, 0, 1 / 3));
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 2 / 3, 1, 0, 1 / 3));
+            }
+            else if (n === 12) {
+                // large bottom
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 2 / 3));
+            }
+            else {
+                // left
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1));
+            }
 
             return template;
         }

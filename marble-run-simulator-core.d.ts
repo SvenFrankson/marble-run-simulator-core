@@ -1145,6 +1145,7 @@ declare namespace MarbleRunSimulatorCore {
         boardColliders: MachineCollider[];
         editorGrid: BABYLON.Mesh;
         private _addBoard;
+        private static _createMiniatureShape;
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number, n: number): MachinePartTemplate;
