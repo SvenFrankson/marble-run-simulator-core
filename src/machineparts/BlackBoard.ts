@@ -141,7 +141,7 @@ namespace MarbleRunSimulatorCore {
             topCollider.depth = borderDepth;
             
             let topMachineCollider = new MachineCollider(topCollider);
-            topMachineCollider.bouncyness = 0.3;
+            topMachineCollider.bouncyness = 0.5;
             
             this.borders[1] = new BABYLON.Mesh("right-border");
             this.borders[1].parent = this;
@@ -181,7 +181,7 @@ namespace MarbleRunSimulatorCore {
             bottomCollider.depth = borderDepth;
             
             let bottomMachineCollider = new MachineCollider(bottomCollider);
-            bottomMachineCollider.bouncyness = 0.3;
+            bottomMachineCollider.bouncyness = 0.5;
             
             this.borders[3] = new BABYLON.Mesh("left-border");
             this.borders[3].parent = this;
@@ -208,7 +208,6 @@ namespace MarbleRunSimulatorCore {
 
         public static PropToPartName(prop: IMachinePartProp): string {
             let partName = "blackboard_" + prop.l + "." + prop.h + "." + prop.n;
-            console.log("blackboard partname " + partName);
             return partName;
         }
 
@@ -341,10 +340,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.template.initialize();
-            console.log("template has " + this.template.trackTemplates.length + " trackTemplates.");
-            console.log("this has " + this.tracks.length + " tracks.");
             this.generateWires();
-            console.log("this has " + this.tracks.length + " tracks.");
         }
 
         public isPointOnBoard(pt: BABYLON.Vector3): boolean {

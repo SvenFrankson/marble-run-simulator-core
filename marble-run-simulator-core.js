@@ -10214,7 +10214,7 @@ var MarbleRunSimulatorCore;
             topCollider.height = borderThickness;
             topCollider.depth = borderDepth;
             let topMachineCollider = new MarbleRunSimulatorCore.MachineCollider(topCollider);
-            topMachineCollider.bouncyness = 0.3;
+            topMachineCollider.bouncyness = 0.5;
             this.borders[1] = new BABYLON.Mesh("right-border");
             this.borders[1].parent = this;
             this.borders[1].position.x = (this.w - 0.5) * MarbleRunSimulatorCore.tileSize + 0.5 * borderThickness;
@@ -10248,7 +10248,7 @@ var MarbleRunSimulatorCore;
             bottomCollider.height = borderThickness;
             bottomCollider.depth = borderDepth;
             let bottomMachineCollider = new MarbleRunSimulatorCore.MachineCollider(bottomCollider);
-            bottomMachineCollider.bouncyness = 0.3;
+            bottomMachineCollider.bouncyness = 0.5;
             this.borders[3] = new BABYLON.Mesh("left-border");
             this.borders[3].parent = this;
             this.borders[3].position.x = -0.5 * MarbleRunSimulatorCore.tileSize - 0.5 * borderThickness;
@@ -10289,7 +10289,6 @@ var MarbleRunSimulatorCore;
         }
         static PropToPartName(prop) {
             let partName = "blackboard_" + prop.l + "." + prop.h + "." + prop.n;
-            console.log("blackboard partname " + partName);
             return partName;
         }
         static GenerateTemplate(l, h, n) {
@@ -10311,6 +10310,28 @@ var MarbleRunSimulatorCore;
             this.borders.forEach(border => {
                 border.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             });
+            if (this.editorGrid) {
+                this.editorGrid.dispose();
+            }
+            if (this.game.mode === MarbleRunSimulatorCore.GameMode.Create) {
+                let lines = [];
+                let colors = [];
+                let c = new BABYLON.Color4(1, 1, 1, 0.5);
+                for (let i = 0; i < this.w - 1; i++) {
+                    let p0 = new BABYLON.Vector3(-0.5 * MarbleRunSimulatorCore.tileSize + MarbleRunSimulatorCore.tileSize * (i + 1), (this.h - 0.5) * MarbleRunSimulatorCore.tileSize, 0);
+                    let p1 = new BABYLON.Vector3(-0.5 * MarbleRunSimulatorCore.tileSize + MarbleRunSimulatorCore.tileSize * (i + 1), -0.5 * MarbleRunSimulatorCore.tileSize, 0);
+                    lines.push([p0, p1]);
+                    colors.push([c, c]);
+                }
+                for (let i = 0; i < this.h - 1; i++) {
+                    let p0 = new BABYLON.Vector3((this.w - 0.5) * MarbleRunSimulatorCore.tileSize, -0.5 * MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * (i + 1), 0);
+                    let p1 = new BABYLON.Vector3(-0.5 * MarbleRunSimulatorCore.tileSize, -0.5 * MarbleRunSimulatorCore.tileHeight + MarbleRunSimulatorCore.tileHeight * (i + 1), 0);
+                    lines.push([p0, p1]);
+                    colors.push([c, c]);
+                }
+                this.editorGrid = BABYLON.MeshBuilder.CreateLineSystem("blackboard-editor-grid", { lines: lines, colors: colors });
+                this.editorGrid.parent = this;
+            }
         }
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas) {
             this.boards.forEach(boardPiece => {
@@ -10366,10 +10387,7 @@ var MarbleRunSimulatorCore;
                 }
             }
             this.template.initialize();
-            console.log("template has " + this.template.trackTemplates.length + " trackTemplates.");
-            console.log("this has " + this.tracks.length + " tracks.");
             this.generateWires();
-            console.log("this has " + this.tracks.length + " tracks.");
         }
         isPointOnBoard(pt) {
             for (let i = 0; i < this.boardColliders.length; i++) {
@@ -12691,6 +12709,12 @@ var MarbleRunSimulatorCore;
             let h = prop.h * MarbleRunSimulatorCore.tileHeight;
             this.body = new BABYLON.Mesh("body");
             this.body.parent = this;
+            if (prop.l % 2 === 0) {
+                this.body.position.x = MarbleRunSimulatorCore.tileSize * 0.5;
+            }
+            if (prop.h % 2 === 0) {
+                this.body.position.y = MarbleRunSimulatorCore.tileHeight * 0.5;
+            }
             let bodyVertexData = Mummu.CreateBeveledBoxVertexData({ width: w, height: h, depth: MarbleRunSimulatorCore.tileSize });
             bodyVertexData.applyToMesh(this.body);
             let bodyCollider = new Mummu.BoxCollider(this.body._worldMatrix);
@@ -12699,10 +12723,10 @@ var MarbleRunSimulatorCore;
             bodyCollider.depth = MarbleRunSimulatorCore.tileSize;
             let bodyMachineCollider = new MarbleRunSimulatorCore.MachineCollider(bodyCollider);
             this.colliders = [bodyMachineCollider];
-            this.localAABBBaseMin.x = -(prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileSize;
-            this.localAABBBaseMin.y = -(prop.h + 0.5) * 0.5 * MarbleRunSimulatorCore.tileHeight;
-            this.localAABBBaseMax.x = (prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileSize;
-            this.localAABBBaseMax.y = (prop.h + 0.5) * 0.5 * MarbleRunSimulatorCore.tileHeight;
+            this.localAABBBaseMin.x = -(prop.l) * 0.5 * MarbleRunSimulatorCore.tileSize + this.body.position.x;
+            this.localAABBBaseMin.y = -(prop.h) * 0.5 * MarbleRunSimulatorCore.tileHeight + this.body.position.y;
+            this.localAABBBaseMax.x = (prop.l) * 0.5 * MarbleRunSimulatorCore.tileSize + this.body.position.x;
+            this.localAABBBaseMax.y = (prop.h) * 0.5 * MarbleRunSimulatorCore.tileHeight + this.body.position.y;
             this.generateWires();
         }
         static PropToPartName(prop) {
@@ -12714,7 +12738,7 @@ var MarbleRunSimulatorCore;
         }
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas) {
             let bodySelector = BABYLON.VertexData.ExtractFromMesh(this.body);
-            Mummu.RotateAngleAxisVertexDataInPlace(bodySelector, Math.PI / 4, BABYLON.Axis.Z);
+            Mummu.TranslateVertexDataInPlace(bodySelector, this.body.position);
             selectorMeshLogicVertexDatas.push(bodySelector);
         }
         recomputeAbsolutePath() {
