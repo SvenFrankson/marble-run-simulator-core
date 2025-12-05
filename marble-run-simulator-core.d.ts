@@ -1856,9 +1856,10 @@ declare namespace MarbleRunSimulatorCore {
         get currentRoomIndex(): number;
         setRoomIndex(roomIndex: number, forceAndskipAnimation?: boolean): Promise<void>;
         contextualRoomIndex(index: number, q: GraphicQuality): number;
-        instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, wallPaperIndex: number): Promise<void>;
+        instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, size?: number): Promise<void>;
         instantiateMuseum(useDecors?: boolean, skyboxPath?: string): Promise<void>;
         instantiateOpenRoom(useDecors?: boolean, skyboxPath?: string): Promise<void>;
+        instantiateBBPuzzle(skyboxPath?: string): Promise<void>;
         animateShow(duration?: number): Promise<void>;
         animateHide(duration?: number): Promise<void>;
         setGroundHeight(h: number): void;

@@ -102,7 +102,7 @@ namespace MarbleRunSimulatorCore {
                 else if (this._currentRoomIndex === 1) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
-                    await this.instantiateSimple(groundColor, wallColor, 0);
+                    await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex >= 2 && this._currentRoomIndex < 7) {
                     let f = (this._currentRoomIndex - 2) / 6;
@@ -110,7 +110,7 @@ namespace MarbleRunSimulatorCore {
                     let wallColor = BABYLON.Color3.FromHSV((Math.floor(f * 360) + 180) % 360, 0.4, 1);
                     console.log("GroundColor " + groundColor.toHexString());
                     console.log("WallColor " + wallColor.toHexString());
-                    await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4(), this._currentRoomIndex % 2);
+                    await this.instantiateSimple(groundColor.toColor4(), wallColor.toColor4(), 10);
                 }
                 else if (this._currentRoomIndex === 7) {
                     await this.instantiateMuseum(false, "./lib/marble-run-simulator-core/datas/skyboxes/icescape_low_res.png");
@@ -118,7 +118,7 @@ namespace MarbleRunSimulatorCore {
                 else if (this._currentRoomIndex === 8) {
                     let groundColor = BABYLON.Color4.FromHexString("#3F4C52FF");
                     let wallColor = BABYLON.Color4.FromHexString("#839099FF");
-                    await this.instantiateSimple(groundColor, wallColor, 1);
+                    await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex === 9) {
                     await this.instantiateOpenRoom(true, "./lib/marble-run-simulator-core/datas/skyboxes/sky.jpeg");
@@ -126,17 +126,27 @@ namespace MarbleRunSimulatorCore {
                 else if (this._currentRoomIndex === 10) {
                     let groundColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
                     let wallColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
-                    await this.instantiateSimple(groundColor, wallColor, 0);
+                    await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex === 11) {
                     let groundColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
                     let wallColor = BABYLON.Color4.FromHexString("#FFFFFFFF");
-                    await this.instantiateSimple(groundColor, wallColor, 0);
+                    await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex === 12) {
                     let groundColor = BABYLON.Color4.FromHexString("#000000FF");
                     let wallColor = BABYLON.Color4.FromHexString("#000000FF");
-                    await this.instantiateSimple(groundColor, wallColor, 0);
+                    await this.instantiateSimple(groundColor, wallColor, 10);
+                }
+                else if (this._currentRoomIndex === 13) {
+                    let groundColor = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
+                    let wallColor = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
+                    console.log("ground " + groundColor.toHexString());
+                    console.log("wall " + wallColor.toHexString());
+                    groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
+                    wallColor = BABYLON.Color4.FromHexString("#4fb0c4ff");
+                    await this.instantiateSimple(groundColor, wallColor, 5);
+                    //await this.instantiateBBPuzzle("./lib/marble-run-simulator-core/datas/skyboxes/sky-2.jpeg");
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
@@ -170,38 +180,39 @@ namespace MarbleRunSimulatorCore {
             return index;
         }
 
-        public async instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, wallPaperIndex: number): Promise<void> {
+        public async instantiateSimple(groundColor: BABYLON.Color4, wallColor: BABYLON.Color4, size: number = 10): Promise<void> {
             this.decors.forEach(decor => {
                 decor.dispose();
             });
             this.decors = [];
 
+            this.skybox.isVisible = true;
             this.frame.isVisible = false;
 
-            let slice9Ground = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.1, color: groundColor, uv1InWorldSpace: true });
+            let slice9Ground = Mummu.Create9SliceVertexData({ width: size, height: size, margin: 0.1, color: groundColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
             this.ground.material = this.game.materials.whiteMaterial;
 
-            let slice9Front = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
-            Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, 5));
+            let slice9Front = Mummu.Create9SliceVertexData({ width: size, height: 3.2, margin: 0.1, color: wallColor });
+            Mummu.TranslateVertexDataInPlace(slice9Front, new BABYLON.Vector3(0, 0, size * 0.5));
 
-            let slice9Right = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
+            let slice9Right = Mummu.Create9SliceVertexData({ width: size, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Right, Math.PI * 0.5, BABYLON.Axis.Y);
-            Mummu.TranslateVertexDataInPlace(slice9Right, new BABYLON.Vector3(5, 0, 0));
+            Mummu.TranslateVertexDataInPlace(slice9Right, new BABYLON.Vector3(size * 0.5, 0, 0));
 
-            let slice9Back = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
+            let slice9Back = Mummu.Create9SliceVertexData({ width: size, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Back, Math.PI, BABYLON.Axis.Y);
-            Mummu.TranslateVertexDataInPlace(slice9Back, new BABYLON.Vector3(0, 0, -5));
+            Mummu.TranslateVertexDataInPlace(slice9Back, new BABYLON.Vector3(0, 0, - size * 0.5));
 
-            let slice9Left = Mummu.Create9SliceVertexData({ width: 10, height: 3.2, margin: 0.1, color: wallColor });
+            let slice9Left = Mummu.Create9SliceVertexData({ width: size, height: 3.2, margin: 0.1, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Left, - Math.PI * 0.5, BABYLON.Axis.Y);
-            Mummu.TranslateVertexDataInPlace(slice9Left, new BABYLON.Vector3(- 5, 0, 0));
+            Mummu.TranslateVertexDataInPlace(slice9Left, new BABYLON.Vector3(- size * 0.5, 0, 0));
 
             Mummu.MergeVertexDatas(slice9Front, slice9Right, slice9Back, slice9Left).applyToMesh(this.wall);
             this.wall.material = this.game.materials.wallShadow;
             
-            let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.2, color: wallColor });
+            let slice9Top = Mummu.Create9SliceVertexData({ width: size, height: size, margin: 0.2, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, - Math.PI * 0.5, BABYLON.Axis.X);
             slice9Top.applyToMesh(this.ceiling);
             this.ceiling.material = this.game.materials.wallShadow;
@@ -233,6 +244,7 @@ namespace MarbleRunSimulatorCore {
             });
             this.decors = [];
 
+            this.skybox.isVisible = true;
             this.frame.isVisible = true;
 
             let skyTexture = new BABYLON.Texture(skyboxPath);
@@ -354,6 +366,7 @@ namespace MarbleRunSimulatorCore {
             });
             this.decors = [];
 
+            this.skybox.isVisible = true;
             this.frame.isVisible = true;
 
             let skyTexture = new BABYLON.Texture(skyboxPath);
@@ -402,6 +415,45 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.isBlurred = true;
+
+            this.light1.intensity = 0.8;
+            this.light2.intensity = 0;
+
+            this.light1.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.light2.includedOnlyMeshes = [this.ground, this.frame, this.ceiling, this.wall, this.skybox];
+            this.decors.forEach(decor => {
+                this.light1.includedOnlyMeshes.push(...decor.getAllMeshes());
+                this.light2.includedOnlyMeshes.push(...decor.getAllMeshes());
+            })
+            if (this.machine && this.machine.baseFrame) {
+                this.light1.includedOnlyMeshes.push(this.machine.baseFrame);
+                this.light2.includedOnlyMeshes.push(this.machine.baseFrame);
+            }
+
+            if (this.machine) {
+                this.setGroundHeight(this.machine.baseMeshMinY - 0.8);
+            }
+        }
+
+        public async instantiateBBPuzzle(skyboxPath?: string): Promise<void> {
+            this.decors.forEach(decor => {
+                decor.dispose();
+            });
+            this.decors = [];
+
+            this.skybox.isVisible = false;
+            this.frame.isVisible = true;
+
+            let skyTexture = new BABYLON.Texture(skyboxPath, undefined, undefined, false);
+            this.skyboxMaterial.diffuseTexture = skyTexture;
+            this.skyboxMaterial.emissiveTexture = skyTexture;
+
+            (new BABYLON.VertexData).applyToMesh(this.ground);
+            (new BABYLON.VertexData).applyToMesh(this.wall);
+            (new BABYLON.VertexData).applyToMesh(this.frame);
+            (new BABYLON.VertexData).applyToMesh(this.ceiling);
+
+            this.isBlurred = false;
 
             this.light1.intensity = 0.8;
             this.light2.intensity = 0;
