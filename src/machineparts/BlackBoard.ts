@@ -516,6 +516,12 @@ namespace MarbleRunSimulatorCore {
             this.lines.pop();
         }
 
+        public removeFirstLine(): void {
+            if (this.lines.length >= 1) {
+                this.lines.splice(0, 1);
+            }
+        }
+
         public setI(v: number, doNotCheckGridLimits?: boolean): void {
             super.setI(0, true);
         }

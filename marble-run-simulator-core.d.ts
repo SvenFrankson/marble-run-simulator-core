@@ -1157,6 +1157,7 @@ declare namespace MarbleRunSimulatorCore {
         addLine(points: BABYLON.Vector3[]): void;
         addRawLine(points: BABYLON.Vector3[]): void;
         removeLastLine(): void;
+        removeFirstLine(): void;
         setI(v: number, doNotCheckGridLimits?: boolean): void;
         setJ(v: number, doNotCheckGridLimits?: boolean): void;
         setK(v: number, doNotCheckGridLimits?: boolean): void;

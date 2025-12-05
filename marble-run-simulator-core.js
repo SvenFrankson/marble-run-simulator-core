@@ -10578,6 +10578,11 @@ var MarbleRunSimulatorCore;
         removeLastLine() {
             this.lines.pop();
         }
+        removeFirstLine() {
+            if (this.lines.length >= 1) {
+                this.lines.splice(0, 1);
+            }
+        }
         setI(v, doNotCheckGridLimits) {
             super.setI(0, true);
         }
