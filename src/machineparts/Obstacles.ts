@@ -12,6 +12,9 @@ namespace MarbleRunSimulatorCore {
 
             let s = prop.l * tileSize / Math.SQRT2;
             this.body = new BABYLON.Mesh("body");
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this.body);
+            }
             this.body.parent = this;
             this.body.rotation.z = Math.PI / 4;
             let bodyVertexData = Mummu.CreateBeveledBoxVertexData({ width: s, height: s, depth: tileSize });
@@ -86,6 +89,9 @@ namespace MarbleRunSimulatorCore {
             let w = prop.l * tileSize;
             let h = prop.h * tileHeight;
             this.body = new BABYLON.Mesh("body");
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this.body);
+            }
             this.body.parent = this;
             if (prop.l % 2 === 0) {
                 this.body.position.x = tileSize * 0.5;

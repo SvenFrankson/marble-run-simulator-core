@@ -1506,6 +1506,9 @@ namespace MarbleRunSimulatorCore {
             this.endPoints.forEach(endpoint => {
                 endpoint.hideHelperMesh();
             })
+            if (this.gridRectMesh) {
+                this.gridRectMesh.dispose();
+            }
             super.dispose();
             this.removeAllNeighbours();
             let index = this.machine.parts.indexOf(this);
@@ -1763,10 +1766,16 @@ namespace MarbleRunSimulatorCore {
             if (!this.instantiated || this.isDisposed()) {
                 return;
             }
+            this.sleepersMeshes.forEach(sleeperMesh => {
+                (new BABYLON.VertexData().applyToMesh(sleeperMesh));
+            });
             let datas = SleeperMeshBuilder.GenerateSleepersVertexData(this, this.sleepersMeshProp);
             datas.forEach((vData, colorIndex) => {
                 if (!this.sleepersMeshes.get(colorIndex)) {
                     let sleeperMesh = new BABYLON.Mesh("sleeper-mesh-" + colorIndex);
+                    if (MainMaterials.UseOutlineMeshes) {
+                        MainMaterials.SetAsOutlinedMesh(sleeperMesh);
+                    }
                     sleeperMesh.parent = this;
                     this.sleepersMeshes.set(colorIndex, sleeperMesh);
                 }

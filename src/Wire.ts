@@ -117,6 +117,11 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 this.wireMesh = BABYLON.ExtrudeShape("wire", { shape: shape, path: path, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                
+                if (MainMaterials.UseOutlineMeshes) {
+                    MainMaterials.SetAsOutlinedMesh(this.wireMesh);
+                }
+
                 this.wireMesh.parent = this;
                 this.wireMesh.material = this.part.game.materials.getMaterial(color, this.part.machine.materialQ);
             }

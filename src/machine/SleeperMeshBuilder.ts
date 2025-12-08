@@ -55,6 +55,9 @@ namespace MarbleRunSimulatorCore {
                 } else if (q === 0) {
                     sleeperPieceVertexDataTypeIndex += 2;
                 }
+                if (part.game.materials.getMaterialType(colorIndex) === MaterialType.Plastic && MainMaterials.UseOutlineMeshes) {
+                    sleeperPieceVertexDataTypeIndex += 3;
+                }
                 let sleeperPieceVertexData = part.machine.sleeperVertexData ? part.machine.sleeperVertexData[sleeperPieceVertexDataTypeIndex] : undefined;
 
                 let quat = BABYLON.Quaternion.Identity();

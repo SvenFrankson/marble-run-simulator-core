@@ -196,7 +196,13 @@ namespace MarbleRunSimulatorCore {
                 this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
             }
             if (this.machine.playing || this.machine.paused || (this.frozen && this.machine.stopped)) {
-                this.renderOutline = false;
+                if (MainMaterials.UseOutlineMeshes) {
+                    MainMaterials.SetAsOutlinedMesh(this);
+                }
+                else {
+                    this.renderOutline = false;
+                }
+
                 if (this.positionZeroGhost) {
                     this.positionZeroGhost.visibility = 0.5;
 
@@ -228,7 +234,12 @@ namespace MarbleRunSimulatorCore {
                     this.outlineColor.copyFrom(UI3DConstants.outlineSelectedColor);
                 }
                 else {
-                    this.renderOutline = false;
+                    if (MainMaterials.UseOutlineMeshes) {
+                        MainMaterials.SetAsOutlinedMesh(this);
+                    }
+                    else {
+                        this.renderOutline = false;
+                    }
                 }
             }
         }
@@ -892,8 +903,8 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
     
-                                this.velocity.copyFrom(otherSpeed.scale(0.99));
-                                ball.velocity.copyFrom(mySpeed.scale(0.99));
+                                this.velocity.copyFrom(otherSpeed.scale(0.9)).addInPlace(mySpeed.scale(-0.1));
+                                ball.velocity.copyFrom(mySpeed.scale(0.9)).addInPlace(otherSpeed.scale(-0.1));
                                 canceledSpeed.copyFromFloats(0, 0, 0);
                                 //this.velocity.copyFrom(otherSpeed).scaleInPlace(.5);
                                 //ball.velocity.copyFrom(mySpeed).scaleInPlace(.6);

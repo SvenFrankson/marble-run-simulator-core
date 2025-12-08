@@ -12,7 +12,10 @@ namespace MarbleRunSimulatorCore {
             let d = 3.5 * tileSize;
             this.base = new BABYLON.Mesh("base");
             this.base.parent = this;
-            let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: d - 0.5 * tileSize, height: 0.005 });
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this.base);
+            }
+            let bodyVertexData = Mummu.CreateBeveledCylinderVertexData({ radius: (d - 0.5 * tileSize) * 0.5, height: 0.005 });
             bodyVertexData.applyToMesh(this.base);
 
             for (let n = 0; n < 2; n++) {

@@ -13,6 +13,9 @@ namespace MarbleRunSimulatorCore {
                 depth: BlackBoard.BoardThickness
             });
             boardVertexData.applyToMesh(this);
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this);
+            }
         }
     }
 
@@ -153,6 +156,9 @@ namespace MarbleRunSimulatorCore {
             let borderDepth = 3 * tileSize;
 
             this.borders[0] = new BABYLON.Mesh("top-border");
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this.borders[0]);
+            }
             this.borders[0].parent = this;
             this.borders[0].position.x = (this.w - 1) * 0.5 * tileSize;
             this.borders[0].position.y = (this.h - 0.5) * tileSize + 0.5 * borderThickness;
@@ -173,6 +179,9 @@ namespace MarbleRunSimulatorCore {
             topMachineCollider.bouncyness = 0.5;
             
             this.borders[1] = new BABYLON.Mesh("right-border");
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this.borders[1]);
+            }
             this.borders[1].parent = this;
             this.borders[1].position.x = (this.w - 0.5) * tileSize + 0.5 * borderThickness;
             this.borders[1].position.y = (this.h - 1) * 0.5 * tileSize;
@@ -193,6 +202,9 @@ namespace MarbleRunSimulatorCore {
             rightMachineCollider.bouncyness = 0.5;
             
             this.borders[2] = new BABYLON.Mesh("bottom-border");
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this.borders[2]);
+            }
             this.borders[2].parent = this;
             this.borders[2].position.x = (this.w - 1) * 0.5 * tileSize;
             this.borders[2].position.y = - 0.5 * tileSize - 0.5 * borderThickness;
@@ -213,6 +225,9 @@ namespace MarbleRunSimulatorCore {
             bottomMachineCollider.bouncyness = 0.5;
             
             this.borders[3] = new BABYLON.Mesh("left-border");
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this.borders[3]);
+            }
             this.borders[3].parent = this;
             this.borders[3].position.x = - 0.5 * tileSize - 0.5 * borderThickness;
             this.borders[3].position.y = (this.h - 1) * 0.5 * tileSize;
@@ -392,7 +407,7 @@ namespace MarbleRunSimulatorCore {
             for (let n = 0; n < this.lines.length; n++) {
                 let rawLine = this.lines[n];
                 let trackTemplate = new TrackTemplate(this.template);
-                trackTemplate.isDouble = true;
+                //trackTemplate.isDouble = true;
                 let dirStart = rawLine[1].subtract(rawLine[0]).normalize();
                 let prevDir = dirStart.clone();
                 let normStart = Mummu.Rotate(dirStart, BABYLON.Axis.Z, Math.PI * 0.5);

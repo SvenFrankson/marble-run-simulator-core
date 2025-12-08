@@ -152,6 +152,8 @@ declare namespace MarbleRunSimulatorCore {
     }
     class MainMaterials {
         game: IGame;
+        static UseOutlineMeshes: boolean;
+        static SetAsOutlinedMesh(m: BABYLON.Mesh): void;
         private _materialsPBR;
         private _materialsSTD;
         private _plexiglasMaterialsPBR;

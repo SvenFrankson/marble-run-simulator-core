@@ -11,6 +11,9 @@ namespace MarbleRunSimulatorCore {
             }
 
             track.mesh = new BABYLON.Mesh("track-mesh");
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(track.mesh);
+            }
             track.mesh.parent = track.part;
             track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
             
