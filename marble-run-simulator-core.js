@@ -9,12 +9,13 @@ var MarbleRunSimulatorCore;
     MarbleRunSimulatorCore.BallGhost = BallGhost;
     let Surface;
     (function (Surface) {
-        Surface[Surface["Rail"] = 0] = "Rail";
-        Surface[Surface["Bowl"] = 1] = "Bowl";
-        Surface[Surface["Velvet"] = 2] = "Velvet";
-        Surface[Surface["Metal"] = 3] = "Metal";
-        Surface[Surface["Plastic"] = 4] = "Plastic";
-        Surface[Surface["Plexiglas"] = 5] = "Plexiglas";
+        Surface[Surface["None"] = 0] = "None";
+        Surface[Surface["Rail"] = 1] = "Rail";
+        Surface[Surface["Bowl"] = 2] = "Bowl";
+        Surface[Surface["Velvet"] = 3] = "Velvet";
+        Surface[Surface["Metal"] = 4] = "Metal";
+        Surface[Surface["Plastic"] = 5] = "Plastic";
+        Surface[Surface["Plexiglas"] = 6] = "Plexiglas";
     })(Surface = MarbleRunSimulatorCore.Surface || (MarbleRunSimulatorCore.Surface = {}));
     let CollisionState;
     (function (CollisionState) {
@@ -36,12 +37,14 @@ var MarbleRunSimulatorCore;
             this.saveTrajectory = false;
             this.currentTrajectory = [];
             this.lastTrajectory = [];
+            this._trailMeshOffset = 0;
+            this._showTrailMesh = true;
+            this.trail = [];
             this._hasBoostMaterial = false;
             this._boostColor = new BABYLON.Color3(0.9, 0.1, 0.3);
             this._boosting = false;
             this.rotationSpeed = 0;
             this.rotationAxis = BABYLON.Vector3.Right();
-            this.surface = Surface.Rail;
             this._showPositionZeroGhost = false;
             this.bumpSurfaceIsRail = true;
             this.flyBackProgress = 0;
@@ -88,6 +91,18 @@ var MarbleRunSimulatorCore;
         }
         get sectionArea() {
             return Math.PI * this.radius * this.radius;
+        }
+        get showTrailMesh() {
+            return this._showTrailMesh;
+        }
+        set showTrailMesh(v) {
+            this._showTrailMesh = v;
+            if (!this._showTrailMesh) {
+                if (this.trailMesh) {
+                    this.trailMesh.dispose();
+                    delete this.trailMesh;
+                }
+            }
         }
         get boosting() {
             return this._boosting;
@@ -288,6 +303,9 @@ var MarbleRunSimulatorCore;
         }
         dispose(doNotRecurse, disposeMaterialAndTextures) {
             super.dispose(doNotRecurse, disposeMaterialAndTextures);
+            if (this.trailMesh) {
+                this.trailMesh.dispose();
+            }
             if (this._boostAnimation) {
                 this._boostAnimation.dispose();
             }
@@ -306,6 +324,12 @@ var MarbleRunSimulatorCore;
         reset() {
             if (this.rotationQuaternion) {
                 this.rotationQuaternion.copyFromFloats(0, 0, 0, 1);
+            }
+            if (this.showTrailMesh) {
+                this.trail = [];
+                if (this.trailMesh) {
+                    this.trailMesh.dispose();
+                }
             }
             this.boosting = false;
             if (this._hasBoostMaterial && this.material instanceof BABYLON.PBRMetallicRoughnessMaterial) {
@@ -389,6 +413,7 @@ var MarbleRunSimulatorCore;
             if (isFinite(rawDT)) {
                 this.updateMaterial(rawDT);
             }
+            this.surface = Surface.None;
             while (this._timer > 0) {
                 let m = this.mass;
                 let physicDT = this.game.physicDT;
@@ -929,6 +954,7 @@ var MarbleRunSimulatorCore;
             }
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if (this.surface === Surface.Rail) {
+                console.log("A");
                 this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 2) + 0.5);
                 this.marbleLoopSound.setVolume(6 * this.strReaction * f, 0.1);
                 if (!this.marbleLoopSound.isPlaying) {
@@ -938,6 +964,7 @@ var MarbleRunSimulatorCore;
                 this.marblePlexiglasTubeLoopSound.setVolume(0, 0.2);
             }
             else if (this.surface === Surface.Plexiglas) {
+                console.log("B");
                 this.marblePlexiglasTubeLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 4) + 0.75);
                 this.marblePlexiglasTubeLoopSound.setVolume(40 * this.strReaction * f, 0.1);
                 if (!this.marblePlexiglasTubeLoopSound.isPlaying) {
@@ -966,6 +993,31 @@ var MarbleRunSimulatorCore;
                     if (!lastTrajectoryPoint || BABYLON.Vector3.DistanceSquared(this.position, lastTrajectoryPoint) > 0.005 * 0.005) {
                         this.currentTrajectory.push(this.position.clone());
                     }
+                }
+            }
+            if (this.showTrailMesh) {
+                if (this.surface === Surface.None) {
+                    this._trailMeshOffset *= 0.95;
+                }
+                else {
+                    this._trailMeshOffset = 0.95 * this._trailMeshOffset + 0.05 * (this.radius - 0.002);
+                }
+                let trailPt = new BABYLON.Vector3(this._trailMeshOffset, 0, 0);
+                BABYLON.Vector3.TransformCoordinatesToRef(trailPt, this.getWorldMatrix(), trailPt);
+                if (!this.trail) {
+                    this.trail = [];
+                }
+                this.trail.push(trailPt);
+                while (this.trail.length > 60) {
+                    this.trail.splice(0, 1);
+                }
+                if (this.trail.length >= 2) {
+                    let data = Mummu.CreateTrailVertexData({ path: this.trail, radiusFunc: (f => { return (f) * 0.001; }), up: new BABYLON.Vector3(0, 0, -1) });
+                    if (!this.trailMesh || this.trailMesh.isDisposed()) {
+                        this.trailMesh = new BABYLON.Mesh("trail-mesh");
+                        this.trailMesh.material = this.game.materials.whiteFullLitMaterial;
+                    }
+                    data.applyToMesh(this.trailMesh);
                 }
             }
         }
@@ -1522,6 +1574,9 @@ var MarbleRunSimulatorCore;
             if (colorIndex >= 6 && colorIndex <= 14) {
                 return MaterialType.Plastic;
             }
+            if (colorIndex === 18) {
+                return MaterialType.Plastic;
+            }
             return MaterialType.Metal;
         }
         getBallMaterialType(colorIndex) {
@@ -1726,6 +1781,8 @@ var MarbleRunSimulatorCore;
             this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("royal-blue-plexiglas-std", BABYLON.Color3.FromHexString("#4355db")));
             this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("pink-plexiglas-pbr", BABYLON.Color3.FromHexString("#d23be7"), envTexture));
             this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("pink-plexiglas-std", BABYLON.Color3.FromHexString("#d23be7")));
+            this._materialsPBR.push(this._makePlasticPBR("white-plastic-pbr", BABYLON.Color3.FromHexString("#ffffff"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("white-plastic-std", BABYLON.Color3.FromHexString("#ffffff")));
         }
     }
     MainMaterials.UseOutlineMeshes = true;
@@ -11900,7 +11957,7 @@ var MarbleRunSimulatorCore;
             super(machine, prop);
             this.setColorCount(1);
             this.setTemplate(this.machine.templateManager.getTemplate(EndBasket.PropToPartName(prop)));
-            let d = 3.5 * MarbleRunSimulatorCore.tileSize;
+            let d = 3 * MarbleRunSimulatorCore.tileSize;
             this.base = new BABYLON.Mesh("base");
             this.base.parent = this;
             if (MarbleRunSimulatorCore.MainMaterials.UseOutlineMeshes) {
@@ -11915,8 +11972,8 @@ var MarbleRunSimulatorCore;
                 shieldWire.path = [];
                 for (let i = 0; i < 32; i++) {
                     let a = i / 32 * 2 * Math.PI;
-                    let x = Math.cos(a) * 0.5 * d;
-                    let z = Math.sin(a) * 0.5 * d;
+                    let x = Math.cos(a) * (1.5 * MarbleRunSimulatorCore.tileSize - 0.003);
+                    let z = Math.sin(a) * (1.5 * MarbleRunSimulatorCore.tileSize - 0.003);
                     shieldWire.path.push(new BABYLON.Vector3(x, MarbleRunSimulatorCore.tileHeight * 0.5 * (n + 1), z));
                 }
                 shieldWire.path.push(shieldWire.path[0].clone());
@@ -11929,6 +11986,38 @@ var MarbleRunSimulatorCore;
             let bodyMachineCollider = new MarbleRunSimulatorCore.MachineCollider(bodyCollider);
             bodyMachineCollider.bouncyness = 0.2;
             this.colliders = [bodyMachineCollider];
+            let flagH = 0.06;
+            this.flagPole = new BABYLON.Mesh("flag-pole");
+            if (MarbleRunSimulatorCore.MainMaterials.UseOutlineMeshes) {
+                MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.flagPole);
+            }
+            let flagPoleVertexData = Mummu.CreateBeveledCylinderVertexData({ radius: 0.001, height: flagH, tessellation: 6 });
+            Mummu.TranslateVertexDataInPlace(flagPoleVertexData, new BABYLON.Vector3(0, flagH * 0.5, 0));
+            flagPoleVertexData.applyToMesh(this.flagPole);
+            this.flagPole.parent = this.base;
+            this.flagPole.position.z = -(d - MarbleRunSimulatorCore.tileSize) * 0.5;
+            this.flagPole.position.y = MarbleRunSimulatorCore.tileHeight;
+            this.flagPole.position.z = -d * 0.5;
+            Mummu.RotateInPlace(this.flagPole.position, BABYLON.Axis.Y, Math.PI / 8);
+            this.flag = new BABYLON.Mesh("flag");
+            if (MarbleRunSimulatorCore.MainMaterials.UseOutlineMeshes) {
+                MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.flag);
+            }
+            let flagVertexData = Mummu.CreateBeveledBoxVertexData({ width: 0.025, height: 0.015, depth: 0.0005 });
+            Mummu.TranslateVertexDataInPlace(flagVertexData, new BABYLON.Vector3(0.025 / 2, -0.015 / 2, 0));
+            flagVertexData.applyToMesh(this.flag);
+            this.flag.parent = this.flagPole;
+            this.flag.position.x = 0.001;
+            this.flag.position.y = flagH - 0.001;
+            this.flag.position.z = 0.001;
+            /*
+            this.flagKnob = BABYLON.CreateSphere("flag-knob", { segments: 8, diameter: 0.007 });
+            if (MainMaterials.UseOutlineMeshes) {
+                MainMaterials.SetAsOutlinedMesh(this.flagKnob);
+            }
+            this.flagKnob.parent = this.flagPole;
+            this.flagKnob.position.y = flagH;
+            */
             this.generateWires();
         }
         static PropToPartName(prop) {
@@ -11936,6 +12025,9 @@ var MarbleRunSimulatorCore;
         }
         async instantiateMachineSpecific() {
             this.base.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
+            this.flagPole.material = this.game.materials.getMaterial(18, this.machine.materialQ);
+            this.flag.material = this.game.materials.getMaterial(7, this.machine.materialQ);
+            //this.flagKnob.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
         }
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas) {
             let bodySelector = BABYLON.VertexData.ExtractFromMesh(this.base);

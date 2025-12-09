@@ -40,6 +40,9 @@ namespace MarbleRunSimulatorCore {
             if (colorIndex >= 6 && colorIndex <= 14) {
                 return MaterialType.Plastic;
             }
+            if (colorIndex === 18) {
+                return MaterialType.Plastic;
+            }
             return MaterialType.Metal;
         }
         public getBallMaterialType(colorIndex: number): BallMaterialType {
@@ -668,6 +671,9 @@ namespace MarbleRunSimulatorCore {
             
             this._plexiglasMaterialsPBR.push(this._makePlexiglasPBR("pink-plexiglas-pbr", BABYLON.Color3.FromHexString("#d23be7"), envTexture));
             this._plexiglasMaterialsSTD.push(this._makePlexiglasSTD("pink-plexiglas-std", BABYLON.Color3.FromHexString("#d23be7")));
+            
+            this._materialsPBR.push(this._makePlasticPBR("white-plastic-pbr", BABYLON.Color3.FromHexString("#ffffff"), envTexture));
+            this._materialsSTD.push(this._makePlasticSTD("white-plastic-std", BABYLON.Color3.FromHexString("#ffffff")));
         }
     }
 }

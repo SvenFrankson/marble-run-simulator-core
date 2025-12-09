@@ -7,12 +7,13 @@ declare namespace MarbleRunSimulatorCore {
         constructor(ball: Ball);
     }
     enum Surface {
-        Rail = 0,
-        Bowl = 1,
-        Velvet = 2,
-        Metal = 3,
-        Plastic = 4,
-        Plexiglas = 5
+        None = 0,
+        Rail = 1,
+        Bowl = 2,
+        Velvet = 3,
+        Metal = 4,
+        Plastic = 5,
+        Plexiglas = 6
     }
     enum CollisionState {
         Normal = 0,
@@ -37,6 +38,12 @@ declare namespace MarbleRunSimulatorCore {
         saveTrajectory: boolean;
         currentTrajectory: BABYLON.Vector3[];
         lastTrajectory: BABYLON.Vector3[];
+        private _trailMeshOffset;
+        private _showTrailMesh;
+        get showTrailMesh(): boolean;
+        set showTrailMesh(v: boolean);
+        trail: BABYLON.Vector3[];
+        trailMesh: BABYLON.Mesh;
         private _boostAnimation;
         private _hasBoostMaterial;
         private _baseColor;
@@ -1295,6 +1302,9 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class EndBasket extends MachinePart {
         base: BABYLON.Mesh;
+        flagPole: BABYLON.Mesh;
+        flag: BABYLON.Mesh;
+        flagKnob: BABYLON.Mesh;
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
