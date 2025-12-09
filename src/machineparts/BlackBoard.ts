@@ -37,7 +37,7 @@ namespace MarbleRunSimulatorCore {
             board.position.x += this.w * tileSize * (x0 + x1 - 1) * 0.5;
             board.position.y = (this.h - 1) * 0.5 * tileSize;
             board.position.y += this.h * tileSize * (y0 + y1 - 1) * 0.5;
-            board.position.z = BlackBoard.BoardThickness * 0.5 + 2 * this.wireGauge;
+            board.position.z = BlackBoard.BoardThickness * 0.5 + 2.5 * this.wireGauge;
 
             let boardCollider = new Mummu.BoxCollider(board._worldMatrix);
             boardCollider.width = this.w * tileSize * wFactor;
@@ -153,7 +153,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             let borderThickness = 3 * BlackBoard.BoardThickness;
-            let borderDepth = 3 * tileSize;
+            let borderDepth = 4 * tileSize;
 
             this.borders[0] = new BABYLON.Mesh("top-border");
             if (MainMaterials.UseOutlineMeshes) {

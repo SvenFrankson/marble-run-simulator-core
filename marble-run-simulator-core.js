@@ -10324,7 +10324,7 @@ var MarbleRunSimulatorCore;
                 this._addBoard(0, 1, 0, 1);
             }
             let borderThickness = 3 * BlackBoard.BoardThickness;
-            let borderDepth = 3 * MarbleRunSimulatorCore.tileSize;
+            let borderDepth = 4 * MarbleRunSimulatorCore.tileSize;
             this.borders[0] = new BABYLON.Mesh("top-border");
             if (MarbleRunSimulatorCore.MainMaterials.UseOutlineMeshes) {
                 MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.borders[0]);
@@ -10416,7 +10416,7 @@ var MarbleRunSimulatorCore;
             board.position.x += this.w * MarbleRunSimulatorCore.tileSize * (x0 + x1 - 1) * 0.5;
             board.position.y = (this.h - 1) * 0.5 * MarbleRunSimulatorCore.tileSize;
             board.position.y += this.h * MarbleRunSimulatorCore.tileSize * (y0 + y1 - 1) * 0.5;
-            board.position.z = BlackBoard.BoardThickness * 0.5 + 2 * this.wireGauge;
+            board.position.z = BlackBoard.BoardThickness * 0.5 + 2.5 * this.wireGauge;
             let boardCollider = new Mummu.BoxCollider(board._worldMatrix);
             boardCollider.width = this.w * MarbleRunSimulatorCore.tileSize * wFactor;
             boardCollider.height = this.h * MarbleRunSimulatorCore.tileHeight * hFactor;
