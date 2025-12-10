@@ -615,6 +615,9 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "bitsplit") {
                     data = BitSplit.GenerateTemplate(mirror);
                 }
+                else if (partName === "largesplit") {
+                    data = LargeBitSplit.GenerateTemplate(mirror);
+                }
                 else if (partName.startsWith("dropside_")) {
                     let h = parseInt(partName.split("_")[1].split(".")[0]);
                     data = DropSide.GenerateTemplate(h, mirror);
@@ -803,6 +806,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "bitsplit") {
                 partName = BitSplit.PropToPartName(prop);
+            }
+            else if (baseName === "largesplit") {
+                partName = LargeBitSplit.PropToPartName(prop);
             }
             else if (baseName === "dropside") {
                 partName = DropSide.PropToPartName(prop);

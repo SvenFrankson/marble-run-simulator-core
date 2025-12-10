@@ -1046,7 +1046,6 @@ namespace MarbleRunSimulatorCore {
 
             let f = Nabu.MinMax((this.velocity.length() - 0.1) / 0.9, 0, 1);
             if ((this.surface as Surface) === Surface.Rail) {
-                console.log("A");
                 this.marbleLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 2) + 0.5);
                 this.marbleLoopSound.setVolume(6 * this.strReaction * f, 0.1);
                 if (!this.marbleLoopSound.isPlaying) {
@@ -1056,7 +1055,6 @@ namespace MarbleRunSimulatorCore {
                 this.marblePlexiglasTubeLoopSound.setVolume(0, 0.2);
             }
             else if ((this.surface as Surface) === Surface.Plexiglas) {
-                console.log("B");
                 this.marblePlexiglasTubeLoopSound.setPlaybackRate(this.game.currentTimeFactor * (this.visibleVelocity.length() / 4) + 0.75);
                 this.marblePlexiglasTubeLoopSound.setVolume(40 * this.strReaction * f, 0.1);
                 if (!this.marblePlexiglasTubeLoopSound.isPlaying) {

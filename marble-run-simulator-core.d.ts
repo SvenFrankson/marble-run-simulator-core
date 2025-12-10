@@ -1141,6 +1141,27 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    class LargeBitSplit extends MachinePart {
+        private _animatePivot;
+        pivot: BABYLON.Mesh;
+        axisZMin: number;
+        axisZMax: number;
+        clicSound: BABYLON.Sound;
+        static boxRadius: number;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        static GenerateTemplate(mirror: boolean): MachinePartTemplate;
+        dispose(): void;
+        reset: () => void;
+        onPositionChanged(): void;
+        private _exitLeft;
+        private _moving;
+        update(dt: number): void;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
     class BlackBoardPiece extends BABYLON.Mesh {
         blackboard: BlackBoard;
         wFactor: number;

@@ -56,7 +56,8 @@ namespace MarbleRunSimulatorCore {
         "diamond",
         "bumper",
         "endbasket",
-        "box"
+        "box",
+        "largesplit"
     ];
 
     export interface IMachinePartProp {
@@ -521,6 +522,9 @@ namespace MarbleRunSimulatorCore {
             if (partName === "bitsplit") {
                 return new BitSplit(this.machine, prop);
             }
+            if (partName === "largesplit") {
+                return new LargeBitSplit(this.machine, prop);
+            }
             if (partName === "dropside" || partName.startsWith("dropside_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
@@ -729,6 +733,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "bitsplit") {
                 return new BitSplit(this.machine, prop);
+            }
+            if (baseName === "largesplit") {
+                return new LargeBitSplit(this.machine, prop);
             }
             if (baseName === "dropside") {
                 return new DropSide(this.machine, prop);
