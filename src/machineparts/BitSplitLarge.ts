@@ -13,7 +13,7 @@ namespace MarbleRunSimulatorCore {
 
         constructor(machine: Machine, prop: IMachinePartProp) {
             super(machine, prop);
-            this.setColorCount(5);
+            this.setColorCount(3);
 
             this.setTemplate(this.machine.templateManager.getTemplate(LargeBitSplit.PropToPartName(prop), prop.mirrorX, prop.mirrorX));
 
@@ -31,22 +31,26 @@ namespace MarbleRunSimulatorCore {
             let dz = this.wireGauge * 0.5;
 
             let wireHorizontal0 = new Wire(this);
-            wireHorizontal0.colorIndex = 4;
+            wireHorizontal0.wireSize = 0.003;
+            wireHorizontal0.colorIndex = 1;
             wireHorizontal0.parent = this.pivot;
             wireHorizontal0.path = [new BABYLON.Vector3(- dx, 0, -dz), new BABYLON.Vector3(dx, 0, -dz)];
 
             let wireHorizontal1 = new Wire(this);
-            wireHorizontal1.colorIndex = 4;
+            wireHorizontal1.wireSize = 0.003;
+            wireHorizontal1.colorIndex = 1;
             wireHorizontal1.parent = this.pivot;
             wireHorizontal1.path = [new BABYLON.Vector3(- dx, 0, dz), new BABYLON.Vector3(dx, 0, dz)];
 
             let wireVertical0 = new Wire(this);
-            wireVertical0.colorIndex = 4;
+            wireVertical0.wireSize = 0.003;
+            wireVertical0.colorIndex = 1;
             wireVertical0.parent = this.pivot;
             wireVertical0.path = [new BABYLON.Vector3(0, dx, -dz), new BABYLON.Vector3(0, 0, -dz)];
 
             let wireVertical1 = new Wire(this);
-            wireVertical1.colorIndex = 4;
+            wireVertical1.wireSize = 0.003;
+            wireVertical1.colorIndex = 1;
             wireVertical1.parent = this.pivot;
             wireVertical1.path = [new BABYLON.Vector3(0, dx, dz), new BABYLON.Vector3(0, 0, dz)];
 
@@ -160,8 +164,8 @@ namespace MarbleRunSimulatorCore {
         protected async instantiateMachineSpecific(): Promise<void> {
             let pivotDatas: BABYLON.VertexData[] = [];
 
-            this.axisZMin = - 0.015 + 0.0005;
-            this.axisZMax = 0.015 - 0.0005;
+            this.axisZMin = - this.wireGauge * 0.5 - 0.005;
+            this.axisZMax = this.wireGauge * 0.5;
 
             let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: this.axisZMax - this.axisZMin, diameter: 0.001 });
             let q = BABYLON.Quaternion.Identity();
@@ -175,14 +179,11 @@ namespace MarbleRunSimulatorCore {
                 arrowData = Mummu.CloneVertexData(arrowData);
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, - 0.007, this.axisZMin));
                 pivotDatas.push(arrowData);
-                arrowData = Mummu.CloneVertexData(arrowData);
-                Mummu.MirrorZVertexDataInPlace(arrowData);
-                pivotDatas.push(arrowData);
             }
 
             Mummu.MergeVertexDatas(...pivotDatas).applyToMesh(this.pivot);
 
-            this.pivot.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
+            this.pivot.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
         }
 
         public onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void {
