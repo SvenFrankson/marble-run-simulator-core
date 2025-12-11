@@ -16,6 +16,10 @@ namespace MarbleRunSimulatorCore {
                 MainMaterials.SetAsOutlinedMesh(this.body);
             }
             this.body.parent = this;
+            if (prop.l % 2 === 0) {
+                this.body.position.x = tileSize * 0.5;
+                this.body.position.y = tileHeight * 0.5;
+            }
             this.body.rotation.z = Math.PI / 4;
             let bodyVertexData = Mummu.CreateBeveledBoxVertexData({ width: s, height: s, depth: tileSize });
             bodyVertexData.applyToMesh(this.body);
@@ -29,10 +33,10 @@ namespace MarbleRunSimulatorCore {
 
             this.colliders = [bodyMachineCollider];
 
-            this.localAABBBaseMin.x = - (prop.l + 0.5) * 0.5 * tileSize;
-            this.localAABBBaseMin.y = - (prop.l + 0.5) * 0.5 * tileHeight;
-            this.localAABBBaseMax.x = (prop.l + 0.5) * 0.5 * tileSize;
-            this.localAABBBaseMax.y = (prop.l + 0.5) * 0.5 * tileHeight;
+            this.localAABBBaseMin.x = - (prop.l) * 0.5 * tileSize + this.body.position.x;
+            this.localAABBBaseMin.y = - (prop.l) * 0.5 * tileHeight + this.body.position.y;
+            this.localAABBBaseMax.x = (prop.l) * 0.5 * tileSize + this.body.position.x;
+            this.localAABBBaseMax.y = (prop.l) * 0.5 * tileHeight + this.body.position.y;
 
             this.generateWires();
         }
@@ -199,6 +203,10 @@ namespace MarbleRunSimulatorCore {
             let s = prop.l * tileSize;
             this.body = new BABYLON.Mesh("body");
             this.body.parent = this;
+            if (prop.l % 2 === 0) {
+                this.body.position.x = tileSize * 0.5;
+                this.body.position.y = tileHeight * 0.5;
+            }
             let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: s, height: tileSize });
             Mummu.RotateAngleAxisVertexDataInPlace(bodyVertexData, Math.PI * 0.5, BABYLON.Axis.X);
             bodyVertexData.applyToMesh(this.body);
