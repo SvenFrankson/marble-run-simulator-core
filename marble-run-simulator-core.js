@@ -916,7 +916,7 @@ var MarbleRunSimulatorCore;
                             this.rotationAxis.normalize();
                         }
                         else {
-                            this.rotationAxis.copyFromFloats(1, 0, 0);
+                            this.rotationAxis.copyFromFloats(0, 0, 1);
                         }
                     }
                 }
@@ -931,7 +931,12 @@ var MarbleRunSimulatorCore;
                 }
             }
             this.lastPosition.copyFrom(this.position);
-            this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
+            if (this.surface === Surface.None) {
+                this.rotationSpeed *= 0.95;
+            }
+            else {
+                this.rotationSpeed = this.rotationSpeed * 0.5 + this.visibleVelocity.length() / (2 * Math.PI * this.radius) * 0.5;
+            }
             let axis = this.rotationAxis;
             let angle = this.rotationSpeed * 2 * Math.PI * dt;
             this.rotate(axis, angle, BABYLON.Space.WORLD);
@@ -1728,7 +1733,7 @@ var MarbleRunSimulatorCore;
             plasticBlack.diffuseColor = BABYLON.Color3.FromHexString("#282a33");
             plasticBlack.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             plasticBlack.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
-            this._materialsPBR.push(plasticBlack);
+            this._materialsPBR.push(this._makePlasticPBR("black-plastic-pbr", BABYLON.Color3.FromHexString("#282a33"), envTexture));
             this._materialsSTD.push(plasticBlack);
             /*#e6261f,#eb7532,#f7d038,#a3e048,#49da9a,#34bbe6,#4355db,#d23be7*/
             this._materialsPBR.push(this._makePlasticPBR("red-plastic-pbr", BABYLON.Color3.FromHexString("#e6261f"), envTexture));
@@ -4459,6 +4464,11 @@ var MarbleRunSimulatorCore;
             });
         }
         setOutlineParams(renderOutline, outlineWidth, outlineColor) {
+            if (!renderOutline && MarbleRunSimulatorCore.MainMaterials.UseOutlineMeshes) {
+                renderOutline = true;
+                outlineWidth = 0.001;
+                outlineColor.copyFromFloats(0, 0, 0);
+            }
             this.allWires.forEach(wire => {
                 if (wire.wireMesh && !wire.wireMesh.isDisposed()) {
                     wire.wireMesh.renderOutline = renderOutline;
@@ -10257,7 +10267,7 @@ var MarbleRunSimulatorCore;
             };
             this._exitLeft = true;
             this._moving = false;
-            this.setColorCount(5);
+            this.setColorCount(3);
             this.setTemplate(this.machine.templateManager.getTemplate(LargeBitSplit.PropToPartName(prop), prop.mirrorX, prop.mirrorX));
             this.clicSound = new BABYLON.Sound("clic-sound", "./lib/marble-run-simulator-core/datas/sounds/clic.wav", this.getScene(), undefined, { loop: false, autoplay: false });
             this.clicSound.setVolume(0.25);
@@ -10270,19 +10280,23 @@ var MarbleRunSimulatorCore;
             let dx = LargeBitSplit.boxRadius - 0.003;
             let dz = this.wireGauge * 0.5;
             let wireHorizontal0 = new MarbleRunSimulatorCore.Wire(this);
-            wireHorizontal0.colorIndex = 4;
+            wireHorizontal0.wireSize = 0.003;
+            wireHorizontal0.colorIndex = 1;
             wireHorizontal0.parent = this.pivot;
             wireHorizontal0.path = [new BABYLON.Vector3(-dx, 0, -dz), new BABYLON.Vector3(dx, 0, -dz)];
             let wireHorizontal1 = new MarbleRunSimulatorCore.Wire(this);
-            wireHorizontal1.colorIndex = 4;
+            wireHorizontal1.wireSize = 0.003;
+            wireHorizontal1.colorIndex = 1;
             wireHorizontal1.parent = this.pivot;
             wireHorizontal1.path = [new BABYLON.Vector3(-dx, 0, dz), new BABYLON.Vector3(dx, 0, dz)];
             let wireVertical0 = new MarbleRunSimulatorCore.Wire(this);
-            wireVertical0.colorIndex = 4;
+            wireVertical0.wireSize = 0.003;
+            wireVertical0.colorIndex = 1;
             wireVertical0.parent = this.pivot;
             wireVertical0.path = [new BABYLON.Vector3(0, dx, -dz), new BABYLON.Vector3(0, 0, -dz)];
             let wireVertical1 = new MarbleRunSimulatorCore.Wire(this);
-            wireVertical1.colorIndex = 4;
+            wireVertical1.wireSize = 0.003;
+            wireVertical1.colorIndex = 1;
             wireVertical1.parent = this.pivot;
             wireVertical1.path = [new BABYLON.Vector3(0, dx, dz), new BABYLON.Vector3(0, 0, dz)];
             let wireLeftP = new MarbleRunSimulatorCore.Wire(this);
@@ -10372,8 +10386,8 @@ var MarbleRunSimulatorCore;
         }
         async instantiateMachineSpecific() {
             let pivotDatas = [];
-            this.axisZMin = -0.015 + 0.0005;
-            this.axisZMax = 0.015 - 0.0005;
+            this.axisZMin = -this.wireGauge * 0.5 - 0.005;
+            this.axisZMax = this.wireGauge * 0.5;
             let tmpVertexData = BABYLON.CreateCylinderVertexData({ height: this.axisZMax - this.axisZMin, diameter: 0.001 });
             let q = BABYLON.Quaternion.Identity();
             Mummu.QuaternionFromYZAxisToRef(new BABYLON.Vector3(0, 0, 1), new BABYLON.Vector3(0, 1, 0), q);
@@ -10385,12 +10399,9 @@ var MarbleRunSimulatorCore;
                 arrowData = Mummu.CloneVertexData(arrowData);
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, -0.007, this.axisZMin));
                 pivotDatas.push(arrowData);
-                arrowData = Mummu.CloneVertexData(arrowData);
-                Mummu.MirrorZVertexDataInPlace(arrowData);
-                pivotDatas.push(arrowData);
             }
             Mummu.MergeVertexDatas(...pivotDatas).applyToMesh(this.pivot);
-            this.pivot.material = this.game.materials.getMaterial(this.getColor(4), this.machine.materialQ);
+            this.pivot.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
         }
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas) {
             let bodySelector = BABYLON.CreateBoxVertexData({ width: LargeBitSplit.boxRadius * 2, height: LargeBitSplit.boxRadius * 2, depth: MarbleRunSimulatorCore.tileSize });
@@ -12253,7 +12264,8 @@ var MarbleRunSimulatorCore;
         async instantiateMachineSpecific() {
             this.base.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
             this.flagPole.material = this.game.materials.getMaterial(18, this.machine.materialQ);
-            this.flag.material = this.game.materials.getMaterial(7, this.machine.materialQ);
+            //this.flag.material = this.game.materials.getMaterial(7, this.machine.materialQ);
+            this.flag.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
             //this.flagKnob.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
         }
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas) {
@@ -13173,6 +13185,10 @@ var MarbleRunSimulatorCore;
                 MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.body);
             }
             this.body.parent = this;
+            if (prop.l % 2 === 0) {
+                this.body.position.x = MarbleRunSimulatorCore.tileSize * 0.5;
+                this.body.position.y = MarbleRunSimulatorCore.tileHeight * 0.5;
+            }
             this.body.rotation.z = Math.PI / 4;
             let bodyVertexData = Mummu.CreateBeveledBoxVertexData({ width: s, height: s, depth: MarbleRunSimulatorCore.tileSize });
             bodyVertexData.applyToMesh(this.body);
@@ -13182,10 +13198,10 @@ var MarbleRunSimulatorCore;
             bodyCollider.depth = MarbleRunSimulatorCore.tileSize;
             let bodyMachineCollider = new MarbleRunSimulatorCore.MachineCollider(bodyCollider);
             this.colliders = [bodyMachineCollider];
-            this.localAABBBaseMin.x = -(prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileSize;
-            this.localAABBBaseMin.y = -(prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileHeight;
-            this.localAABBBaseMax.x = (prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileSize;
-            this.localAABBBaseMax.y = (prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileHeight;
+            this.localAABBBaseMin.x = -(prop.l) * 0.5 * MarbleRunSimulatorCore.tileSize + this.body.position.x;
+            this.localAABBBaseMin.y = -(prop.l) * 0.5 * MarbleRunSimulatorCore.tileHeight + this.body.position.y;
+            this.localAABBBaseMax.x = (prop.l) * 0.5 * MarbleRunSimulatorCore.tileSize + this.body.position.x;
+            this.localAABBBaseMax.y = (prop.l) * 0.5 * MarbleRunSimulatorCore.tileHeight + this.body.position.y;
             this.generateWires();
         }
         static PropToPartName(prop) {
@@ -13316,6 +13332,10 @@ var MarbleRunSimulatorCore;
             let s = prop.l * MarbleRunSimulatorCore.tileSize;
             this.body = new BABYLON.Mesh("body");
             this.body.parent = this;
+            if (prop.l % 2 === 0) {
+                this.body.position.x = MarbleRunSimulatorCore.tileSize * 0.5;
+                this.body.position.y = MarbleRunSimulatorCore.tileHeight * 0.5;
+            }
             let bodyVertexData = BABYLON.CreateCylinderVertexData({ diameter: s, height: MarbleRunSimulatorCore.tileSize });
             Mummu.RotateAngleAxisVertexDataInPlace(bodyVertexData, Math.PI * 0.5, BABYLON.Axis.X);
             bodyVertexData.applyToMesh(this.body);

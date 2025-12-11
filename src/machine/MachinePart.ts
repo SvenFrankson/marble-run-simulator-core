@@ -945,6 +945,11 @@ namespace MarbleRunSimulatorCore {
         }
 
         public setOutlineParams(renderOutline: boolean, outlineWidth: number, outlineColor: BABYLON.Color3): void {
+            if (!renderOutline && MainMaterials.UseOutlineMeshes) {
+                renderOutline = true;
+                outlineWidth = 0.001;
+                outlineColor.copyFromFloats(0, 0, 0);
+            }
             this.allWires.forEach(wire => {
                 if (wire.wireMesh && !wire.wireMesh.isDisposed()) {
                     wire.wireMesh.renderOutline = renderOutline;
