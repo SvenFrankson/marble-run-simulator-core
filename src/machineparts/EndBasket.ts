@@ -39,9 +39,9 @@ namespace MarbleRunSimulatorCore {
             }
 
             let bodyCollider = new Mummu.BoxCollider(this.base._worldMatrix);
-            bodyCollider.width = d;
+            bodyCollider.width = d - 0.5 * tileSize;
             bodyCollider.height = 0.005;
-            bodyCollider.depth = d;
+            bodyCollider.depth = d - 0.5 * tileSize;
             
             let bodyMachineCollider = new MachineCollider(bodyCollider);
             bodyMachineCollider.bouncyness = 0.2;
@@ -57,9 +57,8 @@ namespace MarbleRunSimulatorCore {
             Mummu.TranslateVertexDataInPlace(flagPoleVertexData, new BABYLON.Vector3(0, flagH * 0.5, 0));
             flagPoleVertexData.applyToMesh(this.flagPole);
             this.flagPole.parent = this.base;
-            this.flagPole.position.z = - (d - tileSize) * 0.5;
             this.flagPole.position.y = tileHeight;
-            this.flagPole.position.z = - d * 0.5;
+            this.flagPole.position.z = - (1.5 * tileSize - 0.004);
             Mummu.RotateInPlace(this.flagPole.position, BABYLON.Axis.Y, Math.PI / 8);
             
             this.flag = new BABYLON.Mesh("flag");

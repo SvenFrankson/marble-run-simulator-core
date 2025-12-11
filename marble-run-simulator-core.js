@@ -12218,9 +12218,9 @@ var MarbleRunSimulatorCore;
                 this.wires.push(shieldWire);
             }
             let bodyCollider = new Mummu.BoxCollider(this.base._worldMatrix);
-            bodyCollider.width = d;
+            bodyCollider.width = d - 0.5 * MarbleRunSimulatorCore.tileSize;
             bodyCollider.height = 0.005;
-            bodyCollider.depth = d;
+            bodyCollider.depth = d - 0.5 * MarbleRunSimulatorCore.tileSize;
             let bodyMachineCollider = new MarbleRunSimulatorCore.MachineCollider(bodyCollider);
             bodyMachineCollider.bouncyness = 0.2;
             this.colliders = [bodyMachineCollider];
@@ -12233,9 +12233,8 @@ var MarbleRunSimulatorCore;
             Mummu.TranslateVertexDataInPlace(flagPoleVertexData, new BABYLON.Vector3(0, flagH * 0.5, 0));
             flagPoleVertexData.applyToMesh(this.flagPole);
             this.flagPole.parent = this.base;
-            this.flagPole.position.z = -(d - MarbleRunSimulatorCore.tileSize) * 0.5;
             this.flagPole.position.y = MarbleRunSimulatorCore.tileHeight;
-            this.flagPole.position.z = -d * 0.5;
+            this.flagPole.position.z = -(1.5 * MarbleRunSimulatorCore.tileSize - 0.004);
             Mummu.RotateInPlace(this.flagPole.position, BABYLON.Axis.Y, Math.PI / 8);
             this.flag = new BABYLON.Mesh("flag");
             if (MarbleRunSimulatorCore.MainMaterials.UseOutlineMeshes) {
