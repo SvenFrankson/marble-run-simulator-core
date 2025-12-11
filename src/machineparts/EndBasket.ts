@@ -93,7 +93,8 @@ namespace MarbleRunSimulatorCore {
         protected async instantiateMachineSpecific(): Promise<void> {
             this.base.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
             this.flagPole.material = this.game.materials.getMaterial(18, this.machine.materialQ);
-            this.flag.material = this.game.materials.getMaterial(7, this.machine.materialQ);
+            //this.flag.material = this.game.materials.getMaterial(7, this.machine.materialQ);
+            this.flag.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
             //this.flagKnob.material = this.game.materials.getMaterial(this.getColor(0), this.machine.materialQ);
         }
 
