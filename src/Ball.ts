@@ -1004,7 +1004,7 @@ namespace MarbleRunSimulatorCore {
                             this.rotationAxis.normalize();
                         }
                         else {
-                            this.rotationAxis.copyFromFloats(1, 0, 0);
+                            this.rotationAxis.copyFromFloats(0, 0, 1);
                         }
                     }
                 }
@@ -1020,7 +1020,12 @@ namespace MarbleRunSimulatorCore {
                 }
             }
             this.lastPosition.copyFrom(this.position);
-            this.rotationSpeed = this.visibleVelocity.length() / (2 * Math.PI * this.radius);
+            if (this.surface === Surface.None) {
+                this.rotationSpeed *= 0.95;
+            }
+            else {
+                this.rotationSpeed = this.rotationSpeed * 0.5 + this.visibleVelocity.length() / (2 * Math.PI * this.radius) * 0.5;
+            }
 
             let axis = this.rotationAxis;
             let angle = this.rotationSpeed * 2 * Math.PI * dt
