@@ -598,7 +598,7 @@ namespace MarbleRunSimulatorCore {
             plasticBlack.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             plasticBlack.emissiveColor.copyFromFloats(0.1, 0.1, 0.1);
 
-            this._materialsPBR.push(plasticBlack);
+            this._materialsPBR.push(this._makePlasticPBR("black-plastic-pbr", BABYLON.Color3.FromHexString("#282a33"), envTexture));
             this._materialsSTD.push(plasticBlack);
 
             /*#e6261f,#eb7532,#f7d038,#a3e048,#49da9a,#34bbe6,#4355db,#d23be7*/
