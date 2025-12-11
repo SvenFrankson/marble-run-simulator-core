@@ -139,12 +139,8 @@ namespace MarbleRunSimulatorCore {
                     await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex === 13) {
-                    let groundColor = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
-                    let wallColor = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
-                    console.log("ground " + groundColor.toHexString());
-                    console.log("wall " + wallColor.toHexString());
-                    groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
-                    wallColor = BABYLON.Color4.FromHexString("#4fb0c4ff");
+                    let groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
+                    let wallColor = BABYLON.Color4.FromHexString("#4fb0c4ff");
                     await this.instantiateSimple(groundColor, wallColor, 5);
                     //await this.instantiateBBPuzzle("./lib/marble-run-simulator-core/datas/skyboxes/sky-2.jpeg");
                 }

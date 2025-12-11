@@ -582,6 +582,9 @@ namespace MarbleRunSimulatorCore {
                                 let col: Mummu.IIntersection;
                                 col = Mummu.SphereColliderIntersection(this.position, this.radius, collider.baseCollider);
                                 if (col.hit) {
+                                    if (collider.onImpact) {
+                                        collider.onImpact(col);
+                                    }
                                     //this.setLastHit(wire, col.index);
                                     let colDig = col.normal.scale(-1);
                                     // Move away from collision

@@ -514,6 +514,9 @@ var MarbleRunSimulatorCore;
                                 let col;
                                 col = Mummu.SphereColliderIntersection(this.position, this.radius, collider.baseCollider);
                                 if (col.hit) {
+                                    if (collider.onImpact) {
+                                        collider.onImpact(col);
+                                    }
                                     //this.setLastHit(wire, col.index);
                                     let colDig = col.normal.scale(-1);
                                     // Move away from collision
@@ -3444,6 +3447,7 @@ var MarbleRunSimulatorCore;
             this.baseCollider = baseCollider;
             this.bouncyness = 0.5;
             this.randomness = 0;
+            this.onImpact = (hit) => { };
             this.getSurface = () => {
                 return MarbleRunSimulatorCore.Surface.Rail;
             };
@@ -17247,12 +17251,8 @@ var MarbleRunSimulatorCore;
                     await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex === 13) {
-                    let groundColor = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
-                    let wallColor = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
-                    console.log("ground " + groundColor.toHexString());
-                    console.log("wall " + wallColor.toHexString());
-                    groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
-                    wallColor = BABYLON.Color4.FromHexString("#4fb0c4ff");
+                    let groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
+                    let wallColor = BABYLON.Color4.FromHexString("#4fb0c4ff");
                     await this.instantiateSimple(groundColor, wallColor, 5);
                     //await this.instantiateBBPuzzle("./lib/marble-run-simulator-core/datas/skyboxes/sky-2.jpeg");
                 }

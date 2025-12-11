@@ -522,6 +522,7 @@ declare namespace MarbleRunSimulatorCore {
         baseCollider: Mummu.Collider;
         bouncyness: number;
         randomness: number;
+        onImpact: (hit: Mummu.IIntersection) => void;
         constructor(baseCollider: Mummu.Collider);
         getSurface: () => Surface;
     }
