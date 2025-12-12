@@ -639,6 +639,9 @@ namespace MarbleRunSimulatorCore {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     data = Bumper.GenerateTemplate(l);
                 }
+                else if (partName === "star") {
+                    data = Star.GenerateTemplate();
+                }
                 datas[mirrorIndex] = data;
             }
 
@@ -824,6 +827,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "bumper") {
                 partName = Bumper.PropToPartName(prop);
+            }
+            else if (baseName === "star") {
+                partName = Star.PropToPartName(prop);
             }
 
             if (partName) {

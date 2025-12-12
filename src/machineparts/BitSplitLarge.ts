@@ -3,6 +3,8 @@ namespace MarbleRunSimulatorCore {
         private _animatePivot = Mummu.AnimationFactory.EmptyNumberCallback;
 
         public pivot: BABYLON.Mesh;
+        public stepLeft: BABYLON.Mesh;
+        public stepRight: BABYLON.Mesh;
 
         public axisZMin: number = 0;
         public axisZMax: number = 1;
@@ -26,6 +28,18 @@ namespace MarbleRunSimulatorCore {
             }
             this.pivot.position.copyFromFloats(tileSize * 0.5, tileHeight * 0.5, 0);
             this.pivot.parent = this;
+
+            //this.stepLeft = BABYLON.MeshBuilder.CreateBox("stepLeft", { width: 0.006, height: 0.006, depth: tileSize });
+            this.stepLeft = new BABYLON.Mesh("step-left");
+            this.stepLeft.position.x = - tileSize * 0.5 + 0.005;
+            this.stepLeft.position.y = tileHeight * 1.5 - 0.008;
+            this.stepLeft.parent = this;
+            
+            //this.stepRight = BABYLON.MeshBuilder.CreateBox("stepRight", { width: 0.006, height: 0.006, depth: tileSize });
+            this.stepRight = new BABYLON.Mesh("step-right");
+            this.stepRight.position.x = tileSize * 1.5 - 0.005;
+            this.stepRight.position.y = tileHeight * 1.5 - 0.008;
+            this.stepRight.parent = this;
 
             let dx = LargeBitSplit.boxRadius - 0.003;
             let dz = this.wireGauge * 0.5;
@@ -125,6 +139,18 @@ namespace MarbleRunSimulatorCore {
 
             this.wires = [wireLeftP, wireLeftM, wireRightP, wireRightM, wireBottomP, wireBottomM, wireHorizontal0, wireHorizontal1, wireVertical0, wireVertical1];
 
+            let stepLeftCollider = new Mummu.BoxCollider(this.stepLeft._worldMatrix);
+            stepLeftCollider.width = 0.006;
+            stepLeftCollider.height = 0.006;
+            stepLeftCollider.depth = tileSize;
+
+            let stepRightCollider = new Mummu.BoxCollider(this.stepLeft._worldMatrix);
+            stepRightCollider.width = 0.006;
+            stepRightCollider.height = 0.006;
+            stepRightCollider.depth = tileSize;
+
+            this.colliders = [new MachineCollider(stepLeftCollider), new MachineCollider(stepRightCollider)];
+
             this.generateWires();
 
             this.localAABBBaseMin.x = - 0.5 * tileSize;
@@ -212,9 +238,9 @@ namespace MarbleRunSimulatorCore {
         }
 
         public reset = () => {
-            this._exitLeft = !this.mirrorX;
             this._moving = false;
-            this.pivot.rotation.z = (this.mirrorX ? - 1 : 1) * Math.PI / 4;
+            this._exitLeft = !this.mirrorX;
+            this._animatePivot((this.mirrorX ? - 1 : 1) * Math.PI / 4, 0);
             this.pivot.freezeWorldMatrix();
             this.pivot.getChildMeshes().forEach((child) => {
                 child.freezeWorldMatrix();
@@ -236,8 +262,8 @@ namespace MarbleRunSimulatorCore {
                     let ball = this.machine.balls[i];
                     if (BABYLON.Vector3.Distance(ball.position, this.pivot.absolutePosition) < 0.02) {
                         let local = BABYLON.Vector3.TransformCoordinates(ball.position, this.pivot.getWorldMatrix().clone().invert());
-                        if (local.y < ball.radius * 0.9 && Math.abs(local.z) < 0.001) {
-                            if (this._exitLeft && local.x > ball.radius * 0.5 && local.x < BitSplit.pivotL) {
+                        if (local.y < ball.radius * 1.2 && Math.abs(local.z) < 0.002) {
+                            if (this._exitLeft && local.x > ball.radius * 0.5 && local.x < 1.5 * ball.radius) {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(-Math.PI / 4, 0.6 / this.game.currentTimeFactor).then(() => {
@@ -251,7 +277,7 @@ namespace MarbleRunSimulatorCore {
                                     });
                                 }, 150 / this.game.currentTimeFactor)
                                 return;
-                            } else if (!this._exitLeft && local.x > -BitSplit.pivotL && local.x < -ball.radius * 0.5) {
+                            } else if (!this._exitLeft && local.x > - 1.5 * ball.radius && local.x < -ball.radius * 0.5) {
                                 this._moving = true;
                                 setTimeout(() => {
                                     this._animatePivot(Math.PI / 4, 0.6 / this.game.currentTimeFactor).then(() => {

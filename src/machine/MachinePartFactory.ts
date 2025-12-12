@@ -57,7 +57,8 @@ namespace MarbleRunSimulatorCore {
         "bumper",
         "endbasket",
         "box",
-        "largesplit"
+        "largesplit",
+        "star",
     ];
 
     export interface IMachinePartProp {
@@ -567,6 +568,9 @@ namespace MarbleRunSimulatorCore {
                 }
                 return new Bumper(this.machine, prop);
             }
+            if (partName === "star") {
+                return new Star(this.machine, prop);
+            }
         }
 
         public createTrackBaseName(baseName: string, prop: IMachinePartProp): MachinePart {
@@ -751,6 +755,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "bumper") {
                 return new Bumper(this.machine, prop);
+            }
+            if (baseName === "star") {
+                return new Star(this.machine, prop);
             }
         }
     }
