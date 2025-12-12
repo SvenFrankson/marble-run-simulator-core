@@ -224,6 +224,8 @@ namespace MarbleRunSimulatorCore {
         public onPositionChanged(): void {
             this.reset();
         }
+
+        public onClic = () => {};
  
         private _exitLeft: boolean = true;
         private _moving: boolean = false;
@@ -240,7 +242,10 @@ namespace MarbleRunSimulatorCore {
                                 setTimeout(() => {
                                     this._animatePivot(-Math.PI / 4, 0.6 / this.game.currentTimeFactor).then(() => {
                                         this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
-                                        this.clicSound.play()
+                                        this.clicSound.play();
+                                        if (this.onClic) {
+                                            this.onClic();
+                                        }
                                         this._moving = false;
                                         this._exitLeft = false;
                                     });
@@ -252,6 +257,9 @@ namespace MarbleRunSimulatorCore {
                                     this._animatePivot(Math.PI / 4, 0.6 / this.game.currentTimeFactor).then(() => {
                                         this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
+                                        if (this.onClic) {
+                                            this.onClic();
+                                        }
                                         this._moving = false;
                                         this._exitLeft = true;
                                     });

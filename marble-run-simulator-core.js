@@ -10302,6 +10302,7 @@ var MarbleRunSimulatorCore;
                     child.freezeWorldMatrix();
                 });
             };
+            this.onClic = () => { };
             this._exitLeft = true;
             this._moving = false;
             this.setColorCount(3);
@@ -10475,6 +10476,9 @@ var MarbleRunSimulatorCore;
                                     this._animatePivot(-Math.PI / 4, 0.6 / this.game.currentTimeFactor).then(() => {
                                         this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
+                                        if (this.onClic) {
+                                            this.onClic();
+                                        }
                                         this._moving = false;
                                         this._exitLeft = false;
                                     });
@@ -10487,6 +10491,9 @@ var MarbleRunSimulatorCore;
                                     this._animatePivot(Math.PI / 4, 0.6 / this.game.currentTimeFactor).then(() => {
                                         this.clicSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.clicSound.play();
+                                        if (this.onClic) {
+                                            this.onClic();
+                                        }
                                         this._moving = false;
                                         this._exitLeft = true;
                                     });

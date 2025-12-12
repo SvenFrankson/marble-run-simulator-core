@@ -1162,6 +1162,7 @@ declare namespace MarbleRunSimulatorCore {
         dispose(): void;
         reset: () => void;
         onPositionChanged(): void;
+        onClic: () => void;
         private _exitLeft;
         private _moving;
         update(dt: number): void;
