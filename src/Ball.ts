@@ -109,6 +109,8 @@ namespace MarbleRunSimulatorCore {
             this.material = this.game.materials.getBallMaterial(this.materialIndex, this.machine.materialQ);
         }
         
+        public onBallImpact: (other: Ball) => void;
+        public onColliderImpact: (hit: Mummu.IIntersection, collider: MachineCollider) => void;
 
         public rotationSpeed: number = 0;
         public rotationAxis: BABYLON.Vector3 = BABYLON.Vector3.Right();
@@ -163,6 +165,10 @@ namespace MarbleRunSimulatorCore {
         public marbleBowlLoopSound: BABYLON.Sound;
         public marblePlexiglasTubeLoopSound: BABYLON.Sound;
         public marbleInsideSound: BABYLON.Sound;
+
+        private _soundWorldPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public onMarbleChocSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
+        public onRailBumpSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
 
         public flybackOrigin: BABYLON.Vector3;
         public flybackDestination: BABYLON.Vector3;
@@ -522,6 +528,7 @@ namespace MarbleRunSimulatorCore {
                                     reactionsCount++;
     
                                     this.surface = Surface.Rail;
+                                    this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
 
                                     if (wire.doubleContactPoints) {
                                         col = Mummu.SphereWireIntersection(this.position, this.radius, wire.absolutePath, wire.size * 0.8, true, index, range, col.point, part.wireGauge * 0.9);
@@ -542,6 +549,7 @@ namespace MarbleRunSimulatorCore {
                                             reactionsCount++;
             
                                             this.surface = Surface.Rail;
+                                            this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                         }
                                     }
                                 }
@@ -574,6 +582,7 @@ namespace MarbleRunSimulatorCore {
                                             reactionsCount++;
             
                                             this.surface = Surface.Plexiglas;
+                                            this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                         }
                                     }
                                 }
@@ -584,6 +593,9 @@ namespace MarbleRunSimulatorCore {
                                 if (col.hit) {
                                     if (collider.onImpact) {
                                         collider.onImpact(col);
+                                    }
+                                    if (this.onColliderImpact) {
+                                        this.onColliderImpact(col, collider);
                                     }
                                     //this.setLastHit(wire, col.index);
                                     let colDig = col.normal.scale(-1);
@@ -600,7 +612,8 @@ namespace MarbleRunSimulatorCore {
                                     reactionsCount++;
     
                                     this.surface = collider.getSurface();
-
+                                    this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
+                                    this.bumpSurfaceIsRail = false;
                                     let v = Math.abs(BABYLON.Vector3.Dot(this.velocity, col.normal));
                                     if (v > 0.15) {
                                         if (!this.marbleChocSound.isPlaying) {
@@ -615,6 +628,9 @@ namespace MarbleRunSimulatorCore {
                                                 this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor * 0.65);
                                             }
                                             this.marbleChocSound.play();
+                                            if (this.onMarbleChocSoundPlay) {
+                                                this.onMarbleChocSoundPlay(this.marbleChocSound.getVolume(), col.point);
+                                            }
                                         }
                                     }
                                 }
@@ -646,6 +662,7 @@ namespace MarbleRunSimulatorCore {
     
                                     this.surface = Surface.Bowl;
                                     this.bumpSurfaceIsRail = false;
+                                    this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                 }
                             }
                             if (part instanceof DropBack || part instanceof DropSide) {
@@ -683,6 +700,7 @@ namespace MarbleRunSimulatorCore {
                                         }
     
                                         this.bumpSurfaceIsRail = false;
+                                        this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                     }
                                 });
                             }
@@ -703,6 +721,7 @@ namespace MarbleRunSimulatorCore {
                                     reactions.addInPlace(reaction);
                                     reactionsCount++;
                                     this.bumpSurfaceIsRail = false;
+                                    this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                 }
                             }
                             if (part instanceof Shooter) {
@@ -722,6 +741,7 @@ namespace MarbleRunSimulatorCore {
                                     reactions.addInPlace(reaction);
                                     reactionsCount++;
                                     this.bumpSurfaceIsRail = false;
+                                    this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                 }
                             }
                             if (part instanceof Controler_Legacy) {
@@ -770,6 +790,7 @@ namespace MarbleRunSimulatorCore {
                                         let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
                                         reactions.addInPlace(reaction);
                                         reactionsCount++;
+                                        this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                     }
                                 }
                             }
@@ -825,6 +846,7 @@ namespace MarbleRunSimulatorCore {
                             let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
                             reactions.addInPlace(reaction);
                             reactionsCount++;
+                            this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                         }
                     }
                 }
@@ -903,6 +925,7 @@ namespace MarbleRunSimulatorCore {
                                 reactionsCount++;
             
                                 this.surface = Surface.Velvet;
+                                this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                 this.bumpSurfaceIsRail = true;
                                 if (this.machine.hasExitHole) {
                                     weight.copyFromFloats(- 0.01, -1, -0.01).normalize().scaleInPlace(9 * m);
@@ -920,6 +943,9 @@ namespace MarbleRunSimulatorCore {
                         if (ball != this && ball.collisionState === this.collisionState && !ball.frozen) {
                             let dist = BABYLON.Vector3.Distance(this.position, ball.position);
                             if (dist < this.size) {
+                                if (this.onBallImpact) {
+                                    this.onBallImpact(ball);
+                                }
                                 let depth = this.size - dist;
                                 //this.velocity.scaleInPlace(0.3);
                                 let otherSpeed = ball.velocity.clone();
@@ -931,6 +957,9 @@ namespace MarbleRunSimulatorCore {
                                         this.marbleChocSound.setVolume(((v - 0.15) / 0.85));
                                         this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                                         this.marbleChocSound.play();
+                                        if (this.onMarbleChocSoundPlay) {
+                                            this.onMarbleChocSoundPlay(this.marbleChocSound.getVolume(), BABYLON.Vector3.Lerp(this.position, ball.position, 0.3));
+                                        }
                                     }
                                 }
     
@@ -961,14 +990,22 @@ namespace MarbleRunSimulatorCore {
                                 this.railBumpSound.setVolume(v);
                                 this.railBumpSound.setPlaybackRate(this.game.currentTimeFactor);
                                 this.railBumpSound.play();
+                                if (this.onRailBumpSoundPlay) {
+                                    this.onRailBumpSoundPlay(this.railBumpSound.getVolume(), this._soundWorldPosition);
+                                }
                             }
                         }
                         else {
+                            /*
                             if (!this.marbleChocSound.isPlaying) {
                                 this.marbleChocSound.setVolume(v * 4);
                                 this.marbleChocSound.setPlaybackRate(this.game.currentTimeFactor);
                                 this.marbleChocSound.play();
+                                if (this.onMarbleChocSoundPlay) {
+                                    this.onMarbleChocSoundPlay(this.marbleChocSound.getVolume());
+                                }
                             }
+                            */
                         }
                     }
                     this.strReaction = this.strReaction * 0.2;

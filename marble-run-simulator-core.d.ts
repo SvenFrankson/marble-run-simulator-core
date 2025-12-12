@@ -53,6 +53,8 @@ declare namespace MarbleRunSimulatorCore {
         set boosting(v: boolean);
         useBoostingMaterial(): void;
         unuseBoostingMaterial(): void;
+        onBallImpact: (other: Ball) => void;
+        onColliderImpact: (hit: Mummu.IIntersection, collider: MachineCollider) => void;
         rotationSpeed: number;
         rotationAxis: BABYLON.Vector3;
         surface: Surface;
@@ -73,6 +75,9 @@ declare namespace MarbleRunSimulatorCore {
         marbleBowlLoopSound: BABYLON.Sound;
         marblePlexiglasTubeLoopSound: BABYLON.Sound;
         marbleInsideSound: BABYLON.Sound;
+        private _soundWorldPosition;
+        onMarbleChocSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
+        onRailBumpSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
         flybackOrigin: BABYLON.Vector3;
         flybackDestination: BABYLON.Vector3;
         flybackPeak: BABYLON.Vector3;
