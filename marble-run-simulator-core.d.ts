@@ -1160,6 +1160,7 @@ declare namespace MarbleRunSimulatorCore {
         static PropToPartName(prop: IMachinePartProp): string;
         protected instantiateMachineSpecific(): Promise<void>;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
+        recomputeAbsolutePath(): void;
         static GenerateTemplate(mirror: boolean): MachinePartTemplate;
         dispose(): void;
         reset: () => void;

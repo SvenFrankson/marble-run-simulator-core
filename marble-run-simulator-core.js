@@ -10328,15 +10328,17 @@ var MarbleRunSimulatorCore;
             }
             this.pivot.position.copyFromFloats(MarbleRunSimulatorCore.tileSize * 0.5, MarbleRunSimulatorCore.tileHeight * 0.5, 0);
             this.pivot.parent = this;
-            //this.stepLeft = BABYLON.MeshBuilder.CreateBox("stepLeft", { width: 0.006, height: 0.006, depth: tileSize });
             this.stepLeft = new BABYLON.Mesh("step-left");
+            //this.stepLeft = BABYLON.MeshBuilder.CreateBox("stepLeft", { width: 0.006, height: 0.006, depth: tileSize });
             this.stepLeft.position.x = -MarbleRunSimulatorCore.tileSize * 0.5 + 0.005;
             this.stepLeft.position.y = MarbleRunSimulatorCore.tileHeight * 1.5 - 0.008;
+            this.stepLeft.rotation.z = Math.PI / 4;
             this.stepLeft.parent = this;
-            //this.stepRight = BABYLON.MeshBuilder.CreateBox("stepRight", { width: 0.006, height: 0.006, depth: tileSize });
             this.stepRight = new BABYLON.Mesh("step-right");
+            //this.stepRight = BABYLON.MeshBuilder.CreateBox("stepRight", { width: 0.006, height: 0.006, depth: tileSize });
             this.stepRight.position.x = MarbleRunSimulatorCore.tileSize * 1.5 - 0.005;
             this.stepRight.position.y = MarbleRunSimulatorCore.tileHeight * 1.5 - 0.008;
+            this.stepRight.rotation.z = Math.PI / 4;
             this.stepRight.parent = this;
             let dx = LargeBitSplit.boxRadius - 0.003;
             let dz = this.wireGauge * 0.5;
@@ -10477,6 +10479,17 @@ var MarbleRunSimulatorCore;
             let bodySelector = BABYLON.CreateBoxVertexData({ width: LargeBitSplit.boxRadius * 2, height: LargeBitSplit.boxRadius * 2, depth: MarbleRunSimulatorCore.tileSize });
             Mummu.TranslateVertexDataInPlace(bodySelector, this.pivot.position);
             selectorMeshLogicVertexDatas.push(bodySelector);
+        }
+        recomputeAbsolutePath() {
+            let leftCollider = this.colliders[0];
+            if (leftCollider.baseCollider instanceof Mummu.BoxCollider) {
+                leftCollider.baseCollider.worldMatrix = this.stepLeft._worldMatrix;
+            }
+            let rightCollider = this.colliders[1];
+            if (rightCollider.baseCollider instanceof Mummu.BoxCollider) {
+                rightCollider.baseCollider.worldMatrix = this.stepRight._worldMatrix;
+            }
+            super.recomputeAbsolutePath();
         }
         static GenerateTemplate(mirror) {
             let template = new MarbleRunSimulatorCore.MachinePartTemplate();
