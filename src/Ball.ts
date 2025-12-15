@@ -51,7 +51,7 @@ namespace MarbleRunSimulatorCore {
         public currentTrajectory: BABYLON.Vector3[] = [];
         public lastTrajectory: BABYLON.Vector3[] = [];
         private _trailMeshOffset: number = 0;
-        private _showTrailMesh: boolean = true;
+        private _showTrailMesh: boolean = false;
         public get showTrailMesh(): boolean {
             return this._showTrailMesh;
         }
