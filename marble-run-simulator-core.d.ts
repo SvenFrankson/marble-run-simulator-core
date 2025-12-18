@@ -1194,6 +1194,7 @@ declare namespace MarbleRunSimulatorCore {
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;
         isPointOnBoard(pt: BABYLON.Vector3): boolean;
+        clampPointOnBoard(pt: BABYLON.Vector3, radius: number): BABYLON.Vector3;
         addLine(points: BABYLON.Vector3[]): void;
         addRawLine(points: BABYLON.Vector3[]): void;
         removeLastLine(): void;

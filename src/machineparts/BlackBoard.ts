@@ -475,6 +475,34 @@ namespace MarbleRunSimulatorCore {
             return false;
         }
 
+        public clampPointOnBoard(pt: BABYLON.Vector3, radius: number): BABYLON.Vector3 {
+            let best: BABYLON.Vector3;
+            let bestDist = Infinity;
+
+            for (let i = 0; i < this.boardColliders.length; i++) {
+                let board = this.boards[i];
+                if (board) {
+                    let boardCollider = this.boardColliders[i];
+                    if (boardCollider.baseCollider instanceof Mummu.BoxCollider) {
+                        let hW = boardCollider.baseCollider.width * 0.5;
+                        let hH = boardCollider.baseCollider.height * 0.5;
+
+                        let currPt = pt.clone();
+                        currPt.x = Nabu.MinMax(currPt.x, board.position.x - hW + radius, board.position.x + hW - radius);
+                        currPt.y = Nabu.MinMax(currPt.y, board.position.y - hH + radius, board.position.y + hH - radius);
+
+                        let dist = BABYLON.Vector3.DistanceSquared(currPt, pt);
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            best = currPt;
+                        }
+                    }
+                }
+            }
+
+            return best;
+        }
+
         public addLine(points: BABYLON.Vector3[]): void {
             this.lines.push(points);
         }

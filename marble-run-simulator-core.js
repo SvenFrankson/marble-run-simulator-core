@@ -38,7 +38,7 @@ var MarbleRunSimulatorCore;
             this.currentTrajectory = [];
             this.lastTrajectory = [];
             this._trailMeshOffset = 0;
-            this._showTrailMesh = true;
+            this._showTrailMesh = false;
             this.trail = [];
             this._hasBoostMaterial = false;
             this._boostColor = new BABYLON.Color3(0.9, 0.1, 0.3);
@@ -1419,7 +1419,7 @@ var MarbleRunSimulatorCore;
             this.baseAxisMaterial.useAlphaFromDiffuseTexture = true;
             this.baseAxisMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             this.whiteMaterial = new BABYLON.StandardMaterial("white-material");
-            this.whiteMaterial.diffuseColor.copyFromFloats(0.9, 0.95, 1).scaleInPlace(0.9);
+            this.whiteMaterial.diffuseColor.copyFromFloats(1, 1, 1);
             this.whiteMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
             this.paintingLight = new BABYLON.StandardMaterial("autolit-material");
             this.paintingLight.diffuseColor.copyFromFloats(1, 1, 1);
@@ -1428,7 +1428,7 @@ var MarbleRunSimulatorCore;
             this.wallShadow = new BABYLON.StandardMaterial("autolit-material");
             this.wallShadow.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
             this.wallShadow.specularColor.copyFromFloats(0.1, 0.1, 0.1);
-            this.wallShadow.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
+            this.wallShadow.emissiveColor.copyFromFloats(0.5, 0.5, 0.5);
             this.slice9Cutoff = new BABYLON.StandardMaterial("9-slice-cutoff-material");
             this.slice9Cutoff.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/9-slice-rounded.png");
             this.slice9Cutoff.diffuseTexture.hasAlpha = true;
@@ -10961,6 +10961,29 @@ var MarbleRunSimulatorCore;
             }
             return false;
         }
+        clampPointOnBoard(pt, radius) {
+            let best;
+            let bestDist = Infinity;
+            for (let i = 0; i < this.boardColliders.length; i++) {
+                let board = this.boards[i];
+                if (board) {
+                    let boardCollider = this.boardColliders[i];
+                    if (boardCollider.baseCollider instanceof Mummu.BoxCollider) {
+                        let hW = boardCollider.baseCollider.width * 0.5;
+                        let hH = boardCollider.baseCollider.height * 0.5;
+                        let currPt = pt.clone();
+                        currPt.x = Nabu.MinMax(currPt.x, board.position.x - hW + radius, board.position.x + hW - radius);
+                        currPt.y = Nabu.MinMax(currPt.y, board.position.y - hH + radius, board.position.y + hH - radius);
+                        let dist = BABYLON.Vector3.DistanceSquared(currPt, pt);
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            best = currPt;
+                        }
+                    }
+                }
+            }
+            return best;
+        }
         addLine(points) {
             this.lines.push(points);
         }
@@ -17402,10 +17425,23 @@ var MarbleRunSimulatorCore;
                     await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex === 13) {
+                    /*
                     let groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
                     let wallColor = BABYLON.Color4.FromHexString("#4fb0c4ff");
+                    wallColor = BABYLON.Color4.FromHexString("#ffffffff");
                     await this.instantiateSimple(groundColor, wallColor, 5);
+                    */
                     //await this.instantiateBBPuzzle("./lib/marble-run-simulator-core/datas/skyboxes/sky-2.jpeg");
+                    this.decors.forEach(decor => {
+                        decor.dispose();
+                    });
+                    this.decors = [];
+                    this.skybox.isVisible = false;
+                    this.wall.isVisible = false;
+                    this.ground.isVisible = false;
+                    this.frame.isVisible = false;
+                    this.ceiling.isVisible = false;
+                    this.isBlurred = false;
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();

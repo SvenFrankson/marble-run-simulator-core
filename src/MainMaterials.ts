@@ -292,7 +292,7 @@ namespace MarbleRunSimulatorCore {
             this.baseAxisMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
 
             this.whiteMaterial = new BABYLON.StandardMaterial("white-material");
-            this.whiteMaterial.diffuseColor.copyFromFloats(0.9, 0.95, 1).scaleInPlace(0.9);
+            this.whiteMaterial.diffuseColor.copyFromFloats(1, 1, 1);
             this.whiteMaterial.specularColor.copyFromFloats(0.1, 0.1, 0.1);
 
             this.paintingLight = new BABYLON.StandardMaterial("autolit-material");
@@ -303,7 +303,7 @@ namespace MarbleRunSimulatorCore {
             this.wallShadow = new BABYLON.StandardMaterial("autolit-material");
             this.wallShadow.ambientTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/wall-shadow.png");
             this.wallShadow.specularColor.copyFromFloats(0.1, 0.1, 0.1);
-            this.wallShadow.emissiveColor.copyFromFloats(0.2, 0.2, 0.2);
+            this.wallShadow.emissiveColor.copyFromFloats(0.5, 0.5, 0.5);
 
             this.slice9Cutoff = new BABYLON.StandardMaterial("9-slice-cutoff-material");
             this.slice9Cutoff.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/9-slice-rounded.png");
