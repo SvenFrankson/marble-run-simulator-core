@@ -53,6 +53,7 @@ var MarbleRunSimulatorCore;
             this.animatePosition = Mummu.AnimationFactory.EmptyVector3Callback;
             this._selected = false;
             this._hovered = false;
+            this._flashing = 0;
             this.memCount = 2;
             this._lastWires = [];
             this._lastWireIndexes = [];
@@ -238,6 +239,38 @@ var MarbleRunSimulatorCore;
                     }
                 }
             }
+        }
+        flash() {
+            this._flashing = 1;
+            let step = () => {
+                if (this.isDisposed()) {
+                    return;
+                }
+                if (this._flashing === 0) {
+                    this.outlineColor.copyFromFloats(0, 0, 0);
+                }
+                else {
+                    if (this._flashing <= 6) {
+                        if (this._flashing % 2 === 1) {
+                            this.outlineColor.copyFromFloats(1, 1, 1);
+                            this._flashing++;
+                        }
+                        else if (this._flashing % 2 === 0) {
+                            this.outlineColor.copyFromFloats(0, 0, 0);
+                            this._flashing++;
+                        }
+                        setTimeout(step, 150);
+                    }
+                    else {
+                        this._flashing = 1;
+                        setTimeout(step, 700);
+                    }
+                }
+            };
+            step();
+        }
+        stopFlash() {
+            this._flashing = 0;
         }
         setIsVisible(isVisible) {
             if (this.frozen) {
@@ -2021,7 +2054,7 @@ var MarbleRunSimulatorCore;
         }
         recomputeAbsolutePath() {
             this.computeWorldMatrix(true);
-            this.absolutePath = [];
+            this.absolutePath.splice(this.path.length);
             for (let i = 0; i < this.path.length; i++) {
                 if (!this.absolutePath[i]) {
                     this.absolutePath[i] = BABYLON.Vector3.Zero();
@@ -3882,6 +3915,7 @@ var MarbleRunSimulatorCore;
             this._selected = false;
             this._multiSelected = false;
             this._hovered = false;
+            this._flashing = 0;
             this._alignShadow = () => {
                 if (this._selected && this.machine.constructionMode === MarbleRunSimulatorCore.MachineConstructionMode.Mode3D) {
                     this.gridRectMesh.position.x = this.position.x;
@@ -4450,6 +4484,39 @@ var MarbleRunSimulatorCore;
         anhover() {
             this._hovered = false;
             this.updateSelectorMeshVisibility();
+        }
+        flash() {
+            this._flashing = 1;
+            let step = () => {
+                if (this.isDisposed()) {
+                    return;
+                }
+                if (this._flashing === 0) {
+                    this.outlineColor.copyFromFloats(0, 0, 0);
+                    this.setOutlineParams(true, 0.001, new BABYLON.Color3(0, 0, 0));
+                }
+                else {
+                    if (this._flashing <= 6) {
+                        if (this._flashing % 2 === 1) {
+                            this.setOutlineParams(true, 0.001, new BABYLON.Color3(1, 1, 1));
+                            this._flashing++;
+                        }
+                        else if (this._flashing % 2 === 0) {
+                            this.setOutlineParams(true, 0.001, new BABYLON.Color3(0, 0, 0));
+                            this._flashing++;
+                        }
+                        setTimeout(step, 150);
+                    }
+                    else {
+                        this._flashing = 1;
+                        setTimeout(step, 700);
+                    }
+                }
+            };
+            step();
+        }
+        stopFlash() {
+            this._flashing = 0;
         }
         updateSelectorMeshVisibility() {
             if (this.selectorBodyDisplay) {

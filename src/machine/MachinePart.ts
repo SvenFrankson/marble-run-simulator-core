@@ -890,6 +890,43 @@ namespace MarbleRunSimulatorCore {
             this.updateSelectorMeshVisibility();
         }
 
+        private _flashing: number = 0;
+        public flash(): void {
+            this._flashing = 1;
+            let step = () => {
+                if (this.isDisposed()) {
+                    return;
+                }
+
+                if (this._flashing === 0) {
+                    this.outlineColor.copyFromFloats(0, 0, 0);
+                    this.setOutlineParams(true, 0.001, new BABYLON.Color3(0, 0, 0));
+                }
+                else {
+                    if (this._flashing <= 6) {
+                        if (this._flashing % 2 === 1) {
+                            this.setOutlineParams(true, 0.001, new BABYLON.Color3(1, 1, 1));
+                            this._flashing++;
+                        }
+                        else if (this._flashing % 2 === 0) {
+                            this.setOutlineParams(true, 0.001, new BABYLON.Color3(0, 0, 0));
+                            this._flashing++;
+                        }
+                        setTimeout(step, 150);
+                    }
+                    else {
+                        this._flashing = 1;
+                        setTimeout(step, 700);
+                    }
+                }
+            }
+            step();
+        }
+
+        public stopFlash(): void {
+            this._flashing = 0;
+        }
+
         public updateSelectorMeshVisibility(): void {
             if (this.selectorBodyDisplay) {
                 if (this._selected) {

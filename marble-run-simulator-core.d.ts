@@ -92,6 +92,9 @@ declare namespace MarbleRunSimulatorCore {
         hover(): void;
         anhover(): void;
         updateSelectorMeshVisibility(): void;
+        private _flashing;
+        flash(): void;
+        stopFlash(): void;
         setIsVisible(isVisible: boolean): void;
         instantiate(hotReload?: boolean): Promise<void>;
         updateFrozenStatus(): void;
@@ -767,6 +770,9 @@ declare namespace MarbleRunSimulatorCore {
         private _hovered;
         hover(): void;
         anhover(): void;
+        private _flashing;
+        flash(): void;
+        stopFlash(): void;
         updateSelectorMeshVisibility(): void;
         setOutlineParams(renderOutline: boolean, outlineWidth: number, outlineColor: BABYLON.Color3): void;
         private _alignShadow;
