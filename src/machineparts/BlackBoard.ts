@@ -433,8 +433,6 @@ namespace MarbleRunSimulatorCore {
                     let norm = Mummu.Rotate(prevNorm, BABYLON.Axis.Z, angle);
                     avgNorm.addInPlace(norm);
 
-                    //Mummu.DrawDebugLine(rawPoint.add(this.position), rawPoint.add(this.position).add(norm.scale(0.8)), 300, BABYLON.Color3.Red());
-
                     trackTemplate.trackpoints.push(new TrackPoint(trackTemplate, rawPoint, dir, norm));
 
                     prevDir.copyFrom(dir);
@@ -452,6 +450,9 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
+            while (this.tracks.length > 0) {
+                this.tracks.pop().dispose();
+            }
             this.template.initialize();
             this.generateWires();
         }
@@ -525,9 +526,6 @@ namespace MarbleRunSimulatorCore {
                         if (sqrDist > d * d || i === points.length - 1) {
                             filteredPoints.push(pt);
                         }
-                    }
-                    else if (filteredPoints.length > 0) {
-                        break;
                     }
                 }
 

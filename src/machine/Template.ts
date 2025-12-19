@@ -105,6 +105,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.trackpoints[0].summedLength = 0;
+            this.interpolatedPoints = [];
             for (let i = 0; i < this.trackpoints.length - 1; i++) {
                 let trackPoint = this.trackpoints[i];
                 let nextTrackPoint = this.trackpoints[i + 1];

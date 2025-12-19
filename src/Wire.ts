@@ -51,7 +51,7 @@ namespace MarbleRunSimulatorCore {
 
         public recomputeAbsolutePath(): void {
             this.computeWorldMatrix(true);
-            this.absolutePath.splice(this.path.length);
+            this.absolutePath = [];
             for (let i = 0; i < this.path.length; i++) {
                 if (!this.absolutePath[i]) {
                     this.absolutePath[i] = BABYLON.Vector3.Zero();
