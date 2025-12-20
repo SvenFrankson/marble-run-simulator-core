@@ -459,6 +459,7 @@ var MarbleRunSimulatorCore;
                 let reactionsCount = 0;
                 let forcedDisplacement = BABYLON.Vector3.Zero();
                 let canceledSpeed = BABYLON.Vector3.Zero();
+                let canceledSpeedOneContact = BABYLON.Vector3.Zero();
                 this.bumpSurfaceIsRail = true;
                 let collisionableParts;
                 if (this.collisionState === CollisionState.Normal) {
@@ -557,6 +558,7 @@ var MarbleRunSimulatorCore;
                                     if (this.onColliderImpact) {
                                         this.onColliderImpact(col, collider);
                                     }
+                                    Mummu.DrawDebugHit(col.point, col.normal, 5, BABYLON.Color3.Red());
                                     //this.setLastHit(wire, col.index);
                                     let colDig = col.normal.scale(-1);
                                     // Move away from collision
@@ -564,7 +566,7 @@ var MarbleRunSimulatorCore;
                                     // Cancel depth component of speed
                                     let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
                                     if (depthSpeed > 0) {
-                                        canceledSpeed.addInPlace(colDig.scale(depthSpeed * (1 + collider.bouncyness * (1 + collider.randomness * (Math.random() * 2 - 1)))));
+                                        canceledSpeedOneContact.addInPlace(colDig.scale(depthSpeed * (1 + collider.bouncyness * (1 + collider.randomness * (Math.random() * 2 - 1)))));
                                     }
                                     // Add ground reaction
                                     let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
@@ -924,6 +926,7 @@ var MarbleRunSimulatorCore;
                     if (reactionsCount > 0) {
                         reactions.scaleInPlace(1 / reactionsCount);
                         canceledSpeed.scaleInPlace(1 / reactionsCount).scaleInPlace(1);
+                        canceledSpeed.addInPlace(canceledSpeedOneContact);
                         forcedDisplacement.scaleInPlace(1 / reactionsCount).scaleInPlace(1);
                     }
                     let canceledSpeedLength = canceledSpeed.length();
