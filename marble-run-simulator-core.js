@@ -547,6 +547,33 @@ var MarbleRunSimulatorCore;
                                         }
                                     }
                                 }
+                                else if (track instanceof MarbleRunSimulatorCore.DoubleTrack) {
+                                    let index = this.getLastIndex(track);
+                                    let col;
+                                    let f = Nabu.MinMax(this.velocity.lengthSquared(), 0, 1);
+                                    let range = Math.round(f * 8 + (1 - f) * 2);
+                                    col = Mummu.SphereWireIntersection(this.position, this.radius, track.doublePath, 0.001, true, index, range);
+                                    //}
+                                    if (col.hit) {
+                                        this.position.z = track.part.position.z;
+                                        this.velocity.z = 0;
+                                        //this.setLastHit(wire, col.index);
+                                        let colDig = col.normal.scale(-1);
+                                        // Move away from collision
+                                        forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                        // Cancel depth component of speed
+                                        let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                        if (depthSpeed > 0) {
+                                            canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                        }
+                                        // Add ground reaction
+                                        let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                        reactions.addInPlace(reaction);
+                                        reactionsCount++;
+                                        this.surface = Surface.Rail;
+                                        this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
+                                    }
+                                }
                             });
                             part.colliders.forEach((collider) => {
                                 let col;
@@ -558,7 +585,6 @@ var MarbleRunSimulatorCore;
                                     if (this.onColliderImpact) {
                                         this.onColliderImpact(col, collider);
                                     }
-                                    Mummu.DrawDebugHit(col.point, col.normal, 5, BABYLON.Color3.Red());
                                     //this.setLastHit(wire, col.index);
                                     let colDig = col.normal.scale(-1);
                                     // Move away from collision
@@ -2418,12 +2444,22 @@ var MarbleRunSimulatorCore;
     class DoubleTrack extends MarbleRunSimulatorCore.Track {
         constructor(part) {
             super(part);
-            this.wires = [new MarbleRunSimulatorCore.Wire(this.part), new MarbleRunSimulatorCore.Wire(this.part)];
+            this.doublePath = [];
+            this.wires = [];
         }
         dispose() {
-            super.dispose();
             if (this.mesh) {
                 this.mesh.dispose();
+            }
+        }
+        recomputeWiresPath(forceDisconnexion) {
+        }
+        recomputeAbsolutePath() {
+            this.doublePath = [...this.templateInterpolatedPoints].map((p) => {
+                return p.clone();
+            });
+            for (let i = 0; i < this.doublePath.length; i++) {
+                BABYLON.Vector3.TransformCoordinatesToRef(this.doublePath[i], this.part.getWorldMatrix(), this.doublePath[i]);
             }
         }
     }
@@ -2436,152 +2472,24 @@ var MarbleRunSimulatorCore;
             if (track.mesh) {
                 track.mesh.dispose();
             }
-            track.mesh = new BABYLON.Mesh("track-mesh");
+            let shape = [];
+            for (let i = 0; i < 6; i++) {
+                let a = (i / 6) * 2 * Math.PI;
+                let cosa = Math.cos(a);
+                let sina = Math.sin(a);
+                shape[i] = new BABYLON.Vector3(cosa * 0.003, sina * 0.003, 0);
+            }
+            track.mesh = BABYLON.ExtrudeShape("wire", { shape: shape, path: track.templateInterpolatedPoints, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+            let data = BABYLON.VertexData.ExtractFromMesh(track.mesh);
+            Mummu.TranslateVertexDataInPlace(data, new BABYLON.Vector3(0, 0, track.part.wireGauge * 0.5));
+            let data2 = Mummu.CloneVertexData(data);
+            Mummu.TranslateVertexDataInPlace(data2, new BABYLON.Vector3(0, 0, -track.part.wireGauge));
+            Mummu.MergeVertexDatas(data, data2).applyToMesh(track.mesh);
             if (MarbleRunSimulatorCore.MainMaterials.UseOutlineMeshes) {
                 MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(track.mesh);
             }
             track.mesh.parent = track.part;
             track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
-            let y0 = 0.0026;
-            let y1 = 0.0012;
-            let y2 = 0.0004;
-            let x0 = 0.01;
-            let x1 = 0.0066;
-            let x2 = 0.0044;
-            let x3 = 0.0016;
-            let thickLat = 1.3;
-            let thickVert = 1.3;
-            //let b = 0.0005;
-            let points = [...track.templateInterpolatedPoints];
-            let ups = [...track.trackInterpolatedNormals];
-            console.log(ups);
-            Mummu.DecimatePathInPlace(points, (2 / 180) * Math.PI, ups);
-            let p0 = points[0];
-            let p1 = points[1];
-            let dirIn = p1.subtract(p0).normalize();
-            let pN1 = points[points.length - 2];
-            let pN = points[points.length - 1];
-            let dirOut = pN.subtract(pN1).normalize();
-            let shape = [];
-            let shapeCap = [];
-            shape.push(new BABYLON.Vector3(-x0, y0, 0));
-            shape.push(new BABYLON.Vector3(-x0, y0, 0));
-            shape.push(new BABYLON.Vector3(-x1, y0, 0));
-            shape.push(new BABYLON.Vector3(-x1, y0, 0));
-            shape.push(new BABYLON.Vector3(-x2, y1, 0));
-            shape.push(new BABYLON.Vector3(-x3, y2, 0));
-            shape.push(new BABYLON.Vector3(x3, y2, 0));
-            shape.push(new BABYLON.Vector3(x2, y1, 0));
-            shape.push(new BABYLON.Vector3(x1, y0, 0));
-            shape.push(new BABYLON.Vector3(x1, y0, 0));
-            shape.push(new BABYLON.Vector3(x0, y0, 0));
-            shape.push(new BABYLON.Vector3(x0, y0, 0));
-            shape.push(new BABYLON.Vector3(x0, -y0, 0));
-            shape.push(new BABYLON.Vector3(x0, -y0, 0));
-            shape.push(new BABYLON.Vector3(x1, -y0, 0));
-            shape.push(new BABYLON.Vector3(x1, -y0, 0));
-            shape.push(new BABYLON.Vector3(x2, -y1, 0));
-            shape.push(new BABYLON.Vector3(x3, -y2, 0));
-            shape.push(new BABYLON.Vector3(-x3, -y2, 0));
-            shape.push(new BABYLON.Vector3(-x2, -y1, 0));
-            shape.push(new BABYLON.Vector3(-x1, -y0, 0));
-            shape.push(new BABYLON.Vector3(-x1, -y0, 0));
-            shape.push(new BABYLON.Vector3(-x0, -y0, 0));
-            shapeCap.push(new BABYLON.Vector3(-x0, y0, 0));
-            shapeCap.push(new BABYLON.Vector3(-x1, y0, 0));
-            shapeCap.push(new BABYLON.Vector3(-x2, y1, 0));
-            shapeCap.push(new BABYLON.Vector3(-x3, y2, 0));
-            shapeCap.push(new BABYLON.Vector3(x3, y2, 0));
-            shapeCap.push(new BABYLON.Vector3(x2, y1, 0));
-            shapeCap.push(new BABYLON.Vector3(x1, y0, 0));
-            shapeCap.push(new BABYLON.Vector3(x0, y0, 0));
-            shapeCap.push(new BABYLON.Vector3(x0, -y0, 0));
-            shapeCap.push(new BABYLON.Vector3(x1, -y0, 0));
-            shapeCap.push(new BABYLON.Vector3(x2, -y1, 0));
-            shapeCap.push(new BABYLON.Vector3(x3, -y2, 0));
-            shapeCap.push(new BABYLON.Vector3(-x3, -y2, 0));
-            shapeCap.push(new BABYLON.Vector3(-x2, -y1, 0));
-            shapeCap.push(new BABYLON.Vector3(-x1, -y0, 0));
-            shapeCap.push(new BABYLON.Vector3(-x0, -y0, 0));
-            let t = shape.length;
-            let positions = [];
-            let indices = [];
-            let uvs = [];
-            let normals = [];
-            for (let i = 0; i < points.length; i++) {
-                let dir;
-                let prev = points[i - 1];
-                let point = points[i];
-                let next = points[i + 1];
-                if (!prev) {
-                    prev = point;
-                }
-                if (!next) {
-                    next = point;
-                }
-                dir = next.subtract(prev).normalize();
-                let q = Mummu.QuaternionFromZYAxis(dir, ups[i]);
-                let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), q, point);
-                let idx0 = positions.length / 3;
-                for (let n = 0; n <= t; n++) {
-                    let sn = shape[n % shape.length].clone();
-                    let sn1 = shape[(n + 1) % shape.length];
-                    let tri = BABYLON.Vector3.DistanceSquared(sn, sn1) > 0;
-                    let p = BABYLON.Vector3.TransformCoordinates(sn, m);
-                    positions.push(p.x, p.y, p.z);
-                    if (tri) {
-                        if (i < points.length - 1) {
-                            if (n < t) {
-                                indices.push(idx0 + n, idx0 + n + (t + 1) + 1, idx0 + n + (t + 1));
-                                indices.push(idx0 + n, idx0 + n + 1, idx0 + n + (t + 1) + 1);
-                            }
-                        }
-                    }
-                }
-            }
-            let capData = new BABYLON.VertexData();
-            let capPositions = [];
-            let capIndices = [];
-            let capNormals = [];
-            for (let i = 0; i < shapeCap.length; i++) {
-                let p = shapeCap[i];
-                capPositions.push(p.x, p.y, p.z);
-                capNormals.push(0, 0, -1);
-            }
-            capIndices.push(0, 14, 1);
-            capIndices.push(0, 15, 14);
-            capIndices.push(1, 13, 2);
-            capIndices.push(1, 14, 13);
-            capIndices.push(2, 12, 3);
-            capIndices.push(2, 13, 12);
-            capIndices.push(3, 11, 4);
-            capIndices.push(3, 12, 11);
-            capIndices.push(4, 10, 5);
-            capIndices.push(4, 11, 10);
-            capIndices.push(5, 9, 6);
-            capIndices.push(5, 10, 9);
-            capIndices.push(6, 8, 7);
-            capIndices.push(6, 9, 8);
-            capData.positions = capPositions;
-            capData.indices = capIndices;
-            capData.normals = capNormals;
-            let startCapData = Mummu.CloneVertexData(capData);
-            let q = Mummu.QuaternionFromZYAxis(dirIn, BABYLON.Vector3.Up());
-            Mummu.RotateVertexDataInPlace(startCapData, q);
-            Mummu.TranslateVertexDataInPlace(startCapData, p0);
-            let endCapData = Mummu.CloneVertexData(capData);
-            q = Mummu.QuaternionFromZYAxis(dirOut.scale(-1), BABYLON.Vector3.Up());
-            Mummu.RotateVertexDataInPlace(endCapData, q);
-            Mummu.TranslateVertexDataInPlace(endCapData, pN);
-            let doubleData = new BABYLON.VertexData();
-            doubleData.positions = positions;
-            doubleData.indices = indices;
-            BABYLON.VertexData.ComputeNormals(positions, indices, normals);
-            doubleData.normals = normals;
-            if (track.mesh.isDisposed()) {
-                return;
-            }
-            Mummu.MergeVertexDatas(doubleData, startCapData, endCapData).applyToMesh(track.mesh);
         }
     }
     MarbleRunSimulatorCore.DoubleTrackMeshBuilder = DoubleTrackMeshBuilder;
@@ -5013,7 +4921,9 @@ var MarbleRunSimulatorCore;
                     }
                     track.initialize(this.template.trackTemplates[i]);
                     track.refreshStartEndWorldPosition();
-                    this.allWires.push(track.wires[0], track.wires[1]);
+                    if (track.wires[0] && track.wires[1]) {
+                        this.allWires.push(track.wires[0], track.wires[1]);
+                    }
                 }
                 while (this.tracks.length > this.template.trackTemplates.length) {
                     this.tracks.pop().dispose();
@@ -10537,7 +10447,7 @@ var MarbleRunSimulatorCore;
             Mummu.RotateVertexDataInPlace(tmpVertexData, q);
             Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (this.axisZMax + this.axisZMin) * 0.5));
             pivotDatas.push(tmpVertexData);
-            let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
+            let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 1);
             if (arrowData) {
                 arrowData = Mummu.CloneVertexData(arrowData);
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, -0.007, this.axisZMin));
@@ -10974,7 +10884,8 @@ var MarbleRunSimulatorCore;
             for (let n = 0; n < this.lines.length; n++) {
                 let rawLine = this.lines[n];
                 let trackTemplate = new MarbleRunSimulatorCore.TrackTemplate(this.template);
-                //trackTemplate.isDouble = true;
+                trackTemplate.cutOutSleeper = (n) => { return true; };
+                trackTemplate.isDouble = true;
                 let dirStart = rawLine[1].subtract(rawLine[0]).normalize();
                 let prevDir = dirStart.clone();
                 let normStart = Mummu.Rotate(dirStart, BABYLON.Axis.Z, Math.PI * 0.5);
@@ -17495,23 +17406,23 @@ var MarbleRunSimulatorCore;
                     await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex === 13) {
-                    /*
                     let groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
-                    let wallColor = BABYLON.Color4.FromHexString("#4fb0c4ff");
-                    wallColor = BABYLON.Color4.FromHexString("#ffffffff");
+                    let wallColor = BABYLON.Color4.FromHexString("#2d7685ff");
                     await this.instantiateSimple(groundColor, wallColor, 5);
-                    */
                     //await this.instantiateBBPuzzle("./lib/marble-run-simulator-core/datas/skyboxes/sky-2.jpeg");
+                    /*
                     this.decors.forEach(decor => {
                         decor.dispose();
                     });
                     this.decors = [];
+
                     this.skybox.isVisible = false;
                     this.wall.isVisible = false;
                     this.ground.isVisible = false;
                     this.frame.isVisible = false;
                     this.ceiling.isVisible = false;
                     this.isBlurred = false;
+                    */
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();

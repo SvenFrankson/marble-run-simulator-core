@@ -104,8 +104,8 @@ declare namespace MarbleRunSimulatorCore {
         private _lastWires;
         private _lastWireIndexes;
         private _pouet;
-        getLastIndex(wire: Wire): number;
-        setLastHit(wire: Wire, index: number): void;
+        getLastIndex(wire: Wire | DoubleTrack): number;
+        setLastHit(wire: Wire | DoubleTrack, index: number): void;
         debugNextYFlip: () => void;
         averageWithOptim: number;
         averageNoOptim: number;
@@ -316,8 +316,11 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class DoubleTrack extends Track {
         mesh: BABYLON.Mesh;
+        doublePath: BABYLON.Vector3[];
         constructor(part: MachinePart);
         dispose(): void;
+        recomputeWiresPath(forceDisconnexion?: boolean): void;
+        recomputeAbsolutePath(): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {

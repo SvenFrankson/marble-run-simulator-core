@@ -421,10 +421,10 @@ namespace MarbleRunSimulatorCore {
         }
 
         private memCount = 2;
-        private _lastWires: Wire[] = [];
+        private _lastWires: (Wire | DoubleTrack)[] = [];
         private _lastWireIndexes: number[] = [];
         private _pouet: number = 0;
-        public getLastIndex(wire: Wire): number {
+        public getLastIndex(wire: Wire | DoubleTrack): number {
             for (let i = 0; i < this.memCount; i++) {
                 if (this._lastWires[i] === wire) {
                     return this._lastWireIndexes[i];
@@ -432,7 +432,7 @@ namespace MarbleRunSimulatorCore {
             }
             return -1;
         }
-        public setLastHit(wire: Wire, index: number): void {
+        public setLastHit(wire: Wire | DoubleTrack, index: number): void {
             for (let i = 0; i < this.memCount; i++) {
                 if (this._lastWires[i] === wire) {
                     this._lastWireIndexes[i] = index;
@@ -623,6 +623,34 @@ namespace MarbleRunSimulatorCore {
                                         }
                                     }
                                 }
+                                else if (track instanceof DoubleTrack) {
+                                    let index = this.getLastIndex(track);
+                                    let col: Mummu.IIntersection;
+                                    let f = Nabu.MinMax(this.velocity.lengthSquared(), 0, 1);
+                                    let range = Math.round(f * 8 + (1 - f) * 2);
+                                    col = Mummu.SphereWireIntersection(this.position, this.radius, track.doublePath, 0.001, true, index, range);
+                                    //}
+                                    if (col.hit) {
+                                        this.position.z = track.part.position.z;
+                                        this.velocity.z = 0;
+                                        //this.setLastHit(wire, col.index);
+                                        let colDig = col.normal.scale(-1);
+                                        // Move away from collision
+                                        forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                        // Cancel depth component of speed
+                                        let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                        if (depthSpeed > 0) {
+                                            canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                        }
+                                        // Add ground reaction
+                                        let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                        reactions.addInPlace(reaction);
+                                        reactionsCount++;
+        
+                                        this.surface = Surface.Rail;
+                                        this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
+                                    }
+                                }
                             })
                             part.colliders.forEach((collider) => {
                                 let col: Mummu.IIntersection;
@@ -634,7 +662,7 @@ namespace MarbleRunSimulatorCore {
                                     if (this.onColliderImpact) {
                                         this.onColliderImpact(col, collider);
                                     }
-                                    Mummu.DrawDebugHit(col.point, col.normal, 5, BABYLON.Color3.Red());
+                                    
                                     //this.setLastHit(wire, col.index);
                                     let colDig = col.normal.scale(-1);
                                     // Move away from collision

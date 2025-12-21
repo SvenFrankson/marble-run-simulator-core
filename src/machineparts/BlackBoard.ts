@@ -407,7 +407,8 @@ namespace MarbleRunSimulatorCore {
             for (let n = 0; n < this.lines.length; n++) {
                 let rawLine = this.lines[n];
                 let trackTemplate = new TrackTemplate(this.template);
-                //trackTemplate.isDouble = true;
+                trackTemplate.cutOutSleeper = (n) => { return true; };
+                trackTemplate.isDouble = true;
                 let dirStart = rawLine[1].subtract(rawLine[0]).normalize();
                 let prevDir = dirStart.clone();
                 let normStart = Mummu.Rotate(dirStart, BABYLON.Axis.Z, Math.PI * 0.5);

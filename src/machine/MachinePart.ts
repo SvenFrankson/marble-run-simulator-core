@@ -1581,7 +1581,9 @@ namespace MarbleRunSimulatorCore {
                     }
                     track.initialize(this.template.trackTemplates[i]);
                     track.refreshStartEndWorldPosition();
-                    this.allWires.push(track.wires[0], track.wires[1]);
+                    if (track.wires[0] && track.wires[1]) {
+                        this.allWires.push(track.wires[0], track.wires[1]);
+                    }
                 }
                 while (this.tracks.length > this.template.trackTemplates.length) {
                     this.tracks.pop().dispose();

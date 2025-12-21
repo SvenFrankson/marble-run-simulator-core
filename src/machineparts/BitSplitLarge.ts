@@ -202,7 +202,7 @@ namespace MarbleRunSimulatorCore {
             Mummu.TranslateVertexDataInPlace(tmpVertexData, new BABYLON.Vector3(0, 0, (this.axisZMax + this.axisZMin) * 0.5));
             pivotDatas.push(tmpVertexData);
 
-            let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 0);
+            let arrowData = await this.game.vertexDataLoader.getAtIndex("./lib/marble-run-simulator-core/datas/meshes/splitter-arrow.babylon", 1);
             if (arrowData) {
                 arrowData = Mummu.CloneVertexData(arrowData);
                 Mummu.TranslateVertexDataInPlace(arrowData, new BABYLON.Vector3(0, - 0.007, this.axisZMin));
