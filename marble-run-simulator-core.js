@@ -10413,6 +10413,8 @@ var MarbleRunSimulatorCore;
             stepRightCollider.height = 0.006;
             stepRightCollider.depth = MarbleRunSimulatorCore.tileSize;
             this.colliders = [new MarbleRunSimulatorCore.MachineCollider(stepLeftCollider), new MarbleRunSimulatorCore.MachineCollider(stepRightCollider)];
+            this.colliders[0].bouncyness = 0.2;
+            this.colliders[1].bouncyness = 0.2;
             this.generateWires();
             this.localAABBBaseMin.x = -0.5 * MarbleRunSimulatorCore.tileSize;
             this.localAABBBaseMin.y = -0.5 * MarbleRunSimulatorCore.tileHeight;

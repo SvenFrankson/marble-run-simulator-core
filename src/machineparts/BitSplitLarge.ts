@@ -152,6 +152,8 @@ namespace MarbleRunSimulatorCore {
             stepRightCollider.depth = tileSize;
 
             this.colliders = [new MachineCollider(stepLeftCollider), new MachineCollider(stepRightCollider)];
+            this.colliders[0].bouncyness = 0.2;
+            this.colliders[1].bouncyness = 0.2;
 
             this.generateWires();
 
