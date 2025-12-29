@@ -3316,6 +3316,7 @@ var MarbleRunSimulatorCore;
             this.lastDeserializedData = data;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.isChallengeMachine = false;
+            this.toonOutlineRender = false;
             if (data) {
                 let version;
                 if (isFinite(data.v)) {
@@ -4505,9 +4506,11 @@ var MarbleRunSimulatorCore;
                     track.ringsMesh.outlineColor = outlineColor;
                 }
                 if (track instanceof MarbleRunSimulatorCore.PipeTrack && track.tubeMesh) {
-                    //track.tubeMesh.renderOutline = renderOutline;
-                    //track.tubeMesh.outlineWidth = outlineWidth;
-                    //track.tubeMesh.outlineColor = outlineColor;
+                    if (this.game.materials.getMaterialType(track.part.getColor(0)) === MarbleRunSimulatorCore.MaterialType.Metal) {
+                        track.tubeMesh.renderOutline = renderOutline;
+                        track.tubeMesh.outlineWidth = outlineWidth;
+                        track.tubeMesh.outlineColor = outlineColor;
+                    }
                 }
             });
             this.outlinableMeshes.forEach(mesh => {
@@ -8805,6 +8808,7 @@ var MarbleRunSimulatorCore;
         dataString += MarbleRunSimulatorCore.NToHex(machine.sleepersMeshProp.grndAnchors ? 1 : 0, 1);
         dataString += MarbleRunSimulatorCore.NToHex(Math.floor(machine.sleepersMeshProp.grndAnchorsMaxY * 100), 3);
         dataString += MarbleRunSimulatorCore.NToHex(Math.floor(machine.sleepersMeshProp.spacing * 100), 3);
+        dataString += MarbleRunSimulatorCore.NToHex(machine.toonOutlineRender ? 1 : 0, 1);
         data.content = dataString;
         data.sp = machine.sleepersMeshProp;
         return data;
@@ -8953,6 +8957,10 @@ var MarbleRunSimulatorCore;
             let grndAnchors = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
             let grndAnchorsMaxY = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
             let spacing = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
+            let toonOutline = false;
+            if (pt < dataString.length) {
+                toonOutline = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+            }
             if (makeMiniature) {
                 MarbleRunSimulatorCore.DrawMiniature(lines, canvas, {
                     version: data.v,
@@ -8968,6 +8976,7 @@ var MarbleRunSimulatorCore;
                     grndAnchorsMaxY: grndAnchorsMaxY,
                     spacing: spacing
                 };
+                machine.toonOutlineRender = toonOutline;
             }
         }
     }

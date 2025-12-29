@@ -105,6 +105,7 @@ namespace MarbleRunSimulatorCore {
         dataString += NToHex(machine.sleepersMeshProp.grndAnchors ? 1 : 0, 1);
         dataString += NToHex(Math.floor(machine.sleepersMeshProp.grndAnchorsMaxY * 100), 3);
         dataString += NToHex(Math.floor(machine.sleepersMeshProp.spacing * 100), 3);
+        dataString += NToHex(machine.toonOutlineRender ? 1 : 0, 1);
 
         data.content = dataString;
 
@@ -280,6 +281,10 @@ namespace MarbleRunSimulatorCore {
             let grndAnchors = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
             let grndAnchorsMaxY = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
             let spacing = parseInt(dataString.substring(pt, pt += 3), 36) / 100;
+            let toonOutline = false;
+            if (pt < dataString.length) {
+                toonOutline = parseInt(dataString.substring(pt, pt += 1), 36) === 1 ? true : false;
+            }
 
             if (makeMiniature) {
                 DrawMiniature(
@@ -301,6 +306,7 @@ namespace MarbleRunSimulatorCore {
                     grndAnchorsMaxY: grndAnchorsMaxY,
                     spacing: spacing
                 }
+                machine.toonOutlineRender = toonOutline;
             }
         }
     }

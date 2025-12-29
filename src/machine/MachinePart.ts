@@ -1006,9 +1006,11 @@ namespace MarbleRunSimulatorCore {
                     track.ringsMesh.outlineColor = outlineColor;
                 }
                 if (track instanceof PipeTrack && track.tubeMesh) {
-                    //track.tubeMesh.renderOutline = renderOutline;
-                    //track.tubeMesh.outlineWidth = outlineWidth;
-                    //track.tubeMesh.outlineColor = outlineColor;
+                    if (this.game.materials.getMaterialType(track.part.getColor(0)) === MaterialType.Metal) {
+                        track.tubeMesh.renderOutline = renderOutline;
+                        track.tubeMesh.outlineWidth = outlineWidth;
+                        track.tubeMesh.outlineColor = outlineColor;
+                    }
                 }
             });
             this.outlinableMeshes.forEach(mesh => {

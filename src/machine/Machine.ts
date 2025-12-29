@@ -984,6 +984,7 @@ namespace MarbleRunSimulatorCore {
             this.lastDeserializedData = data;
             this.minimalAutoQualityFailed = GraphicQuality.VeryHigh + 1;
             this.isChallengeMachine = false;
+            this.toonOutlineRender = false;
             if (data) {
                 let version: number;
                 if (isFinite(data.v)) {
