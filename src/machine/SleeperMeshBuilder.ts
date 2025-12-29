@@ -55,7 +55,7 @@ namespace MarbleRunSimulatorCore {
                 } else if (q === 0) {
                     sleeperPieceVertexDataTypeIndex += 2;
                 }
-                if (part.game.materials.getMaterialType(colorIndex) === MaterialType.Plastic && MainMaterials.UseOutlineMeshes) {
+                if (part.game.materials.getMaterialType(colorIndex) === MaterialType.Plastic && part.machine.toonOutlineRender) {
                     sleeperPieceVertexDataTypeIndex += 3;
                 }
                 let sleeperPieceVertexData = part.machine.sleeperVertexData ? part.machine.sleeperVertexData[sleeperPieceVertexDataTypeIndex] : undefined;

@@ -36,6 +36,11 @@ namespace MarbleRunSimulatorCore {
 
             this.rubber1 = new BABYLON.Mesh("rubber1");
             this.rubber1.parent = this.wheel1;
+
+            this.outlinableMeshes = [];
+            this.outlinableMeshes.push(this.base);
+            this.outlinableMeshes.push(this.rubber0);
+            this.outlinableMeshes.push(this.rubber1);
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {

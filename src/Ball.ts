@@ -219,7 +219,7 @@ namespace MarbleRunSimulatorCore {
                 this.positionZeroGhost.isVisible = this._showPositionZeroGhost;
             }
             if (this.machine.playing || this.machine.paused || (this.frozen && this.machine.stopped)) {
-                if (MainMaterials.UseOutlineMeshes) {
+                if (this.machine.toonOutlineRender) {
                     MainMaterials.SetAsOutlinedMesh(this);
                 }
                 else {
@@ -257,7 +257,7 @@ namespace MarbleRunSimulatorCore {
                     this.outlineColor.copyFrom(UI3DConstants.outlineSelectedColor);
                 }
                 else {
-                    if (MainMaterials.UseOutlineMeshes) {
+                    if (this.machine.toonOutlineRender) {
                         MainMaterials.SetAsOutlinedMesh(this);
                     }
                     else {

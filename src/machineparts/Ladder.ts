@@ -51,6 +51,10 @@ namespace MarbleRunSimulatorCore {
             let rightMachineCollider = new MachineCollider(rightCollider);
 
             this.colliders = [leftMachineCollider, rightMachineCollider];
+            
+            this.outlinableMeshes = [];
+            this.outlinableMeshes.push(this.leftWall);
+            this.outlinableMeshes.push(this.rightWall);
 
             this.generateWires();
         }

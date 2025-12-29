@@ -15,7 +15,7 @@ namespace MarbleRunSimulatorCore {
             let d = 3 * tileSize;
             this.base = new BABYLON.Mesh("base");
             this.base.parent = this;
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.base);
             }
             let bodyVertexData = Mummu.CreateBeveledCylinderVertexData({ radius: (d - 0.5 * tileSize) * 0.5, height: 0.005 });
@@ -50,7 +50,7 @@ namespace MarbleRunSimulatorCore {
 
             let flagH = 0.06;
             this.flagPole = new BABYLON.Mesh("flag-pole");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.flagPole);
             }
             let flagPoleVertexData = Mummu.CreateBeveledCylinderVertexData({ radius: 0.001, height: flagH, tessellation: 6 });
@@ -62,7 +62,7 @@ namespace MarbleRunSimulatorCore {
             Mummu.RotateInPlace(this.flagPole.position, BABYLON.Axis.Y, Math.PI / 8);
             
             this.flag = new BABYLON.Mesh("flag");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.flag);
             }
             let flagVertexData = Mummu.CreateBeveledBoxVertexData({ width: 0.025, height: 0.015, depth: 0.0005 });
@@ -75,7 +75,7 @@ namespace MarbleRunSimulatorCore {
 
             /*
             this.flagKnob = BABYLON.CreateSphere("flag-knob", { segments: 8, diameter: 0.007 });
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.flagKnob);
             }
             this.flagKnob.parent = this.flagPole;

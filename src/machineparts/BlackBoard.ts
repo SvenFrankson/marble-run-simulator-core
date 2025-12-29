@@ -13,7 +13,7 @@ namespace MarbleRunSimulatorCore {
                 depth: BlackBoard.BoardThickness
             });
             boardVertexData.applyToMesh(this);
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.blackboard.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this);
             }
         }
@@ -156,7 +156,7 @@ namespace MarbleRunSimulatorCore {
             let borderDepth = 4 * tileSize;
 
             this.borders[0] = new BABYLON.Mesh("top-border");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.borders[0]);
             }
             this.borders[0].parent = this;
@@ -179,7 +179,7 @@ namespace MarbleRunSimulatorCore {
             topMachineCollider.bouncyness = 0.5;
             
             this.borders[1] = new BABYLON.Mesh("right-border");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.borders[1]);
             }
             this.borders[1].parent = this;
@@ -202,7 +202,7 @@ namespace MarbleRunSimulatorCore {
             rightMachineCollider.bouncyness = 0.5;
             
             this.borders[2] = new BABYLON.Mesh("bottom-border");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.borders[2]);
             }
             this.borders[2].parent = this;
@@ -225,7 +225,7 @@ namespace MarbleRunSimulatorCore {
             bottomMachineCollider.bouncyness = 0.5;
             
             this.borders[3] = new BABYLON.Mesh("left-border");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.borders[3]);
             }
             this.borders[3].parent = this;

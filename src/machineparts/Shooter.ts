@@ -102,6 +102,13 @@ namespace MarbleRunSimulatorCore {
             
             this.base.position.copyFromFloats(x * tileWidth * 0.4 - 0, this.shieldYClosed - 0.02, 0);
             this.base.parent = this;
+            
+            this.outlinableMeshes = [];
+            this.outlinableMeshes.push(this.base);
+            this.outlinableMeshes.push(this.kicker);
+            this.outlinableMeshes.push(this.kickerBody);
+            this.outlinableMeshes.push(this.kickerWeight);
+            this.outlinableMeshes.push(this.shield);
 
             this.machine.onStopCallbacks.remove(this.reset);
             this.machine.onStopCallbacks.push(this.reset);

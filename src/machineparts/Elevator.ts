@@ -106,6 +106,11 @@ namespace MarbleRunSimulatorCore {
             data2.applyToMesh(this.cable, true);
             this.cable.parent = this;
 
+            this.outlinableMeshes = [];
+            this.outlinableMeshes.push(this.boxes[0]);
+            this.outlinableMeshes.push(this.boxes[1]);
+            this.outlinableMeshes.push(this.cable);
+
             this.generateWires();
 
             this.machine.onStopCallbacks.remove(this.reset);

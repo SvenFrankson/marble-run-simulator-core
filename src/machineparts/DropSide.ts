@@ -53,6 +53,9 @@ namespace MarbleRunSimulatorCore {
             this.shieldConnector.parent = this;
             Mummu.MergeVertexDatas(...vDatas).applyToMesh(this.shieldConnector);
 
+            this.outlinableMeshes = [];
+            this.outlinableMeshes.push(this.shieldConnector);
+            
             this.generateWires();
         }
 

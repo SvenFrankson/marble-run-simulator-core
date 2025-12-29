@@ -12,12 +12,13 @@ namespace MarbleRunSimulatorCore {
 
     export class MainMaterials {
 
-        public static UseOutlineMeshes: boolean = true;
+        //public static UseOutlineMeshes: boolean = true;
         public static SetAsOutlinedMesh(m: BABYLON.Mesh): void {
             m.renderOutline = true;
             m.outlineColor.copyFromFloats(0, 0, 0);
             m.outlineWidth = 0.001;
         }
+
         private _materialsPBR: BABYLON.Material[] = [];
         private _materialsSTD: BABYLON.Material[] = [];
         private _plexiglasMaterialsPBR: BABYLON.Material[] = [];

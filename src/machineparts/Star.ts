@@ -11,7 +11,7 @@ namespace MarbleRunSimulatorCore {
             this.setTemplate(this.machine.templateManager.getTemplate(Star.PropToPartName(prop)));
 
             this.starMesh = new BABYLON.Mesh("body");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.starMesh);
             }
             this.starMesh.parent = this;

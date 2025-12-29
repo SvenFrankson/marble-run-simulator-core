@@ -170,6 +170,7 @@ namespace MarbleRunSimulatorCore {
         public templateManager: TemplateManager;
 
         public sleeperVertexData: BABYLON.VertexData[];
+        public toonOutlineRender: boolean = false;
 
         public ready: boolean = false;
         public instantiated: boolean = false;
@@ -357,6 +358,7 @@ namespace MarbleRunSimulatorCore {
                 let part = this.parts[i];
                 if (!(hotReload && !part.isPlaced)) {
                     await part.instantiate(undefined, true);
+                    part.updateSelectorMeshVisibility();
                     part.isPlaced = true;
                     if (part instanceof BlackBoard) {
                         this.isDrawBlackboardMachine = true;

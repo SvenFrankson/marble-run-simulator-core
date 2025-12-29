@@ -936,7 +936,12 @@ namespace MarbleRunSimulatorCore {
                     this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineHoverColor);
                 }
                 else {
-                    this.setOutlineParams(false, UI3DConstants.outlineWidth, UI3DConstants.outlineBaseColor);
+                    if (this.machine.toonOutlineRender) {
+                        this.setOutlineParams(true, UI3DConstants.toonOutlineWidth, UI3DConstants.toonOutlineBaseColor);
+                    }
+                    else {
+                        this.setOutlineParams(false, UI3DConstants.outlineWidth, UI3DConstants.outlineBaseColor);
+                    }
                 }
 
                 this.selectorBodyDisplay.visibility = 0;
@@ -982,7 +987,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public setOutlineParams(renderOutline: boolean, outlineWidth: number, outlineColor: BABYLON.Color3): void {
-            if (!renderOutline && MainMaterials.UseOutlineMeshes) {
+            if (!renderOutline && this.machine.toonOutlineRender) {
                 renderOutline = true;
                 outlineWidth = 0.001;
                 outlineColor.copyFromFloats(0, 0, 0);
@@ -1817,7 +1822,7 @@ namespace MarbleRunSimulatorCore {
             datas.forEach((vData, colorIndex) => {
                 if (!this.sleepersMeshes.get(colorIndex)) {
                     let sleeperMesh = new BABYLON.Mesh("sleeper-mesh-" + colorIndex);
-                    if (MainMaterials.UseOutlineMeshes) {
+                    if (this.machine.toonOutlineRender) {
                         MainMaterials.SetAsOutlinedMesh(sleeperMesh);
                     }
                     sleeperMesh.parent = this;

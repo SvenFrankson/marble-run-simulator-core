@@ -12,7 +12,7 @@ namespace MarbleRunSimulatorCore {
 
             let s = prop.l * tileSize / Math.SQRT2;
             this.body = new BABYLON.Mesh("body");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.body);
             }
             this.body.parent = this;
@@ -93,7 +93,7 @@ namespace MarbleRunSimulatorCore {
             let w = prop.l * tileSize;
             let h = prop.h * tileHeight;
             this.body = new BABYLON.Mesh("body");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.body);
             }
             this.body.parent = this;

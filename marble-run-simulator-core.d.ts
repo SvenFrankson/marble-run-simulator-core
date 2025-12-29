@@ -167,7 +167,6 @@ declare namespace MarbleRunSimulatorCore {
     }
     class MainMaterials {
         game: IGame;
-        static UseOutlineMeshes: boolean;
         static SetAsOutlinedMesh(m: BABYLON.Mesh): void;
         private _materialsPBR;
         private _materialsSTD;
@@ -462,6 +461,7 @@ declare namespace MarbleRunSimulatorCore {
         trackFactory: MachinePartFactory;
         templateManager: TemplateManager;
         sleeperVertexData: BABYLON.VertexData[];
+        toonOutlineRender: boolean;
         ready: boolean;
         instantiated: boolean;
         hasBeenOpenedInEditor: boolean;
@@ -996,6 +996,8 @@ declare namespace MarbleRunSimulatorCore {
         static outlineBaseColor: BABYLON.Color3;
         static outlineHoverColor: BABYLON.Color3;
         static outlineSelectedColor: BABYLON.Color3;
+        static toonOutlineWidth: number;
+        static toonOutlineBaseColor: BABYLON.Color3;
     }
 }
 declare namespace MarbleRunSimulatorCore {

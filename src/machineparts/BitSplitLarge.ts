@@ -23,7 +23,7 @@ namespace MarbleRunSimulatorCore {
             this.clicSound.setVolume(0.25);
 
             this.pivot = new BABYLON.Mesh("pivot");
-            if (MainMaterials.UseOutlineMeshes) {
+            if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.pivot);
             }
             this.pivot.position.copyFromFloats(tileSize * 0.5, tileHeight * 0.5, 0);

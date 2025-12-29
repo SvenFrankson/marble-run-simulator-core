@@ -26,7 +26,7 @@ namespace MarbleRunSimulatorCore {
             Mummu.TranslateVertexDataInPlace(data2, new BABYLON.Vector3(0, 0, - track.part.wireGauge));
             Mummu.MergeVertexDatas(data, data2).applyToMesh(track.mesh);
 
-            if (MainMaterials.UseOutlineMeshes) {
+            if (track.part.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(track.mesh);
             }
             track.mesh.parent = track.part;

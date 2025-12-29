@@ -110,6 +110,11 @@ namespace MarbleRunSimulatorCore {
             this.wheel.rotation.y = Math.PI * 0.5;
             this.wheel.parent = this.rotor;
 
+            this.outlinableMeshes = [];
+            this.outlinableMeshes.push(this.wheel);
+            this.outlinableMeshes.push(this.screwWire);
+            this.outlinableMeshes.push(this.shieldConnector);
+
             this.generateWires();
 
             this.machine.onStopCallbacks.remove(this.reset);
