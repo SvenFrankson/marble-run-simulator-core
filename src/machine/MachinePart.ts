@@ -992,6 +992,13 @@ namespace MarbleRunSimulatorCore {
                 outlineWidth = 0.001;
                 outlineColor.copyFromFloats(0, 0, 0);
             }
+            this.sleepersMeshes.forEach(sleeperMesh => {
+                if (sleeperMesh && !sleeperMesh.isDisposed()) {
+                    sleeperMesh.renderOutline = renderOutline;
+                    sleeperMesh.outlineWidth = outlineWidth;
+                    sleeperMesh.outlineColor = outlineColor;
+                }
+            });
             this.allWires.forEach(wire => {
                 if (wire.wireMesh && !wire.wireMesh.isDisposed()) {
                     wire.wireMesh.renderOutline = renderOutline;

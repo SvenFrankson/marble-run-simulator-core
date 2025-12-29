@@ -4492,6 +4492,13 @@ var MarbleRunSimulatorCore;
                 outlineWidth = 0.001;
                 outlineColor.copyFromFloats(0, 0, 0);
             }
+            this.sleepersMeshes.forEach(sleeperMesh => {
+                if (sleeperMesh && !sleeperMesh.isDisposed()) {
+                    sleeperMesh.renderOutline = renderOutline;
+                    sleeperMesh.outlineWidth = outlineWidth;
+                    sleeperMesh.outlineColor = outlineColor;
+                }
+            });
             this.allWires.forEach(wire => {
                 if (wire.wireMesh && !wire.wireMesh.isDisposed()) {
                     wire.wireMesh.renderOutline = renderOutline;
@@ -12092,8 +12099,8 @@ var MarbleRunSimulatorCore;
             data2.applyToMesh(this.cable, true);
             this.cable.parent = this;
             this.outlinableMeshes = [];
-            this.outlinableMeshes.push(this.boxes[0]);
-            this.outlinableMeshes.push(this.boxes[1]);
+            this.outlinableMeshes.push(this.wheels[0]);
+            this.outlinableMeshes.push(this.wheels[1]);
             this.outlinableMeshes.push(this.cable);
             this.generateWires();
             this.machine.onStopCallbacks.remove(this.reset);

@@ -107,8 +107,8 @@ namespace MarbleRunSimulatorCore {
             this.cable.parent = this;
 
             this.outlinableMeshes = [];
-            this.outlinableMeshes.push(this.boxes[0]);
-            this.outlinableMeshes.push(this.boxes[1]);
+            this.outlinableMeshes.push(this.wheels[0]);
+            this.outlinableMeshes.push(this.wheels[1]);
             this.outlinableMeshes.push(this.cable);
 
             this.generateWires();
