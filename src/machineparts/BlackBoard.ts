@@ -477,6 +477,15 @@ namespace MarbleRunSimulatorCore {
             return false;
         }
 
+        public clampLocalPositionOnBBox(pt: BABYLON.Vector3, radius: number): BABYLON.Vector3 {
+            let clampedPt = pt.clone();
+
+            clampedPt.x = Nabu.MinMax(clampedPt.x, - tileSize * 0.5 + radius, (this.w - 0.5) * tileSize - radius);
+            clampedPt.y = Nabu.MinMax(clampedPt.y, - tileHeight * 0.5 + radius, (this.h - 0.5) * tileHeight - radius);
+
+            return clampedPt;
+        }
+
         public clampPointOnBoard(pt: BABYLON.Vector3, radius: number): BABYLON.Vector3 {
             let best: BABYLON.Vector3;
             let bestDist = Infinity;
