@@ -38,6 +38,8 @@ namespace MarbleRunSimulatorCore {
             this.localAABBBaseMax.x = (prop.l) * 0.5 * tileSize + this.body.position.x;
             this.localAABBBaseMax.y = (prop.l) * 0.5 * tileHeight + this.body.position.y;
 
+            this.outlinableMeshes = [this.body];
+
             this.generateWires();
         }
 
@@ -119,6 +121,8 @@ namespace MarbleRunSimulatorCore {
             this.localAABBBaseMin.y = - (prop.h) * 0.5 * tileHeight + this.body.position.y;
             this.localAABBBaseMax.x = (prop.l) * 0.5 * tileSize + this.body.position.x;
             this.localAABBBaseMax.y = (prop.h) * 0.5 * tileHeight + this.body.position.y;
+
+            this.outlinableMeshes = [this.body];
 
             this.generateWires();
         }
@@ -225,6 +229,8 @@ namespace MarbleRunSimulatorCore {
             this.localAABBBaseMin.y = - (prop.l + 0.5) * 0.5 * tileHeight;
             this.localAABBBaseMax.x = (prop.l + 0.5) * 0.5 * tileSize;
             this.localAABBBaseMax.y = (prop.l + 0.5) * 0.5 * tileHeight;
+
+            this.outlinableMeshes = [this.body];
 
             this.generateWires();
         }

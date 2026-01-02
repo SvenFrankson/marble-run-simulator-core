@@ -21,6 +21,8 @@ namespace MarbleRunSimulatorCore {
             this.localAABBBaseMax.x = 0.5 * tileSize;
             this.localAABBBaseMax.y = 0.5 * tileHeight;
 
+            this.outlinableMeshes = [this.starMesh];
+            
             this.generateWires();
         }
 

@@ -155,6 +155,8 @@ namespace MarbleRunSimulatorCore {
             this.colliders[0].bouncyness = 0.2;
             this.colliders[1].bouncyness = 0.2;
 
+            this.outlinableMeshes = [this.pivot];
+
             this.generateWires();
 
             this.localAABBBaseMin.x = - 0.5 * tileSize;

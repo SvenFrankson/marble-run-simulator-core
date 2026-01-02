@@ -28,7 +28,7 @@ namespace MarbleRunSimulatorCore {
                 shieldWire.path = [];
 
                 for (let i = 0; i < 32; i++) {
-                    let a = i / 32 * 2 * Math.PI;
+                    let a = i / 32 * 2 * Math.PI + Math.PI * 0.5;
                     let x = Math.cos(a) * (1.5 * tileSize - 0.003);
                     let z = Math.sin(a) * (1.5 * tileSize - 0.003);
                     shieldWire.path.push(new BABYLON.Vector3(x, tileHeight * 0.5 * (n + 1), z));
@@ -81,6 +81,8 @@ namespace MarbleRunSimulatorCore {
             this.flagKnob.parent = this.flagPole;
             this.flagKnob.position.y = flagH;
             */
+
+            this.outlinableMeshes = [this.flagPole, this.flag, this.base];
 
             this.generateWires();
         }

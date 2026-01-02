@@ -1189,10 +1189,41 @@ declare namespace MarbleRunSimulatorCore {
         hFactor: number;
         constructor(blackboard: BlackBoard, wFactor: number, hFactor: number);
     }
+    class BBTrampoline extends BABYLON.Mesh {
+        blackboard: BlackBoard;
+        p0: BABYLON.Vector3;
+        p1: BABYLON.Vector3;
+        maxDepthStrech: number;
+        contactingBall: Ball;
+        contactNormal: BABYLON.Vector3;
+        bouncingPoint: BABYLON.Vector3;
+        bouncingPointVelocity: BABYLON.Vector3;
+        thicknessRadius: number;
+        getBouncyness(ball: Ball): number;
+        constructor(blackboard: BlackBoard, p0: BABYLON.Vector3, p1: BABYLON.Vector3);
+        private _update;
+        updateMesh(): void;
+    }
+    class BBBouncer extends BABYLON.Mesh {
+        blackboard: BlackBoard;
+        p0: BABYLON.Vector3;
+        p1: BABYLON.Vector3;
+        thicknessRadius: number;
+        body: BABYLON.Mesh;
+        plateTop: BABYLON.Mesh;
+        plateBottom: BABYLON.Mesh;
+        bumpTop: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
+        bumpBottom: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
+        constructor(blackboard: BlackBoard, p0: BABYLON.Vector3, p1: BABYLON.Vector3);
+        bump(): Promise<void>;
+    }
     class BlackBoard extends MachinePart {
         static BoardThickness: number;
         lines: BABYLON.Vector3[][];
+        trampolines: BBTrampoline[];
+        bouncers: BBBouncer[];
         boards: BlackBoardPiece[];
+        backBoard: BABYLON.Mesh;
         borders: BABYLON.Mesh[];
         boardColliders: MachineCollider[];
         editorGrid: BABYLON.Mesh;
@@ -1209,6 +1240,8 @@ declare namespace MarbleRunSimulatorCore {
         clampPointOnBoard(pt: BABYLON.Vector3, radius: number): BABYLON.Vector3;
         addLine(points: BABYLON.Vector3[]): void;
         addRawLine(points: BABYLON.Vector3[]): void;
+        addTrampoline(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void;
+        addBouncer(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void;
         removeLastLine(): void;
         removeFirstLine(): void;
         setI(v: number, doNotCheckGridLimits?: boolean): void;

@@ -731,6 +731,72 @@ namespace MarbleRunSimulatorCore {
                                     this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                 }
                             }
+                            if (part instanceof BlackBoard) {
+                                part.trampolines.forEach(trampoline => {
+                                    let b = trampoline.getBouncyness(this);
+                                    let colPress = Mummu.SphereCapsuleIntersection(this.position, this.radius, part.position.add(trampoline.p0), part.position.add(trampoline.p1), trampoline.thicknessRadius + b * trampoline.maxDepthStrech);
+                                    if (colPress.hit) {
+                                        if (!trampoline.contactingBall) {
+                                            Mummu.DrawDebugHit(colPress.point, colPress.normal, 10, BABYLON.Color3.Red());
+                                            trampoline.contactingBall = this;
+                                            trampoline.contactNormal = colPress.normal;
+                                        }
+                                    }
+                                    else {
+                                        trampoline.contactingBall = undefined;
+                                        trampoline.contactNormal = undefined;
+                                    }
+
+                                    let worldP0 = trampoline.p0.add(trampoline.blackboard.position);
+                                    let worldP1 = trampoline.p1.add(trampoline.blackboard.position);
+                                    if (trampoline.contactNormal) {
+                                        worldP0.subtractInPlace(trampoline.contactNormal.scale(trampoline.maxDepthStrech * b));
+                                        worldP1.subtractInPlace(trampoline.contactNormal.scale(trampoline.maxDepthStrech * b));
+                                    }
+
+                                    let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, worldP0, worldP1, trampoline.thicknessRadius);
+                                    if (col.hit) {
+                                        //this.setLastHit(wire, col.index);
+                                        let colDig = col.normal.scale(-1);
+                                        colDig.z = 0;
+                                        colDig.normalize();
+                                        // Move away from collision
+                                        forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                        // Cancel depth component of speed
+                                        let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                        if (depthSpeed > 0) {
+                                            canceledSpeedOneContact.addInPlace(colDig.scale(depthSpeed * (1 + b)));
+                                        }
+                                        // Add ground reaction
+                                        let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                        reactions.addInPlace(reaction);
+                                        reactionsCount++;
+                                    }
+                                });
+
+                                part.bouncers.forEach(bouncer => {
+                                    let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, bouncer.p0.add(bouncer.blackboard.position), bouncer.p1.add(bouncer.blackboard.position), bouncer.thicknessRadius);
+                                    if (col.hit) {
+                                        //this.setLastHit(wire, col.index);
+                                        let colDig = col.normal.scale(-1);
+                                        colDig.z = 0;
+                                        colDig.normalize();
+                                        // Move away from collision
+                                        forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                        // Cancel depth component of speed
+                                        let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                        if (depthSpeed > 0) {
+                                            canceledSpeedOneContact.addInPlace(colDig.scale(depthSpeed * 1.95));
+                                        }
+                                        // Add ground reaction
+                                        let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                        reactions.addInPlace(reaction);
+                                        reactionsCount++;
+
+                                        bouncer.bump();
+                                    }
+                                });
+                            }
                             if (part instanceof DropBack || part instanceof DropSide) {
                                 let dy = this.position.y - part.position.y;
                                 if (dy > - 0.005 && dy < 0) {

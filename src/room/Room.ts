@@ -139,12 +139,11 @@ namespace MarbleRunSimulatorCore {
                     await this.instantiateSimple(groundColor, wallColor, 10);
                 }
                 else if (this._currentRoomIndex === 13) {
-                    let groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
-                    let wallColor = BABYLON.Color4.FromHexString("#2d7685ff");
-                    await this.instantiateSimple(groundColor, wallColor, 5);
+                    //let groundColor = BABYLON.Color4.FromHexString("#3c5053ff");
+                    //let wallColor = BABYLON.Color4.FromHexString("#2d7685ff");
+                    //await this.instantiateSimple(groundColor, wallColor, 5);
                     
                     //await this.instantiateBBPuzzle("./lib/marble-run-simulator-core/datas/skyboxes/sky-2.jpeg");
-                    /*
                     this.decors.forEach(decor => {
                         decor.dispose();
                     });
@@ -156,7 +155,6 @@ namespace MarbleRunSimulatorCore {
                     this.frame.isVisible = false;
                     this.ceiling.isVisible = false;
                     this.isBlurred = false;
-                    */
                 }
                 if (this.onRoomJustInstantiated) {
                     this.onRoomJustInstantiated();
