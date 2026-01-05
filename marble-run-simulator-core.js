@@ -10756,15 +10756,13 @@ var MarbleRunSimulatorCore;
             this.bumpTop = Mummu.AnimationFactory.EmptyNumberCallback;
             this.bumpBottom = Mummu.AnimationFactory.EmptyNumberCallback;
             this.parent = blackboard;
-            let data = Mummu.CreateWireVertexData({
-                path: [this.p0, this.p1],
-                pathUps: [BABYLON.Vector3.Up(), BABYLON.Vector3.Up()],
-                radius: this.thicknessRadius,
-                cap: BABYLON.Mesh.NO_CAP
-            });
-            data.applyToMesh(this);
-            this.body = new BABYLON.Mesh("bouncer-body");
-            let l = BABYLON.Vector3.Distance(p0, p1) + 2 * this.thicknessRadius;
+            this.updateMesh();
+        }
+        updateMesh() {
+            if (!this.body) {
+                this.body = new BABYLON.Mesh("bouncer-body");
+            }
+            let l = BABYLON.Vector3.Distance(this.p0, this.p1) + 2 * this.thicknessRadius;
             let bodyData = Mummu.CreateBeveledBoxVertexData({
                 width: l,
                 height: 2 * this.thicknessRadius - 0.001,
@@ -10779,14 +10777,18 @@ var MarbleRunSimulatorCore;
                 height: 0.002,
                 depth: MarbleRunSimulatorCore.tileSize - 0.004
             });
-            this.plateTop = BABYLON.MeshBuilder.CreateSphere("plate-top", { diameter: 2 * this.thicknessRadius });
+            if (!this.plateTop) {
+                this.plateTop = new BABYLON.Mesh("plate-top");
+                this.plateTop.parent = this.body;
+            }
             plateData.applyToMesh(this.plateTop);
-            this.plateTop.parent = this.body;
             this.plateTop.position.y = this.thicknessRadius;
             this.bumpTop = Mummu.AnimationFactory.CreateNumber(this.plateTop, this.plateTop.position, "y", () => { this.plateTop.freezeWorldMatrix(); });
-            this.plateBottom = BABYLON.MeshBuilder.CreateSphere("plate-bottom", { diameter: 2 * this.thicknessRadius });
+            if (!this.plateBottom) {
+                this.plateBottom = new BABYLON.Mesh("plate-bottom");
+                this.plateBottom.parent = this.body;
+            }
             plateData.applyToMesh(this.plateBottom);
-            this.plateBottom.parent = this.body;
             this.plateBottom.position.y = -this.thicknessRadius;
             this.bumpBottom = Mummu.AnimationFactory.CreateNumber(this.plateBottom, this.plateBottom.position, "y", () => { this.plateBottom.freezeWorldMatrix(); });
             this.body.material = this.blackboard.game.materials.getMaterial(18, this.blackboard.machine.materialQ);
@@ -10797,6 +10799,14 @@ var MarbleRunSimulatorCore;
                 MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.plateTop);
                 MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.plateBottom);
             }
+        }
+        getClosestPoint(p) {
+            let d0 = BABYLON.Vector3.DistanceSquared(p, this.p0);
+            let d1 = BABYLON.Vector3.DistanceSquared(p, this.p1);
+            if (d0 <= d1) {
+                return this.p0;
+            }
+            return this.p1;
         }
         async bump() {
             this.bumpTop(1.5 * this.thicknessRadius, 0.07);

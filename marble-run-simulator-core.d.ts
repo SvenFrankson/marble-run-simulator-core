@@ -1215,6 +1215,8 @@ declare namespace MarbleRunSimulatorCore {
         bumpTop: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
         bumpBottom: (target: number, duration: number, overrideEasing?: (v: number) => number) => Promise<void>;
         constructor(blackboard: BlackBoard, p0: BABYLON.Vector3, p1: BABYLON.Vector3);
+        updateMesh(): void;
+        getClosestPoint(p: BABYLON.Vector3): BABYLON.Vector3;
         bump(): Promise<void>;
     }
     class BlackBoard extends MachinePart {
