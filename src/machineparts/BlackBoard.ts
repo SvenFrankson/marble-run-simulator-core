@@ -231,6 +231,14 @@ namespace MarbleRunSimulatorCore {
             this.bumpTop(this.thicknessRadius, 0.07);
             await this.bumpBottom(- this.thicknessRadius, 0.07);
         }
+
+        public dispose(): void {
+            let index = this.blackboard.bouncers.indexOf(this);
+            if (index > - 1) {
+                this.blackboard.bouncers.splice(index, 1);
+            }
+            super.dispose();
+        }
     }
 
     export class BlackBoard extends MachinePart {

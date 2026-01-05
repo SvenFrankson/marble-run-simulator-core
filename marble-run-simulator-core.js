@@ -10779,15 +10779,15 @@ var MarbleRunSimulatorCore;
             });
             if (!this.plateTop) {
                 this.plateTop = new BABYLON.Mesh("plate-top");
-                this.plateTop.parent = this.body;
             }
+            this.plateTop.parent = this.body;
             plateData.applyToMesh(this.plateTop);
             this.plateTop.position.y = this.thicknessRadius;
             this.bumpTop = Mummu.AnimationFactory.CreateNumber(this.plateTop, this.plateTop.position, "y", () => { this.plateTop.freezeWorldMatrix(); });
             if (!this.plateBottom) {
                 this.plateBottom = new BABYLON.Mesh("plate-bottom");
-                this.plateBottom.parent = this.body;
             }
+            this.plateBottom.parent = this.body;
             plateData.applyToMesh(this.plateBottom);
             this.plateBottom.position.y = -this.thicknessRadius;
             this.bumpBottom = Mummu.AnimationFactory.CreateNumber(this.plateBottom, this.plateBottom.position, "y", () => { this.plateBottom.freezeWorldMatrix(); });
@@ -10813,6 +10813,13 @@ var MarbleRunSimulatorCore;
             await this.bumpBottom(-1.5 * this.thicknessRadius, 0.07);
             this.bumpTop(this.thicknessRadius, 0.07);
             await this.bumpBottom(-this.thicknessRadius, 0.07);
+        }
+        dispose() {
+            let index = this.blackboard.bouncers.indexOf(this);
+            if (index > -1) {
+                this.blackboard.bouncers.splice(index, 1);
+            }
+            super.dispose();
         }
     }
     MarbleRunSimulatorCore.BBBouncer = BBBouncer;

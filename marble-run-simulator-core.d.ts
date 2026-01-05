@@ -1218,6 +1218,7 @@ declare namespace MarbleRunSimulatorCore {
         updateMesh(): void;
         getClosestPoint(p: BABYLON.Vector3): BABYLON.Vector3;
         bump(): Promise<void>;
+        dispose(): void;
     }
     class BlackBoard extends MachinePart {
         static BoardThickness: number;
