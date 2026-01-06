@@ -1,5 +1,45 @@
 namespace MarbleRunSimulatorCore {
 
+    export class BlackBoardElement {
+
+        public hovered: boolean = false;
+        public selected: boolean = false;
+        public outlinableMeshes: BABYLON.Mesh[] = [];
+
+        constructor(public blackboard: BlackBoard) {
+            
+        }
+
+        public updateHighlight(): void {
+            if (this.hovered || this.selected) {
+                this.outlinableMeshes.forEach(child => {
+                    if (child instanceof BABYLON.Mesh) {
+                        child.renderOutline = true;
+                        child.outlineWidth = UI3DConstants.outlineWidth;
+                        if (this.selected) {
+                            child.outlineColor = UI3DConstants.outlineSelectedColor;
+                        }
+                        else if (this.hovered) {
+                            child.outlineColor = UI3DConstants.outlineHoverColor;
+                        }
+                    }
+                });
+            }
+            else {
+                this.outlinableMeshes.forEach(child => {
+                    if (child instanceof BABYLON.Mesh) {
+                        if (this.blackboard.machine.toonOutlineRender) {
+                            MainMaterials.SetAsOutlinedMesh(child);
+                        }
+                        else {
+                            child.renderOutline = false;
+                        }
+                    }
+                });
+            }
+        }
+    }
+
     export class BlackBoardPiece extends BABYLON.Mesh {
         constructor(
             public blackboard: BlackBoard,
@@ -19,7 +59,8 @@ namespace MarbleRunSimulatorCore {
         }
     }
 
-    export class BBTrampoline extends BABYLON.Mesh {
+    /*
+    export class BBTrampoline extends BlackBoardElement {
 
         public maxDepthStrech = 0.01;
         public contactingBall: Ball;
@@ -39,11 +80,11 @@ namespace MarbleRunSimulatorCore {
         }
 
         constructor(
-            public blackboard: BlackBoard,
+            blackboard: BlackBoard,
             public p0: BABYLON.Vector3,
             public p1: BABYLON.Vector3
         ) {
-            super("trampoline");
+            super(blackboard);
 
             this.bouncingPoint = this.p0.add(this.p1).scaleInPlace(0.5);
 
@@ -143,8 +184,9 @@ namespace MarbleRunSimulatorCore {
             data.applyToMesh(this);
         }
     }
+    */
 
-    export class BBBouncer extends BABYLON.Mesh {
+    export class BBBouncer extends BlackBoardElement {
 
         public thicknessRadius: number = 0.005;
         public body: BABYLON.Mesh;
@@ -155,13 +197,12 @@ namespace MarbleRunSimulatorCore {
         public bumpBottom = Mummu.AnimationFactory.EmptyNumberCallback;
 
         constructor(
-            public blackboard: BlackBoard,
+            blackboard: BlackBoard,
             public p0: BABYLON.Vector3,
             public p1: BABYLON.Vector3
         ) {
-            super("trampoline");
+            super(blackboard);
 
-            this.parent = blackboard;
             this.updateMesh();
         }
 
@@ -179,7 +220,7 @@ namespace MarbleRunSimulatorCore {
             bodyData.applyToMesh(this.body);
             this.body.position = this.p0.add(this.p1).scaleInPlace(0.5);
             this.body.rotationQuaternion = Mummu.QuaternionFromXZAxis(this.p1.subtract(this.p0), BABYLON.Axis.Z);
-            this.body.parent = this;
+            this.body.parent = this.blackboard;
 
             let plateData = Mummu.CreateBeveledBoxVertexData({
                 width: l- 0.004,
@@ -208,12 +249,9 @@ namespace MarbleRunSimulatorCore {
             this.body.material = this.blackboard.game.materials.getMaterial(18, this.blackboard.machine.materialQ);
             this.plateTop.material = this.blackboard.game.materials.getMaterial(7, this.blackboard.machine.materialQ);
             this.plateBottom.material = this.blackboard.game.materials.getMaterial(7, this.blackboard.machine.materialQ);
-            
-            if (this.blackboard.machine.toonOutlineRender) {
-                MainMaterials.SetAsOutlinedMesh(this.body);
-                MainMaterials.SetAsOutlinedMesh(this.plateTop);
-                MainMaterials.SetAsOutlinedMesh(this.plateBottom);
-            }
+
+            this.outlinableMeshes = [this.body, this.plateTop, this.plateBottom];
+            this.updateHighlight();
         }
 
         public getClosestPoint(p: BABYLON.Vector3): BABYLON.Vector3 {
@@ -237,7 +275,7 @@ namespace MarbleRunSimulatorCore {
             if (index > - 1) {
                 this.blackboard.bouncers.splice(index, 1);
             }
-            super.dispose();
+            this.body.dispose();
         }
     }
 
@@ -245,7 +283,7 @@ namespace MarbleRunSimulatorCore {
         
         public static BoardThickness: number = 0.005;
         public lines: BABYLON.Vector3[][] = [];
-        public trampolines: BBTrampoline[] = [];
+        //public trampolines: BBTrampoline[] = [];
         public bouncers: BBBouncer[] = [];
         public boards: BlackBoardPiece[] = [];
         public backBoard: BABYLON.Mesh;
@@ -593,9 +631,9 @@ namespace MarbleRunSimulatorCore {
             });
 
             //this.backBoard.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
-            this.trampolines.forEach(trampoline => {
-                trampoline.updateMesh();
-            });
+            //this.trampolines.forEach(trampoline => {
+            //    trampoline.updateMesh();
+            //});
 
             this.bouncers.forEach(bouncer => {
                 //bouncer.updateMesh();
@@ -813,9 +851,9 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
-        public addTrampoline(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void {
-            this.trampolines.push(new BBTrampoline(this, p0, p1));
-        }
+        //public addTrampoline(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void {
+        //    this.trampolines.push(new BBTrampoline(this, p0, p1));
+        //}
 
         public addBouncer(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void {
             this.bouncers.push(new BBBouncer(this, p0, p1));
@@ -829,6 +867,49 @@ namespace MarbleRunSimulatorCore {
             if (this.lines.length >= 1) {
                 this.lines.splice(0, 1);
             }
+        }
+
+        public removeLine(index: number): void {
+            this.lines.splice(index, 1);
+        }
+
+        public getLineIndexAt(localPosition: BABYLON.Vector3, range: number = 0.01): number {
+            let bestDist = range;
+            let bestIndex = -1;
+
+            let proj = {
+                point: BABYLON.Vector3.Zero(),
+                index: -1
+            }
+            for (let i = 0; i < this.lines.length; i++) {
+                Mummu.ProjectPointOnPathToRef(localPosition, this.lines[i], proj, true);
+                if (proj.index != - 1) {
+                    let dist = BABYLON.Vector3.Distance(proj.point, localPosition);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestIndex = i;
+                    }
+                }
+            }
+
+            return bestIndex;
+        }
+
+        public getBouncerIndexAt(localPosition: BABYLON.Vector3, range: number = 0.01): number {
+            let bestDist = range;
+            let bestIndex = -1;
+
+            let proj = BABYLON.Vector3.Zero();
+            for (let i = 0; i < this.bouncers.length; i++) {
+                Mummu.ProjectPointOnSegmentToRef(localPosition, this.bouncers[i].p0, this.bouncers[i].p1, proj);
+                let dist = BABYLON.Vector3.Distance(proj, localPosition);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestIndex = i;
+                }
+            }
+
+            return bestIndex;
         }
 
         public setI(v: number, doNotCheckGridLimits?: boolean): void {

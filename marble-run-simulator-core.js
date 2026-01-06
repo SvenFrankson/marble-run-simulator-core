@@ -651,6 +651,7 @@ var MarbleRunSimulatorCore;
                                 }
                             }
                             if (part instanceof MarbleRunSimulatorCore.BlackBoard) {
+                                /*
                                 part.trampolines.forEach(trampoline => {
                                     let b = trampoline.getBouncyness(this);
                                     let colPress = Mummu.SphereCapsuleIntersection(this.position, this.radius, part.position.add(trampoline.p0), part.position.add(trampoline.p1), trampoline.thicknessRadius + b * trampoline.maxDepthStrech);
@@ -665,12 +666,14 @@ var MarbleRunSimulatorCore;
                                         trampoline.contactingBall = undefined;
                                         trampoline.contactNormal = undefined;
                                     }
+
                                     let worldP0 = trampoline.p0.add(trampoline.blackboard.position);
                                     let worldP1 = trampoline.p1.add(trampoline.blackboard.position);
                                     if (trampoline.contactNormal) {
                                         worldP0.subtractInPlace(trampoline.contactNormal.scale(trampoline.maxDepthStrech * b));
                                         worldP1.subtractInPlace(trampoline.contactNormal.scale(trampoline.maxDepthStrech * b));
                                     }
+
                                     let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, worldP0, worldP1, trampoline.thicknessRadius);
                                     if (col.hit) {
                                         //this.setLastHit(wire, col.index);
@@ -690,6 +693,7 @@ var MarbleRunSimulatorCore;
                                         reactionsCount++;
                                     }
                                 });
+                                */
                                 part.bouncers.forEach(bouncer => {
                                     let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, bouncer.p0.add(bouncer.blackboard.position), bouncer.p1.add(bouncer.blackboard.position), bouncer.thicknessRadius);
                                     if (col.hit) {
@@ -10627,6 +10631,43 @@ var MarbleRunSimulatorCore;
 })(MarbleRunSimulatorCore || (MarbleRunSimulatorCore = {}));
 var MarbleRunSimulatorCore;
 (function (MarbleRunSimulatorCore) {
+    class BlackBoardElement {
+        constructor(blackboard) {
+            this.blackboard = blackboard;
+            this.hovered = false;
+            this.selected = false;
+            this.outlinableMeshes = [];
+        }
+        updateHighlight() {
+            if (this.hovered || this.selected) {
+                this.outlinableMeshes.forEach(child => {
+                    if (child instanceof BABYLON.Mesh) {
+                        child.renderOutline = true;
+                        child.outlineWidth = MarbleRunSimulatorCore.UI3DConstants.outlineWidth;
+                        if (this.selected) {
+                            child.outlineColor = MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor;
+                        }
+                        else if (this.hovered) {
+                            child.outlineColor = MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor;
+                        }
+                    }
+                });
+            }
+            else {
+                this.outlinableMeshes.forEach(child => {
+                    if (child instanceof BABYLON.Mesh) {
+                        if (this.blackboard.machine.toonOutlineRender) {
+                            MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(child);
+                        }
+                        else {
+                            child.renderOutline = false;
+                        }
+                    }
+                });
+            }
+        }
+    }
+    MarbleRunSimulatorCore.BlackBoardElement = BlackBoardElement;
     class BlackBoardPiece extends BABYLON.Mesh {
         constructor(blackboard, wFactor, hFactor) {
             super("blackboard-piece");
@@ -10645,41 +10686,18 @@ var MarbleRunSimulatorCore;
         }
     }
     MarbleRunSimulatorCore.BlackBoardPiece = BlackBoardPiece;
-    class BBTrampoline extends BABYLON.Mesh {
-        constructor(blackboard, p0, p1) {
-            super("trampoline");
-            this.blackboard = blackboard;
-            this.p0 = p0;
-            this.p1 = p1;
-            this.maxDepthStrech = 0.01;
-            this.bouncingPointVelocity = BABYLON.Vector3.Zero();
-            this.thicknessRadius = 0.005;
-            this._update = () => {
-                if (this.isDisposed()) {
-                    this.blackboard._scene.onBeforeRenderObservable.removeCallback(this._update);
-                }
-                else {
-                    this.updateMesh();
-                }
-            };
-            this.bouncingPoint = this.p0.add(this.p1).scaleInPlace(0.5);
-            this.parent = blackboard;
-            let tip0 = BABYLON.MeshBuilder.CreateSphere("tip0", { diameter: 2 * this.thicknessRadius });
-            tip0.position.copyFrom(this.p0);
-            tip0.parent = this;
-            let tip1 = BABYLON.MeshBuilder.CreateSphere("tip0", { diameter: 2 * this.thicknessRadius });
-            tip1.position.copyFrom(this.p1);
-            tip1.parent = this;
-            if (this.blackboard.machine.toonOutlineRender) {
-                MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this);
-                MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(tip0);
-                MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(tip1);
-            }
-            this.blackboard._scene.onBeforeRenderObservable.add(this._update);
-        }
+    /*
+    export class BBTrampoline extends BlackBoardElement {
+
+        public maxDepthStrech = 0.01;
+        public contactingBall: Ball;
+        public contactNormal: BABYLON.Vector3;
+        public bouncingPoint: BABYLON.Vector3;
+        public bouncingPointVelocity: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+        public thicknessRadius: number = 0.005;
         //public worldHardP0: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         //public worldHardP1: BABYLON.Vector3 = BABYLON.Vector3.Zero();
-        getBouncyness(ball) {
+        public getBouncyness(ball: Ball): number {
             let localP = ball.position.subtract(this.blackboard.position);
             let proj = Mummu.ProjectPointOnSegment(localP, this.p0, this.p1);
             let dist = BABYLON.Vector3.Distance(this.p0, proj);
@@ -10687,13 +10705,52 @@ var MarbleRunSimulatorCore;
             bouncyness = Nabu.Easing.easeOutCubic(bouncyness);
             return bouncyness;
         }
-        updateMesh() {
+
+        constructor(
+            blackboard: BlackBoard,
+            public p0: BABYLON.Vector3,
+            public p1: BABYLON.Vector3
+        ) {
+            super(blackboard);
+
+            this.bouncingPoint = this.p0.add(this.p1).scaleInPlace(0.5);
+
+            this.parent = blackboard;
+            let tip0 = BABYLON.MeshBuilder.CreateSphere("tip0", { diameter: 2 * this.thicknessRadius });
+            tip0.position.copyFrom(this.p0);
+            tip0.parent = this;
+            let tip1 = BABYLON.MeshBuilder.CreateSphere("tip0", { diameter: 2 * this.thicknessRadius });
+            tip1.position.copyFrom(this.p1);
+            tip1.parent = this;
+            
+            if (this.blackboard.machine.toonOutlineRender) {
+                MainMaterials.SetAsOutlinedMesh(this);
+                MainMaterials.SetAsOutlinedMesh(tip0);
+                MainMaterials.SetAsOutlinedMesh(tip1);
+            }
+
+            this.blackboard._scene.onBeforeRenderObservable.add(this._update);
+        }
+
+        private _update = () => {
+            if (this.isDisposed()) {
+                this.blackboard._scene.onBeforeRenderObservable.removeCallback(this._update);
+            }
+            else {
+                this.updateMesh();
+            }
+        }
+
+        public updateMesh(): void {
             let c = this.p0.add(this.p1).scaleInPlace(0.5);
+
             if (!this.contactingBall) {
                 //this.worldHardP0.copyFrom(this.p0);
                 //this.worldHardP0.addInPlace(this.blackboard.position);
+
                 //this.worldHardP1.copyFrom(this.p1);
                 //this.worldHardP1.addInPlace(this.blackboard.position);
+
                 let d = c.subtract(this.bouncingPoint);
                 this.bouncingPointVelocity.addInPlace(d.scale(1.5));
                 this.bouncingPointVelocity.scaleInPlace(0.98);
@@ -10702,18 +10759,22 @@ var MarbleRunSimulatorCore;
             else {
                 let n = this.contactNormal;
                 let b = this.getBouncyness(this.contactingBall);
+
                 //this.worldHardP0.copyFrom(this.p0);
                 //this.worldHardP0.addInPlace(this.blackboard.position);
                 //this.worldHardP0.subtractInPlace(n.scale(this.maxDepthStrech * b));
+
                 //this.worldHardP1.copyFrom(this.p1);
                 //this.worldHardP1.addInPlace(this.blackboard.position);
                 //this.worldHardP1.subtractInPlace(n.scale(this.maxDepthStrech * b));
+
                 let pt = this.contactingBall.position.subtract(this.blackboard.position);
                 let proj = Mummu.ProjectPointOnSegment(pt, this.p0, this.p1);
                 Mummu.DrawDebugPoint(proj, 5, BABYLON.Color3.Red(), 0.05).parent = this.blackboard;
                 let delta = pt.subtract(proj);
                 let dot = BABYLON.Vector3.Dot(delta, n);
                 let dist = Math.min(BABYLON.Vector3.Distance(this.p0, proj), BABYLON.Vector3.Distance(this.p1, proj));
+
                 if (dot < this.contactingBall.radius + this.thicknessRadius && dist > this.thicknessRadius) {
                     pt.subtractInPlace(this.contactNormal.scale(this.contactingBall.radius + this.thicknessRadius));
                     this.bouncingPoint.scaleInPlace(0.5).addInPlace(pt.scale(0.5));
@@ -10725,10 +10786,14 @@ var MarbleRunSimulatorCore;
                     this.bouncingPoint.addInPlace(this.bouncingPointVelocity.scale(0.02));
                 }
             }
+            
+
             let path = [this.p0, this.p1];
             if (BABYLON.Vector3.Distance(this.p0, this.bouncingPoint) < this.thicknessRadius) {
+                
             }
             else if (BABYLON.Vector3.Distance(this.p1, this.bouncingPoint) < this.thicknessRadius) {
+                
             }
             else {
                 path = [this.p0, this.bouncingPoint, this.p1];
@@ -10736,26 +10801,25 @@ var MarbleRunSimulatorCore;
                 Mummu.CatmullRomPathInPlace(path, this.p1.subtract(this.p0), this.p1.subtract(this.p0));
                 Mummu.CatmullRomPathInPlace(path, this.p1.subtract(this.p0), this.p1.subtract(this.p0));
             }
+
             let data = Mummu.CreateWireVertexData({
-                path: path.map(p => { return p.clone(); }),
-                pathUps: path.map(p => { return BABYLON.Vector3.Up(); }),
+                path: path.map(p => { return p.clone()}),
+                pathUps: path.map(p => { return BABYLON.Vector3.Up()}),
                 radius: this.thicknessRadius,
                 cap: BABYLON.Mesh.NO_CAP
             });
             data.applyToMesh(this);
         }
     }
-    MarbleRunSimulatorCore.BBTrampoline = BBTrampoline;
-    class BBBouncer extends BABYLON.Mesh {
+    */
+    class BBBouncer extends BlackBoardElement {
         constructor(blackboard, p0, p1) {
-            super("trampoline");
-            this.blackboard = blackboard;
+            super(blackboard);
             this.p0 = p0;
             this.p1 = p1;
             this.thicknessRadius = 0.005;
             this.bumpTop = Mummu.AnimationFactory.EmptyNumberCallback;
             this.bumpBottom = Mummu.AnimationFactory.EmptyNumberCallback;
-            this.parent = blackboard;
             this.updateMesh();
         }
         updateMesh() {
@@ -10771,7 +10835,7 @@ var MarbleRunSimulatorCore;
             bodyData.applyToMesh(this.body);
             this.body.position = this.p0.add(this.p1).scaleInPlace(0.5);
             this.body.rotationQuaternion = Mummu.QuaternionFromXZAxis(this.p1.subtract(this.p0), BABYLON.Axis.Z);
-            this.body.parent = this;
+            this.body.parent = this.blackboard;
             let plateData = Mummu.CreateBeveledBoxVertexData({
                 width: l - 0.004,
                 height: 0.002,
@@ -10794,11 +10858,8 @@ var MarbleRunSimulatorCore;
             this.body.material = this.blackboard.game.materials.getMaterial(18, this.blackboard.machine.materialQ);
             this.plateTop.material = this.blackboard.game.materials.getMaterial(7, this.blackboard.machine.materialQ);
             this.plateBottom.material = this.blackboard.game.materials.getMaterial(7, this.blackboard.machine.materialQ);
-            if (this.blackboard.machine.toonOutlineRender) {
-                MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.body);
-                MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.plateTop);
-                MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.plateBottom);
-            }
+            this.outlinableMeshes = [this.body, this.plateTop, this.plateBottom];
+            this.updateHighlight();
         }
         getClosestPoint(p) {
             let d0 = BABYLON.Vector3.DistanceSquared(p, this.p0);
@@ -10819,7 +10880,7 @@ var MarbleRunSimulatorCore;
             if (index > -1) {
                 this.blackboard.bouncers.splice(index, 1);
             }
-            super.dispose();
+            this.body.dispose();
         }
     }
     MarbleRunSimulatorCore.BBBouncer = BBBouncer;
@@ -10827,7 +10888,7 @@ var MarbleRunSimulatorCore;
         constructor(machine, prop) {
             super(machine, prop);
             this.lines = [];
-            this.trampolines = [];
+            //public trampolines: BBTrampoline[] = [];
             this.bouncers = [];
             this.boards = [];
             this.borders = [];
@@ -11132,9 +11193,9 @@ var MarbleRunSimulatorCore;
                 border.material = this.game.materials.getMaterial(this.getColor(2), this.machine.materialQ);
             });
             //this.backBoard.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
-            this.trampolines.forEach(trampoline => {
-                trampoline.updateMesh();
-            });
+            //this.trampolines.forEach(trampoline => {
+            //    trampoline.updateMesh();
+            //});
             this.bouncers.forEach(bouncer => {
                 //bouncer.updateMesh();
             });
@@ -11309,9 +11370,9 @@ var MarbleRunSimulatorCore;
                 this.lines.push(filteredPoints);
             }
         }
-        addTrampoline(p0, p1) {
-            this.trampolines.push(new BBTrampoline(this, p0, p1));
-        }
+        //public addTrampoline(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void {
+        //    this.trampolines.push(new BBTrampoline(this, p0, p1));
+        //}
         addBouncer(p0, p1) {
             this.bouncers.push(new BBBouncer(this, p0, p1));
         }
@@ -11322,6 +11383,42 @@ var MarbleRunSimulatorCore;
             if (this.lines.length >= 1) {
                 this.lines.splice(0, 1);
             }
+        }
+        removeLine(index) {
+            this.lines.splice(index, 1);
+        }
+        getLineIndexAt(localPosition, range = 0.01) {
+            let bestDist = range;
+            let bestIndex = -1;
+            let proj = {
+                point: BABYLON.Vector3.Zero(),
+                index: -1
+            };
+            for (let i = 0; i < this.lines.length; i++) {
+                Mummu.ProjectPointOnPathToRef(localPosition, this.lines[i], proj, true);
+                if (proj.index != -1) {
+                    let dist = BABYLON.Vector3.Distance(proj.point, localPosition);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestIndex = i;
+                    }
+                }
+            }
+            return bestIndex;
+        }
+        getBouncerIndexAt(localPosition, range = 0.01) {
+            let bestDist = range;
+            let bestIndex = -1;
+            let proj = BABYLON.Vector3.Zero();
+            for (let i = 0; i < this.bouncers.length; i++) {
+                Mummu.ProjectPointOnSegmentToRef(localPosition, this.bouncers[i].p0, this.bouncers[i].p1, proj);
+                let dist = BABYLON.Vector3.Distance(proj, localPosition);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestIndex = i;
+                }
+            }
+            return bestIndex;
         }
         setI(v, doNotCheckGridLimits) {
             super.setI(0, true);

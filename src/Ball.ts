@@ -732,6 +732,7 @@ namespace MarbleRunSimulatorCore {
                                 }
                             }
                             if (part instanceof BlackBoard) {
+                                /*
                                 part.trampolines.forEach(trampoline => {
                                     let b = trampoline.getBouncyness(this);
                                     let colPress = Mummu.SphereCapsuleIntersection(this.position, this.radius, part.position.add(trampoline.p0), part.position.add(trampoline.p1), trampoline.thicknessRadius + b * trampoline.maxDepthStrech);
@@ -773,7 +774,7 @@ namespace MarbleRunSimulatorCore {
                                         reactionsCount++;
                                     }
                                 });
-
+                                */
                                 part.bouncers.forEach(bouncer => {
                                     let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, bouncer.p0.add(bouncer.blackboard.position), bouncer.p1.add(bouncer.blackboard.position), bouncer.thicknessRadius);
                                     if (col.hit) {
