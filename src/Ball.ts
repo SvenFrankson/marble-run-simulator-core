@@ -794,7 +794,7 @@ namespace MarbleRunSimulatorCore {
                                         reactions.addInPlace(reaction);
                                         reactionsCount++;
 
-                                        bouncer.bump();
+                                        bouncer.bump(col.normal);
                                     }
                                 });
                             }

@@ -1197,6 +1197,10 @@ declare namespace MarbleRunSimulatorCore {
         hFactor: number;
         constructor(blackboard: BlackBoard, wFactor: number, hFactor: number);
     }
+    class BBLine extends BlackBoardElement {
+        points: BABYLON.Vector3[];
+        constructor(blackboard: BlackBoard, points: BABYLON.Vector3[]);
+    }
     class BBBouncer extends BlackBoardElement {
         p0: BABYLON.Vector3;
         p1: BABYLON.Vector3;
@@ -1209,12 +1213,12 @@ declare namespace MarbleRunSimulatorCore {
         constructor(blackboard: BlackBoard, p0: BABYLON.Vector3, p1: BABYLON.Vector3);
         updateMesh(): void;
         getClosestPoint(p: BABYLON.Vector3): BABYLON.Vector3;
-        bump(): Promise<void>;
+        bump(normal: BABYLON.Vector3): Promise<void>;
         dispose(): void;
     }
     class BlackBoard extends MachinePart {
         static BoardThickness: number;
-        lines: BABYLON.Vector3[][];
+        lines: BBLine[];
         bouncers: BBBouncer[];
         boards: BlackBoardPiece[];
         backBoard: BABYLON.Mesh;
@@ -1226,6 +1230,7 @@ declare namespace MarbleRunSimulatorCore {
         constructor(machine: Machine, prop: IMachinePartProp);
         static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number, n: number): MachinePartTemplate;
+        instantiate(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;
@@ -1238,6 +1243,7 @@ declare namespace MarbleRunSimulatorCore {
         removeLastLine(): void;
         removeFirstLine(): void;
         removeLine(index: number): void;
+        eraseLine(localPosition: BABYLON.Vector3, range?: number): boolean;
         getLineIndexAt(localPosition: BABYLON.Vector3, range?: number): number;
         getBouncerIndexAt(localPosition: BABYLON.Vector3, range?: number): number;
         setI(v: number, doNotCheckGridLimits?: boolean): void;

@@ -12,27 +12,27 @@ namespace MarbleRunSimulatorCore {
 
         public updateHighlight(): void {
             if (this.hovered || this.selected) {
-                this.outlinableMeshes.forEach(child => {
-                    if (child instanceof BABYLON.Mesh) {
-                        child.renderOutline = true;
-                        child.outlineWidth = UI3DConstants.outlineWidth;
+                this.outlinableMeshes.forEach(mesh => {
+                    if (mesh instanceof BABYLON.Mesh) {
+                        mesh.renderOutline = true;
+                        mesh.outlineWidth = UI3DConstants.outlineWidth;
                         if (this.selected) {
-                            child.outlineColor = UI3DConstants.outlineSelectedColor;
+                            mesh.outlineColor.copyFrom(UI3DConstants.outlineSelectedColor);
                         }
                         else if (this.hovered) {
-                            child.outlineColor = UI3DConstants.outlineHoverColor;
+                            mesh.outlineColor.copyFrom(UI3DConstants.outlineHoverColor);
                         }
                     }
                 });
             }
             else {
-                this.outlinableMeshes.forEach(child => {
-                    if (child instanceof BABYLON.Mesh) {
+                this.outlinableMeshes.forEach(mesh => {
+                    if (mesh instanceof BABYLON.Mesh) {
                         if (this.blackboard.machine.toonOutlineRender) {
-                            MainMaterials.SetAsOutlinedMesh(child);
+                            MainMaterials.SetAsOutlinedMesh(mesh);
                         }
                         else {
-                            child.renderOutline = false;
+                            mesh.renderOutline = false;
                         }
                     }
                 });
@@ -186,6 +186,16 @@ namespace MarbleRunSimulatorCore {
     }
     */
 
+    export class BBLine extends BlackBoardElement {
+
+        constructor(
+            blackboard: BlackBoard,
+            public points: BABYLON.Vector3[]
+        ) {
+            super(blackboard);
+        }
+    }
+
     export class BBBouncer extends BlackBoardElement {
 
         public thicknessRadius: number = 0.005;
@@ -214,8 +224,8 @@ namespace MarbleRunSimulatorCore {
             let l = BABYLON.Vector3.Distance(this.p0, this.p1) + 2 * this.thicknessRadius;
             let bodyData = Mummu.CreateBeveledBoxVertexData({
                 width: l,
-                height: 2 * this.thicknessRadius - 0.001,
-                depth: tileSize
+                height: 2 * this.thicknessRadius - 0.002,
+                depth: tileSize * 0.7
             });
             bodyData.applyToMesh(this.body);
             this.body.position = this.p0.add(this.p1).scaleInPlace(0.5);
@@ -223,9 +233,9 @@ namespace MarbleRunSimulatorCore {
             this.body.parent = this.blackboard;
 
             let plateData = Mummu.CreateBeveledBoxVertexData({
-                width: l- 0.004,
+                width: l - 0.004,
                 height: 0.002,
-                depth: tileSize - 0.004
+                depth: tileSize * 0.7 - 0.004
             });
 
             if (!this.plateTop) {
@@ -263,11 +273,15 @@ namespace MarbleRunSimulatorCore {
             return this.p1;
         }
 
-        public async bump(): Promise<void> {
-            this.bumpTop(1.5 * this.thicknessRadius, 0.07);
-            await this.bumpBottom(- 1.5 * this.thicknessRadius, 0.07);
-            this.bumpTop(this.thicknessRadius, 0.07);
-            await this.bumpBottom(- this.thicknessRadius, 0.07);
+        public async bump(normal: BABYLON.Vector3): Promise<void> {
+            if (BABYLON.Vector3.Dot(normal, this.body.up) >= 0) {
+                await this.bumpTop(1.5 * this.thicknessRadius, 0.07);
+                await this.bumpTop(this.thicknessRadius, 0.07);
+            }
+            else {
+                await this.bumpBottom(- 1.5 * this.thicknessRadius, 0.07);
+                await this.bumpBottom(- this.thicknessRadius, 0.07);
+            }
         }
 
         public dispose(): void {
@@ -282,7 +296,7 @@ namespace MarbleRunSimulatorCore {
     export class BlackBoard extends MachinePart {
         
         public static BoardThickness: number = 0.005;
-        public lines: BABYLON.Vector3[][] = [];
+        public lines: BBLine[] = [];
         //public trampolines: BBTrampoline[] = [];
         public bouncers: BBBouncer[] = [];
         public boards: BlackBoardPiece[] = [];
@@ -621,6 +635,17 @@ namespace MarbleRunSimulatorCore {
             return template;
         }
         
+        public async instantiate(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): Promise<void> {
+            await super.instantiate(rebuildNeighboursWireMeshes, skipSleepersAndSupport);
+            for (let i = 0; i < this.lines.length; i++) {
+                let bbLine = this.lines[i];
+                let track = this.tracks[i];
+                if (track instanceof DoubleTrack) {
+                    bbLine.outlinableMeshes = [track.mesh]
+                }
+            }
+        }
+
         protected async instantiateMachineSpecific(): Promise<void> {
             this.boards.forEach(board => {
                 board.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
@@ -699,7 +724,7 @@ namespace MarbleRunSimulatorCore {
                 let trackTemplate = new TrackTemplate(this.template);
                 trackTemplate.cutOutSleeper = (n) => { return true; };
                 trackTemplate.isDouble = true;
-                let dirStart = rawLine[1].subtract(rawLine[0]).normalize();
+                let dirStart = rawLine.points[1].subtract(rawLine.points[0]).normalize();
                 let prevDir = dirStart.clone();
                 let normStart = Mummu.Rotate(dirStart, BABYLON.Axis.Z, Math.PI * 0.5);
                 if (normStart.y < 0) {
@@ -708,15 +733,15 @@ namespace MarbleRunSimulatorCore {
                 let prevNorm = normStart.clone();
                 let avgNorm = BABYLON.Vector3.Zero();
 
-                for (let i = 0; i < rawLine.length; i++) {
-                    let rawPoint = rawLine[i];
-                    let prev = rawLine[i - 1];
-                    let next = rawLine[i + 1];
+                for (let i = 0; i < rawLine.points.length; i++) {
+                    let rawPoint = rawLine.points[i];
+                    let prev = rawLine.points[i - 1];
+                    let next = rawLine.points[i + 1];
                     if (!prev) {
-                        prev = rawLine[i];
+                        prev = rawLine.points[i];
                     }
                     if (!next) {
-                        next = rawLine[i];
+                        next = rawLine.points[i];
                     }
                     let dir = next.subtract(prev).normalize();
 
@@ -805,7 +830,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public addLine(points: BABYLON.Vector3[]): void {
-            this.lines.push(points);
+            this.lines.push(new BBLine(this, points));
         }
 
         public addRawLine(points: BABYLON.Vector3[]): void {
@@ -847,7 +872,7 @@ namespace MarbleRunSimulatorCore {
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
                 forceEndDir(0.5);
 
-                this.lines.push(filteredPoints);
+                this.lines.push(new BBLine(this, filteredPoints));
             }
         }
 
@@ -873,6 +898,28 @@ namespace MarbleRunSimulatorCore {
             this.lines.splice(index, 1);
         }
 
+        public eraseLine(localPosition: BABYLON.Vector3, range: number = 0.01): boolean {
+            for (let i = 0; i < this.lines.length; i++) {
+                let line = this.lines[i];
+                for (let j = 0; j < line.points.length; j++) {
+                    let d = BABYLON.Vector3.Distance(localPosition, line.points[j]);
+                    if (d < range) {
+                        if (j < line.points.length * 0.5) {
+                            line.points = line.points.slice(j + 1);
+                        }
+                        else {
+                            line.points = line.points.slice(0, j);
+                        }
+                        if (line.points.length < 2) {
+                            this.removeLine(i);
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public getLineIndexAt(localPosition: BABYLON.Vector3, range: number = 0.01): number {
             let bestDist = range;
             let bestIndex = -1;
@@ -882,7 +929,7 @@ namespace MarbleRunSimulatorCore {
                 index: -1
             }
             for (let i = 0; i < this.lines.length; i++) {
-                Mummu.ProjectPointOnPathToRef(localPosition, this.lines[i], proj, true);
+                Mummu.ProjectPointOnPathToRef(localPosition, this.lines[i].points, proj, true);
                 if (proj.index != - 1) {
                     let dist = BABYLON.Vector3.Distance(proj.point, localPosition);
                     if (dist < bestDist) {

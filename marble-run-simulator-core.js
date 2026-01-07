@@ -712,7 +712,7 @@ var MarbleRunSimulatorCore;
                                         let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
                                         reactions.addInPlace(reaction);
                                         reactionsCount++;
-                                        bouncer.bump();
+                                        bouncer.bump(col.normal);
                                     }
                                 });
                             }
@@ -10640,27 +10640,27 @@ var MarbleRunSimulatorCore;
         }
         updateHighlight() {
             if (this.hovered || this.selected) {
-                this.outlinableMeshes.forEach(child => {
-                    if (child instanceof BABYLON.Mesh) {
-                        child.renderOutline = true;
-                        child.outlineWidth = MarbleRunSimulatorCore.UI3DConstants.outlineWidth;
+                this.outlinableMeshes.forEach(mesh => {
+                    if (mesh instanceof BABYLON.Mesh) {
+                        mesh.renderOutline = true;
+                        mesh.outlineWidth = MarbleRunSimulatorCore.UI3DConstants.outlineWidth;
                         if (this.selected) {
-                            child.outlineColor = MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor;
+                            mesh.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineSelectedColor);
                         }
                         else if (this.hovered) {
-                            child.outlineColor = MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor;
+                            mesh.outlineColor.copyFrom(MarbleRunSimulatorCore.UI3DConstants.outlineHoverColor);
                         }
                     }
                 });
             }
             else {
-                this.outlinableMeshes.forEach(child => {
-                    if (child instanceof BABYLON.Mesh) {
+                this.outlinableMeshes.forEach(mesh => {
+                    if (mesh instanceof BABYLON.Mesh) {
                         if (this.blackboard.machine.toonOutlineRender) {
-                            MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(child);
+                            MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(mesh);
                         }
                         else {
-                            child.renderOutline = false;
+                            mesh.renderOutline = false;
                         }
                     }
                 });
@@ -10812,6 +10812,13 @@ var MarbleRunSimulatorCore;
         }
     }
     */
+    class BBLine extends BlackBoardElement {
+        constructor(blackboard, points) {
+            super(blackboard);
+            this.points = points;
+        }
+    }
+    MarbleRunSimulatorCore.BBLine = BBLine;
     class BBBouncer extends BlackBoardElement {
         constructor(blackboard, p0, p1) {
             super(blackboard);
@@ -10829,8 +10836,8 @@ var MarbleRunSimulatorCore;
             let l = BABYLON.Vector3.Distance(this.p0, this.p1) + 2 * this.thicknessRadius;
             let bodyData = Mummu.CreateBeveledBoxVertexData({
                 width: l,
-                height: 2 * this.thicknessRadius - 0.001,
-                depth: MarbleRunSimulatorCore.tileSize
+                height: 2 * this.thicknessRadius - 0.002,
+                depth: MarbleRunSimulatorCore.tileSize * 0.7
             });
             bodyData.applyToMesh(this.body);
             this.body.position = this.p0.add(this.p1).scaleInPlace(0.5);
@@ -10839,7 +10846,7 @@ var MarbleRunSimulatorCore;
             let plateData = Mummu.CreateBeveledBoxVertexData({
                 width: l - 0.004,
                 height: 0.002,
-                depth: MarbleRunSimulatorCore.tileSize - 0.004
+                depth: MarbleRunSimulatorCore.tileSize * 0.7 - 0.004
             });
             if (!this.plateTop) {
                 this.plateTop = new BABYLON.Mesh("plate-top");
@@ -10869,11 +10876,15 @@ var MarbleRunSimulatorCore;
             }
             return this.p1;
         }
-        async bump() {
-            this.bumpTop(1.5 * this.thicknessRadius, 0.07);
-            await this.bumpBottom(-1.5 * this.thicknessRadius, 0.07);
-            this.bumpTop(this.thicknessRadius, 0.07);
-            await this.bumpBottom(-this.thicknessRadius, 0.07);
+        async bump(normal) {
+            if (BABYLON.Vector3.Dot(normal, this.body.up) >= 0) {
+                await this.bumpTop(1.5 * this.thicknessRadius, 0.07);
+                await this.bumpTop(this.thicknessRadius, 0.07);
+            }
+            else {
+                await this.bumpBottom(-1.5 * this.thicknessRadius, 0.07);
+                await this.bumpBottom(-this.thicknessRadius, 0.07);
+            }
         }
         dispose() {
             let index = this.blackboard.bouncers.indexOf(this);
@@ -11185,6 +11196,16 @@ var MarbleRunSimulatorCore;
             }
             return template;
         }
+        async instantiate(rebuildNeighboursWireMeshes, skipSleepersAndSupport) {
+            await super.instantiate(rebuildNeighboursWireMeshes, skipSleepersAndSupport);
+            for (let i = 0; i < this.lines.length; i++) {
+                let bbLine = this.lines[i];
+                let track = this.tracks[i];
+                if (track instanceof MarbleRunSimulatorCore.DoubleTrack) {
+                    bbLine.outlinableMeshes = [track.mesh];
+                }
+            }
+        }
         async instantiateMachineSpecific() {
             this.boards.forEach(board => {
                 board.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
@@ -11240,7 +11261,7 @@ var MarbleRunSimulatorCore;
                 let trackTemplate = new MarbleRunSimulatorCore.TrackTemplate(this.template);
                 trackTemplate.cutOutSleeper = (n) => { return true; };
                 trackTemplate.isDouble = true;
-                let dirStart = rawLine[1].subtract(rawLine[0]).normalize();
+                let dirStart = rawLine.points[1].subtract(rawLine.points[0]).normalize();
                 let prevDir = dirStart.clone();
                 let normStart = Mummu.Rotate(dirStart, BABYLON.Axis.Z, Math.PI * 0.5);
                 if (normStart.y < 0) {
@@ -11248,15 +11269,15 @@ var MarbleRunSimulatorCore;
                 }
                 let prevNorm = normStart.clone();
                 let avgNorm = BABYLON.Vector3.Zero();
-                for (let i = 0; i < rawLine.length; i++) {
-                    let rawPoint = rawLine[i];
-                    let prev = rawLine[i - 1];
-                    let next = rawLine[i + 1];
+                for (let i = 0; i < rawLine.points.length; i++) {
+                    let rawPoint = rawLine.points[i];
+                    let prev = rawLine.points[i - 1];
+                    let next = rawLine.points[i + 1];
                     if (!prev) {
-                        prev = rawLine[i];
+                        prev = rawLine.points[i];
                     }
                     if (!next) {
-                        next = rawLine[i];
+                        next = rawLine.points[i];
                     }
                     let dir = next.subtract(prev).normalize();
                     let angle = Mummu.AngleFromToAround(prevDir, dir, BABYLON.Axis.Z);
@@ -11329,7 +11350,7 @@ var MarbleRunSimulatorCore;
             return best;
         }
         addLine(points) {
-            this.lines.push(points);
+            this.lines.push(new BBLine(this, points));
         }
         addRawLine(points) {
             if (points.length > 0) {
@@ -11367,7 +11388,7 @@ var MarbleRunSimulatorCore;
                 forceEndDir(1);
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
                 forceEndDir(0.5);
-                this.lines.push(filteredPoints);
+                this.lines.push(new BBLine(this, filteredPoints));
             }
         }
         //public addTrampoline(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void {
@@ -11387,6 +11408,27 @@ var MarbleRunSimulatorCore;
         removeLine(index) {
             this.lines.splice(index, 1);
         }
+        eraseLine(localPosition, range = 0.01) {
+            for (let i = 0; i < this.lines.length; i++) {
+                let line = this.lines[i];
+                for (let j = 0; j < line.points.length; j++) {
+                    let d = BABYLON.Vector3.Distance(localPosition, line.points[j]);
+                    if (d < range) {
+                        if (j < line.points.length * 0.5) {
+                            line.points = line.points.slice(j + 1);
+                        }
+                        else {
+                            line.points = line.points.slice(0, j);
+                        }
+                        if (line.points.length < 2) {
+                            this.removeLine(i);
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
         getLineIndexAt(localPosition, range = 0.01) {
             let bestDist = range;
             let bestIndex = -1;
@@ -11395,7 +11437,7 @@ var MarbleRunSimulatorCore;
                 index: -1
             };
             for (let i = 0; i < this.lines.length; i++) {
-                Mummu.ProjectPointOnPathToRef(localPosition, this.lines[i], proj, true);
+                Mummu.ProjectPointOnPathToRef(localPosition, this.lines[i].points, proj, true);
                 if (proj.index != -1) {
                     let dist = BABYLON.Vector3.Distance(proj.point, localPosition);
                     if (dist < bestDist) {
