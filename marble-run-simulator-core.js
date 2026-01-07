@@ -11388,7 +11388,59 @@ var MarbleRunSimulatorCore;
                 forceEndDir(1);
                 Mummu.SmoothPathInPlace(filteredPoints, 0.5);
                 forceEndDir(0.5);
-                this.lines.push(new BBLine(this, filteredPoints));
+                // Try to merge with existing line
+                let existingLine;
+                let existingProj = {
+                    point: BABYLON.Vector3.Zero(),
+                    index: -1
+                };
+                let start = filteredPoints[0];
+                let startDir = filteredPoints[1].subtract(filteredPoints[0]);
+                let end = filteredPoints[filteredPoints.length - 1];
+                let endDir = filteredPoints[filteredPoints.length - 1].subtract(filteredPoints[filteredPoints.length - 2]);
+                for (let i = 0; i < this.lines.length; i++) {
+                    Mummu.ProjectPointOnPathToRef(start, this.lines[i].points, existingProj, true);
+                    if (existingProj.index != -1) {
+                        existingLine = this.lines[i];
+                        let connectionPoint = existingLine.points[existingProj.index];
+                        let prevConnectionPoint = existingLine.points[existingProj.index - 1];
+                        if (!prevConnectionPoint) {
+                            prevConnectionPoint = connectionPoint;
+                        }
+                        let nextConnectionPoint = existingLine.points[existingProj.index + 1];
+                        if (!nextConnectionPoint) {
+                            nextConnectionPoint = connectionPoint;
+                        }
+                        let connectionDir = nextConnectionPoint.subtract(prevConnectionPoint);
+                        if (BABYLON.Vector3.Dot(connectionDir, startDir) >= 0) {
+                            existingLine.points = existingLine.points.slice(0, existingProj.index);
+                            existingLine.points.push(...filteredPoints);
+                        }
+                        else {
+                            existingLine.points = existingLine.points.slice(existingProj.index + 1);
+                            existingLine.points.reverse();
+                            existingLine.points.push(...filteredPoints);
+                        }
+                        for (let n = existingProj.index - 1; n <= existingProj.index + 1; n++) {
+                            let pt = existingLine.points[n];
+                            if (pt) {
+                                let ptPrev = existingLine.points[n - 1];
+                                if (!ptPrev) {
+                                    ptPrev = pt;
+                                }
+                                let ptNext = existingLine.points[n + 1];
+                                if (!ptNext) {
+                                    ptNext = pt;
+                                }
+                                existingLine.points[n].addInPlace(ptPrev).addInPlace(ptNext).scaleInPlace(1 / 3);
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (!existingLine) {
+                    this.lines.push(new BBLine(this, filteredPoints));
+                }
             }
         }
         //public addTrampoline(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void {
