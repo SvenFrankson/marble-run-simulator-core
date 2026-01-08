@@ -1190,6 +1190,7 @@ declare namespace MarbleRunSimulatorCore {
         outlinableMeshes: BABYLON.Mesh[];
         constructor(blackboard: BlackBoard);
         updateHighlight(): void;
+        dispose(): void;
     }
     class BlackBoardPiece extends BABYLON.Mesh {
         blackboard: BlackBoard;
@@ -1200,6 +1201,7 @@ declare namespace MarbleRunSimulatorCore {
     class BBLine extends BlackBoardElement {
         points: BABYLON.Vector3[];
         constructor(blackboard: BlackBoard, points: BABYLON.Vector3[]);
+        dispose(): void;
     }
     class BBBouncer extends BlackBoardElement {
         p0: BABYLON.Vector3;
@@ -1218,6 +1220,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class BlackBoard extends MachinePart {
         static BoardThickness: number;
+        bbElements: BlackBoardElement[];
         lines: BBLine[];
         bouncers: BBBouncer[];
         boards: BlackBoardPiece[];
@@ -1243,6 +1246,7 @@ declare namespace MarbleRunSimulatorCore {
         removeLastLine(): void;
         removeFirstLine(): void;
         removeLine(index: number): void;
+        removeFirstElement(): void;
         eraseLine(localPosition: BABYLON.Vector3, range?: number): boolean;
         getLineIndexAt(localPosition: BABYLON.Vector3, range?: number): number;
         getBouncerIndexAt(localPosition: BABYLON.Vector3, range?: number): number;

@@ -7,7 +7,7 @@ namespace MarbleRunSimulatorCore {
         public outlinableMeshes: BABYLON.Mesh[] = [];
 
         constructor(public blackboard: BlackBoard) {
-            
+            this.blackboard.bbElements.push(this);
         }
 
         public updateHighlight(): void {
@@ -36,6 +36,13 @@ namespace MarbleRunSimulatorCore {
                         }
                     }
                 });
+            }
+        }
+
+        public dispose(): void {
+            let index = this.blackboard.bbElements.indexOf(this);
+            if (index > - 1) {
+                this.blackboard.bbElements.splice(index, 1);
             }
         }
     }
@@ -193,6 +200,17 @@ namespace MarbleRunSimulatorCore {
             public points: BABYLON.Vector3[]
         ) {
             super(blackboard);
+
+            this.blackboard.lines.push(this);
+        }
+
+        public dispose(): void {
+            super.dispose();
+
+            let index = this.blackboard.lines.indexOf(this);
+            if (index > - 1) {
+                this.blackboard.lines.splice(index, 1);
+            }
         }
     }
 
@@ -212,6 +230,8 @@ namespace MarbleRunSimulatorCore {
             public p1: BABYLON.Vector3
         ) {
             super(blackboard);
+
+            this.blackboard.bouncers.push(this);
 
             this.updateMesh();
         }
@@ -285,6 +305,8 @@ namespace MarbleRunSimulatorCore {
         }
 
         public dispose(): void {
+            super.dispose();
+
             let index = this.blackboard.bouncers.indexOf(this);
             if (index > - 1) {
                 this.blackboard.bouncers.splice(index, 1);
@@ -296,6 +318,7 @@ namespace MarbleRunSimulatorCore {
     export class BlackBoard extends MachinePart {
         
         public static BoardThickness: number = 0.005;
+        public bbElements: BlackBoardElement[] = [];
         public lines: BBLine[] = [];
         //public trampolines: BBTrampoline[] = [];
         public bouncers: BBBouncer[] = [];
@@ -837,7 +860,7 @@ namespace MarbleRunSimulatorCore {
         }
 
         public addLine(points: BABYLON.Vector3[]): void {
-            this.lines.push(new BBLine(this, points));
+            new BBLine(this, points);
         }
 
         public addRawLine(points: BABYLON.Vector3[]): void {
@@ -937,7 +960,7 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 if (!existingLine) {
-                    this.lines.push(new BBLine(this, filteredPoints));
+                    new BBLine(this, filteredPoints);
                 }
             }
         }
@@ -947,21 +970,31 @@ namespace MarbleRunSimulatorCore {
         //}
 
         public addBouncer(p0: BABYLON.Vector3, p1: BABYLON.Vector3): void {
-            this.bouncers.push(new BBBouncer(this, p0, p1));
+            new BBBouncer(this, p0, p1);
         }
 
         public removeLastLine(): void {
-            this.lines.pop();
+            if (this.lines.length > 0) {
+                this.lines[this.lines.length - 1].dispose();
+            }
         }
 
         public removeFirstLine(): void {
-            if (this.lines.length >= 1) {
-                this.lines.splice(0, 1);
+            if (this.lines.length > 0) {
+                this.lines[0].dispose();
             }
         }
 
         public removeLine(index: number): void {
-            this.lines.splice(index, 1);
+            if (this.lines[index]) {
+                this.lines[index].dispose();
+            }
+        }
+
+        public removeFirstElement(): void {
+            if (this.bbElements.length > 0) {
+                this.bbElements[0].dispose();
+            }
         }
 
         public eraseLine(localPosition: BABYLON.Vector3, range: number = 0.01): boolean {

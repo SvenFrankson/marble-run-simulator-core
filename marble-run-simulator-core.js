@@ -10637,6 +10637,7 @@ var MarbleRunSimulatorCore;
             this.hovered = false;
             this.selected = false;
             this.outlinableMeshes = [];
+            this.blackboard.bbElements.push(this);
         }
         updateHighlight() {
             if (this.hovered || this.selected) {
@@ -10664,6 +10665,12 @@ var MarbleRunSimulatorCore;
                         }
                     }
                 });
+            }
+        }
+        dispose() {
+            let index = this.blackboard.bbElements.indexOf(this);
+            if (index > -1) {
+                this.blackboard.bbElements.splice(index, 1);
             }
         }
     }
@@ -10816,6 +10823,14 @@ var MarbleRunSimulatorCore;
         constructor(blackboard, points) {
             super(blackboard);
             this.points = points;
+            this.blackboard.lines.push(this);
+        }
+        dispose() {
+            super.dispose();
+            let index = this.blackboard.lines.indexOf(this);
+            if (index > -1) {
+                this.blackboard.lines.splice(index, 1);
+            }
         }
     }
     MarbleRunSimulatorCore.BBLine = BBLine;
@@ -10827,6 +10842,7 @@ var MarbleRunSimulatorCore;
             this.thicknessRadius = 0.005;
             this.bumpTop = Mummu.AnimationFactory.EmptyNumberCallback;
             this.bumpBottom = Mummu.AnimationFactory.EmptyNumberCallback;
+            this.blackboard.bouncers.push(this);
             this.updateMesh();
         }
         updateMesh() {
@@ -10887,6 +10903,7 @@ var MarbleRunSimulatorCore;
             }
         }
         dispose() {
+            super.dispose();
             let index = this.blackboard.bouncers.indexOf(this);
             if (index > -1) {
                 this.blackboard.bouncers.splice(index, 1);
@@ -10898,6 +10915,7 @@ var MarbleRunSimulatorCore;
     class BlackBoard extends MarbleRunSimulatorCore.MachinePart {
         constructor(machine, prop) {
             super(machine, prop);
+            this.bbElements = [];
             this.lines = [];
             //public trampolines: BBTrampoline[] = [];
             this.bouncers = [];
@@ -11357,7 +11375,7 @@ var MarbleRunSimulatorCore;
             return best;
         }
         addLine(points) {
-            this.lines.push(new BBLine(this, points));
+            new BBLine(this, points);
         }
         addRawLine(points) {
             if (points.length > 0) {
@@ -11449,7 +11467,7 @@ var MarbleRunSimulatorCore;
                     }
                 }
                 if (!existingLine) {
-                    this.lines.push(new BBLine(this, filteredPoints));
+                    new BBLine(this, filteredPoints);
                 }
             }
         }
@@ -11457,18 +11475,27 @@ var MarbleRunSimulatorCore;
         //    this.trampolines.push(new BBTrampoline(this, p0, p1));
         //}
         addBouncer(p0, p1) {
-            this.bouncers.push(new BBBouncer(this, p0, p1));
+            new BBBouncer(this, p0, p1);
         }
         removeLastLine() {
-            this.lines.pop();
+            if (this.lines.length > 0) {
+                this.lines[this.lines.length - 1].dispose();
+            }
         }
         removeFirstLine() {
-            if (this.lines.length >= 1) {
-                this.lines.splice(0, 1);
+            if (this.lines.length > 0) {
+                this.lines[0].dispose();
             }
         }
         removeLine(index) {
-            this.lines.splice(index, 1);
+            if (this.lines[index]) {
+                this.lines[index].dispose();
+            }
+        }
+        removeFirstElement() {
+            if (this.bbElements.length > 0) {
+                this.bbElements[0].dispose();
+            }
         }
         eraseLine(localPosition, range = 0.01) {
             for (let i = 0; i < this.lines.length; i++) {
