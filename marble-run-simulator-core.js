@@ -10969,6 +10969,10 @@ var MarbleRunSimulatorCore;
                 // large bottom
                 this._addBoard(0, 0.6, 2 / 9, 6 / 9);
             }
+            else if (prop.n === 13) {
+                // large bottom
+                this._addBoard(0.25, 0.75, 0, 6 / 11);
+            }
             else {
                 // full
                 this._addBoard(0, 1, 0, 1);
@@ -11190,6 +11194,9 @@ var MarbleRunSimulatorCore;
                 // large bottom
                 template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 5 / 10, 0, 2 / 3));
             }
+            else if (n === 13) {
+                template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0.25, 0.75, 0, 6 / 11));
+            }
             else {
                 // left
                 template.miniatureShapes.push(BlackBoard._createMiniatureShape(l, h, 0, 1, 0, 1));
@@ -11400,7 +11407,8 @@ var MarbleRunSimulatorCore;
                 let endDir = filteredPoints[filteredPoints.length - 1].subtract(filteredPoints[filteredPoints.length - 2]);
                 for (let i = 0; i < this.lines.length; i++) {
                     Mummu.ProjectPointOnPathToRef(start, this.lines[i].points, existingProj, true);
-                    if (existingProj.index != -1) {
+                    let distStart = BABYLON.Vector3.Distance(start, existingProj.point);
+                    if (distStart < 0.01 && existingProj.index != -1) {
                         existingLine = this.lines[i];
                         let connectionPoint = existingLine.points[existingProj.index];
                         let prevConnectionPoint = existingLine.points[existingProj.index - 1];
@@ -11411,7 +11419,7 @@ var MarbleRunSimulatorCore;
                         if (!nextConnectionPoint) {
                             nextConnectionPoint = connectionPoint;
                         }
-                        let connectionDir = nextConnectionPoint.subtract(prevConnectionPoint);
+                        let connectionDir = nextConnectionPoint.subtract(prevConnectionPoint).normalize();
                         if (BABYLON.Vector3.Dot(connectionDir, startDir) >= 0) {
                             existingLine.points = existingLine.points.slice(0, existingProj.index);
                             existingLine.points.push(...filteredPoints);
@@ -11421,18 +11429,20 @@ var MarbleRunSimulatorCore;
                             existingLine.points.reverse();
                             existingLine.points.push(...filteredPoints);
                         }
-                        for (let n = existingProj.index - 1; n <= existingProj.index + 1; n++) {
-                            let pt = existingLine.points[n];
-                            if (pt) {
-                                let ptPrev = existingLine.points[n - 1];
-                                if (!ptPrev) {
-                                    ptPrev = pt;
+                        for (let m = 0; m < 1; m++) {
+                            for (let n = existingProj.index - 1; n <= existingProj.index + 1; n++) {
+                                let pt = existingLine.points[n];
+                                if (pt) {
+                                    let ptPrev = existingLine.points[n - 1];
+                                    if (!ptPrev) {
+                                        ptPrev = pt.clone();
+                                    }
+                                    let ptNext = existingLine.points[n + 1];
+                                    if (!ptNext) {
+                                        ptNext = pt.clone();
+                                    }
+                                    existingLine.points[n].scaleInPlace(3).addInPlace(ptPrev).addInPlace(ptNext).scaleInPlace(1 / 5);
                                 }
-                                let ptNext = existingLine.points[n + 1];
-                                if (!ptNext) {
-                                    ptNext = pt;
-                                }
-                                existingLine.points[n].addInPlace(ptPrev).addInPlace(ptNext).scaleInPlace(1 / 3);
                             }
                         }
                         break;
