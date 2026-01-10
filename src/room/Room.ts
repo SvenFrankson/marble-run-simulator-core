@@ -91,9 +91,10 @@ namespace MarbleRunSimulatorCore {
             return this._currentRoomIndex;
         }
         public async setRoomIndex(roomIndex: number, forceAndskipAnimation?: boolean): Promise<void> {
+            let isEmpty = this._currentRoomIndex === 13;
             if (forceAndskipAnimation || roomIndex != this._currentRoomIndex) {
                 this._currentRoomIndex = roomIndex;
-                if (!forceAndskipAnimation) {
+                if (!forceAndskipAnimation && !isEmpty) {
                     await this.animateHide(1);
                 }
                 if (this._currentRoomIndex === 0) {
@@ -200,6 +201,7 @@ namespace MarbleRunSimulatorCore {
             let slice9Ground = Mummu.Create9SliceVertexData({ width: size, height: size, margin: 0.1, color: groundColor, uv1InWorldSpace: true });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Ground, Math.PI * 0.5, BABYLON.Axis.X);
             slice9Ground.applyToMesh(this.ground);
+            this.ground.isVisible = true;
             this.ground.material = this.game.materials.whiteMaterial;
 
             let slice9Front = Mummu.Create9SliceVertexData({ width: size, height: 3.2, margin: 0.1, color: wallColor });
@@ -218,11 +220,13 @@ namespace MarbleRunSimulatorCore {
             Mummu.TranslateVertexDataInPlace(slice9Left, new BABYLON.Vector3(- size * 0.5, 0, 0));
 
             Mummu.MergeVertexDatas(slice9Front, slice9Right, slice9Back, slice9Left).applyToMesh(this.wall);
+            this.wall.isVisible = true;
             this.wall.material = this.game.materials.wallShadow;
             
             let slice9Top = Mummu.Create9SliceVertexData({ width: size, height: size, margin: 0.2, color: wallColor });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, - Math.PI * 0.5, BABYLON.Axis.X);
             slice9Top.applyToMesh(this.ceiling);
+            this.ceiling.isVisible = true;
             this.ceiling.material = this.game.materials.wallShadow;
 
             this.isBlurred = false;
@@ -261,18 +265,23 @@ namespace MarbleRunSimulatorCore {
             let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/room.babylon");
 
             vertexDatas[0].applyToMesh(this.ground);
+            this.ground.isVisible = true;
             this.ground.receiveShadows = true;
             this.ground.material = this.game.materials.groundMaterial;
+
             vertexDatas[1].applyToMesh(this.wall);
+            this.wall.isVisible = true;
             this.wall.material = this.game.materials.whiteMaterial;
 
             vertexDatas[2].applyToMesh(this.frame);
+            this.frame.isVisible = true;
             this.frame.parent = this.wall;
             this.frame.material = this.game.materials.getMaterial(0, this.machine.materialQ);
             
             let slice9Top = Mummu.Create9SliceVertexData({ width: 10, height: 10, margin: 0.05 });
             Mummu.RotateAngleAxisVertexDataInPlace(slice9Top, - Math.PI * 0.5, BABYLON.Axis.X);
             slice9Top.applyToMesh(this.ceiling);
+            this.ceiling.isVisible = true;
             this.ceiling.material = this.game.materials.whiteMaterial;
 
             let paintingNames = ["bilbao_1", "bilbao_2", "bilbao_3", "flower_1", "flower_2", "flower_3", "flower_4", "fort_william_1", "glasgow_1"];
@@ -384,17 +393,21 @@ namespace MarbleRunSimulatorCore {
             let vertexDatas = await this.game.vertexDataLoader.get("./lib/marble-run-simulator-core/datas/meshes/open-room.babylon");
 
             vertexDatas[0].applyToMesh(this.ground);
+            this.ground.isVisible = true;
             this.ground.receiveShadows = false;
             this.ground.material = this.game.materials.whiteGroundMaterial;
 
             vertexDatas[1].applyToMesh(this.wall);
+            this.wall.isVisible = true;
             this.wall.material = this.game.materials.whiteMaterial;
 
             vertexDatas[2].applyToMesh(this.frame);
+            this.frame.isVisible = true;
             this.frame.parent = this.ground;
             this.frame.material = this.game.materials.whiteMaterial;
 
             vertexDatas[3].applyToMesh(this.ceiling);
+            this.ceiling.isVisible = true;
             this.ceiling.material = this.game.materials.whiteMaterial;
 
             if (useDecors) {
