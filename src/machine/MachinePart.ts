@@ -1252,7 +1252,7 @@ namespace MarbleRunSimulatorCore {
                         })
                     }
                 }
-                Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI);
+                Mummu.DecimatePathInPlaceFast(points, (4 / 180) * Math.PI);
 
                 if (Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[0])) {
                     let endPoint = this.findEndPoint(this.tracks[n].templateInterpolatedPoints[0]);

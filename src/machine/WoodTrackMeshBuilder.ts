@@ -23,7 +23,7 @@ namespace MarbleRunSimulatorCore {
                 return p.add(new BABYLON.Vector3(0, track.radiusToRaise(track.tubeRadius), 0));
             });
             
-            Mummu.DecimatePathInPlace(points, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(points, (2 / 180) * Math.PI);
 
             let p0 = points[0];
             let p1 = points[1];

@@ -4715,7 +4715,7 @@ var MarbleRunSimulatorCore;
                         });
                     }
                 }
-                Mummu.DecimatePathInPlace(points, (4 / 180) * Math.PI);
+                Mummu.DecimatePathInPlaceFast(points, (4 / 180) * Math.PI);
                 if (MarbleRunSimulatorCore.Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[0])) {
                     let endPoint = this.findEndPoint(this.tracks[n].templateInterpolatedPoints[0]);
                     if (endPoint) {
@@ -6110,8 +6110,8 @@ var MarbleRunSimulatorCore;
                 this.wires[0].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(-this.part.wireGauge * 0.5, 0, 0), matrix);
                 this.wires[1].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(this.part.wireGauge * 0.5, 0, 0), matrix);
             }
-            Mummu.DecimatePathInPlace(this.wires[0].path, (2 / 180) * Math.PI);
-            Mummu.DecimatePathInPlace(this.wires[1].path, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(this.wires[0].path, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(this.wires[1].path, (2 / 180) * Math.PI);
             if (this.template.drawStartTip) {
                 this.wires[0].startTipCenter = this.template.trackpoints[0].position.clone();
                 this.wires[0].startTipNormal = this.template.trackpoints[0].normal.clone();
@@ -6201,7 +6201,7 @@ var MarbleRunSimulatorCore;
             });
             Mummu.RemoveFromStartForDistanceInPlace(points, 0.001);
             Mummu.RemoveFromEndForDistanceInPlace(points, 0.001);
-            Mummu.DecimatePathInPlace(points, (2 / 180) * Math.PI, normals);
+            Mummu.DecimatePathInPlaceFast(points, (2 / 180) * Math.PI, normals);
             if (track.template.pipeIgnoresTrackNormals) {
                 points = points.map((pt, i) => {
                     return pt.add(BABYLON.Vector3.Up().scale(0.0085));
@@ -7416,8 +7416,8 @@ var MarbleRunSimulatorCore;
                 this.wires[0].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(-this.part.wireGauge * 0.5, 0, 0), matrix);
                 this.wires[1].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(this.part.wireGauge * 0.5, 0, 0), matrix);
             }
-            Mummu.DecimatePathInPlace(this.wires[0].path, (2 / 180) * Math.PI);
-            Mummu.DecimatePathInPlace(this.wires[1].path, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(this.wires[0].path, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(this.wires[1].path, (2 / 180) * Math.PI);
             if (this.template.drawStartTip) {
                 this.wires[0].startTipCenter = this.template.trackpoints[0].position.clone();
                 this.wires[0].startTipNormal = this.template.trackpoints[0].normal.clone();
@@ -7463,7 +7463,7 @@ var MarbleRunSimulatorCore;
             let points = [...track.templateInterpolatedPoints].map((p) => {
                 return p.add(new BABYLON.Vector3(0, track.radiusToRaise(track.tubeRadius), 0));
             });
-            Mummu.DecimatePathInPlace(points, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(points, (2 / 180) * Math.PI);
             let p0 = points[0];
             let p1 = points[1];
             let dirIn = p1.subtract(p0).normalize();

@@ -65,7 +65,7 @@ namespace MarbleRunSimulatorCore {
             });
             Mummu.RemoveFromStartForDistanceInPlace(points, 0.001);
             Mummu.RemoveFromEndForDistanceInPlace(points, 0.001);
-            Mummu.DecimatePathInPlace(points, (2 / 180) * Math.PI, normals);
+            Mummu.DecimatePathInPlaceFast(points, (2 / 180) * Math.PI, normals);
 
             if (track.template.pipeIgnoresTrackNormals) {
                 points = points.map((pt, i) => {
