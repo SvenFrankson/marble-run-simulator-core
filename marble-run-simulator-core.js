@@ -2483,8 +2483,8 @@ var MarbleRunSimulatorCore;
                 this.wires[0].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(-this.part.wireGauge * 0.5, 0, 0), matrix);
                 this.wires[1].path[i] = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(this.part.wireGauge * 0.5, 0, 0), matrix);
             }
-            Mummu.DecimatePathInPlace(this.wires[0].path, (2 / 180) * Math.PI);
-            Mummu.DecimatePathInPlace(this.wires[1].path, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(this.wires[0].path, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(this.wires[1].path, (2 / 180) * Math.PI);
             if (this.template.drawStartTip) {
                 this.wires[0].startTipCenter = this.template.trackpoints[0].position.clone();
                 this.wires[0].startTipNormal = this.template.trackpoints[0].normal.clone();
