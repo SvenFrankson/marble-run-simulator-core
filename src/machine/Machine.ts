@@ -593,17 +593,17 @@ namespace MarbleRunSimulatorCore {
             let minJ = - 1;
             let minK = -1;
             for (let i = 0; i < this.parts.length; i++) {
-                let track = this.parts[i];
-                this.baseMeshMinX = Math.min(this.baseMeshMinX, track.worldAABBMin.x);
-                this.baseMeshMaxX = Math.max(this.baseMeshMaxX, track.worldAABBMax.x);
+                let part = this.parts[i];
+                this.baseMeshMinX = Math.min(this.baseMeshMinX, part.position.x, part.worldAABBMin.x);
+                this.baseMeshMaxX = Math.max(this.baseMeshMaxX, part.position.x, part.worldAABBMax.x);
                 //this.baseMeshMinY = Math.min(this.baseMeshMinY, track.position.y - tileHeight * (track.h + 1));
-                this.baseMeshMaxY = Math.max(this.baseMeshMaxY, track.worldAABBMax.y);
-                this.baseMeshMinZ = Math.min(this.baseMeshMinZ, track.worldAABBMin.z);
-                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, track.worldAABBMax.z);
+                this.baseMeshMaxY = Math.max(this.baseMeshMaxY, part.position.y, part.worldAABBMax.y);
+                this.baseMeshMinZ = Math.min(this.baseMeshMinZ, part.position.z, part.worldAABBMin.z);
+                this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, part.position.z, part.worldAABBMax.z);
 
-                maxI = Math.max(maxI, track.i + track.w * 3);
-                minJ = Math.min(minJ, track.j - track.d * 3);
-                minK = Math.min(minK, track.k);
+                maxI = Math.max(maxI, part.i + part.w * 3);
+                minJ = Math.min(minJ, part.j - part.d * 3);
+                minK = Math.min(minK, part.k);
             }
             for (let i = 0; i < this.blocks.length; i++) {
                 let block = this.blocks[i];
