@@ -47,6 +47,7 @@ namespace MarbleRunSimulatorCore {
             wireVertical1.parent = this.pivot;
             wireVertical1.path = [new BABYLON.Vector3(0, Split.pivotL, dz), new BABYLON.Vector3(0, rCurb * 0.3, dz)];
 
+            /*
             let curbLeft0 = new Wire(this);
             curbLeft0.colorIndex = 4;
             curbLeft0.wireSize = this.wireSize * 0.8;
@@ -94,8 +95,12 @@ namespace MarbleRunSimulatorCore {
                 let sina = Math.sin(a);
                 curbRight1.path.push(new BABYLON.Vector3(rCurb - cosa * rCurb, rCurb - sina * rCurb, dz));
             }
+            */
 
-            this.wires = [wireHorizontal0, wireHorizontal1, curbLeft0, curbLeft1, wireVertical0, wireVertical1, curbRight0, curbRight1];
+            //this.wires = [wireHorizontal0, wireHorizontal1, curbLeft0, curbLeft1, wireVertical0, wireVertical1, curbRight0, curbRight1];
+            this.wires = [wireHorizontal0, wireHorizontal1, wireVertical0, wireVertical1];
+
+            this.outlinableMeshes = [this.pivot];
 
             this.generateWires();
 
