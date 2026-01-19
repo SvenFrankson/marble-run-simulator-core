@@ -1096,8 +1096,14 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 }
     
-                                this.velocity.copyFrom(otherSpeed.scale(0.9)).addInPlace(mySpeed.scale(-0.1));
-                                ball.velocity.copyFrom(mySpeed.scale(0.9)).addInPlace(otherSpeed.scale(-0.1));
+                                if (this.machine.isDrawBlackboardMachine) {
+                                    this.velocity.copyFrom(otherSpeed.scale(0.85)).addInPlace(mySpeed.scale(-0.15));
+                                    ball.velocity.copyFrom(mySpeed.scale(0.85)).addInPlace(otherSpeed.scale(-0.15));
+                                }
+                                else {
+                                    this.velocity.copyFrom(otherSpeed.scale(0.99));
+                                    ball.velocity.copyFrom(mySpeed.scale(0.99));
+                                }
                                 canceledSpeed.copyFromFloats(0, 0, 0);
                                 //this.velocity.copyFrom(otherSpeed).scaleInPlace(.5);
                                 //ball.velocity.copyFrom(mySpeed).scaleInPlace(.6);
