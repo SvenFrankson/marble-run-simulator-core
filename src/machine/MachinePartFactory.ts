@@ -416,6 +416,9 @@ namespace MarbleRunSimulatorCore {
                 return new ForwardSplit(this.machine, prop);
             }
             if (partName === "sort") {
+                if (!prop.c || prop.c.length < 5) {
+                    prop.c = [1, 0, 0, 0, 0];
+                }
                 return new Sort(this.machine, prop);
             }
             if (partName === "controlerLegacy") {
@@ -679,6 +682,9 @@ namespace MarbleRunSimulatorCore {
                 return new ForwardSplit(this.machine, prop);
             }
             if (baseName === "sort") {
+                if (!prop.c || prop.c.length < 5) {
+                    prop.c = [1, 0, 0, 0, 0];
+                }
                 return new Sort(this.machine, prop);
             }
             if (baseName === "controlerLegacy") {
