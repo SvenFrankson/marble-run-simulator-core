@@ -560,14 +560,14 @@ namespace MarbleRunSimulatorCore {
             return !this.playing && !this.paused;
         }
         public stop(): void {
+            this._paused = false;
+            this.playing = false;
             for (let i = 0; i < this.balls.length; i++) {
                 this.balls[i].reset();
             }
             this.onStopCallbacks.forEach((callback) => {
                 callback();
             });
-            this._paused = false;
-            this.playing = false;
         }
 
         public margin: number = 0.05;

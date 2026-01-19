@@ -377,6 +377,7 @@ var MarbleRunSimulatorCore;
             this.lastTrajectory = this.currentTrajectory;
             this.currentTrajectory = [];
             this.animatePosition(this.positionZero.add(this.machine.root.position), 0);
+            this.updateSelectorMeshVisibility();
         }
         getLastIndex(wire) {
             for (let i = 0; i < this.memCount; i++) {
@@ -3004,14 +3005,14 @@ var MarbleRunSimulatorCore;
             return !this.playing && !this.paused;
         }
         stop() {
+            this._paused = false;
+            this.playing = false;
             for (let i = 0; i < this.balls.length; i++) {
                 this.balls[i].reset();
             }
             this.onStopCallbacks.forEach((callback) => {
                 callback();
             });
-            this._paused = false;
-            this.playing = false;
         }
         async generateBaseMesh() {
             let previousBaseMinY = this.baseMeshMinY;

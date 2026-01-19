@@ -418,6 +418,7 @@ namespace MarbleRunSimulatorCore {
             this.lastTrajectory = this.currentTrajectory;
             this.currentTrajectory = [];
             this.animatePosition(this.positionZero.add(this.machine.root.position), 0);
+            this.updateSelectorMeshVisibility();
         }
 
         private memCount = 2;
