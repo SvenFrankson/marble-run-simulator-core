@@ -231,7 +231,7 @@ namespace MarbleRunSimulatorCore {
         ) {
             super(blackboard);
 
-            this.blackboard.bouncers.push(this);
+            this.blackboard.bumpers.push(this);
 
             this.updateMesh();
         }
@@ -307,9 +307,9 @@ namespace MarbleRunSimulatorCore {
         public dispose(): void {
             super.dispose();
 
-            let index = this.blackboard.bouncers.indexOf(this);
+            let index = this.blackboard.bumpers.indexOf(this);
             if (index > - 1) {
-                this.blackboard.bouncers.splice(index, 1);
+                this.blackboard.bumpers.splice(index, 1);
             }
             this.body.dispose();
         }
@@ -321,7 +321,7 @@ namespace MarbleRunSimulatorCore {
         public bbElements: BlackBoardElement[] = [];
         public lines: BBLine[] = [];
         //public trampolines: BBTrampoline[] = [];
-        public bouncers: BBBouncer[] = [];
+        public bumpers: BBBouncer[] = [];
         public boards: BlackBoardPiece[] = [];
         public backBoard: BABYLON.Mesh;
         public borders: BABYLON.Mesh[] = [];
@@ -690,7 +690,7 @@ namespace MarbleRunSimulatorCore {
             //    trampoline.updateMesh();
             //});
 
-            this.bouncers.forEach(bouncer => {
+            this.bumpers.forEach(bouncer => {
                 //bouncer.updateMesh();
             });
             
@@ -1046,8 +1046,8 @@ namespace MarbleRunSimulatorCore {
             let bestIndex = -1;
 
             let proj = BABYLON.Vector3.Zero();
-            for (let i = 0; i < this.bouncers.length; i++) {
-                Mummu.ProjectPointOnSegmentToRef(localPosition, this.bouncers[i].p0, this.bouncers[i].p1, proj);
+            for (let i = 0; i < this.bumpers.length; i++) {
+                Mummu.ProjectPointOnSegmentToRef(localPosition, this.bumpers[i].p0, this.bumpers[i].p1, proj);
                 let dist = BABYLON.Vector3.Distance(proj, localPosition);
                 if (dist < bestDist) {
                     bestDist = dist;
