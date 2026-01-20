@@ -12,7 +12,8 @@ namespace MarbleRunSimulatorCore {
         Velvet,
         Metal,
         Plastic,
-        Plexiglas
+        Plexiglas,
+        Bumper
     }
 
     export enum CollisionState {
@@ -169,6 +170,7 @@ namespace MarbleRunSimulatorCore {
         private _soundWorldPosition: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public onMarbleChocSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
         public onRailBumpSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
+        public onBumperBounceSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
 
         public flybackOrigin: BABYLON.Vector3;
         public flybackDestination: BABYLON.Vector3;
@@ -776,8 +778,8 @@ namespace MarbleRunSimulatorCore {
                                     }
                                 });
                                 */
-                                part.bouncers.forEach(bouncer => {
-                                    let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, bouncer.p0.add(bouncer.blackboard.position), bouncer.p1.add(bouncer.blackboard.position), bouncer.thicknessRadius);
+                                part.bumpers.forEach(bumper => {
+                                    let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, bumper.p0.add(bumper.blackboard.position), bumper.p1.add(bumper.blackboard.position), bumper.thicknessRadius);
                                     if (col.hit) {
                                         //this.setLastHit(wire, col.index);
                                         let colDig = col.normal.scale(-1);
@@ -795,7 +797,10 @@ namespace MarbleRunSimulatorCore {
                                         reactions.addInPlace(reaction);
                                         reactionsCount++;
 
-                                        bouncer.bump(col.normal);
+                                        this.bumpSurfaceIsRail = false;
+                                        this.surface = Surface.Bumper;
+
+                                        bumper.bump(col.normal);
                                     }
                                 });
                             }
@@ -1137,6 +1142,14 @@ namespace MarbleRunSimulatorCore {
                             }
                         }
                         else {
+                            if (this.surface as Surface === Surface.Bumper) {
+                                this.railBumpSound.setVolume(v * 2);
+                                this.railBumpSound.setPlaybackRate(this.game.currentTimeFactor * 1.5);
+                                this.railBumpSound.play();
+                                if (this.onBumperBounceSoundPlay) {
+                                    this.onBumperBounceSoundPlay(this.railBumpSound.getVolume(), this._soundWorldPosition);
+                                }
+                            }
                             /*
                             if (!this.marbleChocSound.isPlaying) {
                                 this.marbleChocSound.setVolume(v * 4);

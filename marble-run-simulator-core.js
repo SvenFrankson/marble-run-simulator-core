@@ -16,6 +16,7 @@ var MarbleRunSimulatorCore;
         Surface[Surface["Metal"] = 4] = "Metal";
         Surface[Surface["Plastic"] = 5] = "Plastic";
         Surface[Surface["Plexiglas"] = 6] = "Plexiglas";
+        Surface[Surface["Bumper"] = 7] = "Bumper";
     })(Surface = MarbleRunSimulatorCore.Surface || (MarbleRunSimulatorCore.Surface = {}));
     let CollisionState;
     (function (CollisionState) {
@@ -695,8 +696,8 @@ var MarbleRunSimulatorCore;
                                     }
                                 });
                                 */
-                                part.bouncers.forEach(bouncer => {
-                                    let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, bouncer.p0.add(bouncer.blackboard.position), bouncer.p1.add(bouncer.blackboard.position), bouncer.thicknessRadius);
+                                part.bumpers.forEach(bumper => {
+                                    let col = Mummu.SphereCapsuleIntersection(this.position, this.radius, bumper.p0.add(bumper.blackboard.position), bumper.p1.add(bumper.blackboard.position), bumper.thicknessRadius);
                                     if (col.hit) {
                                         //this.setLastHit(wire, col.index);
                                         let colDig = col.normal.scale(-1);
@@ -713,7 +714,9 @@ var MarbleRunSimulatorCore;
                                         let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
                                         reactions.addInPlace(reaction);
                                         reactionsCount++;
-                                        bouncer.bump(col.normal);
+                                        this.bumpSurfaceIsRail = false;
+                                        this.surface = Surface.Bumper;
+                                        bumper.bump(col.normal);
                                     }
                                 });
                             }
@@ -1043,6 +1046,14 @@ var MarbleRunSimulatorCore;
                             }
                         }
                         else {
+                            if (this.surface === Surface.Bumper) {
+                                this.railBumpSound.setVolume(v * 2);
+                                this.railBumpSound.setPlaybackRate(this.game.currentTimeFactor * 1.5);
+                                this.railBumpSound.play();
+                                if (this.onBumperBounceSoundPlay) {
+                                    this.onBumperBounceSoundPlay(this.railBumpSound.getVolume(), this._soundWorldPosition);
+                                }
+                            }
                             /*
                             if (!this.marbleChocSound.isPlaying) {
                                 this.marbleChocSound.setVolume(v * 4);
@@ -10855,7 +10866,7 @@ var MarbleRunSimulatorCore;
             this.thicknessRadius = 0.005;
             this.bumpTop = Mummu.AnimationFactory.EmptyNumberCallback;
             this.bumpBottom = Mummu.AnimationFactory.EmptyNumberCallback;
-            this.blackboard.bouncers.push(this);
+            this.blackboard.bumpers.push(this);
             this.updateMesh();
         }
         updateMesh() {
@@ -10917,9 +10928,9 @@ var MarbleRunSimulatorCore;
         }
         dispose() {
             super.dispose();
-            let index = this.blackboard.bouncers.indexOf(this);
+            let index = this.blackboard.bumpers.indexOf(this);
             if (index > -1) {
-                this.blackboard.bouncers.splice(index, 1);
+                this.blackboard.bumpers.splice(index, 1);
             }
             this.body.dispose();
         }
@@ -10931,7 +10942,7 @@ var MarbleRunSimulatorCore;
             this.bbElements = [];
             this.lines = [];
             //public trampolines: BBTrampoline[] = [];
-            this.bouncers = [];
+            this.bumpers = [];
             this.boards = [];
             this.borders = [];
             this.boardColliders = [];
@@ -11255,7 +11266,7 @@ var MarbleRunSimulatorCore;
             //this.trampolines.forEach(trampoline => {
             //    trampoline.updateMesh();
             //});
-            this.bouncers.forEach(bouncer => {
+            this.bumpers.forEach(bouncer => {
                 //bouncer.updateMesh();
             });
             if (this.editorGrid) {
@@ -11554,8 +11565,8 @@ var MarbleRunSimulatorCore;
             let bestDist = range;
             let bestIndex = -1;
             let proj = BABYLON.Vector3.Zero();
-            for (let i = 0; i < this.bouncers.length; i++) {
-                Mummu.ProjectPointOnSegmentToRef(localPosition, this.bouncers[i].p0, this.bouncers[i].p1, proj);
+            for (let i = 0; i < this.bumpers.length; i++) {
+                Mummu.ProjectPointOnSegmentToRef(localPosition, this.bumpers[i].p0, this.bumpers[i].p1, proj);
                 let dist = BABYLON.Vector3.Distance(proj, localPosition);
                 if (dist < bestDist) {
                     bestDist = dist;

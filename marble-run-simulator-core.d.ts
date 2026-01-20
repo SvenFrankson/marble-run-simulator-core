@@ -13,7 +13,8 @@ declare namespace MarbleRunSimulatorCore {
         Velvet = 3,
         Metal = 4,
         Plastic = 5,
-        Plexiglas = 6
+        Plexiglas = 6,
+        Bumper = 7
     }
     enum CollisionState {
         Normal = 0,
@@ -78,6 +79,7 @@ declare namespace MarbleRunSimulatorCore {
         private _soundWorldPosition;
         onMarbleChocSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
         onRailBumpSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
+        onBumperBounceSoundPlay: (volume: number, position: BABYLON.Vector3) => void;
         flybackOrigin: BABYLON.Vector3;
         flybackDestination: BABYLON.Vector3;
         flybackPeak: BABYLON.Vector3;
@@ -1222,7 +1224,7 @@ declare namespace MarbleRunSimulatorCore {
         static BoardThickness: number;
         bbElements: BlackBoardElement[];
         lines: BBLine[];
-        bouncers: BBBouncer[];
+        bumpers: BBBouncer[];
         boards: BlackBoardPiece[];
         backBoard: BABYLON.Mesh;
         borders: BABYLON.Mesh[];
