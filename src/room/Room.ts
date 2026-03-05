@@ -81,7 +81,6 @@ namespace MarbleRunSimulatorCore {
             this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
             this.skybox.material = this.skyboxMaterial;
-            this.skybox.rotation.y = 0.16 * Math.PI;
         }
 
         public onRoomJustInstantiated: () => void;
@@ -151,6 +150,10 @@ namespace MarbleRunSimulatorCore {
                     this.decors = [];
 
                     this.skybox.isVisible = false;
+                    //let skyTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/skyboxes/sky_toon.jpeg");
+                    //this.skyboxMaterial.diffuseTexture = skyTexture;
+                    //this.skyboxMaterial.emissiveTexture = skyTexture;
+                    
                     this.wall.isVisible = false;
                     this.ground.isVisible = false;
                     this.frame.isVisible = false;

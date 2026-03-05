@@ -46,6 +46,7 @@ var MarbleRunSimulatorCore;
             this._boosting = false;
             this.rotationSpeed = 0;
             this.rotationAxis = BABYLON.Vector3.Right();
+            this.inTheAir = false;
             this._showPositionZeroGhost = false;
             this.bumpSurfaceIsRail = true;
             this._soundWorldPosition = BABYLON.Vector3.Zero();
@@ -2127,6 +2128,31 @@ var MarbleRunSimulatorCore;
             Mummu.ColorizeVertexDataInPlace(boxDataFlipped, new BABYLON.Color3(0.5, 0.5, 0.5));
             boxData = Mummu.MergeVertexDatas(boxData, boxDataFlipped);
             return boxData;
+        }
+        static async ShowPop(mesh, duration = 1) {
+            return new Promise(resolve => {
+                let t0 = performance.now() / 1000;
+                let step = () => {
+                    let t = performance.now() / 1000;
+                    if (t - t0 < duration) {
+                        let f = (t - t0) / duration;
+                        f = Nabu.Easing.easeOutSquare(f);
+                        mesh.scaling.copyFromFloats(f, f, f);
+                        mesh.freezeWorldMatrix();
+                        requestAnimationFrame(step);
+                    }
+                    else {
+                        mesh.scaling.copyFromFloats(1, 1, 1);
+                        mesh.freezeWorldMatrix();
+                        resolve();
+                    }
+                };
+                step();
+            });
+        }
+        static HidePopInstant(mesh) {
+            mesh.scaling.copyFromFloats(0, 0, 0);
+            mesh.freezeWorldMatrix();
         }
     }
     MarbleRunSimulatorCore.Tools = Tools;
@@ -4439,6 +4465,52 @@ var MarbleRunSimulatorCore;
                 }
             });
         }
+        hidePopInstante() {
+            this.scaling.copyFromFloats(0, 0, 0);
+            this.refreshWorldMatrix();
+        }
+        async hidePop(duration = 1) {
+            return new Promise(resolve => {
+                let t0 = performance.now() / 1000;
+                let step = () => {
+                    let t = performance.now() / 1000;
+                    if (t - t0 < duration) {
+                        let f = (t - t0) / duration;
+                        f = Nabu.Easing.easeInSquare(f);
+                        this.scaling.copyFromFloats(1 - f, 1 - f, 1 - f);
+                        this.refreshWorldMatrix();
+                        requestAnimationFrame(step);
+                    }
+                    else {
+                        this.scaling.copyFromFloats(0, 0, 0);
+                        this.refreshWorldMatrix();
+                        resolve();
+                    }
+                };
+                step();
+            });
+        }
+        async showPop(duration = 1) {
+            return new Promise(resolve => {
+                let t0 = performance.now() / 1000;
+                let step = () => {
+                    let t = performance.now() / 1000;
+                    if (t - t0 < duration) {
+                        let f = (t - t0) / duration;
+                        f = Nabu.Easing.easeOutSquare(f);
+                        this.scaling.copyFromFloats(f, f, f);
+                        this.refreshWorldMatrix();
+                        requestAnimationFrame(step);
+                    }
+                    else {
+                        this.scaling.copyFromFloats(1, 1, 1);
+                        this.refreshWorldMatrix();
+                        resolve();
+                    }
+                };
+                step();
+            });
+        }
         get partVisilibityMode() {
             return this._partVisibilityMode;
         }
@@ -6322,7 +6394,7 @@ var MarbleRunSimulatorCore;
                     if (track.template.cutOutSleeper && track.template.cutOutSleeper(i)) {
                         addSleeper = false;
                     }
-                    if (track instanceof MarbleRunSimulatorCore.PipeTrack || track instanceof MarbleRunSimulatorCore.WoodTrack || track instanceof MarbleRunSimulatorCore.DoubleTrack) {
+                    if (track instanceof MarbleRunSimulatorCore.PipeTrack || track instanceof MarbleRunSimulatorCore.WoodTrack) {
                         addSleeper = false;
                     }
                     let anchor = BABYLON.Vector3.Zero();
@@ -6388,7 +6460,7 @@ var MarbleRunSimulatorCore;
                                 tmp.dispose();
                             }
                         }
-                        if (track.part.isPlaced && (props.grndAnchors && q > 0)) {
+                        if (track.part.isPlaced && !(track instanceof MarbleRunSimulatorCore.DoubleTrack) && (props.grndAnchors && q > 0)) {
                             if (((n - 1.5) % 6 === 0 || count === 1) && up.y > 0.1) {
                                 let anchorYWorld = anchor.y + part.position.y;
                                 let anchorBase = anchor.clone();
@@ -11255,6 +11327,22 @@ var MarbleRunSimulatorCore;
                 }
             }
         }
+        async showPop(duration) {
+            for (let i = 0; i < this.boards.length; i++) {
+                MarbleRunSimulatorCore.Tools.HidePopInstant(this.boards[i]);
+            }
+            for (let i = 0; i < this.borders.length; i++) {
+                MarbleRunSimulatorCore.Tools.HidePopInstant(this.borders[i]);
+            }
+            this.scaling.copyFromFloats(1, 1, 1);
+            this.refreshWorldMatrix();
+            for (let i = 0; i < this.borders.length; i++) {
+                await MarbleRunSimulatorCore.Tools.ShowPop(this.borders[i], duration);
+            }
+            for (let i = 0; i < this.boards.length; i++) {
+                await MarbleRunSimulatorCore.Tools.ShowPop(this.boards[i], duration);
+            }
+        }
         async instantiateMachineSpecific() {
             this.boards.forEach(board => {
                 board.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
@@ -11308,7 +11396,7 @@ var MarbleRunSimulatorCore;
             for (let n = 0; n < this.lines.length; n++) {
                 let rawLine = this.lines[n];
                 let trackTemplate = new MarbleRunSimulatorCore.TrackTemplate(this.template);
-                trackTemplate.cutOutSleeper = (n) => { return true; };
+                //trackTemplate.cutOutSleeper = (n) => { return true; };
                 trackTemplate.isDouble = true;
                 let dirStart = rawLine.points[1].subtract(rawLine.points[0]).normalize();
                 let prevDir = dirStart.clone();
@@ -11421,77 +11509,79 @@ var MarbleRunSimulatorCore;
                         }
                     }
                 }
-                let p0 = filteredPoints[0].clone();
-                let p1 = filteredPoints[1].clone();
-                let p1n = filteredPoints[filteredPoints.length - 2].clone();
-                let p0n = filteredPoints[filteredPoints.length - 1].clone();
-                let forceEndDir = (f) => {
-                    if (filteredPoints.length >= 2) {
-                        BABYLON.Vector3.LerpToRef(filteredPoints[0], p0, f, filteredPoints[0]);
-                        BABYLON.Vector3.LerpToRef(filteredPoints[1], p1, f, filteredPoints[1]);
-                        BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 2], p1n, f, filteredPoints[filteredPoints.length - 2]);
-                        BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 1], p0n, f, filteredPoints[filteredPoints.length - 1]);
-                    }
-                };
-                Mummu.SmoothPathInPlace(filteredPoints, 0.5);
-                forceEndDir(1);
-                Mummu.SmoothPathInPlace(filteredPoints, 0.5);
-                forceEndDir(0.5);
-                // Try to merge with existing line
-                let existingLine;
-                let existingProj = {
-                    point: BABYLON.Vector3.Zero(),
-                    index: -1
-                };
-                let start = filteredPoints[0];
-                let startDir = filteredPoints[1].subtract(filteredPoints[0]);
-                let end = filteredPoints[filteredPoints.length - 1];
-                let endDir = filteredPoints[filteredPoints.length - 1].subtract(filteredPoints[filteredPoints.length - 2]);
-                for (let i = 0; i < this.lines.length; i++) {
-                    Mummu.ProjectPointOnPathToRef(start, this.lines[i].points, existingProj, true);
-                    let distStart = BABYLON.Vector3.Distance(start, existingProj.point);
-                    if (distStart < 0.01 && existingProj.index != -1) {
-                        existingLine = this.lines[i];
-                        let connectionPoint = existingLine.points[existingProj.index];
-                        let prevConnectionPoint = existingLine.points[existingProj.index - 1];
-                        if (!prevConnectionPoint) {
-                            prevConnectionPoint = connectionPoint;
+                if (filteredPoints.length >= 2) {
+                    let p0 = filteredPoints[0].clone();
+                    let p1 = filteredPoints[1].clone();
+                    let p1n = filteredPoints[filteredPoints.length - 2].clone();
+                    let p0n = filteredPoints[filteredPoints.length - 1].clone();
+                    let forceEndDir = (f) => {
+                        if (filteredPoints.length >= 2) {
+                            BABYLON.Vector3.LerpToRef(filteredPoints[0], p0, f, filteredPoints[0]);
+                            BABYLON.Vector3.LerpToRef(filteredPoints[1], p1, f, filteredPoints[1]);
+                            BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 2], p1n, f, filteredPoints[filteredPoints.length - 2]);
+                            BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 1], p0n, f, filteredPoints[filteredPoints.length - 1]);
                         }
-                        let nextConnectionPoint = existingLine.points[existingProj.index + 1];
-                        if (!nextConnectionPoint) {
-                            nextConnectionPoint = connectionPoint;
-                        }
-                        let connectionDir = nextConnectionPoint.subtract(prevConnectionPoint).normalize();
-                        if (BABYLON.Vector3.Dot(connectionDir, startDir) >= 0) {
-                            existingLine.points = existingLine.points.slice(0, existingProj.index);
-                            existingLine.points.push(...filteredPoints);
-                        }
-                        else {
-                            existingLine.points = existingLine.points.slice(existingProj.index + 1);
-                            existingLine.points.reverse();
-                            existingLine.points.push(...filteredPoints);
-                        }
-                        for (let m = 0; m < 1; m++) {
-                            for (let n = existingProj.index - 1; n <= existingProj.index + 1; n++) {
-                                let pt = existingLine.points[n];
-                                if (pt) {
-                                    let ptPrev = existingLine.points[n - 1];
-                                    if (!ptPrev) {
-                                        ptPrev = pt.clone();
+                    };
+                    Mummu.SmoothPathInPlace(filteredPoints, 0.3);
+                    forceEndDir(1);
+                    Mummu.SmoothPathInPlace(filteredPoints, 0.3);
+                    forceEndDir(0.5);
+                    // Try to merge with existing line
+                    let existingLine;
+                    let existingProj = {
+                        point: BABYLON.Vector3.Zero(),
+                        index: -1
+                    };
+                    let start = filteredPoints[0];
+                    let startDir = filteredPoints[1].subtract(filteredPoints[0]);
+                    let end = filteredPoints[filteredPoints.length - 1];
+                    let endDir = filteredPoints[filteredPoints.length - 1].subtract(filteredPoints[filteredPoints.length - 2]);
+                    for (let i = 0; i < this.lines.length; i++) {
+                        Mummu.ProjectPointOnPathToRef(start, this.lines[i].points, existingProj, true);
+                        let distStart = BABYLON.Vector3.Distance(start, existingProj.point);
+                        if (distStart < 0.01 && existingProj.index != -1) {
+                            existingLine = this.lines[i];
+                            let connectionPoint = existingLine.points[existingProj.index];
+                            let prevConnectionPoint = existingLine.points[existingProj.index - 1];
+                            if (!prevConnectionPoint) {
+                                prevConnectionPoint = connectionPoint;
+                            }
+                            let nextConnectionPoint = existingLine.points[existingProj.index + 1];
+                            if (!nextConnectionPoint) {
+                                nextConnectionPoint = connectionPoint;
+                            }
+                            let connectionDir = nextConnectionPoint.subtract(prevConnectionPoint).normalize();
+                            if (BABYLON.Vector3.Dot(connectionDir, startDir) >= 0) {
+                                existingLine.points = existingLine.points.slice(0, existingProj.index);
+                                existingLine.points.push(...filteredPoints);
+                            }
+                            else {
+                                existingLine.points = existingLine.points.slice(existingProj.index + 1);
+                                existingLine.points.reverse();
+                                existingLine.points.push(...filteredPoints);
+                            }
+                            for (let m = 0; m < 1; m++) {
+                                for (let n = existingProj.index - 0; n <= existingProj.index + 0; n++) {
+                                    let pt = existingLine.points[n];
+                                    if (pt) {
+                                        let ptPrev = existingLine.points[n - 1];
+                                        if (!ptPrev) {
+                                            ptPrev = pt.clone();
+                                        }
+                                        let ptNext = existingLine.points[n + 1];
+                                        if (!ptNext) {
+                                            ptNext = pt.clone();
+                                        }
+                                        existingLine.points[n].scaleInPlace(3).addInPlace(ptPrev).addInPlace(ptNext).scaleInPlace(1 / 5);
                                     }
-                                    let ptNext = existingLine.points[n + 1];
-                                    if (!ptNext) {
-                                        ptNext = pt.clone();
-                                    }
-                                    existingLine.points[n].scaleInPlace(3).addInPlace(ptPrev).addInPlace(ptNext).scaleInPlace(1 / 5);
                                 }
                             }
+                            break;
                         }
-                        break;
                     }
-                }
-                if (!existingLine) {
-                    new BBLine(this, filteredPoints);
+                    if (!existingLine) {
+                        new BBLine(this, filteredPoints);
+                    }
                 }
             }
         }
@@ -17917,7 +18007,6 @@ var MarbleRunSimulatorCore;
             this.skyboxMaterial.diffuseColor.copyFromFloats(0, 0, 0);
             this.skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
             this.skybox.material = this.skyboxMaterial;
-            this.skybox.rotation.y = 0.16 * Math.PI;
         }
         get isBlurred() {
             return this._isBlurred;
@@ -17996,6 +18085,9 @@ var MarbleRunSimulatorCore;
                     });
                     this.decors = [];
                     this.skybox.isVisible = false;
+                    //let skyTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/skyboxes/sky_toon.jpeg");
+                    //this.skyboxMaterial.diffuseTexture = skyTexture;
+                    //this.skyboxMaterial.emissiveTexture = skyTexture;
                     this.wall.isVisible = false;
                     this.ground.isVisible = false;
                     this.frame.isVisible = false;

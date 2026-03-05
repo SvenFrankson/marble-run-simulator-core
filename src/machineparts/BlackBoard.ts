@@ -676,6 +676,24 @@ namespace MarbleRunSimulatorCore {
             }
         }
 
+        public async showPop(duration?: number): Promise<void> {
+            for (let i = 0; i < this.boards.length; i++) {
+                Tools.HidePopInstant(this.boards[i]);
+            }
+            for (let i = 0; i < this.borders.length; i++) {
+                Tools.HidePopInstant(this.borders[i]);
+            }
+            this.scaling.copyFromFloats(1, 1, 1);
+            this.refreshWorldMatrix();
+
+            for (let i = 0; i < this.borders.length; i++) {
+                await Tools.ShowPop(this.borders[i], duration);
+            }
+            for (let i = 0; i < this.boards.length; i++) {
+                await Tools.ShowPop(this.boards[i], duration);
+            }
+        }
+
         protected async instantiateMachineSpecific(): Promise<void> {
             this.boards.forEach(board => {
                 board.material = this.game.materials.getMaterial(this.getColor(1), this.machine.materialQ);
@@ -752,7 +770,7 @@ namespace MarbleRunSimulatorCore {
             for (let n = 0; n < this.lines.length; n++) {
                 let rawLine = this.lines[n];
                 let trackTemplate = new TrackTemplate(this.template);
-                trackTemplate.cutOutSleeper = (n) => { return true; };
+                //trackTemplate.cutOutSleeper = (n) => { return true; };
                 trackTemplate.isDouble = true;
                 let dirStart = rawLine.points[1].subtract(rawLine.points[0]).normalize();
                 let prevDir = dirStart.clone();
@@ -884,83 +902,85 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
 
-                let p0 = filteredPoints[0].clone();
-                let p1 = filteredPoints[1].clone();
-                let p1n = filteredPoints[filteredPoints.length - 2].clone();
-                let p0n = filteredPoints[filteredPoints.length - 1].clone();
+                if (filteredPoints.length >= 2) {
+                    let p0 = filteredPoints[0].clone();
+                    let p1 = filteredPoints[1].clone();
+                    let p1n = filteredPoints[filteredPoints.length - 2].clone();
+                    let p0n = filteredPoints[filteredPoints.length - 1].clone();
 
-                let forceEndDir = (f: number) => {
-                    if (filteredPoints.length >= 2) {
-                        BABYLON.Vector3.LerpToRef(filteredPoints[0], p0, f, filteredPoints[0]);
-                        BABYLON.Vector3.LerpToRef(filteredPoints[1], p1, f, filteredPoints[1]);
-                        BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 2], p1n, f, filteredPoints[filteredPoints.length - 2]);
-                        BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 1], p0n, f, filteredPoints[filteredPoints.length - 1]);
+                    let forceEndDir = (f: number) => {
+                        if (filteredPoints.length >= 2) {
+                            BABYLON.Vector3.LerpToRef(filteredPoints[0], p0, f, filteredPoints[0]);
+                            BABYLON.Vector3.LerpToRef(filteredPoints[1], p1, f, filteredPoints[1]);
+                            BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 2], p1n, f, filteredPoints[filteredPoints.length - 2]);
+                            BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 1], p0n, f, filteredPoints[filteredPoints.length - 1]);
+                        }
                     }
-                }
-                Mummu.SmoothPathInPlace(filteredPoints, 0.5);
-                forceEndDir(1);
-                Mummu.SmoothPathInPlace(filteredPoints, 0.5);
-                forceEndDir(0.5);
+                    Mummu.SmoothPathInPlace(filteredPoints, 0.3);
+                    forceEndDir(1);
+                    Mummu.SmoothPathInPlace(filteredPoints, 0.3);
+                    forceEndDir(0.5);
 
-                // Try to merge with existing line
-                let existingLine: BBLine;
-                let existingProj = {
-                    point: BABYLON.Vector3.Zero(),
-                    index: -1
-                };
-                let start = filteredPoints[0];
-                let startDir = filteredPoints[1].subtract(filteredPoints[0]);
-                let end = filteredPoints[filteredPoints.length - 1];
-                let endDir = filteredPoints[filteredPoints.length - 1].subtract(filteredPoints[filteredPoints.length - 2]);
-                for (let i = 0; i < this.lines.length; i++) {
-                    Mummu.ProjectPointOnPathToRef(start, this.lines[i].points, existingProj, true);
-                    let distStart = BABYLON.Vector3.Distance(start, existingProj.point);
-                    if (distStart < 0.01 && existingProj.index != - 1) {
-                        existingLine = this.lines[i];
-                        let connectionPoint = existingLine.points[existingProj.index];
-                        let prevConnectionPoint = existingLine.points[existingProj.index - 1];
-                        if (!prevConnectionPoint) {
-                            prevConnectionPoint = connectionPoint;
-                        }
-                        let nextConnectionPoint = existingLine.points[existingProj.index + 1];
-                        if (!nextConnectionPoint) {
-                            nextConnectionPoint = connectionPoint;
-                        }
-                        let connectionDir = nextConnectionPoint.subtract(prevConnectionPoint).normalize();
-                        if (BABYLON.Vector3.Dot(connectionDir, startDir) >= 0) {
-                            existingLine.points = existingLine.points.slice(0, existingProj.index);
-                            existingLine.points.push(...filteredPoints);
-                        }
-                        else {
-                            existingLine.points = existingLine.points.slice(existingProj.index + 1);
-                            existingLine.points.reverse();
-                            existingLine.points.push(...filteredPoints);
-                        }
-                        
-                        for (let m = 0; m < 1; m++) {
-                            for (let n = existingProj.index - 1; n <= existingProj.index + 1; n++) {
-                                let pt = existingLine.points[n];
-                                if (pt) {
-                                    let ptPrev = existingLine.points[n - 1];
-                                    if (!ptPrev) {
-                                        ptPrev = pt.clone();
+                    // Try to merge with existing line
+                    let existingLine: BBLine;
+                    let existingProj = {
+                        point: BABYLON.Vector3.Zero(),
+                        index: -1
+                    };
+                    let start = filteredPoints[0];
+                    let startDir = filteredPoints[1].subtract(filteredPoints[0]);
+                    let end = filteredPoints[filteredPoints.length - 1];
+                    let endDir = filteredPoints[filteredPoints.length - 1].subtract(filteredPoints[filteredPoints.length - 2]);
+                    for (let i = 0; i < this.lines.length; i++) {
+                        Mummu.ProjectPointOnPathToRef(start, this.lines[i].points, existingProj, true);
+                        let distStart = BABYLON.Vector3.Distance(start, existingProj.point);
+                        if (distStart < 0.01 && existingProj.index != - 1) {
+                            existingLine = this.lines[i];
+                            let connectionPoint = existingLine.points[existingProj.index];
+                            let prevConnectionPoint = existingLine.points[existingProj.index - 1];
+                            if (!prevConnectionPoint) {
+                                prevConnectionPoint = connectionPoint;
+                            }
+                            let nextConnectionPoint = existingLine.points[existingProj.index + 1];
+                            if (!nextConnectionPoint) {
+                                nextConnectionPoint = connectionPoint;
+                            }
+                            let connectionDir = nextConnectionPoint.subtract(prevConnectionPoint).normalize();
+                            if (BABYLON.Vector3.Dot(connectionDir, startDir) >= 0) {
+                                existingLine.points = existingLine.points.slice(0, existingProj.index);
+                                existingLine.points.push(...filteredPoints);
+                            }
+                            else {
+                                existingLine.points = existingLine.points.slice(existingProj.index + 1);
+                                existingLine.points.reverse();
+                                existingLine.points.push(...filteredPoints);
+                            }
+                            
+                            for (let m = 0; m < 1; m++) {
+                                for (let n = existingProj.index - 0; n <= existingProj.index + 0; n++) {
+                                    let pt = existingLine.points[n];
+                                    if (pt) {
+                                        let ptPrev = existingLine.points[n - 1];
+                                        if (!ptPrev) {
+                                            ptPrev = pt.clone();
+                                        }
+                                        let ptNext = existingLine.points[n + 1];
+                                        if (!ptNext) {
+                                            ptNext = pt.clone();
+                                        }
+                                        existingLine.points[n].scaleInPlace(3).addInPlace(ptPrev).addInPlace(ptNext).scaleInPlace(1 / 5);
                                     }
-                                    let ptNext = existingLine.points[n + 1];
-                                    if (!ptNext) {
-                                        ptNext = pt.clone();
-                                    }
-                                    existingLine.points[n].scaleInPlace(3).addInPlace(ptPrev).addInPlace(ptNext).scaleInPlace(1 / 5);
                                 }
                             }
+
+                            break;
                         }
 
-                        break;
                     }
 
-                }
-
-                if (!existingLine) {
-                    new BBLine(this, filteredPoints);
+                    if (!existingLine) {
+                        new BBLine(this, filteredPoints);
+                    }  
                 }
             }
         }

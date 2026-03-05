@@ -59,6 +59,7 @@ declare namespace MarbleRunSimulatorCore {
         rotationSpeed: number;
         rotationAxis: BABYLON.Vector3;
         surface: Surface;
+        inTheAir: boolean;
         _showPositionZeroGhost: boolean;
         get showPositionZeroGhost(): boolean;
         setShowPositionZeroGhost(v: boolean): void;
@@ -258,6 +259,8 @@ declare namespace MarbleRunSimulatorCore {
         static V3Dir(angleInDegrees: number, length?: number): BABYLON.Vector3;
         static IsWorldPosAConnexion(worldPos: BABYLON.Vector3): boolean;
         static Box9SliceVertexData(min: BABYLON.Vector3, max: BABYLON.Vector3, margin: number): BABYLON.VertexData;
+        static ShowPop(mesh: BABYLON.Mesh, duration?: number): Promise<void>;
+        static HidePopInstant(mesh: BABYLON.Mesh): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {
@@ -763,6 +766,9 @@ declare namespace MarbleRunSimulatorCore {
         getAbsoluteCoordinatesPosition(): BABYLON.Vector3;
         getAbsoluteAfterUpdateCoordinatesPosition(): BABYLON.Vector3;
         setIsVisible(isVisible: boolean): void;
+        hidePopInstante(): void;
+        hidePop(duration?: number): Promise<void>;
+        showPop(duration?: number): Promise<void>;
         private _partVisibilityMode;
         get partVisilibityMode(): PartVisibilityMode;
         set partVisibilityMode(v: PartVisibilityMode);
@@ -1236,6 +1242,7 @@ declare namespace MarbleRunSimulatorCore {
         static PropToPartName(prop: IMachinePartProp): string;
         static GenerateTemplate(l: number, h: number, n: number): MachinePartTemplate;
         instantiate(rebuildNeighboursWireMeshes?: boolean, skipSleepersAndSupport?: boolean): Promise<void>;
+        showPop(duration?: number): Promise<void>;
         protected instantiateMachineSpecific(): Promise<void>;
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         regenerateTemplate(): void;

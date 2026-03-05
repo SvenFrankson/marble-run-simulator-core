@@ -71,5 +71,32 @@ namespace MarbleRunSimulatorCore {
 
             return boxData;
         }
+
+        public static async ShowPop(mesh: BABYLON.Mesh, duration: number = 1): Promise<void> {
+            return new Promise<void>(resolve => {
+                let t0 = performance.now() / 1000;
+                let step = () => {
+                    let t = performance.now() / 1000;
+                    if (t - t0 < duration) {
+                        let f = (t - t0) / duration;
+                        f = Nabu.Easing.easeOutSquare(f);
+                        mesh.scaling.copyFromFloats(f, f, f);
+                        mesh.freezeWorldMatrix();
+                        requestAnimationFrame(step);
+                    }
+                    else {
+                        mesh.scaling.copyFromFloats(1, 1, 1);
+                        mesh.freezeWorldMatrix();
+                        resolve();
+                    }
+                }
+                step();
+            });
+        }
+
+        public static HidePopInstant(mesh: BABYLON.Mesh): void {
+            mesh.scaling.copyFromFloats(0, 0, 0);
+            mesh.freezeWorldMatrix();
+        }
     }
 }

@@ -116,6 +116,7 @@ namespace MarbleRunSimulatorCore {
         public rotationSpeed: number = 0;
         public rotationAxis: BABYLON.Vector3 = BABYLON.Vector3.Right();
         public surface: Surface;
+        public inTheAir: boolean = false;
 
         public _showPositionZeroGhost: boolean = false;
         public get showPositionZeroGhost(): boolean {

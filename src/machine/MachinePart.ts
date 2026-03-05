@@ -836,6 +836,55 @@ namespace MarbleRunSimulatorCore {
             });
         }
 
+        public hidePopInstante(): void {
+            this.scaling.copyFromFloats(0, 0, 0);
+            this.refreshWorldMatrix();
+        }
+
+        public async hidePop(duration: number = 1): Promise<void> {
+            return new Promise<void>(resolve => {
+                let t0 = performance.now() / 1000;
+                let step = () => {
+                    let t = performance.now() / 1000;
+                    if (t - t0 < duration) {
+                        let f = (t - t0) / duration;
+                        f = Nabu.Easing.easeInSquare(f);
+                        this.scaling.copyFromFloats(1 - f, 1 - f, 1 - f);
+                        this.refreshWorldMatrix();
+                        requestAnimationFrame(step);
+                    }
+                    else {
+                        this.scaling.copyFromFloats(0, 0, 0);
+                        this.refreshWorldMatrix();
+                        resolve();
+                    }
+                }
+                step();
+            });
+        }
+
+        public async showPop(duration: number = 1): Promise<void> {
+            return new Promise<void>(resolve => {
+                let t0 = performance.now() / 1000;
+                let step = () => {
+                    let t = performance.now() / 1000;
+                    if (t - t0 < duration) {
+                        let f = (t - t0) / duration;
+                        f = Nabu.Easing.easeOutSquare(f);
+                        this.scaling.copyFromFloats(f, f, f);
+                        this.refreshWorldMatrix();
+                        requestAnimationFrame(step);
+                    }
+                    else {
+                        this.scaling.copyFromFloats(1, 1, 1);
+                        this.refreshWorldMatrix();
+                        resolve();
+                    }
+                }
+                step();
+            });
+        }
+
         private _partVisibilityMode: PartVisibilityMode = PartVisibilityMode.Default;
         public get partVisilibityMode(): PartVisibilityMode {
             return this._partVisibilityMode;
