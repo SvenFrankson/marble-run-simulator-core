@@ -14093,10 +14093,10 @@ var MarbleRunSimulatorCore;
             let bodyCollider = new Mummu.CapsuleCollider(new BABYLON.Vector3(0, 0, -MarbleRunSimulatorCore.tileSize * 0.5), new BABYLON.Vector3(0, 0, MarbleRunSimulatorCore.tileSize * 0.5), s * 0.5);
             let bodyMachineCollider = new MarbleRunSimulatorCore.MachineCollider(bodyCollider);
             this.colliders = [bodyMachineCollider];
-            this.localAABBBaseMin.x = -(prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileSize;
-            this.localAABBBaseMin.y = -(prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileHeight;
-            this.localAABBBaseMax.x = (prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileSize;
-            this.localAABBBaseMax.y = (prop.l + 0.5) * 0.5 * MarbleRunSimulatorCore.tileHeight;
+            this.localAABBBaseMin.x = -(prop.l) * 0.5 * MarbleRunSimulatorCore.tileSize + this.body.position.x;
+            this.localAABBBaseMin.y = -(prop.l) * 0.5 * MarbleRunSimulatorCore.tileHeight + this.body.position.y;
+            this.localAABBBaseMax.x = (prop.l) * 0.5 * MarbleRunSimulatorCore.tileSize + this.body.position.x;
+            this.localAABBBaseMax.y = (prop.l) * 0.5 * MarbleRunSimulatorCore.tileHeight + this.body.position.y;
             this.outlinableMeshes = [this.body];
             this.generateWires();
         }
@@ -14115,10 +14115,7 @@ var MarbleRunSimulatorCore;
             super.recomputeAbsolutePath();
             let collider = this.colliders[0];
             if (collider.baseCollider instanceof Mummu.CapsuleCollider) {
-                collider.baseCollider.c1.copyFrom(this.position);
-                collider.baseCollider.c1.z -= MarbleRunSimulatorCore.tileSize * 0.5;
-                collider.baseCollider.c2.copyFrom(this.position);
-                collider.baseCollider.c2.z += MarbleRunSimulatorCore.tileSize * 0.5;
+                collider.baseCollider.worldMatrix = this.body._worldMatrix;
             }
             super.recomputeAbsolutePath();
         }

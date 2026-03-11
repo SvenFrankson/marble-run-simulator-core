@@ -225,10 +225,10 @@ namespace MarbleRunSimulatorCore {
 
             this.colliders = [bodyMachineCollider];
 
-            this.localAABBBaseMin.x = - (prop.l + 0.5) * 0.5 * tileSize;
-            this.localAABBBaseMin.y = - (prop.l + 0.5) * 0.5 * tileHeight;
-            this.localAABBBaseMax.x = (prop.l + 0.5) * 0.5 * tileSize;
-            this.localAABBBaseMax.y = (prop.l + 0.5) * 0.5 * tileHeight;
+            this.localAABBBaseMin.x = - (prop.l) * 0.5 * tileSize + this.body.position.x;
+            this.localAABBBaseMin.y = - (prop.l) * 0.5 * tileHeight + this.body.position.y;
+            this.localAABBBaseMax.x = (prop.l) * 0.5 * tileSize + this.body.position.x;
+            this.localAABBBaseMax.y = (prop.l) * 0.5 * tileHeight + this.body.position.y;
 
             this.outlinableMeshes = [this.body];
 
@@ -253,10 +253,7 @@ namespace MarbleRunSimulatorCore {
             super.recomputeAbsolutePath();
             let collider = this.colliders[0];
             if (collider.baseCollider instanceof Mummu.CapsuleCollider) {
-                collider.baseCollider.c1.copyFrom(this.position);
-                collider.baseCollider.c1.z -= tileSize * 0.5;
-                collider.baseCollider.c2.copyFrom(this.position);
-                collider.baseCollider.c2.z += tileSize * 0.5;
+                collider.baseCollider.worldMatrix = this.body._worldMatrix;
             }
             super.recomputeAbsolutePath();
         }
