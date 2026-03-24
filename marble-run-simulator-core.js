@@ -6316,6 +6316,8 @@ var MarbleRunSimulatorCore;
             //    Mummu.TranslateVertexDataInPlace(cube, points[i]);
             //    allDatas.push(cube);
             //}
+            console.log(Mummu.MergeVertexDatas(ringIn, ringOut));
+            console.log(Mummu.MergeVertexDatas(pipeData, flip));
             Mummu.MergeVertexDatas(ringIn, ringOut).applyToMesh(track.ringsMesh);
             Mummu.MergeVertexDatas(pipeData, flip).applyToMesh(track.tubeMesh);
         }
@@ -11538,7 +11540,8 @@ var MarbleRunSimulatorCore;
                     let endDir = filteredPoints[filteredPoints.length - 1].subtract(filteredPoints[filteredPoints.length - 2]);
                     for (let i = 0; i < this.lines.length; i++) {
                         Mummu.ProjectPointOnPathToRef(start, this.lines[i].points, existingProj, true);
-                        let distStart = BABYLON.Vector3.Distance(start, existingProj.point);
+                        let offset = existingProj.point.subtract(start);
+                        let distStart = offset.length();
                         if (distStart < 0.01 && existingProj.index != -1) {
                             existingLine = this.lines[i];
                             let connectionPoint = existingLine.points[existingProj.index];
@@ -11553,28 +11556,20 @@ var MarbleRunSimulatorCore;
                             let connectionDir = nextConnectionPoint.subtract(prevConnectionPoint).normalize();
                             if (BABYLON.Vector3.Dot(connectionDir, startDir) >= 0) {
                                 existingLine.points = existingLine.points.slice(0, existingProj.index);
+                                let n = filteredPoints.length;
+                                filteredPoints.forEach((pt, i) => {
+                                    pt.addInPlace(offset.scale(1 - i / (n - 1)));
+                                });
                                 existingLine.points.push(...filteredPoints);
                             }
                             else {
                                 existingLine.points = existingLine.points.slice(existingProj.index + 1);
                                 existingLine.points.reverse();
+                                let n = filteredPoints.length;
+                                filteredPoints.forEach((pt, i) => {
+                                    pt.addInPlace(offset.scale(1 - i / (n - 1)));
+                                });
                                 existingLine.points.push(...filteredPoints);
-                            }
-                            for (let m = 0; m < 1; m++) {
-                                for (let n = existingProj.index - 0; n <= existingProj.index + 0; n++) {
-                                    let pt = existingLine.points[n];
-                                    if (pt) {
-                                        let ptPrev = existingLine.points[n - 1];
-                                        if (!ptPrev) {
-                                            ptPrev = pt.clone();
-                                        }
-                                        let ptNext = existingLine.points[n + 1];
-                                        if (!ptNext) {
-                                            ptNext = pt.clone();
-                                        }
-                                        existingLine.points[n].scaleInPlace(3).addInPlace(ptPrev).addInPlace(ptNext).scaleInPlace(1 / 5);
-                                    }
-                                }
                             }
                             break;
                         }
