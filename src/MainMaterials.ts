@@ -90,11 +90,33 @@ namespace MarbleRunSimulatorCore {
         private _parkourBallMaterialPBR: BABYLON.Material;
         private _parkourBallMaterialSTD: BABYLON.Material;
         public getBallMaterial(colorIndex: number, materialQ: number): BABYLON.Material {
-            if (materialQ === MaterialQuality.PBR) {
-                return this._ballMaterialsPBR[colorIndex % this._ballMaterialsPBR.length];
+            if (isNaN(colorIndex) || colorIndex < 0) {
+                colorIndex = 0;
             }
-            return this._ballMaterialsSTD[colorIndex % this._ballMaterialsSTD.length];
+
+            if (materialQ === MaterialQuality.PBR) {
+                if (!this._ballMaterialsPBR[colorIndex]) {
+                    if (this._loadBallMaterialPBR(colorIndex)) {
+
+                    }
+                    else {
+                        this._ballMaterialsPBR[colorIndex] = this._ballMaterialsPBR[0];
+                    }
+                }
+                return this._ballMaterialsPBR[colorIndex];
+            }
+
+            if (!this._ballMaterialsSTD[colorIndex]) {
+                if (this._loadBallMaterialSTD(colorIndex)) {
+
+                }
+                else {
+                    this._ballMaterialsSTD[colorIndex] = this._ballMaterialsSTD[0];
+                }
+            }
+            return this._ballMaterialsSTD[colorIndex];
         }
+
         public getParkourBallMaterial(materialQ: number): BABYLON.Material {
             if (materialQ === MaterialQuality.PBR) {
                 return this._parkourBallMaterialPBR;
@@ -176,8 +198,10 @@ namespace MarbleRunSimulatorCore {
         public selectorFullLitBlueMaterial: BABYLON.StandardMaterial;
         public selectorFullLitGreenMaterial: BABYLON.StandardMaterial;
 
+        public envTexture: BABYLON.CubeTexture;
+
         constructor(public game: IGame, public existingCountryFlags: ICountryFlag[]) {
-            let envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
+            this.envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
 
             this.handleMaterial = new BABYLON.StandardMaterial("handle-material");
             this.handleMaterial.diffuseColor.copyFromFloats(0, 0, 0);
@@ -240,37 +264,37 @@ namespace MarbleRunSimulatorCore {
             this.selectorFullLitGreenMaterial.emissiveColor = BABYLON.Color3.FromHexString("#268396");
             this.selectorFullLitGreenMaterial.specularColor.copyFromFloats(0, 0, 0);
             
-            this._generateMaterials(envTexture);
+            this._generateMaterials(this.envTexture);
 
             let plasticIndigo = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticIndigo.baseColor = BABYLON.Color3.FromHexString("#004777");
             plasticIndigo.metallic = 0;
             plasticIndigo.roughness = 0.9;
-            plasticIndigo.environmentTexture = envTexture;
+            plasticIndigo.environmentTexture = this.envTexture;
 
             let plasticRed = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticRed.baseColor = BABYLON.Color3.FromHexString("#A30000");
             plasticRed.metallic = 0;
             plasticRed.roughness = 0.9;
-            plasticRed.environmentTexture = envTexture;
+            plasticRed.environmentTexture = this.envTexture;
             
             let plasticOrange = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticOrange.baseColor = BABYLON.Color3.FromHexString("#FF7700");
             plasticOrange.metallic = 0;
             plasticOrange.roughness = 0.9;
-            plasticOrange.environmentTexture = envTexture;
+            plasticOrange.environmentTexture = this.envTexture;
 
             let plasticYellow = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticYellow.baseColor = BABYLON.Color3.FromHexString("#EFD28D");
             plasticYellow.metallic = 0;
             plasticYellow.roughness = 0.9;
-            plasticYellow.environmentTexture = envTexture;
+            plasticYellow.environmentTexture = this.envTexture;
 
             let plasticGreen = new BABYLON.PBRMetallicRoughnessMaterial("pbr", this.game.scene);
             plasticGreen.baseColor = BABYLON.Color3.FromHexString("#00AFB5");
             plasticGreen.metallic = 0;
             plasticGreen.roughness = 0.9;
-            plasticGreen.environmentTexture = envTexture;
+            plasticGreen.environmentTexture = this.envTexture;
 
             this.plasticWhite = new BABYLON.StandardMaterial("plastic-black", this.game.scene);
             this.plasticWhite.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
@@ -346,7 +370,7 @@ namespace MarbleRunSimulatorCore {
             cableMaterialPBR.metallic = 0.8;
             cableMaterialPBR.roughness = 0.4;
             cableMaterialPBR.lightmapTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/cable.png");
-            cableMaterialPBR.environmentTexture = envTexture;
+            cableMaterialPBR.environmentTexture = this.envTexture;
 
             this.cableMaterial = cableMaterial;
 
@@ -375,41 +399,22 @@ namespace MarbleRunSimulatorCore {
             boneMaterial.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/bone_2.png");
             //boneMaterial.normalTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/bone_nm.png");
             boneMaterial.roughness = 0.9;
-            boneMaterial.environmentTexture = envTexture;
+            boneMaterial.environmentTexture = this.envTexture;
 
             this.bone = boneMaterial;
 
-            let makeBrandedBallMaterialSTD = (name: string, textureName: string) => {
-                let ballMaterial = new BABYLON.StandardMaterial(name, this.game.scene);
-                ballMaterial.specularColor = new BABYLON.Color3(0.7, 0.7, 0.7);
-                ballMaterial.roughness = 0.3;
-                ballMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + textureName, undefined, undefined, false);
-                ballMaterial.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0.3);
-
-                return ballMaterial;
-            }
-
-            let makeBrandedBallMaterialPBR = (name: string, textureName: string) => {
-                let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
-                ballMaterial.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
-                ballMaterial.metallic = 0.7;
-                ballMaterial.roughness = 0.3;
-                ballMaterial.environmentTexture = envTexture;
-                ballMaterial.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + textureName, undefined, undefined, false);
-
-                return ballMaterial;
-            }
+            
 
             this._ballMaterialsPBR = [
                 this._materialsPBR[0],
                 this._materialsPBR[1],
-                makeBrandedBallMaterialPBR("square-red", "ball-square-red.png"),
-                makeBrandedBallMaterialPBR("circle-green", "ball-circle-green.png"),
-                makeBrandedBallMaterialPBR("star-blue", "ball-star-blue.png"),
-                makeBrandedBallMaterialPBR("tiaratum", "ball-tiaratum.png"),
-                makeBrandedBallMaterialPBR("html5", "ball-html5.png"),
-                makeBrandedBallMaterialPBR("tiaratum", "ball-bjs.png"),
-                makeBrandedBallMaterialPBR("poki", "ball-poki.png"),
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
                 this._materialsPBR[15],
                 this._materialsPBR[17],
                 this._materialsPBR[2],
@@ -431,13 +436,13 @@ namespace MarbleRunSimulatorCore {
             this._ballMaterialsSTD = [
                 this._materialsSTD[0],
                 this._materialsSTD[1],
-                makeBrandedBallMaterialSTD("square-red", "ball-square-red.png"),
-                makeBrandedBallMaterialSTD("circle-green", "ball-circle-green.png"),
-                makeBrandedBallMaterialSTD("star-blue", "ball-star-blue.png"),
-                makeBrandedBallMaterialSTD("tiaratum", "ball-tiaratum.png"),
-                makeBrandedBallMaterialSTD("html5", "ball-html5.png"),
-                makeBrandedBallMaterialSTD("tiaratum", "ball-bjs.png"),
-                makeBrandedBallMaterialSTD("poki", "ball-poki.png"),
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
                 this._materialsSTD[15],
                 this._materialsSTD[17],
                 this._materialsSTD[2],
@@ -454,7 +459,9 @@ namespace MarbleRunSimulatorCore {
                 this._materialsSTD[12],
                 this._materialsSTD[13],
                 this._materialsSTD[14]
-            ]
+            ];
+
+            console.log(this._ballMaterialsPBR.length);
 
             let parkourBallColor = BABYLON.Color3.FromHexString("#0c0c18");
 
@@ -463,7 +470,7 @@ namespace MarbleRunSimulatorCore {
             parkourBallMaterialPBR.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/ball-parkour.png", undefined, undefined, false);
             parkourBallMaterialPBR.metallic = 0.75;
             parkourBallMaterialPBR.roughness = 0.25;
-            parkourBallMaterialPBR.environmentTexture = envTexture;
+            parkourBallMaterialPBR.environmentTexture = this.envTexture;
             
             let parkourBallMaterialSTD = new BABYLON.StandardMaterial("parkour-ball-pbr", this.game.scene);
             parkourBallMaterialSTD.diffuseColor = parkourBallColor.scale(4);
@@ -557,7 +564,28 @@ namespace MarbleRunSimulatorCore {
             return plexiglas;
         }
 
-        public testMakeCountryFlagMaterialPBR(countryCode: string, envTexture: BABYLON.CubeTexture): BABYLON.Material {
+        private _makeBrandedBallMaterialSTD(name: string, textureName: string): BABYLON.StandardMaterial {
+                let ballMaterial = new BABYLON.StandardMaterial(name, this.game.scene);
+                ballMaterial.specularColor = new BABYLON.Color3(0.7, 0.7, 0.7);
+                ballMaterial.roughness = 0.3;
+                ballMaterial.diffuseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + textureName, undefined, undefined, false);
+                ballMaterial.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+
+                return ballMaterial;
+            }
+
+        private _makeBrandedBallMaterialPBR(name: string, textureName: string, envTexture: BABYLON.CubeTexture): BABYLON.PBRMetallicRoughnessMaterial {
+            let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial(name, this.game.scene);
+            ballMaterial.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+            ballMaterial.metallic = 0.7;
+            ballMaterial.roughness = 0.3;
+            ballMaterial.environmentTexture = envTexture;
+            ballMaterial.baseTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/textures/" + textureName, undefined, undefined, false);
+
+            return ballMaterial;
+        }
+
+        public makeCountryFlagMaterial(countryCode: string, isPBR?: boolean): BABYLON.Material {
             let cFlag = this.existingCountryFlags.find(c => c.code === countryCode);
             let c1: string = "white";
             let c2: string = "";
@@ -569,11 +597,22 @@ namespace MarbleRunSimulatorCore {
                 c3 = cFlag.c3 || c2;
             }
 
-            let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial("flag-" + countryCode, this.game.scene);
-            ballMaterial.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
-            ballMaterial.metallic = 0.7;
-            ballMaterial.roughness = 0.3;
-            ballMaterial.environmentTexture = envTexture;
+            let ballMaterial: BABYLON.Material;
+            if (isPBR) {
+                let pbrBallMaterial = new BABYLON.PBRMetallicRoughnessMaterial("flag-" + countryCode, this.game.scene);
+                pbrBallMaterial.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+                pbrBallMaterial.metallic = 0.7;
+                pbrBallMaterial.roughness = 0.3;
+                pbrBallMaterial.environmentTexture = this.envTexture;
+                ballMaterial = pbrBallMaterial;
+            }
+            else {
+                let stdBallMaterial = new BABYLON.StandardMaterial("flag-" + countryCode, this.game.scene);
+                stdBallMaterial.specularColor = new BABYLON.Color3(0.7, 0.7, 0.7);
+                stdBallMaterial.roughness = 0.3;
+                stdBallMaterial.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+                ballMaterial = stdBallMaterial;
+            }
 
             let flagW = 256 * 0.75;
             let flagH = flagW / 4 * 3;
@@ -603,7 +642,12 @@ namespace MarbleRunSimulatorCore {
                     ctx.drawImage(bitmap, (canvasW - flagW) / 2, (canvasW - flagH) / 2);
 
                     var texture = new BABYLON.Texture(canvas.toDataURL(), undefined, undefined, false);
-                    ballMaterial.baseTexture = texture;
+                    if (isPBR) {
+                        (ballMaterial as BABYLON.PBRMetallicRoughnessMaterial).baseTexture = texture;
+                    }
+                    else {
+                        (ballMaterial as BABYLON.StandardMaterial).diffuseTexture = texture;
+                    }
                 });
             }
             image.src = "./styles/flags/4x3/" + countryCode + ".svg";
@@ -621,9 +665,9 @@ namespace MarbleRunSimulatorCore {
             steelMaterialPBR.roughness = 0.15;
             steelMaterialPBR.environmentTexture = envTexture;
 
-            let code = "fr";
-            code = this.existingCountryFlags[Math.floor(Math.random() * 10)].code;
-            steelMaterialPBR = this.testMakeCountryFlagMaterialPBR(code, envTexture) as BABYLON.PBRMetallicRoughnessMaterial;
+            //let code = "fr";
+            //code = this.existingCountryFlags[Math.floor(Math.random() * this.existingCountryFlags.length)].code;
+            //steelMaterialPBR = this.testMakeCountryFlagMaterialPBR(code, envTexture) as BABYLON.PBRMetallicRoughnessMaterial;
             
             let steelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
             steelMaterialSTD.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7);
@@ -742,6 +786,75 @@ namespace MarbleRunSimulatorCore {
             
             this._materialsPBR.push(this._makePlasticPBR("white-plastic-pbr", BABYLON.Color3.FromHexString("#ffffff"), envTexture));
             this._materialsSTD.push(this._makePlasticSTD("white-plastic-std", BABYLON.Color3.FromHexString("#ffffff")));
+        }
+
+        private _loadBallMaterialPBR(index: number): boolean {
+            console.log("Loading ball material PBR " + index);
+            if (index === 2) {
+                this._ballMaterialsPBR[2] = this._makeBrandedBallMaterialPBR("square-red", "ball-square-red.png", this.envTexture);
+            }
+            else if (index === 3) {
+                this._ballMaterialsPBR[3] = this._makeBrandedBallMaterialPBR("circle-green", "ball-circle-green.png", this.envTexture);
+            }
+            else if (index === 4) {
+                this._ballMaterialsPBR[4] = this._makeBrandedBallMaterialPBR("star-blue", "ball-star-blue.png", this.envTexture);
+            }
+            else if (index === 5) {
+                this._ballMaterialsPBR[5] = this._makeBrandedBallMaterialPBR("tiaratum", "ball-tiaratum.png", this.envTexture);
+            }
+            else if (index === 6) {
+                this._ballMaterialsPBR[6] = this._makeBrandedBallMaterialPBR("html5", "ball-html5.png", this.envTexture);
+            }
+            else if (index === 7) {
+                this._ballMaterialsPBR[7] = this._makeBrandedBallMaterialPBR("tiaratum", "ball-bjs.png", this.envTexture);
+            }
+            else if (index === 8) {
+                this._ballMaterialsPBR[8] = this._makeBrandedBallMaterialPBR("poki", "ball-poki.png", this.envTexture);
+            }
+            else if (index >= 25 && index < 25 + this.existingCountryFlags.length) {
+                let cFlag = this.existingCountryFlags[index - 25];
+                this._ballMaterialsPBR[index] = this.makeCountryFlagMaterial(cFlag.code, true);
+                return true;
+            }
+            else {
+                return false;
+            }
+            return true;
+        }
+
+        private _loadBallMaterialSTD(index: number): boolean {
+            console.log("Loading ball material STD " + index);
+            console.trace();
+            if (index === 2) {
+                this._ballMaterialsSTD[2] = this._makeBrandedBallMaterialSTD("square-red", "ball-square-red.png");
+            }
+            else if (index === 3) {
+                this._ballMaterialsSTD[3] = this._makeBrandedBallMaterialSTD("circle-green", "ball-circle-green.png");
+            }
+            else if (index === 4) {
+                this._ballMaterialsSTD[4] = this._makeBrandedBallMaterialSTD("star-blue", "ball-star-blue.png");
+            }
+            else if (index === 5) {
+                this._ballMaterialsSTD[5] = this._makeBrandedBallMaterialSTD("tiaratum", "ball-tiaratum.png");
+            }
+            else if (index === 6) {
+                this._ballMaterialsSTD[6] = this._makeBrandedBallMaterialSTD("html5", "ball-html5.png");
+            }
+            else if (index === 7) {
+                this._ballMaterialsSTD[7] = this._makeBrandedBallMaterialSTD("tiaratum", "ball-bjs.png");
+            }
+            else if (index === 8) {
+                this._ballMaterialsSTD[8] = this._makeBrandedBallMaterialSTD("poki", "ball-poki.png");
+            }
+            else if (index >= 25 && index < 25 + this.existingCountryFlags.length) {
+                let cFlag = this.existingCountryFlags[index - 25];
+                this._ballMaterialsSTD[index] = this.makeCountryFlagMaterial(cFlag.code, false);
+                return true;
+            }
+            else {
+                return false;
+            }
+            return true;
         }
     }
 }

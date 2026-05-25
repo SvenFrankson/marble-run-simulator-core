@@ -232,6 +232,7 @@ declare namespace MarbleRunSimulatorCore {
         selectorFullLitLightBlueMaterial: BABYLON.StandardMaterial;
         selectorFullLitBlueMaterial: BABYLON.StandardMaterial;
         selectorFullLitGreenMaterial: BABYLON.StandardMaterial;
+        envTexture: BABYLON.CubeTexture;
         constructor(game: IGame, existingCountryFlags: ICountryFlag[]);
         private _makePlasticPBR;
         private _makePlasticSTD;
@@ -239,8 +240,12 @@ declare namespace MarbleRunSimulatorCore {
         private _makeMetalSTD;
         private _makePlexiglasPBR;
         private _makePlexiglasSTD;
-        testMakeCountryFlagMaterialPBR(countryCode: string, envTexture: BABYLON.CubeTexture): BABYLON.Material;
+        private _makeBrandedBallMaterialSTD;
+        private _makeBrandedBallMaterialPBR;
+        makeCountryFlagMaterial(countryCode: string, isPBR?: boolean): BABYLON.Material;
         private _generateMaterials;
+        private _loadBallMaterialPBR;
+        private _loadBallMaterialSTD;
     }
 }
 declare namespace MarbleRunSimulatorCore {
