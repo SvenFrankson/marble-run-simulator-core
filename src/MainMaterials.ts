@@ -461,8 +461,6 @@ namespace MarbleRunSimulatorCore {
                 this._materialsSTD[14]
             ];
 
-            console.log(this._ballMaterialsPBR.length);
-
             let parkourBallColor = BABYLON.Color3.FromHexString("#0c0c18");
 
             let parkourBallMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("parkour-ball-pbr", this.game.scene);
@@ -789,7 +787,6 @@ namespace MarbleRunSimulatorCore {
         }
 
         private _loadBallMaterialPBR(index: number): boolean {
-            console.log("Loading ball material PBR " + index);
             if (index === 2) {
                 this._ballMaterialsPBR[2] = this._makeBrandedBallMaterialPBR("square-red", "ball-square-red.png", this.envTexture);
             }
@@ -823,8 +820,6 @@ namespace MarbleRunSimulatorCore {
         }
 
         private _loadBallMaterialSTD(index: number): boolean {
-            console.log("Loading ball material STD " + index);
-            console.trace();
             if (index === 2) {
                 this._ballMaterialsSTD[2] = this._makeBrandedBallMaterialSTD("square-red", "ball-square-red.png");
             }

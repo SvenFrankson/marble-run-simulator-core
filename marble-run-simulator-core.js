@@ -1685,7 +1685,6 @@ var MarbleRunSimulatorCore;
                 this._materialsSTD[13],
                 this._materialsSTD[14]
             ];
-            console.log(this._ballMaterialsPBR.length);
             let parkourBallColor = BABYLON.Color3.FromHexString("#0c0c18");
             let parkourBallMaterialPBR = new BABYLON.PBRMetallicRoughnessMaterial("parkour-ball-pbr", this.game.scene);
             parkourBallMaterialPBR.baseColor = parkourBallColor;
@@ -2057,7 +2056,6 @@ var MarbleRunSimulatorCore;
             this._materialsSTD.push(this._makePlasticSTD("white-plastic-std", BABYLON.Color3.FromHexString("#ffffff")));
         }
         _loadBallMaterialPBR(index) {
-            console.log("Loading ball material PBR " + index);
             if (index === 2) {
                 this._ballMaterialsPBR[2] = this._makeBrandedBallMaterialPBR("square-red", "ball-square-red.png", this.envTexture);
             }
@@ -2090,8 +2088,6 @@ var MarbleRunSimulatorCore;
             return true;
         }
         _loadBallMaterialSTD(index) {
-            console.log("Loading ball material STD " + index);
-            console.trace();
             if (index === 2) {
                 this._ballMaterialsSTD[2] = this._makeBrandedBallMaterialSTD("square-red", "ball-square-red.png");
             }
