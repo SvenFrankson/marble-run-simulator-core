@@ -1,4 +1,13 @@
 namespace MarbleRunSimulatorCore {
+
+    export interface ICountryFlag {
+        code: string;
+        name: string;
+        c1?: string;
+        c2?: string;
+        c3?: string;
+    }
+
     export enum MaterialType {
         Plastic,
         Metal,
@@ -167,7 +176,7 @@ namespace MarbleRunSimulatorCore {
         public selectorFullLitBlueMaterial: BABYLON.StandardMaterial;
         public selectorFullLitGreenMaterial: BABYLON.StandardMaterial;
 
-        constructor(public game: IGame) {
+        constructor(public game: IGame, public existingCountryFlags: ICountryFlag[]) {
             let envTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("./lib/marble-run-simulator-core/datas/environment/environmentSpecular.env", this.game.scene);
 
             this.handleMaterial = new BABYLON.StandardMaterial("handle-material");
@@ -548,6 +557,60 @@ namespace MarbleRunSimulatorCore {
             return plexiglas;
         }
 
+        public testMakeCountryFlagMaterialPBR(countryCode: string, envTexture: BABYLON.CubeTexture): BABYLON.Material {
+            let cFlag = this.existingCountryFlags.find(c => c.code === countryCode);
+            let c1: string = "white";
+            let c2: string = "";
+            let c3: string = "";
+
+            if (cFlag) {
+                c1 = cFlag.c1 || c1;
+                c2 = cFlag.c2 || c1;
+                c3 = cFlag.c3 || c2;
+            }
+
+            let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial("flag-" + countryCode, this.game.scene);
+            ballMaterial.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+            ballMaterial.metallic = 0.7;
+            ballMaterial.roughness = 0.3;
+            ballMaterial.environmentTexture = envTexture;
+
+            let flagW = 256 * 0.75;
+            let flagH = flagW / 4 * 3;
+            let canvasW = 256;
+            const image = new Image();
+            image.width = flagW;
+            image.height = flagH;
+            image.onload = function () {
+                createImageBitmap(image, {
+                    resizeWidth: flagW,
+                    resizeHeight: flagH,
+                    resizeQuality: "high"
+                }).then((bitmap) => {
+                    let canvas = document.createElement("canvas");
+                    canvas.width = canvasW;
+                    canvas.height = canvasW;
+                    let ctx = canvas.getContext("2d");
+                    ctx.fillStyle = c1;
+                    ctx.fillRect(0, 0, canvasW, canvasW);
+                    /*
+                    ctx.fillStyle = c3;
+                    ctx.fillRect(0, (canvasW - flagH) / 2 - 2, canvasW, flagH + 4);
+                    ctx.fillStyle = c1;
+                    ctx.fillRect(0, (canvasW - flagH) / 2, canvasW, flagH);
+                    */
+
+                    ctx.drawImage(bitmap, (canvasW - flagW) / 2, (canvasW - flagH) / 2);
+
+                    var texture = new BABYLON.Texture(canvas.toDataURL(), undefined, undefined, false);
+                    ballMaterial.baseTexture = texture;
+                });
+            }
+            image.src = "./styles/flags/4x3/" + countryCode + ".svg";
+
+            return ballMaterial;
+        }
+
         private _generateMaterials(envTexture: BABYLON.CubeTexture): void {
             this._materialsPBR = [];
             this._materialsSTD = [];
@@ -557,6 +620,10 @@ namespace MarbleRunSimulatorCore {
             steelMaterialPBR.metallic = 1.0;
             steelMaterialPBR.roughness = 0.15;
             steelMaterialPBR.environmentTexture = envTexture;
+
+            let code = "fr";
+            code = this.existingCountryFlags[Math.floor(Math.random() * 10)].code;
+            steelMaterialPBR = this.testMakeCountryFlagMaterialPBR(code, envTexture) as BABYLON.PBRMetallicRoughnessMaterial;
             
             let steelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
             steelMaterialSTD.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7);

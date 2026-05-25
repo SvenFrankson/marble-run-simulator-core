@@ -18,12 +18,12 @@ namespace MarbleRunSimulatorCore {
             if (this.machine.toonOutlineRender) {
                 MainMaterials.SetAsOutlinedMesh(this.base);
             }
-            let bodyVertexData = Mummu.CreateBeveledCylinderVertexData({ radius: (d - 0.5 * tileSize) * 0.5, height: 0.005 });
+            let bodyVertexData = Mummu.CreateBeveledCylinderVertexData({ radius: (d - 0.5 * tileSize) * 0.5, height: 0.004 });
             bodyVertexData.applyToMesh(this.base);
 
             for (let n = 0; n < 2; n++) {
                 let shieldWire = new Wire(this);
-                shieldWire.wireSize = 0.006;
+                shieldWire.wireSize = 0.004 + 0.002 * n;
                 shieldWire.colorIndex = 0;
                 shieldWire.path = [];
 
@@ -40,7 +40,7 @@ namespace MarbleRunSimulatorCore {
 
             let bodyCollider = new Mummu.BoxCollider(this.base._worldMatrix);
             bodyCollider.width = d - 0.5 * tileSize;
-            bodyCollider.height = 0.005;
+            bodyCollider.height = 0.004;
             bodyCollider.depth = d - 0.5 * tileSize;
             
             let bodyMachineCollider = new MachineCollider(bodyCollider);

@@ -1438,8 +1438,9 @@ var MarbleRunSimulatorCore;
         BallMaterialType[BallMaterialType["Logo"] = 1] = "Logo";
     })(BallMaterialType = MarbleRunSimulatorCore.BallMaterialType || (MarbleRunSimulatorCore.BallMaterialType = {}));
     class MainMaterials {
-        constructor(game) {
+        constructor(game, existingCountryFlags) {
             this.game = game;
+            this.existingCountryFlags = existingCountryFlags;
             this._materialsPBR = [];
             this._materialsSTD = [];
             this._plexiglasMaterialsPBR = [];
@@ -1878,6 +1879,53 @@ var MarbleRunSimulatorCore;
             plexiglas.alpha = 0.5;
             return plexiglas;
         }
+        testMakeCountryFlagMaterialPBR(countryCode, envTexture) {
+            let cFlag = this.existingCountryFlags.find(c => c.code === countryCode);
+            let c1 = "white";
+            let c2 = "";
+            let c3 = "";
+            if (cFlag) {
+                c1 = cFlag.c1 || c1;
+                c2 = cFlag.c2 || c1;
+                c3 = cFlag.c3 || c2;
+            }
+            let ballMaterial = new BABYLON.PBRMetallicRoughnessMaterial("flag-" + countryCode, this.game.scene);
+            ballMaterial.baseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+            ballMaterial.metallic = 0.7;
+            ballMaterial.roughness = 0.3;
+            ballMaterial.environmentTexture = envTexture;
+            let flagW = 256 * 0.75;
+            let flagH = flagW / 4 * 3;
+            let canvasW = 256;
+            const image = new Image();
+            image.width = flagW;
+            image.height = flagH;
+            image.onload = function () {
+                createImageBitmap(image, {
+                    resizeWidth: flagW,
+                    resizeHeight: flagH,
+                    resizeQuality: "high"
+                }).then((bitmap) => {
+                    let canvas = document.createElement("canvas");
+                    canvas.width = canvasW;
+                    canvas.height = canvasW;
+                    let ctx = canvas.getContext("2d");
+                    ctx.fillStyle = c1;
+                    ctx.fillRect(0, 0, canvasW, canvasW);
+                    /*
+                    ctx.fillStyle = c3;
+                    ctx.fillRect(0, (canvasW - flagH) / 2 - 2, canvasW, flagH + 4);
+                    ctx.fillStyle = c1;
+                    ctx.fillRect(0, (canvasW - flagH) / 2, canvasW, flagH);
+                    */
+                    ctx.drawImage(bitmap, (canvasW - flagW) / 2, (canvasW - flagH) / 2);
+                    var texture = new BABYLON.Texture(canvas.toDataURL(), undefined, undefined, false);
+                    ballMaterial.baseTexture = texture;
+                });
+            };
+            image.src = "./styles/flags/4x3/" + countryCode + ".svg";
+            return ballMaterial;
+        }
         _generateMaterials(envTexture) {
             this._materialsPBR = [];
             this._materialsSTD = [];
@@ -1886,6 +1934,9 @@ var MarbleRunSimulatorCore;
             steelMaterialPBR.metallic = 1.0;
             steelMaterialPBR.roughness = 0.15;
             steelMaterialPBR.environmentTexture = envTexture;
+            let code = "fr";
+            code = this.existingCountryFlags[Math.floor(Math.random() * 10)].code;
+            steelMaterialPBR = this.testMakeCountryFlagMaterialPBR(code, envTexture);
             let steelMaterialSTD = new BABYLON.StandardMaterial("steel-std", this.game.scene);
             steelMaterialSTD.diffuseColor = new BABYLON.Color3(0.5, 0.6, 0.7);
             steelMaterialSTD.specularColor = new BABYLON.Color3(1, 1, 1);
@@ -6316,8 +6367,6 @@ var MarbleRunSimulatorCore;
             //    Mummu.TranslateVertexDataInPlace(cube, points[i]);
             //    allDatas.push(cube);
             //}
-            console.log(Mummu.MergeVertexDatas(ringIn, ringOut));
-            console.log(Mummu.MergeVertexDatas(pipeData, flip));
             Mummu.MergeVertexDatas(ringIn, ringOut).applyToMesh(track.ringsMesh);
             Mummu.MergeVertexDatas(pipeData, flip).applyToMesh(track.tubeMesh);
         }
@@ -11400,6 +11449,7 @@ var MarbleRunSimulatorCore;
                 let trackTemplate = new MarbleRunSimulatorCore.TrackTemplate(this.template);
                 //trackTemplate.cutOutSleeper = (n) => { return true; };
                 trackTemplate.isDouble = true;
+                trackTemplate.noMiniatureRender = true;
                 let dirStart = rawLine.points[1].subtract(rawLine.points[0]).normalize();
                 let prevDir = dirStart.clone();
                 let normStart = Mummu.Rotate(dirStart, BABYLON.Axis.Z, Math.PI * 0.5);
@@ -11524,9 +11574,7 @@ var MarbleRunSimulatorCore;
                             BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 1], p0n, f, filteredPoints[filteredPoints.length - 1]);
                         }
                     };
-                    Mummu.SmoothPathInPlace(filteredPoints, 0.3);
-                    forceEndDir(1);
-                    Mummu.SmoothPathInPlace(filteredPoints, 0.3);
+                    Mummu.SmoothPathInPlace(filteredPoints, 0.2);
                     forceEndDir(0.5);
                     // Try to merge with existing line
                     let existingLine;
@@ -12942,11 +12990,11 @@ var MarbleRunSimulatorCore;
             if (this.machine.toonOutlineRender) {
                 MarbleRunSimulatorCore.MainMaterials.SetAsOutlinedMesh(this.base);
             }
-            let bodyVertexData = Mummu.CreateBeveledCylinderVertexData({ radius: (d - 0.5 * MarbleRunSimulatorCore.tileSize) * 0.5, height: 0.005 });
+            let bodyVertexData = Mummu.CreateBeveledCylinderVertexData({ radius: (d - 0.5 * MarbleRunSimulatorCore.tileSize) * 0.5, height: 0.004 });
             bodyVertexData.applyToMesh(this.base);
             for (let n = 0; n < 2; n++) {
                 let shieldWire = new MarbleRunSimulatorCore.Wire(this);
-                shieldWire.wireSize = 0.006;
+                shieldWire.wireSize = 0.004 + 0.002 * n;
                 shieldWire.colorIndex = 0;
                 shieldWire.path = [];
                 for (let i = 0; i < 32; i++) {
@@ -12960,7 +13008,7 @@ var MarbleRunSimulatorCore;
             }
             let bodyCollider = new Mummu.BoxCollider(this.base._worldMatrix);
             bodyCollider.width = d - 0.5 * MarbleRunSimulatorCore.tileSize;
-            bodyCollider.height = 0.005;
+            bodyCollider.height = 0.004;
             bodyCollider.depth = d - 0.5 * MarbleRunSimulatorCore.tileSize;
             let bodyMachineCollider = new MarbleRunSimulatorCore.MachineCollider(bodyCollider);
             bodyMachineCollider.bouncyness = 0.2;
@@ -18076,10 +18124,10 @@ var MarbleRunSimulatorCore;
                         decor.dispose();
                     });
                     this.decors = [];
-                    this.skybox.isVisible = false;
-                    //let skyTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/skyboxes/sky_toon.jpeg");
-                    //this.skyboxMaterial.diffuseTexture = skyTexture;
-                    //this.skyboxMaterial.emissiveTexture = skyTexture;
+                    this.skybox.isVisible = true;
+                    let skyTexture = new BABYLON.Texture("./datas/icons-bb/sky_toon.jpeg");
+                    this.skyboxMaterial.diffuseTexture = skyTexture;
+                    this.skyboxMaterial.emissiveTexture = skyTexture;
                     this.wall.isVisible = false;
                     this.ground.isVisible = false;
                     this.frame.isVisible = false;

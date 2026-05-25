@@ -159,6 +159,13 @@ declare namespace MarbleRunSimulatorCore {
     }
 }
 declare namespace MarbleRunSimulatorCore {
+    interface ICountryFlag {
+        code: string;
+        name: string;
+        c1?: string;
+        c2?: string;
+        c3?: string;
+    }
     enum MaterialType {
         Plastic = 0,
         Metal = 1,
@@ -170,6 +177,7 @@ declare namespace MarbleRunSimulatorCore {
     }
     class MainMaterials {
         game: IGame;
+        existingCountryFlags: ICountryFlag[];
         static SetAsOutlinedMesh(m: BABYLON.Mesh): void;
         private _materialsPBR;
         private _materialsSTD;
@@ -224,13 +232,14 @@ declare namespace MarbleRunSimulatorCore {
         selectorFullLitLightBlueMaterial: BABYLON.StandardMaterial;
         selectorFullLitBlueMaterial: BABYLON.StandardMaterial;
         selectorFullLitGreenMaterial: BABYLON.StandardMaterial;
-        constructor(game: IGame);
+        constructor(game: IGame, existingCountryFlags: ICountryFlag[]);
         private _makePlasticPBR;
         private _makePlasticSTD;
         private _makeMetalPBR;
         private _makeMetalSTD;
         private _makePlexiglasPBR;
         private _makePlexiglasSTD;
+        testMakeCountryFlagMaterialPBR(countryCode: string, envTexture: BABYLON.CubeTexture): BABYLON.Material;
         private _generateMaterials;
     }
 }

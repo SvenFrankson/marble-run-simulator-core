@@ -149,10 +149,10 @@ namespace MarbleRunSimulatorCore {
                     });
                     this.decors = [];
 
-                    this.skybox.isVisible = false;
-                    //let skyTexture = new BABYLON.Texture("./lib/marble-run-simulator-core/datas/skyboxes/sky_toon.jpeg");
-                    //this.skyboxMaterial.diffuseTexture = skyTexture;
-                    //this.skyboxMaterial.emissiveTexture = skyTexture;
+                    this.skybox.isVisible = true;
+                    let skyTexture = new BABYLON.Texture("./datas/icons-bb/sky_toon.jpeg");
+                    this.skyboxMaterial.diffuseTexture = skyTexture;
+                    this.skyboxMaterial.emissiveTexture = skyTexture;
                     
                     this.wall.isVisible = false;
                     this.ground.isVisible = false;

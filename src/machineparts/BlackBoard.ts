@@ -772,6 +772,7 @@ namespace MarbleRunSimulatorCore {
                 let trackTemplate = new TrackTemplate(this.template);
                 //trackTemplate.cutOutSleeper = (n) => { return true; };
                 trackTemplate.isDouble = true;
+                trackTemplate.noMiniatureRender = true;
                 let dirStart = rawLine.points[1].subtract(rawLine.points[0]).normalize();
                 let prevDir = dirStart.clone();
                 let normStart = Mummu.Rotate(dirStart, BABYLON.Axis.Z, Math.PI * 0.5);
@@ -916,9 +917,7 @@ namespace MarbleRunSimulatorCore {
                             BABYLON.Vector3.LerpToRef(filteredPoints[filteredPoints.length - 1], p0n, f, filteredPoints[filteredPoints.length - 1]);
                         }
                     }
-                    Mummu.SmoothPathInPlace(filteredPoints, 0.3);
-                    forceEndDir(1);
-                    Mummu.SmoothPathInPlace(filteredPoints, 0.3);
+                    Mummu.SmoothPathInPlace(filteredPoints, 0.2);
                     forceEndDir(0.5);
 
                     // Try to merge with existing line
