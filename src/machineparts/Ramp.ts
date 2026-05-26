@@ -5,16 +5,12 @@ namespace MarbleRunSimulatorCore {
             this.setColorCount(1);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Ramp.PropToPartName(prop)));
-            if (prop.woodVersion) {
-                this.localAABBBaseMin.z = - 3 * tileSize;
-                this.localAABBBaseMax.z = 2 * tileSize;
-            }
             this.generateWires();
         }
 
         public static PropToPartName(prop: IMachinePartProp): string {
             let partName = (prop.pipeVersion ? "pipe" : "") + (prop.woodVersion ? "wood" : "") + "ramp_" + prop.l.toFixed(0) + "." + prop.h.toFixed(0) + "." + prop.d.toFixed(0);
-            if (!prop.pipeVersion && !prop.woodVersion) {
+            if (!prop.pipeVersion) {
                 partName += "." + prop.s.toFixed(0);
             }
             return partName;
@@ -24,7 +20,7 @@ namespace MarbleRunSimulatorCore {
             let template = new MachinePartTemplate();
 
             template.partName = (pipeVersion ? "pipe" : "") + (woodVersion ? "wood" : "") + "ramp_" + l.toFixed(0) + "." + h.toFixed(0) + "." + d.toFixed(0);
-            if (!pipeVersion && !woodVersion) {
+            if (!pipeVersion) {
                 template.partName += "." + s.toFixed(0)
             }
 

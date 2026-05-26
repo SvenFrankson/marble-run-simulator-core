@@ -13,19 +13,32 @@ namespace MarbleRunSimulatorCore {
             track.mesh = new BABYLON.Mesh("track-mesh");
             track.mesh.parent = track.part;
             track.mesh.material = track.part.game.materials.getMaterial(track.part.getColor(0), track.part.machine.materialQ);
+
+            /*
+            let normalLines = [];
+            for (let i = 0; i < track.templateInterpolatedPoints.length; i++) {
+                let p = track.templateInterpolatedPoints[i];
+                let n = track.trackInterpolatedNormals[i];
+                normalLines.push([p, p.add(n.scale(0.05))]);
+            }
+            BABYLON.MeshBuilder.CreateLineSystem("normals", { lines: normalLines }).parent = track.mesh;
+            */
             
-            let W = 3 * tileSize + 0.01;
-            let w = 3 * tileSize;
+            let W = track.trackWidth;
+            let w = track.trackWidth - 0.01;
             let W05 = W * 0.5;
             let w05 = w * 0.5;
             let H = 0.015;
             let h = 0.01;
             let dH = H - h;
             let m = 0.001;
+            let y0 = - 0.0025;
 
-            let points = track.templateInterpolatedPoints;
+            let points = track.templateInterpolatedPoints.map((p) => {
+                return p.clone();
+            });
             
-            Mummu.DecimatePathInPlaceFast(points, (2 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(points, (5 / 180) * Math.PI);
 
             let p0 = points[0];
             let p1 = points[1];
@@ -67,41 +80,41 @@ namespace MarbleRunSimulatorCore {
             shape.push(new BABYLON.Vector3(thickLat * r - b, - thickVert * r - b, 0));
             */
 
-            shape.push(new BABYLON.Vector3(- W05, - dH, 0));
-            shape.push(new BABYLON.Vector3(- W05, - dH, 0));
-            shape.push(new BABYLON.Vector3(- W05, h - m, 0));
-            shape.push(new BABYLON.Vector3(- W05 + m, h, 0));
-            shape.push(new BABYLON.Vector3(- w05 - m, h, 0));
-            shape.push(new BABYLON.Vector3(- w05, h - m, 0));
-            shape.push(new BABYLON.Vector3(- w05, 0, 0));
-            shape.push(new BABYLON.Vector3(- w05, 0, 0));
-            shape.push(new BABYLON.Vector3(w05, 0, 0));
-            shape.push(new BABYLON.Vector3(w05, 0, 0));
-            shape.push(new BABYLON.Vector3(w05, h - m, 0));
-            shape.push(new BABYLON.Vector3(w05 + m, h, 0));
-            shape.push(new BABYLON.Vector3(W05 - m, h, 0));
-            shape.push(new BABYLON.Vector3(W05, h - m, 0));
-            shape.push(new BABYLON.Vector3(W05, - dH, 0));
-            shape.push(new BABYLON.Vector3(W05, - dH, 0));
+            shape.push(new BABYLON.Vector3(- W05, y0 - dH, 0));
+            shape.push(new BABYLON.Vector3(- W05, y0 - dH, 0));
+            shape.push(new BABYLON.Vector3(- W05, y0 + h - m, 0));
+            shape.push(new BABYLON.Vector3(- W05 + m, y0 + h, 0));
+            shape.push(new BABYLON.Vector3(- w05 - m, y0 + h, 0));
+            shape.push(new BABYLON.Vector3(- w05, y0 + h - m, 0));
+            shape.push(new BABYLON.Vector3(- w05, y0, 0));
+            shape.push(new BABYLON.Vector3(- w05, y0, 0));
+            shape.push(new BABYLON.Vector3(w05, y0, 0));
+            shape.push(new BABYLON.Vector3(w05, y0, 0));
+            shape.push(new BABYLON.Vector3(w05, y0 + h - m, 0));
+            shape.push(new BABYLON.Vector3(w05 + m, y0 + h, 0));
+            shape.push(new BABYLON.Vector3(W05 - m, y0 + h, 0));
+            shape.push(new BABYLON.Vector3(W05, y0 + h - m, 0));
+            shape.push(new BABYLON.Vector3(W05, y0 - dH, 0));
+            shape.push(new BABYLON.Vector3(W05, y0 - dH, 0));
 
-            shapeCap.push(new BABYLON.Vector3(- W05, - dH, 0));
-            shapeCap.push(new BABYLON.Vector3(- W05, h - m, 0));
-            shapeCap.push(new BABYLON.Vector3(- W05 + m, h, 0));
-            shapeCap.push(new BABYLON.Vector3(- w05 - m, h, 0));
-            shapeCap.push(new BABYLON.Vector3(- w05, h - m, 0));
-            shapeCap.push(new BABYLON.Vector3(- w05, 0, 0));
-            shapeCap.push(new BABYLON.Vector3(w05, 0, 0));
-            shapeCap.push(new BABYLON.Vector3(w05, h - m, 0));
-            shapeCap.push(new BABYLON.Vector3(w05 + m, h, 0));
-            shapeCap.push(new BABYLON.Vector3(W05 - m, h, 0));
-            shapeCap.push(new BABYLON.Vector3(W05, h - m, 0));
-            shapeCap.push(new BABYLON.Vector3(W05, - dH, 0));
+            shapeCap.push(new BABYLON.Vector3(- W05, y0 - dH, 0));
+            shapeCap.push(new BABYLON.Vector3(- W05, y0 + h - m, 0));
+            shapeCap.push(new BABYLON.Vector3(- W05 + m, y0 + h, 0));
+            shapeCap.push(new BABYLON.Vector3(- w05 - m, y0 + h, 0));
+            shapeCap.push(new BABYLON.Vector3(- w05, y0 + h - m, 0));
+            shapeCap.push(new BABYLON.Vector3(- w05, y0, 0));
+            shapeCap.push(new BABYLON.Vector3(w05, y0, 0));
+            shapeCap.push(new BABYLON.Vector3(w05, y0 + h - m, 0));
+            shapeCap.push(new BABYLON.Vector3(w05 + m, y0 + h, 0));
+            shapeCap.push(new BABYLON.Vector3(W05 - m, y0 + h, 0));
+            shapeCap.push(new BABYLON.Vector3(W05, y0 + h - m, 0));
+            shapeCap.push(new BABYLON.Vector3(W05, y0 - dH, 0));
             
             track.shape = [
-                new BABYLON.Vector3(- w05, h, 0),
-                new BABYLON.Vector3(- W05, 0, 0),
-                new BABYLON.Vector3(W05, 0, 0),
-                new BABYLON.Vector3(w05, h, 0),
+                new BABYLON.Vector3(- w05, y0 + h, 0),
+                new BABYLON.Vector3(- W05, y0, 0),
+                new BABYLON.Vector3(W05, y0, 0),
+                new BABYLON.Vector3(w05, y0 + h, 0),
             ]
             
             let t = shape.length;
@@ -119,16 +132,16 @@ namespace MarbleRunSimulatorCore {
                     dir = next.subtract(prev).normalize();
                 }
                 else if (next) {
-                    dir = next.subtract(point);
-                    dir.x = Math.sign(dir.x);
-                    dir.y = 0;
-                    dir.z = 0;
+                    dir = next.subtract(point).normalize();
+                    dir.x = Math.round(dir.x);
+                    dir.y = Math.round(dir.y);
+                    dir.z = Math.round(dir.z);
                 }
                 else if (prev) {
-                    dir = point.subtract(prev);
-                    dir.x = Math.sign(dir.x);
-                    dir.y = 0;
-                    dir.z = 0;
+                    dir = point.subtract(prev).normalize();
+                    dir.x = Math.round(dir.x);
+                    dir.y = Math.round(dir.y);
+                    dir.z = Math.round(dir.z);
                 }
                 let q = Mummu.QuaternionFromZYAxis(dir, BABYLON.Vector3.Up());
                 let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), q, point);

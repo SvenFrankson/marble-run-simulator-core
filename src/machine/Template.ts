@@ -391,7 +391,16 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("pipecurb_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = Curb.GenerateTemplate(l, h, undefined, true, false);
+                    data = Curb.GenerateTemplate(l, h, TrackSpeed.Flat, true, false);
+                }
+                else if (partName.startsWith("woodcurb_")) {
+                    let l = parseInt(partName.split("_")[1].split(".")[0]);
+                    let h = parseInt(partName.split("_")[1].split(".")[1]);
+                    let s = parseInt(partName.split("_")[1].split(".")[2]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = Curb.GenerateTemplate(l, h, s, false, true);
                 }
                 else if (partName.startsWith("uturn_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
@@ -410,7 +419,11 @@ namespace MarbleRunSimulatorCore {
                 else if (partName.startsWith("wooduturn_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
-                    data = UTurn.GenerateTemplate(l, h, 0, false, true);
+                    let s = parseInt(partName.split("_")[1].split(".")[2]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = UTurn.GenerateTemplate(l, h, s, false, true);
                 }
                 else if (partName.startsWith("wall_")) {
                     let l = parseInt(partName.split("_")[1].split(".")[0]);
@@ -445,13 +458,17 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     let d = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, true);
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, TrackSpeed.Flat, true);
                 }
                 else if (partName.startsWith("woodramp_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
                     let h = parseInt(partName.split("_")[1].split(".")[1]);
                     let d = parseInt(partName.split("_")[1].split(".")[2]);
-                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, 0, false, true);
+                    let s = parseInt(partName.split("_")[1].split(".")[3]);
+                    if (isNaN(s)) {
+                        s = 2;
+                    }
+                    data = Ramp.GenerateTemplate(w, h, isFinite(d) ? d : 1, s, false, true);
                 }
                 else if (partName.startsWith("wave_")) {
                     let w = parseInt(partName.split("_")[1].split(".")[0]);
@@ -662,6 +679,10 @@ namespace MarbleRunSimulatorCore {
                 prop.pipeVersion = true;
                 partName = Curb.PropToPartName(prop);
             }
+            else if (baseName === "woodcurb") {
+                prop.woodVersion = true;
+                partName = Curb.PropToPartName(prop);
+            }
             else if (baseName === "uturn") {
                 partName = UTurn.PropToPartName(prop);
             }
@@ -693,6 +714,7 @@ namespace MarbleRunSimulatorCore {
                 partName = Ramp.PropToPartName(prop);
             }
             else if (baseName === "woodramp") {
+                prop.woodVersion = true;
                 partName = Ramp.PropToPartName(prop);
             }
             else if (baseName === "wave") {

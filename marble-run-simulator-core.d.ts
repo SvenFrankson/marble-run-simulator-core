@@ -1033,6 +1033,7 @@ declare namespace MarbleRunSimulatorCore {
         AABBMin: BABYLON.Vector3;
         AABBMax: BABYLON.Vector3;
         shape: BABYLON.Vector3[];
+        get trackWidth(): number;
         constructor(part: MachinePart);
         get trackIndex(): number;
         getSlopeAt(index: number): number;

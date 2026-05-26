@@ -59,7 +59,8 @@ namespace MarbleRunSimulatorCore {
         "box",
         "largesplit",
         "star",
-        "pixel"
+        "pixel",
+        "woodcurb"
     ];
 
     export interface IMachinePartProp {
@@ -154,11 +155,18 @@ namespace MarbleRunSimulatorCore {
                     let w = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
                     let d = parseInt(argStr.split(".")[2]);
+                    let s = parseInt(argStr.split(".")[3]);
                     prop.l = w;
                     prop.h = h;
                     prop.d = d;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
                 }
                 prop.woodVersion = true;
+                if (isNaN(prop.s)) {
+                    prop.s = TrackSpeed.Slow;
+                }
                 return new Ramp(this.machine, prop);
             }
             if (partName === "wave" || partName.startsWith("wave_")) {
@@ -213,6 +221,24 @@ namespace MarbleRunSimulatorCore {
                 prop.pipeVersion = true;
                 return new Curb(this.machine, prop);
             }
+            if (partName === "woodcurb" || partName.startsWith("woodcurb_")) {
+                let argStr = partName.split("_")[1];
+                if (argStr) {
+                    let l = parseInt(argStr.split(".")[0]);
+                    let h = parseInt(argStr.split(".")[1]);
+                    let s = parseInt(argStr.split(".")[2]);
+                    prop.l = l;
+                    prop.h = h;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
+                }
+                prop.woodVersion = true;
+                if (isNaN(prop.s)) {
+                    prop.s = TrackSpeed.Slow;
+                }
+                return new Curb(this.machine, prop);
+            }
             if (partName === "uturn" || partName.startsWith("uturn_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
@@ -263,10 +289,17 @@ namespace MarbleRunSimulatorCore {
                 if (argStr) {
                     let l = parseInt(argStr.split(".")[0]);
                     let h = parseInt(argStr.split(".")[1]);
+                    let s = parseInt(argStr.split(".")[2]);
                     prop.l = l;
                     prop.h = h;
+                    if (isFinite(s)) {
+                        prop.s = s;
+                    }
                 }
                 prop.woodVersion = true;
+                if (isNaN(prop.s)) {
+                    prop.s = TrackSpeed.Slow;
+                }
                 return new UTurn(this.machine, prop);
             }
             if (partName === "wall" || partName.startsWith("wall_")) {
@@ -609,6 +642,11 @@ namespace MarbleRunSimulatorCore {
                 return new Curb(this.machine, prop);
             }
             if (baseName === "pipecurb") {
+                prop.pipeVersion = true;
+                return new Curb(this.machine, prop);
+            }
+            if (baseName === "woodcurb") {
+                prop.woodVersion = true;
                 return new Curb(this.machine, prop);
             }
             if (baseName === "uturn") {

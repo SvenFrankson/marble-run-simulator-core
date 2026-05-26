@@ -20,6 +20,10 @@ namespace MarbleRunSimulatorCore {
 
         public shape: BABYLON.Vector3[] = [];
 
+        public get trackWidth(): number {
+            return (1 + 2 * this.part.s) * tileSize;
+        }
+
         constructor(part: MachinePart) {
             super(part);
             this.wires = [new Wire(this.part), new Wire(this.part)];
@@ -116,6 +120,10 @@ namespace MarbleRunSimulatorCore {
                     dir = dir.subtract(point);
                 }
 
+                let tmp = BABYLON.Vector3.Cross(this.trackInterpolatedNormals[i], dir);
+                BABYLON.Vector3.CrossToRef(dir, tmp, this.trackInterpolatedNormals[i]);
+                this.trackInterpolatedNormals[i].normalize();
+
                 Mummu.RotateInPlace(this.trackInterpolatedNormals[i], dir, angles[i]);
             }
 
@@ -170,6 +178,16 @@ namespace MarbleRunSimulatorCore {
                 BABYLON.Vector3.TransformCoordinatesToRef(this.absolutePath[i], this.part.getWorldMatrix(), this.absolutePath[i]);
                 BABYLON.Vector3.TransformNormalToRef(this.absoluteNormals[i], this.part.getWorldMatrix(), this.absoluteNormals[i]);
             }
+
+            /*
+            let normalLines = [];
+            for (let i = 0; i < this.absolutePath.length; i++) {
+                let p = this.absolutePath[i];
+                let n = this.absoluteNormals[i];
+                normalLines.push([p, p.add(n.scale(0.05))]);
+            }
+            BABYLON.MeshBuilder.CreateLineSystem("normals", { lines: normalLines }).setParent(this.part);
+            */
         }
     }
 }

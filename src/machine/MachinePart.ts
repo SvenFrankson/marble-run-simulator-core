@@ -1445,17 +1445,22 @@ namespace MarbleRunSimulatorCore {
                 for (let j = 0; j < track.template.trackpoints.length; j++){
                     let trackpoint = track.template.trackpoints[j];
 
+                    let halfGauge = this.wireGauge * 0.5;
+                    if (track instanceof WoodTrack) {
+                        halfGauge = track.trackWidth * 0.5;
+                    }
+
                     let dx = 0;
-                    let dy = this.wireGauge * 0.5;
-                    let dz = this.wireGauge * 0.5;
+                    let dy = halfGauge;
+                    let dz = halfGauge;
                     if (trackpoint.dir) {
                         if (Math.abs(trackpoint.dir.y) > 0.5) {
-                            dx = this.wireGauge * 0.5
-                            dy = this.wireGauge * 0.5;
-                            dz = this.wireGauge * 0.5;
+                            dx = halfGauge;
+                            dy = halfGauge;
+                            dz = halfGauge;
                         }
                         if (Math.abs(trackpoint.dir.z) > Math.abs(trackpoint.dir.x)) {
-                            dx = this.wireGauge * 0.5
+                            dx = halfGauge;
                             dz = 0;
                         }
                     }
