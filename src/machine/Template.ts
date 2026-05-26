@@ -582,6 +582,9 @@ namespace MarbleRunSimulatorCore {
                 else if (partName === "screen") {
                     data = Screen.GenerateTemplate();
                 }
+                else if (partName === "pixel") {
+                    data = Pixel.GenerateTemplate();
+                }
                 else if (partName === "speeder" || partName.startsWith("speeder_")) {
                     let l = 3;
                     if (partName.indexOf("_") != - 1) {
@@ -786,6 +789,9 @@ namespace MarbleRunSimulatorCore {
             }
             else if (baseName === "screen") {
                 partName = Screen.PropToPartName(prop);
+            }
+            else if (baseName === "pixel") {
+                partName = Pixel.PropToPartName(prop);
             }
             else if (baseName === "speeder") {
                 partName = Speeder.PropToPartName(prop);

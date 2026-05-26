@@ -59,6 +59,7 @@ namespace MarbleRunSimulatorCore {
         "box",
         "largesplit",
         "star",
+        "pixel"
     ];
 
     export interface IMachinePartProp {
@@ -485,6 +486,9 @@ namespace MarbleRunSimulatorCore {
             if (partName === "screen") {
                 return new Screen(this.machine, prop);
             }
+            if (partName === "pixel") {
+                return new Pixel(this.machine, prop);
+            }
             if (partName === "speeder" || partName.startsWith("speeder_")) {
                 let argStr = partName.split("_")[1];
                 if (argStr) {
@@ -719,6 +723,9 @@ namespace MarbleRunSimulatorCore {
             }
             if (baseName === "screen") {
                 return new Screen(this.machine, prop);
+            }
+            if (baseName === "pixel") {
+                return new Pixel(this.machine, prop);
             }
             if (baseName === "speeder") {
                 return new Speeder(this.machine, prop);

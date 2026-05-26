@@ -579,8 +579,16 @@ namespace MarbleRunSimulatorCore {
         public baseMeshMinZ: number = -this.margin;
         public baseMeshMaxZ: number = this.margin;
 
+        private _updating: boolean = false;
         public async generateBaseMesh(): Promise<void> {
-            let previousBaseMinY = this.baseMeshMinY;
+            console.log("Generating base mesh...");
+            this.requestUpdateBaseMesh = false;
+            while (this._updating) {
+                await Nabu.Wait(1);
+            }
+            this._updating = true;
+            let previousBaseMin = new BABYLON.Vector3(this.baseMeshMinX, this.baseMeshMinY, this.baseMeshMinZ);
+            let previousBaseMax = new BABYLON.Vector3(this.baseMeshMaxX, this.baseMeshMaxY, this.baseMeshMaxZ);
 
             this.baseMeshMinX = - tileWidth * 0.5;
             this.baseMeshMaxX = tileWidth * 0.5;
@@ -614,6 +622,21 @@ namespace MarbleRunSimulatorCore {
                     this.baseMeshMaxY = Math.max(this.baseMeshMaxY, block.line[n].y);
                     this.baseMeshMinZ = Math.min(this.baseMeshMinZ, block.line[n].z);
                     this.baseMeshMaxZ = Math.max(this.baseMeshMaxZ, block.line[n].z);
+                }
+            }
+
+            if (previousBaseMin.x === this.baseMeshMinX) {
+                if (previousBaseMin.y === this.baseMeshMinY) {
+                    if (previousBaseMin.z === this.baseMeshMinZ) {
+                        if (previousBaseMax.x === this.baseMeshMaxX) {
+                            if (previousBaseMax.y === this.baseMeshMaxY) {
+                                if (previousBaseMax.z === this.baseMeshMaxZ) {
+                                    this._updating = false;
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -796,7 +819,7 @@ namespace MarbleRunSimulatorCore {
                 }
             }
 
-            if (previousBaseMinY != this.baseMeshMinY) {
+            if (previousBaseMin.y != this.baseMeshMinY) {
                 for (let i = 0; i < this.parts.length; i++) {
                     this.parts[i].doSleepersMeshUpdate();
                 }
@@ -839,7 +862,7 @@ namespace MarbleRunSimulatorCore {
             }
 
             this.ready = true;
-            this.requestUpdateBaseMesh = false;
+            this._updating = false;
         }
 
         public generateLimitsMesh(): void {

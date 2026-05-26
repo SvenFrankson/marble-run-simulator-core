@@ -524,6 +524,7 @@ declare namespace MarbleRunSimulatorCore {
         baseMeshMaxY: number;
         baseMeshMinZ: number;
         baseMeshMaxZ: number;
+        private _updating;
         generateBaseMesh(): Promise<void>;
         generateLimitsMesh(): void;
         regenerateBaseAxis(): void;
@@ -1025,13 +1026,13 @@ declare namespace MarbleRunSimulatorCore {
 declare namespace MarbleRunSimulatorCore {
     class WoodTrack extends Track {
         mesh: BABYLON.Mesh;
-        tubeRadius: number;
-        radiusToRaise(r: number): number;
-        tubePath: BABYLON.Vector3[];
+        absolutePath: BABYLON.Vector3[];
+        absoluteNormals: BABYLON.Vector3[];
         get preferedStartBank(): number;
         get preferedEndBank(): number;
         AABBMin: BABYLON.Vector3;
         AABBMax: BABYLON.Vector3;
+        shape: BABYLON.Vector3[];
         constructor(part: MachinePart);
         get trackIndex(): number;
         getSlopeAt(index: number): number;
@@ -1535,6 +1536,17 @@ declare namespace MarbleRunSimulatorCore {
         onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
         recomputeAbsolutePath(): void;
         static GenerateTemplate(l: number): MachinePartTemplate;
+    }
+}
+declare namespace MarbleRunSimulatorCore {
+    class Pixel extends MachinePart {
+        screenMesh: BABYLON.Mesh;
+        shieldConnector: BABYLON.Mesh;
+        constructor(machine: Machine, prop: IMachinePartProp);
+        static PropToPartName(prop: IMachinePartProp): string;
+        protected instantiateMachineSpecific(): Promise<void>;
+        static GenerateTemplate(): MachinePartTemplate;
+        onBeforeApplyingSelectorMeshLogicVertexData(selectorMeshLogicVertexDatas: BABYLON.VertexData[]): void;
     }
 }
 declare namespace MarbleRunSimulatorCore {

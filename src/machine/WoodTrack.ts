@@ -3,11 +3,9 @@
 namespace MarbleRunSimulatorCore {
     export class WoodTrack extends Track {
         public mesh: BABYLON.Mesh;
-        public tubeRadius: number = 0.01;
-        public radiusToRaise(r: number): number {
-            return r - 0.003;
-        }
-        public tubePath: BABYLON.Vector3[] = [];
+
+        public absolutePath: BABYLON.Vector3[] = [];
+        public absoluteNormals: BABYLON.Vector3[] = [];
 
         public get preferedStartBank(): number {
             return 0;
@@ -19,6 +17,8 @@ namespace MarbleRunSimulatorCore {
 
         public AABBMin: BABYLON.Vector3 = BABYLON.Vector3.Zero();
         public AABBMax: BABYLON.Vector3 = BABYLON.Vector3.Zero();
+
+        public shape: BABYLON.Vector3[] = [];
 
         constructor(part: MachinePart) {
             super(part);
@@ -159,19 +159,16 @@ namespace MarbleRunSimulatorCore {
         }
 
         public recomputeAbsolutePath(): void {
-            let points = [...this.templateInterpolatedPoints].map((p) => {
+            this.absolutePath = [...this.templateInterpolatedPoints].map((p) => {
                 return p.clone();
             });
-            let normals = [...this.trackInterpolatedNormals].map((p) => {
+            this.absoluteNormals = [...this.trackInterpolatedNormals].map((p) => {
                 return p.clone();
             });
 
-            this.tubePath = points.map((pt, i) => {
-                return pt.add(normals[i].scale(this.radiusToRaise(this.tubeRadius)));
-            });
-
-            for (let i = 0; i < this.tubePath.length; i++) {
-                BABYLON.Vector3.TransformCoordinatesToRef(this.tubePath[i], this.part.getWorldMatrix(), this.tubePath[i]);
+            for (let i = 0; i < this.absolutePath.length; i++) {
+                BABYLON.Vector3.TransformCoordinatesToRef(this.absolutePath[i], this.part.getWorldMatrix(), this.absolutePath[i]);
+                BABYLON.Vector3.TransformNormalToRef(this.absoluteNormals[i], this.part.getWorldMatrix(), this.absoluteNormals[i]);
             }
         }
     }

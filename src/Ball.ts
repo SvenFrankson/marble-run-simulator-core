@@ -597,17 +597,38 @@ namespace MarbleRunSimulatorCore {
                             });
                             part.tracks.forEach(track => {
                                 if (track instanceof PipeTrack || track instanceof WoodTrack) {
-                                    let col: Mummu.IIntersection;
-                                    let r = 0.011;
                                     if (track instanceof WoodTrack) {
-                                        r = track.tubeRadius;
-                                    }
-                                    col = Mummu.SphereInTubeIntersection(this.position, this.radius, track.tubePath, r);
-                                    if (col.hit) {
-                                        if (track instanceof WoodTrack && col.normal.y < -0.1) {
+                                        let cols = Mummu.SphereExtrudeIntersections(
+                                            this.position, this.radius,
+                                            track.absolutePath,
+                                            track.absoluteNormals,
+                                            track.shape
+                                        );
+                                        cols.forEach(col => {
+                                            if (col.hit) {
+                                                //this.setLastHit(wire, col.index);
+                                                let colDig = col.normal.scale(-1);
+                                                // Move away from collision
+                                                forcedDisplacement.addInPlace(col.normal.scale(col.depth));
+                                                // Cancel depth component of speed
+                                                let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
+                                                if (depthSpeed > 0) {
+                                                    canceledSpeed.addInPlace(colDig.scale(depthSpeed));
+                                                }
+                                                // Add ground reaction
+                                                let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
+                                                reactions.addInPlace(reaction);
+                                                reactionsCount++;
 
-                                        }
-                                        else {
+                                                this.surface = Surface.Plexiglas;
+                                                this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
+                                            }
+                                        });
+                                    }
+                                    else if (track instanceof PipeTrack) {
+                                        let r = 0.011;
+                                        let col = Mummu.SphereInTubeIntersection(this.position, this.radius, track.tubePath, r);
+                                        if (col.hit) {
                                             //this.setLastHit(wire, col.index);
                                             let colDig = col.normal.scale(-1);
                                             // Move away from collision
@@ -626,6 +647,7 @@ namespace MarbleRunSimulatorCore {
                                             this._soundWorldPosition.scaleInPlace(0.5).addInPlace(col.point.scale(0.5));
                                         }
                                     }
+                                    
                                 }
                                 else if (track instanceof DoubleTrack) {
                                     let index = this.getLastIndex(track);

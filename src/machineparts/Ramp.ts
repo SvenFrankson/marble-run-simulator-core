@@ -5,6 +5,10 @@ namespace MarbleRunSimulatorCore {
             this.setColorCount(1);
 
             this.setTemplate(this.machine.templateManager.getTemplate(Ramp.PropToPartName(prop)));
+            if (prop.woodVersion) {
+                this.localAABBBaseMin.z = - 3 * tileSize;
+                this.localAABBBaseMax.z = 2 * tileSize;
+            }
             this.generateWires();
         }
 

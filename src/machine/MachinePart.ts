@@ -1691,7 +1691,6 @@ namespace MarbleRunSimulatorCore {
                     this.rebuildWireMeshesIfNeeded().then(() => {
                         this.updateSelectorMeshVisibility();
                     });
-                    this.machine.requestUpdateBaseMesh = true;
                     this.machine.requestUpdateShadow = true;
                 }
                 else {
