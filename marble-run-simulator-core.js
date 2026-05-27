@@ -534,7 +534,7 @@ var MarbleRunSimulatorCore;
                                                 // Cancel depth component of speed
                                                 let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
                                                 if (depthSpeed > 0) {
-                                                    canceledSpeed.addInPlace(colDig.scale(depthSpeed * 1.5));
+                                                    canceledSpeed.addInPlace(colDig.scale(depthSpeed * 2));
                                                 }
                                                 // Add ground reaction
                                                 let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
@@ -5122,12 +5122,11 @@ var MarbleRunSimulatorCore;
                         halfGauge = track.trackWidth * 0.5;
                     }
                     let dx = 0;
-                    let dy = halfGauge;
+                    let dy = this.wireGauge * 0.5;
                     let dz = halfGauge;
                     if (trackpoint.dir) {
                         if (Math.abs(trackpoint.dir.y) > 0.5) {
                             dx = halfGauge;
-                            dy = halfGauge;
                             dz = halfGauge;
                         }
                         if (Math.abs(trackpoint.dir.z) > Math.abs(trackpoint.dir.x)) {
@@ -7835,8 +7834,8 @@ var MarbleRunSimulatorCore;
             }
             BABYLON.MeshBuilder.CreateLineSystem("normals", { lines: normalLines }).parent = track.mesh;
             */
-            let W = track.trackWidth;
-            let w = track.trackWidth - 0.01;
+            let W = track.trackWidth - 0.005;
+            let w = W - 0.01;
             let W05 = W * 0.5;
             let w05 = w * 0.5;
             let H = 0.015;
@@ -7847,7 +7846,7 @@ var MarbleRunSimulatorCore;
             let points = track.templateInterpolatedPoints.map((p) => {
                 return p.clone();
             });
-            Mummu.DecimatePathInPlaceFast(points, (5 / 180) * Math.PI);
+            Mummu.DecimatePathInPlaceFast(points, (2 / 180) * Math.PI);
             let p0 = points[0];
             let p1 = points[1];
             let dirIn = p1.subtract(p0).normalize();
@@ -7860,8 +7859,31 @@ var MarbleRunSimulatorCore;
             dirOut.x = Math.round(dirOut.x);
             dirOut.y = Math.round(dirOut.y);
             dirOut.z = Math.round(dirOut.z);
-            p0.addInPlace(dirIn.scale(0.0005));
-            pN.subtractInPlace(dirOut.scale(0.0005));
+            //p0.addInPlace(dirIn.scale(0.0005));
+            //pN.subtractInPlace(dirOut.scale(0.0005));
+            let rightIn = BABYLON.Vector3.Cross(BABYLON.Vector3.Up(), dirIn).normalize();
+            let rightOut = BABYLON.Vector3.Cross(BABYLON.Vector3.Up(), dirOut).normalize();
+            let p0Left = p0.add(rightIn.scale(-W05));
+            let p0Right = p0.add(rightIn.scale(W05));
+            let pNLeft = pN.add(rightOut.scale(-W05));
+            let pNRight = pN.add(rightOut.scale(W05));
+            let dLeft = p0Left.subtract(pNLeft).multiplyByFloats(1, 0, 1).length();
+            let dRight = p0Right.subtract(pNRight).multiplyByFloats(1, 0, 1).length();
+            let d = p0.subtract(pN).multiplyByFloats(1, 0, 1).length();
+            let leftPoints = [];
+            let rightPoints = [];
+            for (let i = 0; i < points.length; i++) {
+                let p = points[i].subtract(p0);
+                p.scaleInPlace(dLeft / d);
+                p.addInPlace(p0Left);
+                p.y = points[i].y;
+                leftPoints.push(p);
+                p = points[i].subtract(p0);
+                p.scaleInPlace(dRight / d);
+                p.addInPlace(p0Right);
+                p.y = points[i].y;
+                rightPoints.push(p);
+            }
             let shape = [];
             let shapeCap = [];
             /*
@@ -7924,6 +7946,7 @@ var MarbleRunSimulatorCore;
             let uvs = [];
             let normals = [];
             for (let i = 0; i < points.length; i++) {
+                let right = rightPoints[i].subtract(leftPoints[i]).normalize();
                 let dir;
                 let prev = points[i - 1];
                 let point = points[i];
@@ -7943,7 +7966,7 @@ var MarbleRunSimulatorCore;
                     dir.y = Math.round(dir.y);
                     dir.z = Math.round(dir.z);
                 }
-                let q = Mummu.QuaternionFromZYAxis(dir, BABYLON.Vector3.Up());
+                let q = Mummu.QuaternionFromXYAxis(right, BABYLON.Vector3.Up());
                 let m = BABYLON.Matrix.Compose(BABYLON.Vector3.One(), q, point);
                 let idx0 = positions.length / 3;
                 for (let n = 0; n <= t; n++) {

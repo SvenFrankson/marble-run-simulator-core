@@ -1451,12 +1451,11 @@ namespace MarbleRunSimulatorCore {
                     }
 
                     let dx = 0;
-                    let dy = halfGauge;
+                    let dy = this.wireGauge * 0.5;
                     let dz = halfGauge;
                     if (trackpoint.dir) {
                         if (Math.abs(trackpoint.dir.y) > 0.5) {
                             dx = halfGauge;
-                            dy = halfGauge;
                             dz = halfGauge;
                         }
                         if (Math.abs(trackpoint.dir.z) > Math.abs(trackpoint.dir.x)) {
