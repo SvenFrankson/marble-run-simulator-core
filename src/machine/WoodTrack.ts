@@ -204,7 +204,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 let W = this.trackWidth - 0.005;
                 let w = W - 0.01;
-                let inW = tileSize * 1.3;
+                let inW = tileSize * 1.4;
                 if (this.inTrack instanceof WoodTrack) {
                     inW = this.inTrack.trackWidth - 0.005;
                 }
@@ -280,7 +280,7 @@ namespace MarbleRunSimulatorCore {
                 }
                 let W = this.trackWidth - 0.005;
                 let w = W - 0.01;
-                let outW = tileSize * 1.3;
+                let outW = tileSize * 1.4;
                 if (this.outTrack instanceof WoodTrack) {
                     outW = this.outTrack.trackWidth - 0.005;
                 }
@@ -355,28 +355,39 @@ namespace MarbleRunSimulatorCore {
             }
             if (this.part.s > 0) {
                 let l = Mummu.GetPathLength(this.templateInterpolatedPoints);
-                let nObstacles = Math.floor(l / 0.06) - 1;
-                for (let i = 0; i < nObstacles; i++) {
-                    let obstacle = BABYLON.MeshBuilder.CreateBox("obstacle", { width: 0.005, height: 0.016, depth: 0.005 }, this.part.game.scene);
+                let nObstacles = Math.floor(l / 0.03) - 1;
+                for (let i = 1; i < nObstacles - 1; i++) {
                     let zAxis = Mummu.EvaluatePathTangent((i + 1) / (nObstacles + 1), this.templateInterpolatedPoints);
                     let yAxis = Mummu.EvaluatePath((i + 1) / (nObstacles + 1), this.trackInterpolatedNormals).normalize();
-                    obstacle.position = Mummu.EvaluatePath((i + 1) / (nObstacles + 1), this.templateInterpolatedPoints);
-                    obstacle.position.addInPlace(yAxis.scale(WoodTrack.Y0 + 0.008));
-                    obstacle.rotationQuaternion = Mummu.QuaternionFromYZAxis(yAxis, zAxis);
-                    obstacle.rotate(BABYLON.Axis.Y, Math.PI / 4, BABYLON.Space.LOCAL);
-                    
-                    obstacle.parent = this.part;
-                    this.obstacles.push(obstacle);
+                    let xAxis = BABYLON.Vector3.Cross(yAxis, zAxis).normalize();
+                    let jMax = this.part.s - 1;
+                    if (this.part.s > 1) {
+                        jMax -= i % 2;
+                    }
+                    for (let j = - this.part.s + 1; j <= jMax; j++) {
+                        
+                        let obstacle = Mummu.CreateBeveledBox("obstacle", { width: 0.005, height: 0.01, depth: 0.005 }, this.part.game.scene);
+                        obstacle.position = Mummu.EvaluatePath((i + 1) / (nObstacles + 1), this.templateInterpolatedPoints);
+                        obstacle.position.addInPlace(yAxis.scale(WoodTrack.Y0 + 0.005));
+                        obstacle.position.addInPlace(xAxis.scale(0.046 * j));
+                        if (this.part.s > 1) {
+                            obstacle.position.addInPlace(xAxis.scale(0.023 * (i % 2)));
+                        }
+                        obstacle.rotationQuaternion = Mummu.QuaternionFromYZAxis(yAxis, zAxis);
+                        obstacle.rotate(BABYLON.Axis.Y, Math.PI / 4, BABYLON.Space.LOCAL);
+                        obstacle.material = this.part.game.materials.getMaterial(this.part.getColor(1), this.part.machine.materialQ);
+                        
+                        obstacle.parent = this.part;
+                        this.obstacles.push(obstacle);
 
-                    
-                    let collider = new Mummu.BoxCollider(obstacle.getWorldMatrix());
-                    collider.width = 0.005;
-                    collider.height = 0.016;
-                    collider.depth = 0.005;
-                    let machineCollider = new MachineCollider(collider);
-                    machineCollider.randomness = 0.5;
+                        
+                        let collider = new Mummu.CapsuleCollider(new BABYLON.Vector3(0, - 0.005, 0), new BABYLON.Vector3(0, 0.005, 0), 0.0025, obstacle.getWorldMatrix());
+                        let machineCollider = new MachineCollider(collider);
+                        machineCollider.bouncyness = 0.5;
+                        machineCollider.randomness = 0.5;
 
-                    this.part.colliders.push( machineCollider);
+                        this.part.colliders.push( machineCollider);
+                    }
                 }
             }
 

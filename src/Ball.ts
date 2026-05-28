@@ -692,6 +692,10 @@ namespace MarbleRunSimulatorCore {
                                     }
                                     
                                     //this.setLastHit(wire, col.index);
+                                    col.normal.x += 0.25 * 2 * (Math.random() - 0.5) * collider.randomness;
+                                    col.normal.y += 0.25 * 2 * (Math.random() - 0.5) * collider.randomness;
+                                    col.normal.z += 0.25 * 2 * (Math.random() - 0.5) * collider.randomness;
+                                    col.normal.normalize();
                                     let colDig = col.normal.scale(-1);
                                     // Move away from collision
                                     forcedDisplacement.addInPlace(col.normal.scale(col.depth));
@@ -1132,10 +1136,10 @@ namespace MarbleRunSimulatorCore {
                                     ball.velocity.copyFrom(mySpeed.scale(0.85)).addInPlace(otherSpeed.scale(-0.15));
                                 }
                                 else {
-                                    this.velocity.copyFrom(otherSpeed.scale(0.999));
-                                    ball.velocity.copyFrom(mySpeed.scale(0.999));
+                                    this.velocity.copyFrom(otherSpeed.scale(0.99));
+                                    ball.velocity.copyFrom(mySpeed.scale(0.99));
                                 }
-                                canceledSpeed.copyFromFloats(0, 0, 0);
+                                //canceledSpeed.copyFromFloats(0, 0, 0);
                                 //this.velocity.copyFrom(otherSpeed).scaleInPlace(.5);
                                 //ball.velocity.copyFrom(mySpeed).scaleInPlace(.6);
     
