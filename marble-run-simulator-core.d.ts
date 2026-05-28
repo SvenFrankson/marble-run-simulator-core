@@ -533,6 +533,7 @@ declare namespace MarbleRunSimulatorCore {
             isEnd: boolean;
             bank: number;
             part: MachinePart;
+            track: Track;
             pipeTrack: boolean;
         };
         static MachineDataCompare(d1: IMachineData, d2: IMachineData): boolean;
@@ -659,7 +660,6 @@ declare namespace MarbleRunSimulatorCore {
         getColor(index: number): number;
         setColorCount(c: number, defaultValue?: number): void;
         sleepersMeshes: Map<number, BABYLON.Mesh>;
-        selectorBodyDisplay: BABYLON.Mesh;
         selectorBodyLogic: MachinePartSelectorMesh;
         selectorEndpointsDisplay: BABYLON.Mesh[];
         selectorEndpointsLogic: EndpointSelectorMesh[];
@@ -1025,6 +1025,7 @@ declare namespace MarbleRunSimulatorCore {
 }
 declare namespace MarbleRunSimulatorCore {
     class WoodTrack extends Track {
+        static Y0: number;
         mesh: BABYLON.Mesh;
         absolutePath: BABYLON.Vector3[];
         absoluteNormals: BABYLON.Vector3[];
@@ -1034,6 +1035,13 @@ declare namespace MarbleRunSimulatorCore {
         AABBMax: BABYLON.Vector3;
         shape: BABYLON.Vector3[];
         get trackWidth(): number;
+        inTrack: Track | null;
+        outTrack: Track | null;
+        inBlockZP: BABYLON.Mesh | null;
+        inBlockZM: BABYLON.Mesh | null;
+        outBlockZP: BABYLON.Mesh | null;
+        outBlockZM: BABYLON.Mesh | null;
+        obstacles: BABYLON.Mesh[];
         constructor(part: MachinePart);
         get trackIndex(): number;
         getSlopeAt(index: number): number;

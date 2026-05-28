@@ -2,6 +2,7 @@
 
 namespace MarbleRunSimulatorCore {
     export class WoodTrack extends Track {
+        public static Y0 = - 0.002;
         public mesh: BABYLON.Mesh;
 
         public absolutePath: BABYLON.Vector3[] = [];
@@ -21,8 +22,17 @@ namespace MarbleRunSimulatorCore {
         public shape: BABYLON.Vector3[] = [];
 
         public get trackWidth(): number {
-            return (1 + 2 * this.part.s) * tileSize;
+            return (2.5 + 2 * this.part.s) * tileSize;
         }
+
+        public inTrack: Track | null = null;
+        public outTrack: Track | null = null;
+
+        public inBlockZP: BABYLON.Mesh | null = null;
+        public inBlockZM: BABYLON.Mesh | null = null;
+        public outBlockZP: BABYLON.Mesh | null = null;
+        public outBlockZM: BABYLON.Mesh | null = null;
+        public obstacles: BABYLON.Mesh[] = [];
 
         constructor(part: MachinePart) {
             super(part);
@@ -88,8 +98,10 @@ namespace MarbleRunSimulatorCore {
 
             let startBank = this.preferedStartBank;
             if (!forceDisconnexion) {
+                this.inTrack = null;
                 let otherS = this.part.machine.getBankAt(this.startWorldPosition, this.part);
                 if (otherS) {
+                    this.inTrack = otherS.track;
                     this.part.addNeighbour(otherS.part);
                     startBank = 0;
                 }
@@ -97,8 +109,10 @@ namespace MarbleRunSimulatorCore {
 
             let endBank = this.preferedEndBank;
             if (!forceDisconnexion) {
+                this.outTrack = null;
                 let otherE = this.part.machine.getBankAt(this.endWorldPosition, this.part);
                 if (otherE) {
+                    this.outTrack = otherE.track;
                     this.part.addNeighbour(otherE.part);
                     endBank = 0;
                 }
@@ -177,6 +191,193 @@ namespace MarbleRunSimulatorCore {
             for (let i = 0; i < this.absolutePath.length; i++) {
                 BABYLON.Vector3.TransformCoordinatesToRef(this.absolutePath[i], this.part.getWorldMatrix(), this.absolutePath[i]);
                 BABYLON.Vector3.TransformNormalToRef(this.absoluteNormals[i], this.part.getWorldMatrix(), this.absoluteNormals[i]);
+            }
+
+            let exitThickness = 0.015;
+            this.part.colliders = [];
+            if (this.inTrack && (this.inTrack instanceof WoodTrack && this.inTrack.trackWidth < this.trackWidth || !(this.inTrack instanceof WoodTrack) && this.part.n > 0)) {
+                if (this.inBlockZP) {
+                    this.inBlockZP.dispose();
+                }
+                if (this.inBlockZM) {
+                    this.inBlockZM.dispose();
+                }
+                let W = this.trackWidth - 0.005;
+                let w = W - 0.01;
+                let inW = tileSize * 1.3;
+                if (this.inTrack instanceof WoodTrack) {
+                    inW = this.inTrack.trackWidth - 0.005;
+                }
+                let inw = inW - 0.01;
+                let blockVertexData = Mummu.CreateBeveledBoxVertexData(
+                    {
+                        width: 0.005,
+                        height: 0.015,
+                        depth: 0.5 * (w - inw),
+                    }
+                )
+                for (let i = 0; i < blockVertexData.positions.length; i += 3) {
+                    let x = blockVertexData.positions[i];
+                    let z = blockVertexData.positions[i + 2];
+                    if (x > 0 && z > 0) {
+                        blockVertexData.positions[i] += exitThickness;
+                    }
+                    if (z < 0) {
+                        blockVertexData.positions[i + 2] += 0.001;
+                    }
+                }
+                this.inBlockZP = new BABYLON.Mesh("inBlockZP", this.part.game.scene);
+                blockVertexData.applyToMesh(this.inBlockZP);
+                let xAxis = this.templateInterpolatedPoints[1].subtract(this.templateInterpolatedPoints[0]).normalize();
+                xAxis.x = Math.round(xAxis.x);
+                xAxis.y = Math.round(xAxis.y);
+                xAxis.z = Math.round(xAxis.z);
+                let zAxis = BABYLON.Vector3.Cross(xAxis, BABYLON.Axis.Y).normalize();
+                this.inBlockZP.rotationQuaternion = Mummu.QuaternionFromXYAxis(xAxis, BABYLON.Axis.Y);
+                
+                this.inBlockZP.position.copyFrom(this.templateInterpolatedPoints[0]);
+                this.inBlockZP.position.addInPlace(zAxis.scale(0.25 * (w + inw)));
+                this.inBlockZP.position.addInPlace(xAxis.scale(0.005 * 0.5));
+                this.inBlockZP.position.y += WoodTrack.Y0 + 0.015 * 0.5;
+                this.inBlockZP.parent = this.part;
+                this.inBlockZP.computeWorldMatrix(true);
+                
+                this.inBlockZP.material = this.part.game.materials.getMaterial(this.part.getColor(0), this.part.machine.materialQ);
+
+                this.inBlockZM = new BABYLON.Mesh("inBlockZM", this.part.game.scene);
+                this.inBlockZM.position.copyFrom(this.inBlockZP.position);
+                this.inBlockZM.rotationQuaternion = this.inBlockZP.rotationQuaternion;
+                Mummu.MirrorZVertexDataInPlace(blockVertexData).applyToMesh(this.inBlockZM);
+                this.inBlockZM.position.addInPlace(zAxis.scale(- 0.5 * (w + inw)));
+                this.inBlockZM.parent = this.part;
+                this.inBlockZM.computeWorldMatrix(true);
+
+                this.inBlockZM.material = this.inBlockZP.material;
+
+                let bodyColliderZP = new Mummu.MeshCollider(this.inBlockZP);
+                let bodyMachineColliderZP = new MachineCollider(bodyColliderZP);
+
+                let bodyColliderZM = new Mummu.MeshCollider(this.inBlockZM);
+                let bodyMachineColliderZM = new MachineCollider(bodyColliderZM);
+
+                this.part.colliders.push(bodyMachineColliderZP, bodyMachineColliderZM);
+            }
+            else {
+                if (this.inBlockZP) {
+                    this.inBlockZP.dispose();
+                }
+                if (this.inBlockZM) {
+                    this.inBlockZM.dispose();
+                }
+            }
+
+            if (this.outTrack && (this.outTrack instanceof WoodTrack && this.outTrack.trackWidth < this.trackWidth || !(this.outTrack instanceof WoodTrack) && this.part.n > 0)) {
+                if (this.outBlockZP) {
+                    this.outBlockZP.dispose();
+                }
+                if (this.outBlockZM) {
+                    this.outBlockZM.dispose();
+                }
+                let W = this.trackWidth - 0.005;
+                let w = W - 0.01;
+                let outW = tileSize * 1.3;
+                if (this.outTrack instanceof WoodTrack) {
+                    outW = this.outTrack.trackWidth - 0.005;
+                }
+                let outw = outW - 0.01;
+                let blockVertexData = Mummu.CreateBeveledBoxVertexData(
+                    {
+                        width: 0.005,
+                        height: 0.015,
+                        depth: 0.5 * (w - outw),
+                    }
+                )
+                for (let i = 0; i < blockVertexData.positions.length; i += 3) {
+                    let x = blockVertexData.positions[i];
+                    let z = blockVertexData.positions[i + 2];
+                    if (x < 0 && z > 0) {
+                        blockVertexData.positions[i] -= exitThickness;
+                    }
+                    if (z < 0) {
+                        blockVertexData.positions[i + 2] += 0.001;
+                    }
+                }
+                this.outBlockZP = new BABYLON.Mesh("outBlockZP", this.part.game.scene);
+                blockVertexData.applyToMesh(this.outBlockZP);
+                let xAxis = this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1].subtract(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 2]).normalize();
+                xAxis.x = Math.round(xAxis.x);
+                xAxis.y = Math.round(xAxis.y);
+                xAxis.z = Math.round(xAxis.z);
+                let zAxis = BABYLON.Vector3.Cross(xAxis, BABYLON.Axis.Y).normalize();
+                this.outBlockZP.rotationQuaternion = Mummu.QuaternionFromXYAxis(xAxis, BABYLON.Axis.Y);
+                
+                this.outBlockZP.position.copyFrom(this.templateInterpolatedPoints[this.templateInterpolatedPoints.length - 1]);
+                this.outBlockZP.position.addInPlace(zAxis.scale(0.25 * (w + outw)));
+                this.outBlockZP.position.addInPlace(xAxis.scale(- 0.005 * 0.5));
+                this.outBlockZP.position.y += WoodTrack.Y0 + 0.015 * 0.5;
+                this.outBlockZP.parent = this.part;
+                this.outBlockZP.computeWorldMatrix(true);
+                
+                this.outBlockZP.material = this.part.game.materials.getMaterial(this.part.getColor(0), this.part.machine.materialQ);
+
+                this.outBlockZM = new BABYLON.Mesh("outBlockZM", this.part.game.scene);
+                this.outBlockZM.position.copyFrom(this.outBlockZP.position);
+                this.outBlockZM.rotationQuaternion = this.outBlockZP.rotationQuaternion;
+                Mummu.MirrorZVertexDataInPlace(blockVertexData).applyToMesh(this.outBlockZM);
+                this.outBlockZM.position.addInPlace(zAxis.scale(- 0.5 * (w + outw)));
+                this.outBlockZM.parent = this.part;
+                this.outBlockZM.computeWorldMatrix(true);
+
+                this.outBlockZM.material = this.outBlockZP.material;
+
+                let bodyColliderZP = new Mummu.MeshCollider(this.outBlockZP);
+                let bodyMachineColliderZP = new MachineCollider(bodyColliderZP);
+
+                let bodyColliderZM = new Mummu.MeshCollider(this.outBlockZM);
+                let bodyMachineColliderZM = new MachineCollider(bodyColliderZM);
+
+                this.part.colliders.push(bodyMachineColliderZP, bodyMachineColliderZM);
+            }
+            else {
+                if (this.outBlockZP) {
+                    this.outBlockZP.dispose();
+                }
+                if (this.outBlockZM) {
+                    this.outBlockZM.dispose();
+                }
+            }
+
+            while (this.obstacles.length > 0) {
+                let o = this.obstacles.pop();
+                if (o) {
+                    o.dispose();
+                }
+            }
+            if (this.part.s > 0) {
+                let l = Mummu.GetPathLength(this.templateInterpolatedPoints);
+                let nObstacles = Math.floor(l / 0.06) - 1;
+                for (let i = 0; i < nObstacles; i++) {
+                    let obstacle = BABYLON.MeshBuilder.CreateBox("obstacle", { width: 0.005, height: 0.016, depth: 0.005 }, this.part.game.scene);
+                    let zAxis = Mummu.EvaluatePathTangent((i + 1) / (nObstacles + 1), this.templateInterpolatedPoints);
+                    let yAxis = Mummu.EvaluatePath((i + 1) / (nObstacles + 1), this.trackInterpolatedNormals).normalize();
+                    obstacle.position = Mummu.EvaluatePath((i + 1) / (nObstacles + 1), this.templateInterpolatedPoints);
+                    obstacle.position.addInPlace(yAxis.scale(WoodTrack.Y0 + 0.008));
+                    obstacle.rotationQuaternion = Mummu.QuaternionFromYZAxis(yAxis, zAxis);
+                    obstacle.rotate(BABYLON.Axis.Y, Math.PI / 4, BABYLON.Space.LOCAL);
+                    
+                    obstacle.parent = this.part;
+                    this.obstacles.push(obstacle);
+
+                    
+                    let collider = new Mummu.BoxCollider(obstacle.getWorldMatrix());
+                    collider.width = 0.005;
+                    collider.height = 0.016;
+                    collider.depth = 0.005;
+                    let machineCollider = new MachineCollider(collider);
+                    machineCollider.randomness = 0.5;
+
+                    this.part.colliders.push( machineCollider);
+                }
             }
 
             /*

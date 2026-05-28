@@ -606,7 +606,7 @@ namespace MarbleRunSimulatorCore {
                                         );
                                         cols.forEach(col => {
                                             if (col.hit) {
-                                                //Mummu.DrawDebugHit(col.point, col.normal, 144, BABYLON.Color3.Red());
+                                                //Mummu.DrawDebugHit(col.point, col.normal, 30, BABYLON.Color3.Red());
                                                 //this.setLastHit(wire, col.index);
                                                 let colDig = col.normal.scale(-1);
                                                 // Move away from collision
@@ -614,7 +614,8 @@ namespace MarbleRunSimulatorCore {
                                                 // Cancel depth component of speed
                                                 let depthSpeed = BABYLON.Vector3.Dot(this.velocity, colDig);
                                                 if (depthSpeed > 0) {
-                                                    canceledSpeed.addInPlace(colDig.scale(depthSpeed * 2));
+                                                    let bouncyness = 0.9 * (1 - Math.abs(col.normal.y));
+                                                    canceledSpeedOneContact.addInPlace(colDig.scale(depthSpeed * (1 + bouncyness)));
                                                 }
                                                 // Add ground reaction
                                                 let reaction = col.normal.scale(col.depth * 1000); // 1000 is a magic number.
@@ -1131,15 +1132,15 @@ namespace MarbleRunSimulatorCore {
                                     ball.velocity.copyFrom(mySpeed.scale(0.85)).addInPlace(otherSpeed.scale(-0.15));
                                 }
                                 else {
-                                    this.velocity.copyFrom(otherSpeed.scale(0.99));
-                                    ball.velocity.copyFrom(mySpeed.scale(0.99));
+                                    this.velocity.copyFrom(otherSpeed.scale(0.999));
+                                    ball.velocity.copyFrom(mySpeed.scale(0.999));
                                 }
                                 canceledSpeed.copyFromFloats(0, 0, 0);
                                 //this.velocity.copyFrom(otherSpeed).scaleInPlace(.5);
                                 //ball.velocity.copyFrom(mySpeed).scaleInPlace(.6);
     
                                 let dir = this.position.subtract(ball.position).normalize();
-                                forcedDisplacement.addInPlace(dir.scale(depth));
+                                forcedDisplacement.addInPlace(dir.scale(depth * 1));
                                 reactionsCount++;
                             }
                         }

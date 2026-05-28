@@ -28,11 +28,11 @@ namespace MarbleRunSimulatorCore {
             let w = W - 0.01;
             let W05 = W * 0.5;
             let w05 = w * 0.5;
-            let H = 0.015;
-            let h = 0.01;
+            let H = 0.02;
+            let h = 0.015;
             let dH = H - h;
             let m = 0.001;
-            let y0 = - 0.0025;
+            let y0 = WoodTrack.Y0;
 
             let points = track.templateInterpolatedPoints.map((p) => {
                 return p.clone();
@@ -137,8 +137,8 @@ namespace MarbleRunSimulatorCore {
             
             track.shape = [
                 new BABYLON.Vector3(- w05, y0 + h, 0),
-                new BABYLON.Vector3(- W05, y0, 0),
-                new BABYLON.Vector3(W05, y0, 0),
+                new BABYLON.Vector3(- w05, y0, 0),
+                new BABYLON.Vector3(w05, y0, 0),
                 new BABYLON.Vector3(w05, y0 + h, 0),
             ]
             

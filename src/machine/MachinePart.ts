@@ -57,6 +57,16 @@ namespace MarbleRunSimulatorCore {
         let sina = Math.sin(a);
         selectorHullPipeShapeDisplay[i] = new BABYLON.Vector3(cosa * 0.012, sina * 0.012, 0);
     }
+
+    function getSelectorHullWoodShapeDisplay(track: WoodTrack): BABYLON.Vector3[] {
+        let w = track.trackWidth * 0.5;
+        return [
+            new BABYLON.Vector3(w, - 0.5 * tileHeight, 0),
+            new BABYLON.Vector3(w, 0.5 * tileHeight, 0),
+            new BABYLON.Vector3(- w, 0.5 * tileHeight, 0),
+            new BABYLON.Vector3(- w, - 0.5 * tileHeight, 0)
+        ];
+    }
     
     export class MachinePartSelectorMesh extends BABYLON.Mesh {
         constructor(public part: MachinePart) {
@@ -320,7 +330,6 @@ namespace MarbleRunSimulatorCore {
             }
         }
         public sleepersMeshes: Map<number, BABYLON.Mesh> = new Map<number, BABYLON.Mesh>();
-        public selectorBodyDisplay: BABYLON.Mesh;
         public selectorBodyLogic: MachinePartSelectorMesh;
         public selectorEndpointsDisplay: BABYLON.Mesh[] = [];
         public selectorEndpointsLogic: EndpointSelectorMesh[] = [];
@@ -977,33 +986,18 @@ namespace MarbleRunSimulatorCore {
         }
 
         public updateSelectorMeshVisibility(): void {
-            if (this.selectorBodyDisplay) {
-                if (this._selected) {
-                    this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineSelectedColor);
-                }
-                else if (this._hovered) {
-                    this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineHoverColor);
+            if (this._selected) {
+                this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineSelectedColor);
+            }
+            else if (this._hovered) {
+                this.setOutlineParams(true, UI3DConstants.outlineWidth, UI3DConstants.outlineHoverColor);
+            }
+            else {
+                if (this.machine.toonOutlineRender) {
+                    this.setOutlineParams(true, UI3DConstants.toonOutlineWidth, UI3DConstants.toonOutlineBaseColor);
                 }
                 else {
-                    if (this.machine.toonOutlineRender) {
-                        this.setOutlineParams(true, UI3DConstants.toonOutlineWidth, UI3DConstants.toonOutlineBaseColor);
-                    }
-                    else {
-                        this.setOutlineParams(false, UI3DConstants.outlineWidth, UI3DConstants.outlineBaseColor);
-                    }
-                }
-
-                this.selectorBodyDisplay.visibility = 0;
-                if (this.tracks[0] && this.tracks[0].template.isPipe) {
-                    if (this._selected) {
-                        this.selectorBodyDisplay.visibility = 0.6;
-                    }
-                    else if (this._hovered) {
-                        this.selectorBodyDisplay.visibility = 0.3;
-                    }
-                    else {
-                        this.selectorBodyDisplay.visibility = 0;
-                    }
+                    this.setOutlineParams(false, UI3DConstants.outlineWidth, UI3DConstants.outlineBaseColor);
                 }
             }
 
@@ -1067,6 +1061,11 @@ namespace MarbleRunSimulatorCore {
                         track.tubeMesh.outlineWidth = outlineWidth;
                         track.tubeMesh.outlineColor = outlineColor;
                     }
+                }
+                if (track instanceof WoodTrack && track.mesh) {
+                    track.mesh.renderOutline = renderOutline;
+                    track.mesh.outlineWidth = outlineWidth;
+                    track.mesh.outlineColor = outlineColor;
                 }
             });
             this.outlinableMeshes.forEach(mesh => {
@@ -1272,7 +1271,6 @@ namespace MarbleRunSimulatorCore {
                 selectorHullShapeLogic[i] = (new BABYLON.Vector3(cosa * selectorHullShapeLogicR, sina * selectorHullShapeLogicR, 0));
             }
 
-            let selectorMeshDisplayVertexDatas: BABYLON.VertexData[] = [];
             let selectorMeshLogicVertexDatas: BABYLON.VertexData[] = [];
 
             this.selectorEndpointsDisplay.forEach(selectorEndpoint => {
@@ -1285,12 +1283,13 @@ namespace MarbleRunSimulatorCore {
             this.selectorEndpointsLogic = [];
 
             for (let n = 0; n < this.tracks.length; n++) {
-                let points = [...this.tracks[n].templateInterpolatedPoints].map((p) => {
+                let track = this.tracks[n];
+                let points = [...track.templateInterpolatedPoints].map((p) => {
                     return p.clone();
                 });
-                if (this.tracks[n].template.isPipeOrWood) {
-                    let normals = this.tracks[n].trackInterpolatedNormals;
-                    if (this.tracks[n].template.pipeIgnoresTrackNormals) {
+                if (track.template.isPipe) {
+                    let normals = track.trackInterpolatedNormals;
+                    if (track.template.pipeIgnoresTrackNormals) {
                         points.forEach(pt => {
                             pt.y += PipeTrack.PIPE_OFFSET_OVER_BASETRACK;
                         })
@@ -1303,8 +1302,8 @@ namespace MarbleRunSimulatorCore {
                 }
                 Mummu.DecimatePathInPlaceFast(points, (4 / 180) * Math.PI);
 
-                if (Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[0])) {
-                    let endPoint = this.findEndPoint(this.tracks[n].templateInterpolatedPoints[0]);
+                if (Tools.IsWorldPosAConnexion(track.templateInterpolatedPoints[0])) {
+                    let endPoint = this.findEndPoint(track.templateInterpolatedPoints[0]);
                     if (endPoint) {
                         let selectorEndpoint = new BABYLON.Mesh("selector-endpoint-start");
                         let dir = Mummu.Rotate(BABYLON.Axis.X, BABYLON.Axis.Y, - endPoint.localR * Math.PI * 0.5);
@@ -1336,8 +1335,8 @@ namespace MarbleRunSimulatorCore {
                     }
                 }
 
-                if (Tools.IsWorldPosAConnexion(this.tracks[n].templateInterpolatedPoints[this.tracks[n].templateInterpolatedPoints.length - 1])) {
-                    let endPoint = this.findEndPoint(this.tracks[n].templateInterpolatedPoints[this.tracks[n].templateInterpolatedPoints.length - 1]);
+                if (Tools.IsWorldPosAConnexion(track.templateInterpolatedPoints[track.templateInterpolatedPoints.length - 1])) {
+                    let endPoint = this.findEndPoint(track.templateInterpolatedPoints[track.templateInterpolatedPoints.length - 1]);
                     if (endPoint) {
                         let selectorEndpoint = new BABYLON.Mesh("selector-endpoint-end");
                         let dir = Mummu.Rotate(BABYLON.Axis.X, BABYLON.Axis.Y, - endPoint.localR * Math.PI * 0.5);
@@ -1370,27 +1369,16 @@ namespace MarbleRunSimulatorCore {
                 }
 
                 if (points.length >= 2) {
-                    let shape = this.tracks[n].template.isPipeOrWood ? selectorHullPipeShapeDisplay : selectorHullShapeDisplay;
-
-                    let dataDisplay = Mummu.CreateExtrudeShapeVertexData({ shape: shape, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
-                    Mummu.ColorizeVertexDataInPlace(dataDisplay, BABYLON.Color3.FromHexString("#FFFFFF"));
-                    selectorMeshDisplayVertexDatas.push(dataDisplay);
+                    let shape = selectorHullShapeLogic;
+                    if (track.template.isWood && track instanceof WoodTrack) {
+                        shape = getSelectorHullWoodShapeDisplay(track);
+                    }
                     
-                    let dataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: selectorHullShapeLogic, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
+                    let dataLogic = Mummu.CreateExtrudeShapeVertexData({ shape: shape, path: points, closeShape: true, cap: BABYLON.Mesh.CAP_ALL });
                     Mummu.ColorizeVertexDataInPlace(dataLogic, BABYLON.Color3.FromHexString("#FFFFFF"));
                     selectorMeshLogicVertexDatas.push(dataLogic);
                 }
             }
-
-            if (!this.selectorBodyDisplay) {
-                this.selectorBodyDisplay = new BABYLON.Mesh("selector-mesh-display-" + this.name);
-            }
-            this.selectorBodyDisplay.material = this.game.materials.whiteFullLitMaterial;
-            this.selectorBodyDisplay.parent = this;
-            if (selectorMeshDisplayVertexDatas.length > 0) {
-                Mummu.MergeVertexDatas(...selectorMeshDisplayVertexDatas).applyToMesh(this.selectorBodyDisplay);
-            }
-            this.selectorBodyDisplay.visibility = 0;
 
             if (this.selectorBodyLogic) {
                 this.selectorBodyLogic.dispose();
